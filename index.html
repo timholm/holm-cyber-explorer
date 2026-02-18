@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>DARKNODE // FILE EXPLORER</title>
+  <style>
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: 0.7; }
+      94% { opacity: 1; }
+      97% { opacity: 0.85; }
+      98% { opacity: 1; }
+    }
+
+    @keyframes scanline {
+      0% { top: -4px; }
+      100% { top: 100%; }
+    }
+
+    @keyframes nodeGlow {
+      0%, 100% { box-shadow: 0 0 4px var(--glow, #bf5fff); }
+      50% { box-shadow: 0 0 12px var(--glow, #bf5fff), 0 0 20px var(--glow, #bf5fff); }
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-text-size-adjust: 100%; }
+
+    body {
+      background: #06000f;
+      color: #e0d0ff;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ---- SCANLINE OVERLAY ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(100, 50, 180, 0.03) 2px,
+        rgba(100, 50, 180, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ---- MOVING SCANLINE ---- */
+    body::after {
+      content: '';
+      position: fixed;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(180deg, transparent, rgba(180, 100, 255, 0.08), transparent);
+      animation: scanline 8s linear infinite;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ---- HEADER / TOOLBAR ---- */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(6, 0, 15, 0.96);
+      border-bottom: 1px solid #3a1a6e;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 12px 16px 10px;
+    }
+
+    .toolbar-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .logo {
+      font-size: 14px;
+      font-weight: bold;
+      color: #bf5fff;
+      text-shadow: 0 0 10px #bf5fff, 0 0 30px #7b2fff;
+      letter-spacing: 3px;
+      animation: flicker 6s infinite;
+    }
+
+    .logo-sub {
+      font-size: 9px;
+      color: #7b5faf;
+      letter-spacing: 2px;
+      margin-left: auto;
+    }
+
+    /* ---- BREADCRUMB ---- */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      font-size: 11px;
+      color: #9966cc;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+
+    .breadcrumb::-webkit-scrollbar { display: none; }
+
+    .bc-seg {
+      color: #bf5fff;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bc-seg:active { color: #e0aaff; }
+
+    .bc-sep {
+      color: #4a2a7e;
+      margin: 0 4px;
+    }
+
+    .bc-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 13px;
+      background: #bf5fff;
+      margin-left: 4px;
+      animation: cursorBlink 1s step-end infinite;
+    }
+
+    /* ---- SEARCH ---- */
+    .search-bar {
+      margin-top: 8px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(60, 20, 120, 0.15);
+      border: 1px solid #3a1a6e;
+      color: #e0d0ff;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      padding: 8px 12px;
+      outline: none;
+    }
+
+    .search-input::placeholder { color: #5a3a8e; }
+    .search-input:focus { border-color: #bf5fff; box-shadow: 0 0 8px rgba(191, 95, 255, 0.3); }
+
+    /* ---- STATUS BAR ---- */
+    .statusbar {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: #5a3a8e;
+      letter-spacing: 1px;
+      margin-top: 6px;
+    }
+
+    .status-online { color: #00ff88; }
+
+    /* ---- FILE TREE ---- */
+    .tree {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 8px 12px 60px;
+    }
+
+    /* ---- FOLDER ---- */
+    .node {
+      margin-top: 2px;
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      border-left: 2px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .node-header:active {
+      background: rgba(191, 95, 255, 0.08);
+    }
+
+    .node.open > .node-header {
+      border-left-color: var(--glow, #bf5fff);
+      background: rgba(191, 95, 255, 0.04);
+    }
+
+    .node-icon {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Folder icon - glowing diamond */
+    .folder-icon {
+      width: 12px;
+      height: 12px;
+      background: var(--glow, #bf5fff);
+      transform: rotate(45deg);
+      box-shadow: 0 0 6px var(--glow, #bf5fff);
+      transition: box-shadow 0.3s;
+    }
+
+    .node.open > .node-header .folder-icon {
+      animation: nodeGlow 2s ease-in-out infinite;
+    }
+
+    /* File icon - small bar */
+    .file-icon {
+      width: 10px;
+      height: 12px;
+      border: 1px solid var(--glow, #7b5faf);
+      border-top-right-radius: 3px;
+      position: relative;
+    }
+
+    .file-icon::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 4px;
+      border-bottom: 1px solid var(--glow, #7b5faf);
+      border-left: 1px solid var(--glow, #7b5faf);
+    }
+
+    .node-label {
+      flex: 1;
+      font-size: 12px;
+      font-weight: bold;
+      color: #e0d0ff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .node.open > .node-header .node-label {
+      color: #fff;
+      text-shadow: 0 0 4px rgba(191, 95, 255, 0.4);
+    }
+
+    .node-meta {
+      font-size: 9px;
+      color: #5a3a8e;
+      letter-spacing: 1px;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    .node-arrow {
+      font-size: 10px;
+      color: #5a3a8e;
+      margin-left: 6px;
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .node.open > .node-header .node-arrow {
+      transform: rotate(90deg);
+      color: #bf5fff;
+    }
+
+    /* ---- CHILDREN ---- */
+    .node-children {
+      display: none;
+      padding-left: 20px;
+      border-left: 1px solid rgba(191, 95, 255, 0.1);
+      margin-left: 8px;
+    }
+
+    .node.open > .node-children {
+      display: block;
+    }
+
+    /* ---- FILE ENTRY (leaf) ---- */
+    .file-link {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      margin-top: 2px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+      color: #c0b0e0;
+      border-left: 2px solid transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .file-link:active {
+      background: rgba(191, 95, 255, 0.1);
+      border-left-color: var(--glow, #bf5fff);
+      color: #fff;
+    }
+
+    .file-code {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--glow, #bf5fff);
+      margin-left: 10px;
+    }
+
+    .file-ext {
+      font-size: 9px;
+      color: #5a3a8e;
+      margin-left: auto;
+      letter-spacing: 1px;
+    }
+
+    /* ---- HIDDEN ---- */
+    .hidden { display: none !important; }
+
+    /* ---- NO RESULTS ---- */
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: #ff3366;
+      font-size: 13px;
+      display: none;
+      letter-spacing: 2px;
+    }
+
+    /* ---- FOOTER ---- */
+    .footer {
+      text-align: center;
+      padding: 16px;
+      border-top: 1px solid #1a0a2e;
+      font-size: 9px;
+      color: #3a1a6e;
+      letter-spacing: 2px;
+    }
+
+    /* ---- DEPTH COLORING ---- */
+    .depth-0 { --glow: #bf5fff; }
+    .depth-1 { --glow: #9944ee; }
+    .depth-2 { --glow: #7733cc; }
+    .depth-3 { --glow: #00ccff; }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <div class="toolbar-top">
+      <span class="logo">DARKNODE</span>
+      <span class="logo-sub">HEAVENLY FILE EXPLORER</span>
+    </div>
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="bc-seg">/HOLM-INTELLIGENCE-COMPLEX</span>
+      <span class="bc-cursor"></span>
+    </div>
+    <div class="search-bar">
+      <input class="search-input" id="search" type="text" placeholder="// SEARCH FILES..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="statusbar">
+      <span>NODES: <span id="stat-nodes">0</span> &nbsp; FILES: <span id="stat-files">0</span></span>
+      <span class="status-online">SYSTEM ONLINE</span>
+    </div>
+  </div>
+
+  <div class="tree" id="tree"></div>
+
+  <div class="no-results" id="no-results">// NO MATCHING NODES</div>
+
+  <footer class="footer">DARKNODE v1.0 &mdash; HOLM INTELLIGENCE COMPLEX &mdash; HEAVENLY CYBERPUNK EDITION</footer>
+
+  <script>
+    var BASE = "https://holm.chat/";
+    var HIC = BASE + "hic/";
+
+    function f(prefix, count, start, base) {
+      var a = [], s = start || 1, b = base || BASE;
+      for (var i = s; i <= count; i++) {
+        var n = i < 10 ? "00" + i : (i < 100 ? "0" + i : "" + i);
+        a.push({ code: prefix.toUpperCase() + "-" + n, url: b + prefix.toLowerCase() + "-" + n + ".html" });
+      }
+      return a;
+    }
+
+    function d(code, file, base) {
+      return { code: code, url: (base || BASE) + file };
+    }
+
+    /* ================================================================
+       FILE SYSTEM TREE
+       ================================================================ */
+    var FS = [
+      { name: "ROOFTOP-SIMULATION", folders: [
+        { name: "HIC-CONTROL", files: f("hic", 20, 1, HIC) },
+        { name: "DISASTER-SIMULATION", files: f("d12", 14) },
+        { name: "EVOLUTION-LAB", files: f("d13", 13) },
+        { name: "INSTITUTIONAL-MEMORY", files: f("d20", 13) }
+      ]},
+      { name: "STRATEGY-DOCTRINE", folders: [
+        { name: "CONSTITUTION", files: f("con", 13) },
+        { name: "GOVERNANCE", files: f("gov", 14) },
+        { name: "META-FRAMEWORK", files: [d("META-FW", "meta-framework.html")].concat(f("meta", 15)) },
+        { name: "ETHICS", files: [d("ETH-001", "eth-001.html"), d("OPS-001", "ops-001.html")] }
+      ]},
+      { name: "COMMAND", folders: [
+        { name: "SECURITY-OPS", files: f("sec", 14) },
+        { name: "ETHICS-QUALITY", files: f("d15", 5).concat(f("d19", 15)) },
+        { name: "ADMINISTRATION", files: f("d11", 13) },
+        { name: "EDUCATION-TRAINING", files: f("d9", 13) },
+        { name: "DAILY-OPERATIONS", files: f("d10", 14, 2) },
+        { name: "AUTOMATION", files: f("d8", 13) },
+        { name: "OPS-DOCTRINE", files: [
+          d("STAGE3-AUTO-OPS", "stage3-automation-ops.html"),
+          d("STAGE3-GOV-OPS", "stage3-governance-ops.html"),
+          d("STAGE3-EDU-OPS", "stage3-education-ops.html"),
+          d("STAGE3-ETHQ-OPS", "stage3-ethics-quality-ops.html"),
+          d("STAGE4-AUTO-ADV", "stage4-automation-advanced.html"),
+          d("STAGE4-SEC-ADV", "stage4-security-advanced.html")
+        ]}
+      ]},
+      { name: "ANALYSIS", folders: [
+        { name: "INTELLIGENCE", files: f("d7", 13).concat([d("STAGE3-INTEL-OPS", "stage3-intel-ops.html")]) },
+        { name: "RESEARCH-THEORY", files: f("d14", 13).concat([
+          d("STAGE4-RESEARCH-ADV", "stage4-research-advanced.html"),
+          d("STAGE4-EVOMEM-ADV", "stage4-evolution-memory-advanced.html")
+        ]) },
+        { name: "INFRASTRUCTURE", files: f("d4", 14).concat([
+          d("STAGE3-PLATFORM-OPS", "stage3-platform-ops.html"),
+          d("STAGE4-INFRA-ADV", "stage4-infrastructure-advanced.html")
+        ]) },
+        { name: "PLATFORM-CORE", files: f("d5", 6) },
+        { name: "DASHBOARDS", files: [
+          d("X-DOMAIN-DEP", "cross-domain-dependency-matrix.html"),
+          d("X-DOMAIN-INT", "cross-domain-integration.html"),
+          d("X-DOMAIN-INT-2", "cross-domain-integration-2.html"),
+          d("X-DOMAIN-SYN", "cross-domain-synthesis-domains-6-10.html"),
+          d("MAINT-PLAN", "universal-maintenance-plan.html"),
+          d("REVIEW-PROC", "universal-review-process.html"),
+          d("WRITE-SCHED", "consolidated-writing-schedule.html")
+        ]}
+      ]},
+      { name: "COLLECTION", folders: [
+        { name: "DATA-ARCHIVES", files: f("d6", 15).concat([
+          d("STAGE3-DATA-OPS", "stage3-data-ops.html"),
+          d("STAGE4-DATA-ADV", "stage4-data-advanced.html")
+        ]) },
+        { name: "INTERFACE-NAVIGATION", files: f("d16", 14) },
+        { name: "FEDERATION-SCALING", files: f("d17", 15) },
+        { name: "IMPORT-QUARANTINE", files: f("d18", 14) },
+        { name: "FEDERATION-OPS", files: [
+          d("STAGE3-FED-OPS", "stage3-federation-ops.html"),
+          d("STAGE3-IFACE-OPS", "stage3-interface-ops.html"),
+          d("STAGE3-OPS-B3", "stage3-ops-batch3.html"),
+          d("STAGE4-FED-ADV", "stage4-federation-import-advanced.html")
+        ]}
+      ]},
+      { name: "LOBBY", folders: [
+        { name: "DOMAIN-DIRECTORY", files: (function() {
+          var arr = [d("INDEX", "index.html")];
+          for (var i = 1; i <= 15; i++) arr.push(d("DOMAIN-" + (i < 10 ? "0" + i : i), "domain-" + i + ".html"));
+          return arr;
+        })() },
+        { name: "DEPLOY-GUIDES", files: [
+          d("DEPLOY-QUICK", "deploy-quick.html"),
+          d("DEPLOY-README", "deploy/DEPLOY-README.html")
+        ]},
+        { name: "APPENDICES", files: [
+          d("APPENDIX-A", "appendix-a.html"),
+          d("APPENDIX-A-2", "appendix-a-2.html"),
+          d("APPENDIX-B", "appendix-b.html"),
+          d("APPENDIX-B-2", "appendix-b-2.html"),
+          d("APPENDIX-C", "appendix-c.html")
+        ]}
+      ]},
+      { name: "DEEP-ARCHIVES", folders: [
+        { name: "OPS-DOCTRINE", files: [
+          d("STAGE3-OPS-B1", "stage3-ops-batch1.html"),
+          d("STAGE3-OPS-B2", "stage3-ops-batch2.html")
+        ]},
+        { name: "COLD-STORAGE", files: [
+          d("STAGE1-META", "stage1-meta-framework.html"),
+          d("STAGE1-D1-5", "stage1-domains-1-5.html"),
+          d("STAGE1-D6-10", "stage1-domains-6-10.html"),
+          d("STAGE1-D11-15", "stage1-domains-11-15.html"),
+          d("STAGE1-D16-20", "stage1-domains-16-20.html"),
+          d("STAGE2-CHARTER", "stage2-core-charter.html"),
+          d("STAGE2-PHIL-B2", "stage2-philosophy-batch2.html"),
+          d("STAGE2-PHIL-B3", "stage2-philosophy-batch3.html"),
+          d("STAGE2-PHIL-B4", "stage2-philosophy-batch4.html"),
+          d("STAGE5-META-B1", "stage5-meta-batch1.html"),
+          d("STAGE5-META-B2", "stage5-meta-batch2.html"),
+          d("STAGE5-META-B3", "stage5-meta-batch3.html")
+        ]}
+      ]}
+    ];
+
+    /* ================================================================
+       RENDER TREE
+       ================================================================ */
+    var treeEl = document.getElementById("tree");
+    var totalNodes = 0;
+    var totalFiles = 0;
+    var allFileEls = [];
+    var allNodeEls = [];
+
+    function renderFolder(parent, folder, depth) {
+      totalNodes++;
+      var node = document.createElement("div");
+      node.className = "node depth-" + Math.min(depth, 3);
+
+      var header = document.createElement("div");
+      header.className = "node-header";
+
+      var fileCount = 0;
+      if (folder.files) fileCount += folder.files.length;
+      if (folder.folders) {
+        folder.folders.forEach(function(sub) {
+          if (sub.files) fileCount += sub.files.length;
+          if (sub.folders) sub.folders.forEach(function(s2) { if (s2.files) fileCount += s2.files.length; });
+        });
+      }
+
+      header.innerHTML =
+        '<div class="node-icon"><div class="folder-icon"></div></div>' +
+        '<span class="node-label">' + folder.name + '</span>' +
+        '<span class="node-meta">' + fileCount + '</span>' +
+        '<span class="node-arrow">\u25B8</span>';
+
+      node.appendChild(header);
+
+      var children = document.createElement("div");
+      children.className = "node-children";
+
+      /* Sub-folders */
+      if (folder.folders) {
+        folder.folders.forEach(function(sub) {
+          renderFolder(children, sub, depth + 1);
+        });
+      }
+
+      /* Files */
+      if (folder.files) {
+        folder.files.forEach(function(file) {
+          totalFiles++;
+          var a = document.createElement("a");
+          a.className = "file-link";
+          a.href = file.url;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.setAttribute("data-code", file.code.toLowerCase());
+          a.innerHTML =
+            '<div class="node-icon"><div class="file-icon"></div></div>' +
+            '<span class="file-code">' + file.code + '</span>' +
+            '<span class="file-ext">.HTML</span>';
+          children.appendChild(a);
+          allFileEls.push({ el: a, code: file.code.toLowerCase(), node: node, parentNodes: [] });
+        });
+      }
+
+      node.appendChild(children);
+
+      header.addEventListener("click", function(e) {
+        e.stopPropagation();
+        node.classList.toggle("open");
+      });
+
+      parent.appendChild(node);
+      allNodeEls.push(node);
+    }
+
+    FS.forEach(function(root) {
+      renderFolder(treeEl, root, 0);
+    });
+
+    /* Walk tree to set parent chains for search */
+    function walkParents(el, parents) {
+      var nodes = el.querySelectorAll(".node");
+      for (var i = 0; i < nodes.length; i++) {
+        var n = nodes[i];
+        var newParents = parents.concat([n]);
+        var links = n.querySelectorAll(":scope > .node-children > .file-link");
+        for (var j = 0; j < links.length; j++) {
+          for (var k = 0; k < allFileEls.length; k++) {
+            if (allFileEls[k].el === links[j]) {
+              allFileEls[k].parentNodes = newParents;
+            }
+          }
+        }
+        walkParents(n, newParents);
+      }
+    }
+    walkParents(treeEl, []);
+
+    document.getElementById("stat-nodes").textContent = totalNodes;
+    document.getElementById("stat-files").textContent = totalFiles;
+
+    /* ================================================================
+       SEARCH
+       ================================================================ */
+    var searchInput = document.getElementById("search");
+    var noResults = document.getElementById("no-results");
+    var timer = null;
+
+    searchInput.addEventListener("input", function() {
+      clearTimeout(timer);
+      timer = setTimeout(doSearch, 200);
+    });
+
+    function doSearch() {
+      var q = searchInput.value.trim().toLowerCase();
+
+      if (!q) {
+        allNodeEls.forEach(function(n) { n.classList.remove("hidden", "open"); });
+        allFileEls.forEach(function(f) { f.el.classList.remove("hidden"); });
+        noResults.style.display = "none";
+        return;
+      }
+
+      /* Hide everything first */
+      allNodeEls.forEach(function(n) { n.classList.add("hidden"); n.classList.remove("open"); });
+      allFileEls.forEach(function(f) { f.el.classList.add("hidden"); });
+
+      var found = 0;
+
+      allFileEls.forEach(function(item) {
+        if (item.code.indexOf(q) !== -1) {
+          found++;
+          item.el.classList.remove("hidden");
+          /* Show and open all parent nodes */
+          item.parentNodes.forEach(function(p) {
+            p.classList.remove("hidden");
+            p.classList.add("open");
+          });
+        }
+      });
+
+      /* Also match folder names */
+      allNodeEls.forEach(function(n) {
+        var label = n.querySelector(".node-label");
+        if (label && label.textContent.toLowerCase().indexOf(q) !== -1) {
+          n.classList.remove("hidden");
+          n.classList.add("open");
+          /* Show children */
+          var kids = n.querySelectorAll(".node, .file-link");
+          for (var i = 0; i < kids.length; i++) {
+            kids[i].classList.remove("hidden");
+          }
+          /* Show parents */
+          var p = n.parentElement;
+          while (p && p !== treeEl) {
+            if (p.classList.contains("node")) {
+              p.classList.remove("hidden");
+              p.classList.add("open");
+            }
+            p = p.parentElement;
+          }
+          found++;
+        }
+      });
+
+      noResults.style.display = found === 0 ? "block" : "none";
+    }
+  </script>
+
+</body>
+</html>

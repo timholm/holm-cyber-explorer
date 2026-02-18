@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: holm-cyber
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: holm-cyber
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+      root /usr/share/nginx/html;
+      index index.html;
+
+      location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+      }
+
+      location ~* \.(css|js|svg|png|jpg|ico|json)$ {
+        expires 1h;
+        add_header Cache-Control "public, max-age=3600";
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: holm-cyber
+  namespace: holm-cyber
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: holm-cyber
+  template:
+    metadata:
+      labels:
+        app: holm-cyber
+    spec:
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - "8.8.8.8"
+          - "1.1.1.1"
+      initContainers:
+        - name: git-clone
+          image: alpine/git:latest
+          command:
+            - sh
+            - -c
+            - |
+              git clone --depth 1 https://github.com/timholm/holm-cyber-explorer.git /tmp/repo
+              cp -r /tmp/repo/* /data/
+          volumeMounts:
+            - name: web-content
+              mountPath: /data
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: web-content
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "25m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+      volumes:
+        - name: web-content
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: holm-cyber
+  namespace: holm-cyber
+spec:
+  selector:
+    app: holm-cyber
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: holm-cyber
+  namespace: holm-cyber
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: default
+  hostnames:
+    - "cyber.holm.chat"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: holm-cyber
+          port: 80
