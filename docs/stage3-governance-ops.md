@@ -1,0 +1,1069 @@
+# STAGE 3: GOVERNANCE OPERATIONS
+
+## Operational Doctrine for Domain 2 -- Governance & Authority
+
+**Document ID:** STAGE3-GOVERNANCE-OPS
+**Version:** 1.0.0
+**Date:** 2026-02-16
+**Status:** Ratified
+**Classification:** Operational Doctrine -- These articles translate the governance philosophy established in GOV-001 into concrete, executable procedures. They are the "how" documents for institutional governance.
+
+---
+
+## How to Read This Document
+
+This document contains five operational governance articles for the holm.chat Documentation Institution. They are numbered GOV-003 through GOV-007, following the root governance article GOV-001 (Authority Model) established in the Stage 2 Core Charter. GOV-002 is reserved for the Amendment Procedures article, which will codify the detailed mechanics of the amendment process outlined in GOV-001. These five articles address the operational realities that GOV-001 establishes in principle but does not elaborate in practice.
+
+Where GOV-001 defines what authority is and how it is structured, these articles define what happens when authority is contested (GOV-003), transferred (GOV-004), disrupted (GOV-005), distributed across roles (GOV-006), and evaluated for health (GOV-007). They are practical documents. They contain procedures, checklists, timelines, and matrices. They are designed to be consulted in moments of need, not merely read for understanding.
+
+These articles were written simultaneously and cross-reference one another extensively. They derive their authority from GOV-001 and, through it, from ETH-001 and CON-001. No procedure in these articles may contradict the principles, constraints, or rules established in those root documents. Where ambiguity arises between an operational procedure here and a principle in a root document, the root document prevails.
+
+If you are reading this during a crisis -- a dispute, a succession event, an emergency -- go directly to the relevant article. Each article is self-contained enough to be actionable on its own. You do not need to read them in order during an emergency. You should read them in order at least once during calm times, so that the emergency reading is a re-reading, not a first encounter.
+
+---
+
+---
+
+# GOV-003 -- Dispute Resolution Procedures
+
+**Document ID:** GOV-003
+**Domain:** 2 -- Governance & Authority
+**Version:** 1.0.0
+**Date:** 2026-02-16
+**Status:** Ratified
+**Depends On:** ETH-001, CON-001, GOV-001
+**Depended Upon By:** GOV-004, GOV-005, GOV-006, GOV-007. Referenced by all articles involving conflicting requirements or priority decisions.
+
+---
+
+## 1. Purpose
+
+This article defines how disputes are identified, classified, and resolved within the holm.chat Documentation Institution. In a single-operator institution, the word "dispute" may seem misplaced. There is nobody to dispute with. But this misunderstands the nature of institutional governance. Disputes in this institution arise in four distinct forms: conflicts between the operator's present priorities and the institution's documented principles, conflicts between competing institutional requirements, conflicts between the current operator and the interests of future operators, and -- in federated or succession scenarios -- conflicts between distinct human actors.
+
+The purpose of dispute resolution is not to prevent disagreement. Disagreement is healthy. It means the operator is still thinking critically about institutional decisions rather than following procedures mechanically. The purpose is to ensure that disagreements are resolved deliberately, documented thoroughly, and resolved in a manner consistent with the institutional hierarchy of authority established in GOV-001.
+
+Without formal dispute resolution, conflicts are resolved by whichever impulse is strongest at the moment. The operator who wants to add a complex new system will override the operator who knows the complexity budget is exhausted, simply because the desire to build is more psychologically compelling than the discipline of restraint. Formal dispute resolution creates a space for the disciplined voice to be heard, even when it is quieter.
+
+## 2. Scope
+
+This article covers:
+
+- The definition and taxonomy of institutional disputes.
+- Self-dispute resolution for a single operator confronting conflicting priorities.
+- Multi-stakeholder dispute resolution for federated, advisory, or succession scenarios.
+- Escalation paths from informal resolution to formal governance action.
+- Documentation requirements for all dispute proceedings and outcomes.
+- The relationship between dispute resolution and the authority tiers defined in GOV-001.
+
+This article does not cover technical troubleshooting (which is a Domain 10 concern) or security incident response (which is a Domain 3 concern). It covers governance disputes -- conflicts about what the institution should do, how it should be run, and which priorities should prevail.
+
+## 3. Background
+
+Every institution that survives long enough develops internal contradictions. A mandate to remain simple conflicts with a need for new capability. A commitment to thorough documentation conflicts with a period of low energy and motivation. A security requirement conflicts with an operational convenience. These contradictions are not bugs. They are the natural consequence of principles that were written in the abstract being applied to situations that are messy, specific, and unanticipated.
+
+The founding documents of this institution -- ETH-001, CON-001, GOV-001, SEC-001, and OPS-001 -- contain internal tensions by design. ETH-001 Principle 1 (Sovereignty of the Individual) can conflict with Principle 5 (Harm Reduction). CON-001's mandate for completeness can conflict with OPS-001's complexity budget. SEC-001's security demands can conflict with OPS-001's sustainability requirement. These tensions are not failures of the founding documents. They are acknowledgments that a living institution cannot be reduced to a set of non-contradictory axioms. The institution needs a way to navigate the tensions, not eliminate them.
+
+The history of long-lived institutions -- from monastic orders to constitutional democracies -- demonstrates that formalized dispute resolution is not bureaucratic overhead. It is the mechanism by which institutions adapt to circumstances their founders did not anticipate, without abandoning the principles their founders established. This article brings that mechanism to a single-operator institution.
+
+## 4. System Model
+
+### 4.1 Dispute Taxonomy
+
+All institutional disputes fall into one of five categories:
+
+**Category A: Principle-vs-Principle Disputes.**
+Two or more founding principles conflict in a specific situation. Example: the sovereignty principle (ETH-001, Principle 1) demands that the operator be free to configure systems as they see fit, but the integrity principle (ETH-001, Principle 2) demands that the operator not deploy a configuration that risks data corruption.
+
+Resolution priority: ETH-001 establishes a numbered hierarchy. Higher-numbered principles yield to lower-numbered principles. However, the yielding must be documented, and the losing principle must be accommodated to the greatest extent possible without violating the prevailing principle.
+
+**Category B: Mandate-vs-Reality Disputes.**
+An institutional mandate encounters a practical limitation. Example: CON-001 mandates that the institution not depend on any external service, but a specific hardware component requires firmware updates that are only available online.
+
+Resolution priority: the mandate prevails as the default position. The operator must document the gap, seek alternatives that comply with the mandate, and -- only if no compliant alternative exists -- document a constrained exception with a sunset date and a plan to eliminate the dependency.
+
+**Category C: Priority-vs-Priority Disputes.**
+Two legitimate institutional activities compete for the same scarce resource (time, storage, complexity budget, attention). Example: the backup system needs a major overhaul, but a new archival capability has been half-built and needs to be completed before its documentation context decays.
+
+Resolution priority: the activity that protects existing institutional assets takes precedence over the activity that creates new capabilities. Preservation before creation. Defense before expansion.
+
+**Category D: Present-vs-Future Disputes.**
+A decision that benefits the current operator conflicts with the interests of future operators or the long-term health of the institution. Example: the current operator wants to use a proprietary data format because it offers significant present advantages, but this creates a dependency that future operators will inherit.
+
+Resolution priority: the institution's fifty-year horizon takes precedence over present convenience. This is a direct application of ETH-001, Principle 4 (Longevity Over Novelty). The current operator may override this default only through a Tier 2 decision with full documentation, including an explicit acknowledgment of the burden being placed on future operators.
+
+**Category E: Person-vs-Person Disputes.**
+Two or more human actors disagree about an institutional decision. This category is relevant during succession transitions, advisory relationships, or federated operations. It is not relevant during normal single-operator governance, but it must be defined now so that the procedures exist before they are needed.
+
+Resolution priority: the person who holds primary authority as defined in GOV-001 has final decision-making power, subject to the constraints of the root documents. The dissenting position must be documented in the decision log. If the dissenting party believes the decision violates a root document, they may invoke the escalation path defined in Section 4.3.
+
+### 4.2 The Self-Dispute Protocol
+
+The most common disputes in a single-operator institution are internal. The operator wants two things that conflict. The self-dispute protocol provides a structured way to resolve these conflicts rather than letting the louder impulse win.
+
+**Step 1: Identify the conflict.** Write down, in plain language, the two competing priorities. Give each a name. Example: "Priority Alpha: Rebuild the backup system with ZFS. Priority Beta: Complete the archival ingestion pipeline."
+
+**Step 2: Classify the dispute.** Determine which category (A through D) the dispute falls into. Most self-disputes are Category C (priority vs. priority) or Category D (present vs. future).
+
+**Step 3: State the case for each side.** Write a brief argument (three to five sentences) for each priority. Include the institutional justification -- which principles, mandates, or goals does each priority serve?
+
+**Step 4: Apply the resolution priority.** Using the priorities defined in Section 4.1, determine which priority prevails under institutional rules.
+
+**Step 5: Check for creative alternatives.** Before accepting the resolution, ask whether there is a way to partially satisfy both priorities. Can the scope of the winning priority be reduced to free resources for the losing priority? Can the losing priority be scheduled for a specific future date?
+
+**Step 6: Document the outcome.** Record the dispute, the arguments, and the resolution in the decision log. Classify the decision at the appropriate tier per GOV-001. The losing priority should be recorded with a note about when and how it will be revisited.
+
+**Step 7: Honor the outcome.** Follow through on the resolution. Do not relitigate the dispute until the review date recorded in Step 6, unless material circumstances change.
+
+The self-dispute protocol should take thirty minutes to an hour. It should not take a day. If a dispute cannot be resolved in that timeframe, it is probably a Tier 2 or Tier 1 decision that requires the full waiting period defined in GOV-001.
+
+### 4.3 The Escalation Path
+
+Not all disputes can be resolved at the level where they arise. The escalation path provides a structured way to move disputes upward through the governance hierarchy:
+
+**Level 1: Operational Resolution.** The operator resolves the dispute using the self-dispute protocol or, in multi-stakeholder scenarios, through direct discussion. Most disputes should be resolved here. Documentation: decision log entry at the appropriate tier.
+
+**Level 2: Principle Review.** The dispute is evaluated against the root documents (ETH-001, CON-001, GOV-001, SEC-001, OPS-001). The operator re-reads the relevant sections and determines whether the root documents provide clear guidance. If they do, the guidance is followed. Documentation: decision log entry with explicit citations to the root documents consulted.
+
+**Level 3: Commentary Consultation.** The operator consults the Commentary Sections of all relevant articles for precedent. Has a similar dispute been resolved before? What was the outcome? Is that precedent still appropriate? Documentation: decision log entry referencing the precedent and explaining whether it was followed or distinguished.
+
+**Level 4: Formal Amendment.** If the dispute reveals a genuine gap or contradiction in the root documents, the resolution may require a formal amendment. This triggers the amendment process defined in GOV-001 at the appropriate tier, with all required waiting periods, documentation, and review. Documentation: full Tier 1 or Tier 2 decision record, including the amendment proposal.
+
+## 5. Rules & Constraints
+
+- **R-GOV-03-01:** All disputes that reach Level 2 or above on the escalation path must be recorded in the decision log. Level 1 disputes may be recorded at the operator's discretion but must be recorded if they recur.
+- **R-GOV-03-02:** No dispute resolution may contradict a root document without first amending the root document through the process defined in GOV-001.
+- **R-GOV-03-03:** The losing side of every resolved dispute must be documented with the same thoroughness as the winning side. Suppressing the losing argument creates a false record of institutional unanimity.
+- **R-GOV-03-04:** Recurring disputes (the same conflict arising three or more times within twelve months) must be escalated to at least Level 3 and formally assessed for whether they indicate a structural problem in the institution's design.
+- **R-GOV-03-05:** In multi-stakeholder disputes, all parties must have access to the decision log and the root documents before the dispute is considered formally resolved. Resolution without informed participation is not resolution.
+- **R-GOV-03-06:** During a succession transition (see GOV-004), disputes between the outgoing and incoming operator are resolved by the outgoing operator for Tier 1 and Tier 2 matters and by the incoming operator for Tier 3 and Tier 4 matters, unless the outgoing operator has formally relinquished all authority.
+
+## 6. Failure Modes
+
+- **Dispute avoidance.** The operator never formally identifies disputes, instead letting the psychologically easier option win every time. Over years, this creates a systematic bias toward novelty, convenience, and short-term gratification at the expense of discipline, documentation, and long-term health. Mitigation: the quarterly governance health check (GOV-007) includes a review of whether the self-dispute protocol is being used.
+- **Dispute paralysis.** The operator becomes so concerned with resolving disputes correctly that they cannot resolve them at all. Every decision becomes a agonizing process. The institution stalls. Mitigation: the self-dispute protocol has a time limit. If resolution is not achieved within one hour, classify the dispute at a higher tier and apply the appropriate waiting period. Use the waiting period to think, not to agonize.
+- **Precedent ossification.** Early dispute resolutions become immutable precedent, applied mechanically to later disputes without consideration of changed circumstances. The Commentary Sections calcify into case law rather than remaining living guidance. Mitigation: every precedent consultation (Level 3) must include an explicit assessment of whether the precedent's context still applies.
+- **Majority-of-the-moment rule.** In multi-stakeholder scenarios, disputes are resolved by whoever is most forceful rather than by institutional principles. Mitigation: the resolution priority framework in Section 4.1, which grounds dispute resolution in documented principles rather than personality dynamics.
+
+## 7. Recovery Procedures
+
+1. **If disputes have been systematically avoided:** Conduct a retrospective review of the last twelve months of decisions. Identify decisions where competing priorities existed but were not formally acknowledged. For each, retroactively apply the self-dispute protocol and record the analysis in the decision log. Going forward, integrate dispute identification into the weekly review cycle.
+2. **If a dispute was resolved in violation of root documents:** Record the violation in the decision log. Assess whether the resolution can be reversed. If it can, reverse it and re-resolve the dispute through proper channels. If it cannot, document the violation as an exception, add an entry to the Commentary Section of the relevant root document, and implement safeguards to prevent recurrence.
+3. **If a multi-stakeholder dispute has damaged relationships:** Separate the personal dimension from the institutional dimension. Resolve the institutional dispute through the formal process in Section 4.1. Address the personal dimension outside the scope of institutional governance. Record the institutional resolution in the decision log with a note about the interpersonal context, so that future readers understand the full picture.
+4. **If precedent has been applied inappropriately:** Revisit the original precedent. Document how circumstances have changed. Create a new decision log entry that explicitly supersedes or distinguishes the old precedent. Update the Commentary Section of the relevant article.
+
+## 8. Evolution Path
+
+- **Years 0-5:** Most disputes will be Category C (priority vs. priority) and will be resolved through the self-dispute protocol. The operator is building the habit of formalizing internal conflicts. The decision log will accumulate early precedents that will guide future resolutions.
+- **Years 5-15:** The body of precedent becomes substantial. The operator should review precedents annually during the comprehensive assessment (GOV-007) to identify patterns -- are the same types of disputes recurring? Are resolutions consistent? Do the resolution priorities in Section 4.1 need refinement?
+- **Years 15-30:** Multi-stakeholder disputes become more likely as succession planning activates (GOV-004). Category E disputes need the procedures established here. The federated governance provisions should be reviewed and potentially expanded.
+- **Years 30-50+:** The dispute resolution framework should be mature, with decades of precedent in the Commentary Sections and decision log. New operators inherit not just the procedures but the institutional wisdom embedded in past resolutions. The framework may need formal amendment to address governance structures that did not exist at founding.
+
+## 9. Commentary Section
+
+*This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.*
+
+**2026-02-16 -- Founding Entry:**
+Writing dispute resolution procedures for arguments with yourself is a peculiar exercise. But the truth is, the arguments I have with myself about this institution are among the most consequential decisions it faces. The part of me that wants to build something new is constantly in tension with the part that knows the complexity budget is finite. The part that wants to skip documentation today is in tension with the part that knows my future self will pay the price. Formalizing these internal conflicts does not eliminate them. It ensures they are resolved by principle rather than by impulse. That is not a small thing.
+
+I expect Category D disputes (present vs. future) to be the hardest to resolve honestly. It is easy to write that the fifty-year horizon takes precedence. It is hard to live it when the present convenience is tangible and the future cost is abstract. This is exactly why the protocol demands documentation. Writing down "I am choosing present convenience over future sustainability" makes the cost concrete. That is the point.
+
+## 10. References
+
+- ETH-001 -- Ethical Foundations of the Institution (the principle hierarchy that governs Category A disputes)
+- CON-001 -- The Founding Mandate (the institutional mission against which all disputes are evaluated)
+- GOV-001 -- Authority Model (the tier system and decision log that provide the structural framework for dispute resolution)
+- GOV-004 -- Succession Planning and Execution (succession-related disputes)
+- GOV-005 -- Emergency Governance Protocols (disputes during emergencies)
+- GOV-007 -- Institutional Health Assessment (quarterly review of dispute patterns)
+- OPS-001 -- Operations Philosophy (the complexity budget and sustainability requirement that generate many Category C disputes)
+- Domain 20 -- Institutional Memory (the decision log architecture that records dispute resolutions)
+
+---
+
+---
+
+# GOV-004 -- Succession Planning and Execution
+
+**Document ID:** GOV-004
+**Domain:** 2 -- Governance & Authority
+**Version:** 1.0.0
+**Date:** 2026-02-16
+**Status:** Ratified
+**Depends On:** ETH-001, CON-001, GOV-001, SEC-001, GOV-003
+**Depended Upon By:** GOV-005, GOV-006, GOV-007. Referenced by all articles involving authority transfer, onboarding, or institutional continuity.
+
+---
+
+## 1. Purpose
+
+This article is the complete succession playbook for the holm.chat Documentation Institution. It defines how authority, knowledge, and operational responsibility transfer from one operator to another -- whether that transfer is planned, unexpected, or somewhere in between.
+
+GOV-001 establishes the succession protocol in principle: it defines the distinction between planned and unplanned succession, the requirement for supervised operation, and the 180-day restricted authority period. This article operationalizes those principles into executable procedures. It answers the questions that GOV-001 leaves open: How do you identify a successor? How do you train them? What does the supervised period actually look like? What legal and practical preparations should be made? What happens in the first hours and days after an unplanned succession event? What happens in the years afterward?
+
+Succession is not an event. It is a process that begins years before the actual transfer and continues years afterward. The purpose of this article is to ensure that every phase of that process is documented, rehearsed, and ready -- even if succession never actually occurs during the founding operator's lifetime. The act of preparing for succession makes the institution stronger, because it forces the operator to ensure that no critical knowledge exists only in their head.
+
+## 2. Scope
+
+This article covers:
+
+- Candidate identification and evaluation criteria.
+- The training pipeline: from initial contact to full operational competence.
+- Planned succession procedures: retirement, voluntary transition, gradual handoff.
+- Unplanned succession procedures: incapacity, death, disappearance.
+- The authority transfer ceremony and its documentation requirements.
+- The 180-day restricted authority period and what it permits and prohibits.
+- Legal and practical preparations that support succession.
+- Post-succession review and stabilization.
+
+This article does not cover the day-to-day operational procedures that a successor must learn (those are distributed across Domain 10 and other operational articles). It covers the governance framework within which succession occurs.
+
+## 3. Background
+
+Every institution that depends on a single person carries an existential risk: the departure of that person. This is not hypothetical. It is a certainty. The only questions are when and how.
+
+Succession planning in large organizations is a mature discipline, but its literature is largely irrelevant here. It addresses boards of directors, executive search firms, and transitions between professional managers. This institution has one person, operating alone, building something intensely personal, which must survive the loss of that person. The successor must understand not just the technical systems (which are documentable) but the institutional philosophy (which is subtle and deeply contextual). They must inherit not just authority but judgment. This article attempts to make that inheritance possible.
+
+## 4. System Model
+
+### 4.1 Succession Phases
+
+Succession occurs in five distinct phases, regardless of whether it is planned or unplanned:
+
+**Phase 1: Preparation (Ongoing).**
+This phase begins the day the institution is founded and never ends. It consists of all activities that make succession possible: maintaining documentation, keeping the decision log current, ensuring that security credentials are accessible through the succession provisions in SEC-001, and periodically reviewing the succession plan itself (per R-GOV-05 in GOV-001, at least every five years).
+
+During this phase, the operator should maintain a Succession Readiness Package -- a collection of documents and materials that a successor would need to assume operations. The package includes:
+
+- A letter of introduction explaining the institution, its purpose, and its principles, written for a reader who has never seen it before.
+- The location of all root documents and how to access them.
+- The location and access procedures for all security credentials, including encryption keys.
+- A map of all physical hardware and its function.
+- A list of all critical maintenance procedures and their schedules.
+- The names and contact information (if applicable) of any persons who have been identified as potential successors.
+- A plain-language guide to the first 30 days of institutional operation, written for a competent but unfamiliar reader.
+
+This package must be stored physically (printed, not merely digital) in a secure location known to potential successors. It must be reviewed and updated annually during the annual operations cycle (OPS-001, Section 4.1).
+
+**Phase 2: Identification.**
+A successor candidate is identified. In a planned succession, this is a deliberate choice. In an unplanned succession, this is whoever meets the criteria defined in Section 4.2 and has physical access to the institution.
+
+**Phase 3: Training.**
+The candidate learns the institution. This phase is only possible in planned successions. In unplanned successions, the Succession Readiness Package and the institutional documentation serve as the training materials.
+
+**Phase 4: Transfer.**
+Authority formally transfers from one operator to another. This is documented in the decision log as a Tier 1 decision.
+
+**Phase 5: Stabilization.**
+The new operator assumes full responsibility. The 180-day restricted authority period applies. The institution adjusts to its new operator.
+
+### 4.2 Successor Candidate Criteria
+
+Not everyone is suited to operate this institution. The successor need not be a technical expert -- technical skills can be learned. But they must possess certain qualities that cannot easily be taught:
+
+- **Respect for documentation.** The successor must understand that the documentation is the institution. If they are the kind of person who reads manuals, they are a viable candidate. If they are the kind of person who skips manuals, they are not.
+- **Discipline over impulse.** The institution's governance model requires that decisions be made deliberately, not impulsively. The successor must be able to follow a process even when it feels slow or unnecessary.
+- **Comfort with solitude.** Operating this institution is largely solitary work. The successor must be someone who finds satisfaction in quiet, sustained effort rather than requiring external validation or collaboration.
+- **Intellectual honesty.** The institution's ethical foundation (ETH-001, Principle 6) demands honest accounting of limitations. The successor must be someone who can say "I do not understand this" without embarrassment and "I was wrong about this" without defensiveness.
+- **Long-term orientation.** The successor must be capable of making decisions in service of a fifty-year horizon, even when those decisions are costly in the short term.
+
+These criteria are intentionally qualitative. They cannot be reduced to a checklist or a test score. The founding operator's judgment in assessing these qualities is necessarily subjective. The operator should document their assessment, including their uncertainties, in the decision log when designating a successor.
+
+### 4.3 The Training Pipeline
+
+Planned succession training proceeds through four stages:
+
+**Stage 1: Orientation (30 days).** The candidate reads all root documents (ETH-001, CON-001, GOV-001, SEC-001, OPS-001) and the complete decision log. The candidate tours all physical infrastructure. The candidate asks questions, and the operator records both the questions and the answers in the training log. At the end of this stage, the candidate writes a brief document (1-2 pages) summarizing their understanding of the institution's purpose, principles, and architecture. The operator reviews this document for comprehension.
+
+**Stage 2: Supervised Operations (90 days minimum).** The candidate performs operational tasks under the direct supervision of the current operator. They execute daily checks, weekly maintenance, and at least one monthly cycle. They participate in at least one governance decision at Tier 3 or above, observing the process from proposal to implementation. They practice at least one recovery procedure from the disaster recovery documentation. At the end of this stage, the operator assesses whether the candidate can perform routine operations independently.
+
+**Stage 3: Independent Operations with Oversight (90 days minimum).** The candidate operates the institution independently, with the current operator available for consultation but not directly supervising. The candidate makes Tier 4 decisions independently and proposes Tier 3 decisions for the operator's review. The candidate maintains the operational log and decision log. At the end of this stage, the operator assesses whether the candidate can maintain the institution without assistance.
+
+**Stage 4: Authority Transfer.** If the operator is satisfied with the candidate's competence, the formal authority transfer proceeds as defined in Section 4.4.
+
+The total training pipeline requires a minimum of 210 days (30 + 90 + 90). In practice, it may take considerably longer. There is no maximum. The operator should not transfer authority until they are genuinely confident in the successor's readiness. This confidence, and the basis for it, must be documented.
+
+### 4.4 The Authority Transfer Ceremony
+
+The word "ceremony" is used deliberately. Transferring authority over a lifelong institution is a significant act and should be treated as one. The ceremony is not ritualistic or mystical. It is procedural and thorough.
+
+The authority transfer consists of the following steps, performed in order and documented in the decision log:
+
+1. The outgoing operator records a Tier 1 decision: "Transfer of primary operational authority from [outgoing operator identifier] to [incoming operator identifier], effective [date]."
+2. The incoming operator reads and signs the decision log, acknowledging the full history of decisions they are inheriting, as required by R-GOV-04 in GOV-001.
+3. The incoming operator reads and acknowledges ETH-001, recorded in the institutional log as required by R-ETH-06.
+4. All security credentials are formally transferred per the procedures defined in SEC-001's succession provisions. The outgoing operator's access credentials are revoked or reclassified as appropriate.
+5. The incoming operator records their first Commentary Section entry in each root document, stating their understanding of and commitment to the document's principles.
+6. The outgoing operator records a final Commentary Section entry in each root document, offering guidance, warnings, and context for the successor.
+7. Both operators sign a physical document (pen on paper) recording the transfer, the date, and the identities of both parties. This physical document is stored with the Succession Readiness Package.
+
+### 4.5 The 180-Day Restricted Authority Period
+
+GOV-001 defines a 180-day restricted authority period for unplanned successions. This article extends that concept to planned successions as well, though with different constraints.
+
+**For unplanned successions:** The successor may only make Tier 3 and Tier 4 decisions for 180 days. Tier 1 and Tier 2 decisions require the full waiting period plus an additional 90-day extension. This restriction exists because the successor has not had the benefit of the full training pipeline and must learn the institution while operating it.
+
+**For planned successions:** The successor may make decisions at all tiers, but for the first 180 days, all Tier 1 and Tier 2 decisions require a 30-day extension beyond the normal waiting period. This extension exists not because the successor is incompetent but because even thorough training cannot replicate the institutional intuition that comes from years of operation. The extension provides a buffer against well-intentioned but premature structural changes.
+
+During the restricted period, the successor should maintain a "first impressions" journal: a record of things that seem wrong, confusing, or unnecessary. These impressions are valuable precisely because they come from fresh eyes. They should not be acted on immediately (the restricted period prevents hasty action) but should be preserved for review at the end of the 180 days, when the successor has enough context to evaluate their initial reactions.
+
+### 4.6 Unplanned Succession: The Emergency Playbook
+
+When the founding operator becomes unavailable without having completed a planned succession, the following procedure activates:
+
+**Hours 1-24:** The successor (or the person assuming responsibility) locates the Succession Readiness Package. They read the letter of introduction and the first-30-days guide. They verify that all physical systems are operational. They do not change anything. They observe and read.
+
+**Days 1-7:** The successor reads all root documents. They read the most recent twelve months of the decision log and operational log. They perform daily checks as documented. They record their assumption of authority in the decision log, marked "UNPLANNED SUCCESSION," as specified in GOV-001.
+
+**Days 7-30:** The successor works through the complete documentation of all active systems. They perform a full backup verification. They resolve any immediate maintenance items that were pending. They do not make any architectural or policy changes.
+
+**Days 30-180:** The restricted authority period. The successor operates the institution within the constraints defined in Section 4.5. They build familiarity through routine operation. They record questions and observations in the first-impressions journal.
+
+**Days 180+:** The restricted authority period ends. The successor reviews their first-impressions journal. They propose any Tier 2 or Tier 3 changes they believe are necessary, following the full governance process. Normal governance resumes.
+
+### 4.7 Legal and Practical Preparations
+
+Institutional succession requires practical and, in many cases, legal preparation that exists outside the institution itself. While specific legal requirements vary by jurisdiction and are beyond the scope of this technical document, the following preparations are universally relevant:
+
+- **Physical access provisions.** The successor must be able to physically access the institution's hardware. If the hardware is located in the operator's home, provisions must be made for the successor to access that location in the event of the operator's incapacity or death. This may involve legal instruments such as wills, powers of attorney, or property access agreements.
+- **Knowledge of the institution's existence.** At least one person besides the operator should know that the institution exists and where it is located. This person does not need to understand the institution. They need to know enough to direct a designated successor to it.
+- **Credential accessibility.** The succession provisions in SEC-001 must be current. If credentials are stored in a physical safe, the successor must know the location of the safe and the combination or key. If the operator dies, these details must be retrievable from legal documents or trusted persons.
+- **Financial continuity.** If the institution has ongoing costs (electricity, replacement hardware budgets, physical storage rental), provisions should be made for these costs to be covered during and after succession.
+
+These preparations should be reviewed annually and updated whenever circumstances change (new address, new successor candidate, new legal requirements).
+
+## 5. Rules & Constraints
+
+- **R-GOV-04-01:** The Succession Readiness Package must be reviewed and updated at least annually, during the annual operations cycle.
+- **R-GOV-04-02:** The designation of a successor is a Tier 1 decision requiring the full 90-day waiting period.
+- **R-GOV-04-03:** No successor may assume full unrestricted authority without completing either the full training pipeline (planned succession) or the 180-day restricted authority period (unplanned succession).
+- **R-GOV-04-04:** The authority transfer ceremony must be documented in full in the decision log. No step may be omitted.
+- **R-GOV-04-05:** The outgoing operator's commentary entries and decision log entries must remain permanently accessible to the successor. They may not be removed, redacted, or archived beyond easy access.
+- **R-GOV-04-06:** If no successor has been identified and the operator assesses their continued ability to operate the institution as uncertain (due to age, health, or other factors), a formal search for a successor must be initiated as a Tier 2 decision.
+- **R-GOV-04-07:** The physical Succession Readiness Package must be stored in a location that is accessible to the designated successor even if the operator is incapacitated. This location must be documented in at least one place outside the institution itself.
+
+## 6. Failure Modes
+
+- **Perpetual postponement.** The operator never identifies a successor because it always feels too early. "I will do it next year" becomes a decades-long refrain. The operator dies or becomes incapacitated with no preparations in place. Mitigation: the five-year mandatory review (R-GOV-05 in GOV-001) and the annual Succession Readiness Package update force periodic engagement with the question.
+- **Documentation gap.** The institution's documentation is thorough for current operations but assumes the reader is the founding operator. Jargon, implicit assumptions, and undocumented contextual knowledge make the documentation impenetrable to a newcomer. Mitigation: the Succession Readiness Package includes a plain-language guide written explicitly for an unfamiliar reader. This guide serves as a litmus test -- if the guide cannot be written, the documentation has a gap.
+- **Credential inaccessibility.** Security credentials are so well-protected that they are inaccessible to a legitimate successor. The institution is locked against its own continuation. Mitigation: SEC-001's succession provisions, reviewed annually, with explicit testing of the succession access path.
+- **Successor mismatch.** The designated successor lacks the temperament or commitment to maintain the institution long-term. They accept the role out of obligation rather than genuine alignment with the institution's mission. The institution degrades under their stewardship. Mitigation: the training pipeline's length and rigor are designed to reveal mismatches before authority transfers. The operator should be willing to revoke the designation if concerns arise during training.
+- **Institutional mourning.** After the loss of the founding operator, the successor is so focused on preserving the founder's vision exactly as it was that they refuse to let the institution evolve. The institution becomes a museum rather than a living system. Mitigation: the root documents, including this one, explicitly encourage evolution. The successor's first-impressions journal is designed to give them permission to see the institution with fresh eyes.
+
+## 7. Recovery Procedures
+
+1. **If no succession preparations exist:** Begin immediately. Create the Succession Readiness Package (Section 4.1, Phase 1). Even without a specific successor candidate, the package makes unplanned succession possible. This is the single most impactful recovery action.
+2. **If the Succession Readiness Package is outdated:** Update it. Treat this as a high-priority Tier 3 task. Test the package by asking: "If I were incapacitated tomorrow, could someone use this package to begin operating the institution within 30 days?" If the answer is no, identify and fix the gaps.
+3. **If a succession is underway and the training pipeline was insufficient:** Extend the restricted authority period beyond 180 days. There is no penalty for additional caution. The successor should continue in supervised or restricted mode until both parties are confident in readiness.
+4. **If an unplanned succession has occurred without any preparation:** The successor should enter preservation mode: no changes, maintenance only, extensive reading. They should proceed through the unplanned succession playbook (Section 4.6) at whatever pace allows genuine comprehension. Speed is less important than understanding.
+
+## 8. Evolution Path
+
+- **Years 0-5:** Succession planning is primarily about creating and maintaining the Succession Readiness Package. The operator may not have identified a specific successor, and that is acceptable. The package itself is the critical deliverable.
+- **Years 5-15:** Successor identification becomes more important. The operator should be actively considering candidates, even if informally. The training pipeline should be reviewed and updated based on the operator's growing understanding of what institutional knowledge is hardest to transfer.
+- **Years 15-30:** Active succession planning. If a successor has not been identified, this should be treated as an institutional risk. The operator should consider expanding the circle of people who know the institution exists, even if they are not yet candidates.
+- **Years 30-50+:** Succession may have already occurred. The institution may be on its second or third operator. The succession procedures should be reviewed by each new operator and updated based on their experience of the process. What worked? What was missing? What should the next succession look like?
+
+## 9. Commentary Section
+
+*This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.*
+
+**2026-02-16 -- Founding Entry:**
+Succession is the governance topic I find most difficult to write about, not because the procedures are complex, but because they require confronting the reality that I will not always be here. This institution is designed to outlive me. That is its purpose. But the emotional weight of that purpose is different when you are writing the procedures for what happens after you are gone.
+
+I have tried to be practical rather than sentimental. The procedures here are executable. The training pipeline is realistic. The emergency playbook gives a successor enough structure to avoid paralysis without so much structure that they cannot adapt to circumstances I did not anticipate.
+
+The single thing I most want to communicate to my successor, whoever and whenever they are: this institution is not a monument to me. It is a tool that I built because I believed it was worth building. If you have inherited it, you are not a curator. You are an operator. Operate it. Change what needs changing. Preserve what is worth preserving. And when it is your turn, pass it on in better condition than you received it.
+
+## 10. References
+
+- ETH-001 -- Ethical Foundations of the Institution (Principle 3: Transparency; Principle 4: Longevity)
+- CON-001 -- The Founding Mandate (the fifty-year horizon that makes succession essential)
+- GOV-001 -- Authority Model (the succession protocol that this article operationalizes, Section 7.1)
+- SEC-001 -- Threat Model and Security Philosophy (credential management and succession provisions)
+- GOV-003 -- Dispute Resolution Procedures (disputes during succession transitions)
+- GOV-005 -- Emergency Governance Protocols (emergency provisions that may apply during unplanned succession)
+- GOV-006 -- Role Definitions and Responsibility Matrix (the roles involved in succession)
+- OPS-001 -- Operations Philosophy (the operational tempo the successor must learn to sustain)
+- Domain 12 -- Disaster Recovery (backup and recovery procedures the successor must master)
+
+---
+
+---
+
+# GOV-005 -- Emergency Governance Protocols
+
+**Document ID:** GOV-005
+**Domain:** 2 -- Governance & Authority
+**Version:** 1.0.0
+**Date:** 2026-02-16
+**Status:** Ratified
+**Depends On:** ETH-001, CON-001, GOV-001, SEC-001, GOV-003, GOV-004
+**Depended Upon By:** GOV-006, GOV-007. Referenced by all articles involving crisis response, emergency procedures, or temporary authority modifications.
+
+---
+
+## 1. Purpose
+
+This article defines what happens when normal governance breaks down. Normal governance, as defined in GOV-001, relies on deliberation, waiting periods, documentation, and careful tier classification. These mechanisms are designed for a stable institution operating under non-crisis conditions. They are not designed for emergencies.
+
+An emergency, in institutional terms, is any situation where the delay imposed by normal governance would cause irreversible harm to the institution's data, systems, or continuity. A hard drive that is actively failing does not wait for a 30-day deliberation period. A security breach does not pause while the operator classifies it by tier. A natural disaster does not respect the documentation-first principle.
+
+The purpose of this article is to define a set of emergency governance protocols that allow the operator to act quickly while preserving the institution's accountability, integrity, and legitimacy. Emergency governance is not the suspension of governance. It is a different mode of governance, one that prioritizes action over deliberation while still requiring honesty, documentation, and eventual review.
+
+The most dangerous moment for any institution is the transition from normal operations to crisis response. In that moment, the temptation to abandon all rules is strongest, and the consequences of abandoning rules are most severe. This article provides a structured alternative to abandonment: a defined set of emergency powers, with defined limits, defined durations, and defined review requirements.
+
+## 2. Scope
+
+This article covers:
+
+- The definition of an institutional emergency and the criteria for declaring one.
+- Emergency authority: what expanded powers the operator gains during an emergency.
+- Automatic sunset provisions that terminate emergency powers without requiring affirmative action.
+- Communication protocols during emergencies (relevant for multi-stakeholder scenarios and for the operator's own clarity).
+- Post-emergency review and governance restoration.
+- The relationship between emergency governance and the succession protocols in GOV-004.
+
+This article does not cover specific technical emergency procedures (those belong in Domain 3 for security emergencies, Domain 4 for infrastructure emergencies, and Domain 12 for disaster recovery). It covers the governance framework within which those technical procedures operate.
+
+## 3. Background
+
+The history of institutions is littered with emergencies that became permanent. A government declares emergency powers to address a crisis, and the powers outlive the crisis by decades. An organization suspends its normal approval process "just until the emergency passes," and the process never resumes. Emergency governance is one of the most dangerous tools in institutional design because it is simultaneously necessary and corrosive.
+
+It is necessary because real emergencies require rapid action. An institution that cannot respond quickly to a genuine crisis will not survive that crisis. It is corrosive because emergency conditions create a psychological state -- urgency, fear, tunnel vision -- that makes institutional discipline feel like an impediment rather than a safeguard. Every emergency is an invitation to dismantle the governance structures that feel inconvenient, and every dismantling leaves the institution weaker for the next emergency.
+
+For a single-operator institution, the danger is amplified. There is no board to restrain an operator who declares an emergency unnecessarily. There is no committee to review whether emergency powers are being used appropriately. The only restraint is the operator's own discipline, informed by the procedures in this document.
+
+This article is therefore designed with a strong bias toward restraint. Emergency powers are narrow, time-limited, and automatically expire. The burden of proof lies with extending an emergency, not with ending one. The post-emergency review is mandatory, not optional. These design choices are deliberate. They exist because the author of these procedures is also the person who will be tempted to abuse them.
+
+## 4. System Model
+
+### 4.1 Emergency Classification
+
+Emergencies are classified by severity and domain:
+
+**Severity Level 1: Critical -- Imminent Data Loss or Security Breach.**
+Active, ongoing harm to institutional data integrity or security. Examples: a storage device is actively failing with no current backup, a security perimeter has been breached, a fire or flood is threatening hardware.
+
+Governance implications: All waiting periods are suspended. The operator may take any action necessary to protect data and systems, including actions that would normally require Tier 1 or Tier 2 authorization. All actions must be logged, but the logging may be abbreviated during the active emergency and expanded during the post-emergency review.
+
+Automatic sunset: 72 hours from declaration. If the emergency persists beyond 72 hours, it must be re-declared with updated justification.
+
+**Severity Level 2: Urgent -- Probable Harm Within Days.**
+A condition that will cause institutional harm if not addressed within days, but is not causing active harm at the moment of declaration. Examples: a SMART warning indicating imminent drive failure, discovery of a significant configuration error that puts data at risk, environmental conditions (temperature, humidity) that are degrading hardware.
+
+Governance implications: Tier 2 waiting periods are reduced from 30 days to 7 days. Tier 3 waiting periods are eliminated. Tier 1 waiting periods remain at 90 days (constitutional decisions are not accelerated by Level 2 emergencies). Documentation must be maintained in real time.
+
+Automatic sunset: 30 days from declaration. If the emergency persists beyond 30 days, it must be re-declared or downgraded to normal governance.
+
+**Severity Level 3: Elevated -- Increased Risk Requiring Heightened Vigilance.**
+A condition that increases the probability of institutional harm but does not constitute an imminent threat. Examples: a significant security vulnerability discovered in installed software, a backup verification that reveals minor inconsistencies, an approaching storm season with above-average severity predictions.
+
+Governance implications: No waiting period modifications. The operator should increase the frequency of relevant monitoring (daily checks become twice-daily, weekly maintenance is prioritized). All decisions should include an explicit assessment of whether the elevated risk affects the decision.
+
+Automatic sunset: 90 days from declaration. If the condition persists, it should be formally incorporated into the threat model (SEC-001) or operational procedures (OPS-001) rather than remaining in emergency status indefinitely.
+
+### 4.2 Emergency Declaration Protocol
+
+Declaring an emergency is itself a governance act. It must follow a procedure, even if that procedure is abbreviated:
+
+1. **Identify the threat.** What is the specific condition that constitutes an emergency? Be precise. "Something seems wrong" is not a declaration. "SMART data indicates drive sda is in pre-failure state with 23 reallocated sectors and increasing error rate" is a declaration.
+
+2. **Classify the severity.** Using the definitions in Section 4.1, assign a severity level. If in doubt, assign the higher level. It is better to over-respond and scale down than to under-respond and lose data.
+
+3. **Record the declaration.** Write an entry in the decision log: "EMERGENCY DECLARED -- Level [X] -- [brief description of threat] -- [date and time]." This entry is the formal beginning of the emergency governance period.
+
+4. **Identify the response plan.** Before acting, identify the technical response plan from the relevant domain's emergency procedures (Domain 3, Domain 4, Domain 12, etc.). If no pre-existing plan applies, draft an ad hoc plan and record it before executing.
+
+5. **Execute the response.** Take the necessary actions. Log each significant action with timestamps.
+
+6. **Monitor and reassess.** As the response progresses, reassess the severity level. Upgrade or downgrade as conditions change. Record each reassessment.
+
+### 4.3 Emergency Authority Boundaries
+
+Even during a declared emergency, certain boundaries remain absolute:
+
+- **The air gap may not be breached** except under Level 1 conditions where data loss is imminent and the only available backup or recovery resource requires a temporary, controlled network connection. Any air-gap breach must be documented in detail and reported in the post-emergency review. The breach must be reversed immediately upon completion of the emergency action.
+- **ETH-001 remains in effect.** Emergency conditions do not suspend the ethical foundation. If an emergency action would violate an ethical principle, the principle prevails. The operator must find an alternative response that is both effective and ethical.
+- **The decision log remains append-only.** Emergency conditions never justify modifying or deleting historical records.
+- **Succession provisions are not suspended.** If the operator becomes incapacitated during an emergency, the succession protocols in GOV-004 activate. Emergency governance does not create a situation where the institution has no governance at all.
+
+### 4.4 Communication Protocols During Emergencies
+
+In a single-operator institution, communication protocols may seem irrelevant. They are not. Communication during an emergency serves three functions:
+
+**Communication with self:** The operator should maintain a running log of their mental state, decisions, and reasoning during the emergency. This log serves the post-emergency review and also serves as a check against tunnel vision. Writing down "I am about to do X because I believe Y" forces a moment of reflection between impulse and action.
+
+**Communication with designated successor (if applicable):** If a successor has been designated and is reachable, they should be notified of any Level 1 or Level 2 emergency. Not for authorization (the current operator retains full authority) but for awareness. If the operator becomes incapacitated during the emergency, the successor needs to know the situation they are inheriting.
+
+**Communication with advisory contacts (if applicable):** If the operator has any trusted technical contacts who could provide guidance, a Level 1 emergency is an appropriate time to consult them. This consultation does not compromise the air gap if it is conducted verbally or through physically separate systems. The institution's internal data should not be shared, but the general nature of the technical problem may be discussed.
+
+### 4.5 Automatic Sunset and Emergency Termination
+
+Emergency governance terminates automatically at the sunset time defined by the severity level, unless explicitly re-declared. This is the most important safeguard in this article. It means that emergency powers cannot persist through inaction. They require affirmative renewal.
+
+When an emergency terminates (either by sunset or by explicit termination):
+
+1. The operator records the termination in the decision log: "EMERGENCY TERMINATED -- Level [X] -- [original threat description] -- [date and time of termination] -- [brief outcome: resolved, mitigated, or incorporated into normal operations]."
+2. All actions taken under emergency authority are reviewed within 7 days (see Section 4.6).
+3. Any suspended waiting periods resume from where they were paused, not from the beginning.
+4. Any temporary measures implemented during the emergency are evaluated for permanent adoption through normal governance or rollback.
+
+### 4.6 Post-Emergency Governance Review
+
+Within 7 days of emergency termination, the operator must conduct a post-emergency governance review. This review is mandatory for Level 1 and Level 2 emergencies and recommended for Level 3 emergencies.
+
+The review addresses:
+
+- **What happened?** A factual account of the emergency, the response, and the outcome.
+- **Was the declaration appropriate?** In retrospect, was the severity level correctly assigned? Was an emergency declaration warranted at all?
+- **Were emergency powers used appropriately?** Did the operator stay within the boundaries defined in Section 4.3? Were actions proportionate to the threat?
+- **What governance was bypassed?** Which waiting periods were shortened or suspended? Which decisions were made without normal deliberation? Were these bypasses justified by the circumstances?
+- **What should change?** Does the threat model (SEC-001) need updating? Do emergency procedures in relevant domains need revision? Do the emergency governance protocols themselves need amendment?
+- **Governance restoration confirmation.** An explicit statement that normal governance has been fully restored and all emergency provisions have been terminated.
+
+The review is recorded in the decision log and, if it reveals significant institutional lessons, in the Commentary Section of this article and any other affected articles.
+
+## 5. Rules & Constraints
+
+- **R-GOV-05-01:** An emergency may only be declared when delay would cause irreversible or significant harm to institutional data, systems, or continuity. Inconvenience, frustration, or impatience do not constitute emergencies.
+- **R-GOV-05-02:** Emergency declarations must include a specific threat description, a severity level, and a response plan. Declarations without these elements are invalid.
+- **R-GOV-05-03:** Emergency authority sunsets automatically at the times specified in Section 4.1. Re-declaration requires fresh justification; the previous declaration may not be simply extended.
+- **R-GOV-05-04:** The post-emergency governance review is mandatory for Level 1 and Level 2 emergencies and must be completed within 7 days of emergency termination.
+- **R-GOV-05-05:** No emergency declaration may suspend ETH-001, the append-only nature of the decision log, or the succession provisions in GOV-004.
+- **R-GOV-05-06:** If more than three Level 1 or Level 2 emergencies are declared within a twelve-month period, a Tier 2 architectural review must be initiated to determine whether the institution's design is systematically inadequate.
+- **R-GOV-05-07:** The emergency governance protocols must be reviewed during the annual operations cycle (OPS-001) and tested through at least one simulated emergency per year.
+
+## 6. Failure Modes
+
+- **Emergency normalization.** Emergencies are declared so frequently that emergency governance becomes the default mode. Waiting periods are permanently suspended in practice, even though each individual declaration is technically justified. Mitigation: R-GOV-05-06, which triggers an architectural review after three emergencies in twelve months.
+- **Emergency avoidance.** The operator is so reluctant to declare an emergency that they attempt to resolve genuinely urgent situations through normal governance, resulting in preventable data loss or system damage. Mitigation: the severity levels are designed to be clear and actionable. When in doubt, declare; the post-emergency review will assess whether the declaration was appropriate.
+- **Sunset override.** The operator extends an emergency indefinitely by re-declaring it every time it sunsets, without genuinely reassessing whether emergency governance is still warranted. Mitigation: each re-declaration requires fresh justification and is subject to the post-emergency review cycle.
+- **Post-emergency amnesia.** The emergency passes, the system is saved, and the operator moves on without conducting the governance review. The lessons of the emergency are lost. Mitigation: R-GOV-05-04 makes the review mandatory, and the quarterly governance health check (GOV-007) will flag missing reviews.
+- **Scope creep during emergencies.** The operator uses emergency authority to make changes that are not related to the emergency itself. A Level 1 data emergency becomes an excuse to reorganize the entire storage architecture. Mitigation: the post-emergency review explicitly asks whether actions were proportionate to the threat. Emergency authority is bounded by the specific threat that triggered the declaration.
+
+## 7. Recovery Procedures
+
+1. **If emergency governance has been normalized:** Declare a return to normal governance as a Tier 3 decision. Review all decisions made under emergency authority in the past twelve months. For each, assess whether it would have been approved through normal governance. For decisions that would not have been approved, initiate a formal review to confirm or reverse them.
+2. **If an emergency was mishandled:** Conduct the post-emergency review with particular attention to what went wrong. If institutional harm occurred due to the mishandling, document the harm, the cause, and the corrective actions. If the emergency governance protocols themselves contributed to the mishandling, propose amendments through normal Tier 3 governance.
+3. **If post-emergency reviews have been skipped:** Conduct retroactive reviews for all unreviewed emergencies. These reviews will necessarily be less detailed than timely reviews, but the exercise of retroactive assessment still provides institutional value. Going forward, schedule the review as a calendar item at the moment of emergency declaration, so it is not forgotten.
+4. **If emergency powers were used beyond their scope:** Treat the excess as a governance violation. Document it in the decision log. Assess the impact of the out-of-scope actions. Reverse what can be reversed. For what cannot be reversed, document the situation and the lessons learned. Add an entry to the Commentary Section of this article.
+
+## 8. Evolution Path
+
+- **Years 0-5:** The emergency protocols are untested. The first real emergency will be the first test. Simulated emergencies during the annual operations cycle should cover at least one Level 1 and one Level 2 scenario. The protocols will likely need refinement based on these simulations.
+- **Years 5-15:** Several real emergencies will likely have occurred. The Commentary Section should contain lessons learned from each. The severity levels and sunset periods should be evaluated for whether they are well-calibrated.
+- **Years 15-30:** The protocols should be mature. Hardware transitions (which are pseudo-emergencies with long lead times) will test the Level 2 provisions. Succession planning may introduce new emergency scenarios (what happens if succession is forced by a health emergency?).
+- **Years 30-50+:** The emergency governance protocols should be one of the most well-tested parts of the governance framework, with decades of experience reflected in the Commentary Section and decision log. New operators will benefit from the accumulated wisdom of past emergencies.
+
+## 9. Commentary Section
+
+*This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.*
+
+**2026-02-16 -- Founding Entry:**
+I have never declared an institutional emergency, because the institution was founded today. But I have lived through personal technology emergencies -- the failed drive, the corrupted filesystem, the moment of pure adrenaline when you realize that the backup you assumed was there is not there. In those moments, the thing I most needed was not technical skill (though that helped). It was structure. A list of steps. A procedure that told me what to do first, what to do second, and what not to do at all.
+
+This article is that structure, generalized to institutional scale. The automatic sunsets are the feature I am most uncertain about -- 72 hours for a Level 1 emergency may be too short for some scenarios and too long for others. But the principle of automatic termination is more important than the specific duration. Emergency powers that require affirmative action to continue are fundamentally different from emergency powers that require affirmative action to end. The former decay naturally. The latter persist indefinitely. I chose decay.
+
+## 10. References
+
+- ETH-001 -- Ethical Foundations of the Institution (ethical boundaries that remain in effect during emergencies)
+- CON-001 -- The Founding Mandate (the institutional mission that emergency response serves)
+- GOV-001 -- Authority Model (the normal governance framework that emergency governance modifies)
+- SEC-001 -- Threat Model and Security Philosophy (the threat categories that generate emergencies)
+- GOV-003 -- Dispute Resolution Procedures (disputes that may arise from emergency decisions)
+- GOV-004 -- Succession Planning and Execution (succession during emergencies)
+- GOV-007 -- Institutional Health Assessment (quarterly review of emergency patterns)
+- OPS-001 -- Operations Philosophy (operational tempo during and after emergencies)
+- Domain 3 -- Security & Integrity (security emergency technical procedures)
+- Domain 4 -- Infrastructure & Power (infrastructure emergency technical procedures)
+- Domain 12 -- Disaster Recovery (disaster recovery technical procedures)
+
+---
+
+---
+
+# GOV-006 -- Role Definitions and Responsibility Matrix
+
+**Document ID:** GOV-006
+**Domain:** 2 -- Governance & Authority
+**Version:** 1.0.0
+**Date:** 2026-02-16
+**Status:** Ratified
+**Depends On:** ETH-001, CON-001, GOV-001, GOV-004
+**Depended Upon By:** GOV-007. Referenced by all articles that assign responsibilities to specific roles.
+
+---
+
+## 1. Purpose
+
+This article defines every role the institution needs, the responsibilities assigned to each role, and the procedures for creating and retiring roles as the institution evolves. It provides the Responsibility Assignment Matrix (RACI) that maps institutional activities to institutional roles, ensuring that for every critical function, someone is clearly responsible, accountable, consulted, and informed.
+
+In a single-operator institution, a role matrix may appear absurd. One person holds all roles. Why define them separately? The answer is threefold. First, even a single person operates in different capacities at different times -- the same person who is the system administrator on Monday is the archivist on Tuesday and the governance auditor on Wednesday. Defining roles clarifies which hat the operator is wearing at any given moment and which set of principles and procedures should guide their actions. Second, roles provide the framework for succession. When a successor assumes responsibility, they need to know not just what the institution does but which of its functions they are assuming and in what order of priority. Third, roles provide the framework for delegation. If the institution ever expands beyond a single operator -- through an advisory relationship, a part-time assistant, or a federated partnership -- the role definitions determine what authority can be delegated and what must be retained.
+
+This article defines the roles as they exist at founding and the roles that are anticipated for the institution's future. It provides the minimum viable governance model -- the smallest set of roles that keeps the institution functional -- and the procedures for expanding and contracting the role structure as circumstances change.
+
+## 2. Scope
+
+This article covers:
+
+- Definitions of all current and anticipated roles within the institution.
+- The Responsibility Assignment Matrix (RACI) for critical institutional functions.
+- Procedures for creating new roles, modifying existing roles, and retiring roles.
+- The minimum viable governance model.
+- The relationship between roles and the authority tiers defined in GOV-001.
+
+This article does not cover the specific procedures associated with each role (those belong in the relevant domain articles). It defines what the roles are and who is responsible for what. How they do it is defined elsewhere.
+
+## 3. Background
+
+The concept of formal roles in a one-person organization seems borrowed from corporate bureaucracy. It is not. It is borrowed from older traditions -- the lighthouse keeper who maintained separate logs for navigation, maintenance, and weather observation, not because three people were involved but because three distinct functions required three distinct disciplines. The ship captain who maintained separate roles for navigation, command, and record-keeping, even when the same person performed all three.
+
+The purpose of role definition is not to create organizational hierarchy. It is to create clarity of function. When the operator sits down to verify backup integrity, they are performing the Backup Custodian function, and they should be guided by the backup custodian's procedures and standards. When the same person reviews the decision log for governance compliance, they are performing the Governance Auditor function, and they should apply the auditor's critical eye -- even to their own decisions made in other roles.
+
+This separation of functions within a single person is not natural. It requires discipline. But the alternative -- an undifferentiated mass of responsibilities with no clear boundaries -- leads to exactly the kind of ad hoc, impulse-driven operation that GOV-001 was designed to prevent.
+
+Role definitions also serve as the institutional map for succession. When GOV-004's training pipeline asks the successor to learn the institution, the role definitions tell them what "the institution" actually consists of in terms of human activity. The hardware is listed in Domain 4. The software is listed in Domain 5. The roles are listed here.
+
+## 4. System Model
+
+### 4.1 Current Roles (Founding Configuration)
+
+At founding, the institution has one human operator who holds all roles. Each role is defined with its own identity, responsibilities, and guiding principles, even though all roles are currently held by the same person.
+
+**Role: Primary Operator (Founder)**
+- **Identity:** The person who holds ultimate authority over the institution.
+- **Authority Level:** All tiers (Tier 1 through Tier 4).
+- **Core Responsibilities:** Strategic direction, constitutional governance, final decision-making on all matters. This role is not delegatable during the founding period.
+- **Guiding Documents:** ETH-001, CON-001, GOV-001.
+- **Time Commitment:** Embedded in all other roles; not separately scheduled.
+
+**Role: System Administrator**
+- **Identity:** The person responsible for maintaining hardware, software, and system configurations.
+- **Authority Level:** Tier 3 and Tier 4 for routine administration. Tier 2 decisions (architectural changes) are escalated to the Primary Operator role.
+- **Core Responsibilities:** Daily system health checks, software maintenance, hardware monitoring, configuration management, system documentation.
+- **Guiding Documents:** OPS-001, Domain 4, Domain 5.
+- **Time Commitment:** Daily checks (15 minutes), weekly maintenance (1 hour), monthly hardware review (2 hours).
+
+**Role: Security Officer**
+- **Identity:** The person responsible for maintaining the institution's security posture.
+- **Authority Level:** Tier 2 for security architecture decisions. Tier 3 and Tier 4 for routine security operations.
+- **Core Responsibilities:** Threat model maintenance, security audits, drill execution, access control management, incident response leadership.
+- **Guiding Documents:** SEC-001, Domain 3.
+- **Time Commitment:** Monthly security review (2 hours), annual security audit (full day), drills as scheduled.
+
+**Role: Data Custodian**
+- **Identity:** The person responsible for the integrity, organization, and preservation of all institutional data.
+- **Authority Level:** Tier 3 for data policy decisions. Tier 4 for routine data operations.
+- **Core Responsibilities:** Backup management and verification, data integrity checks, archive management, format migration planning, data lifecycle management.
+- **Guiding Documents:** OPS-001, Domain 6, Domain 12.
+- **Time Commitment:** Monthly backup verification (half day), quarterly data integrity review (half day).
+
+**Role: Governance Auditor**
+- **Identity:** The person responsible for ensuring that governance procedures are being followed.
+- **Authority Level:** Advisory only. The Governance Auditor observes and reports but does not make decisions. In a single-operator institution, this means the operator periodically audits their own governance compliance.
+- **Core Responsibilities:** Quarterly governance health check, decision log review, tier compliance verification, dispute resolution documentation review.
+- **Guiding Documents:** GOV-001, GOV-003, GOV-007.
+- **Time Commitment:** Quarterly review (half day), annual comprehensive assessment (full day).
+
+**Role: Documentation Steward**
+- **Identity:** The person responsible for the completeness, accuracy, and currency of all institutional documentation.
+- **Authority Level:** Tier 3 for documentation policy. Tier 4 for routine documentation maintenance.
+- **Core Responsibilities:** Documentation completeness reviews, style and format enforcement, cross-reference verification, documentation debt tracking.
+- **Guiding Documents:** OPS-001, Stage 1 Documentation Framework.
+- **Time Commitment:** Weekly documentation review (30 minutes), quarterly comprehensive review (half day).
+
+### 4.2 Future Roles (Anticipated)
+
+These roles are not currently filled but are defined here so that the institutional framework is ready when they become relevant.
+
+**Role: Designated Successor**
+- **Identity:** A person who has been formally designated to inherit operational authority per GOV-004.
+- **Authority Level:** During training: observation and Tier 4 under supervision. After transfer: per the 180-day restricted authority provisions in GOV-004.
+- **Core Responsibilities:** Learning the institution, participating in training pipeline activities, maintaining the first-impressions journal.
+- **Guiding Documents:** GOV-004, all root documents.
+- **Activation Trigger:** Formal designation through a Tier 1 decision.
+
+**Role: Technical Advisor**
+- **Identity:** A trusted external person who provides technical guidance on specific domains without holding operational authority.
+- **Authority Level:** Advisory only. No decision-making authority. No access to institutional systems unless explicitly granted for a specific purpose.
+- **Core Responsibilities:** Providing technical expertise when consulted, reviewing proposed architectural changes, offering an external perspective on institutional health.
+- **Guiding Documents:** ETH-001 (Principle 3: Transparency), SEC-001 (trust model boundaries).
+- **Activation Trigger:** Formal engagement through a Tier 3 decision, with scope, duration, and access boundaries explicitly defined.
+
+**Role: External Auditor**
+- **Identity:** A trusted external person who conducts independent assessments of institutional health, security, or governance compliance.
+- **Authority Level:** Advisory only. Read access to specified documents and logs. No modification rights.
+- **Core Responsibilities:** Conducting the audit as scoped, producing a written report, providing recommendations.
+- **Guiding Documents:** GOV-007, SEC-001.
+- **Activation Trigger:** Formal engagement through a Tier 2 decision (because it involves granting an external party access to institutional records).
+
+**Role: Federation Partner**
+- **Identity:** An operator of a separate but allied institution who participates in mutual support, shared procedures, or coordinated governance.
+- **Authority Level:** No authority within this institution. Collaborative authority within the scope of a formal federation agreement.
+- **Core Responsibilities:** As defined in the federation agreement.
+- **Guiding Documents:** To be defined in a future federation governance article.
+- **Activation Trigger:** Formal federation agreement through a Tier 1 decision (because federation fundamentally alters the institution's sovereignty model).
+
+### 4.3 The Responsibility Assignment Matrix (RACI)
+
+The RACI matrix maps critical institutional functions to roles. R = Responsible (does the work), A = Accountable (ultimately answerable), C = Consulted (provides input), I = Informed (kept aware).
+
+At founding, the Primary Operator is both R and A for everything. The matrix below reflects the target state when multiple roles are filled by different persons.
+
+| Function | Primary Operator | Sys Admin | Security Officer | Data Custodian | Gov Auditor | Doc Steward | Successor |
+|---|---|---|---|---|---|---|---|
+| Constitutional decisions | R, A | I | C | I | C | I | C |
+| Architectural decisions | A | R | C | C | C | I | I |
+| Policy decisions | A | C | C | C | C | C | I |
+| Operational decisions | I | R, A | R (security) | R (data) | I | I | I |
+| Daily health checks | I | R, A | I | I | I | I | I |
+| Backup management | I | C | I | R, A | I | I | I |
+| Security audits | I | C | R, A | I | C | I | I |
+| Governance review | A | I | I | I | R | I | I |
+| Documentation review | I | C | C | C | I | R, A | I |
+| Succession training | A | C | C | C | I | C | R |
+| Emergency response | A | R | R (security) | R (data) | I | I | I |
+| Annual assessment | R, A | C | C | C | C | C | C |
+
+### 4.4 Role Creation and Retirement Procedures
+
+**Creating a new role:**
+1. Draft a role definition following the format in Section 4.1: identity, authority level, core responsibilities, guiding documents, time commitment, and activation trigger.
+2. Update the RACI matrix to reflect the new role's responsibilities.
+3. Submit as a Tier 3 decision (Tier 2 if the role carries Tier 2 authority or above).
+4. Observe the appropriate waiting period.
+5. If the role is to be filled by a specific person, document the appointment in the decision log.
+
+**Retiring a role:**
+1. Verify that all responsibilities assigned to the role are either transferred to another role or confirmed as no longer necessary.
+2. Update the RACI matrix.
+3. Record the retirement as a Tier 3 decision with rationale.
+4. Archive the role definition (do not delete it; it remains part of the institutional record).
+
+**Modifying a role:**
+1. Draft the proposed modification.
+2. If the modification changes the role's authority level, treat it as a Tier 2 decision. Otherwise, Tier 3.
+3. Update the RACI matrix.
+4. Document the change and its rationale in the decision log.
+
+### 4.5 The Minimum Viable Governance Model
+
+If the institution must operate with the absolute minimum governance overhead -- due to a succession crisis, an extended period of reduced capacity, or a simplification initiative -- the following roles are essential:
+
+- **Primary Operator** (cannot be eliminated while the institution exists).
+- **System Administrator** (the institution requires ongoing technical maintenance to survive).
+- **Data Custodian** (data integrity is the institution's core value; it cannot be neglected even in minimal mode).
+
+All other roles may be suspended during minimum viable governance, with their responsibilities deferred or performed at reduced frequency. The Governance Auditor role should be the last to be suspended and the first to be reinstated, as it provides the oversight necessary to detect when minimum viable governance is no longer sufficient.
+
+Minimum viable governance is a survival mode, not a target operating mode. Entry into minimum viable governance should be documented as a Tier 3 decision. Exit should be planned at the time of entry, with a specific date or condition that triggers return to full governance.
+
+## 5. Rules & Constraints
+
+- **R-GOV-06-01:** Every critical institutional function must be assigned to at least one role. No function may exist in an unassigned state.
+- **R-GOV-06-02:** The RACI matrix must be reviewed and updated during the quarterly governance review (GOV-007) and whenever a role is created, modified, or retired.
+- **R-GOV-06-03:** Role definitions must include clear authority boundaries. No role may exercise authority beyond its defined level without escalation to a higher-authority role.
+- **R-GOV-06-04:** When a single person holds multiple roles, they must maintain awareness of which role they are performing at any given time. Operational logs should note the role under which an action is taken.
+- **R-GOV-06-05:** New roles that grant any person other than the Primary Operator access to institutional systems require a Tier 2 decision and must comply with the access control provisions in SEC-001.
+- **R-GOV-06-06:** The minimum viable governance model (Section 4.5) may only be activated through a documented Tier 3 decision with a planned exit condition.
+
+## 6. Failure Modes
+
+- **Role collapse.** The operator stops distinguishing between roles and operates as an undifferentiated "person who does everything." The clarity of function that roles provide is lost. Decisions that should require the Security Officer's careful assessment are made with the System Administrator's bias toward convenience. Mitigation: the quarterly governance review includes an assessment of role discipline.
+- **Role inflation.** Too many roles are created, each with narrow responsibilities, creating a bureaucratic overhead that exceeds the institution's capacity. Mitigation: the minimum viable governance model provides a floor. The creation of new roles requires a formal decision, which creates a natural check on proliferation.
+- **RACI fantasy.** The RACI matrix is maintained on paper but ignored in practice. Responsibilities are executed based on habit rather than assignment. Mitigation: the quarterly review includes a comparison of actual activity against the RACI matrix.
+- **Delegation without authority.** A role is delegated to a new person, but the authority to actually perform the role's functions is not clearly transferred. The new person has the title but not the ability to act. Mitigation: role definitions include explicit authority levels, and role activation includes a formal decision that confirms the authority transfer.
+- **Succession role confusion.** During a succession transition, it is unclear which roles the successor is assuming and which remain with the outgoing operator. Mitigation: the authority transfer ceremony in GOV-004 explicitly addresses role transfer. The RACI matrix should be updated as part of the ceremony.
+
+## 7. Recovery Procedures
+
+1. **If roles have collapsed into undifferentiated operation:** Re-read Section 4.1. For one week, begin each operational session by explicitly noting which role you are performing. This simple discipline often restores role awareness without requiring structural changes.
+2. **If the RACI matrix is out of date:** Reconstruct it from current practice. For each institutional function, ask: "Who actually does this? Who is actually accountable?" Update the matrix to reflect reality, then assess whether reality matches the desired state. If not, plan corrections.
+3. **If a role has been activated without proper authority:** Retroactively create the decision log entry that should have been created. If the role activation involved access to institutional systems, conduct a security review to ensure access was appropriate.
+4. **If the minimum viable governance model has persisted beyond its planned exit condition:** Treat this as a governance health warning. Conduct a GOV-007 assessment focused on governance capacity. Either restore full governance or formally extend the minimum viable period with a new exit condition.
+
+## 8. Evolution Path
+
+- **Years 0-5:** The operator holds all roles. The primary evolution is in discipline: learning to distinguish between roles internally and to apply the appropriate standards for each. The RACI matrix is simple but should be maintained for its future value.
+- **Years 5-15:** Advisory roles may become relevant as the operator encounters technical challenges that benefit from external input. The Technical Advisor and External Auditor roles should be considered.
+- **Years 15-30:** The Designated Successor role becomes critical. The RACI matrix becomes a practical tool for dividing responsibilities during the training pipeline. The matrix's accuracy determines the clarity of the succession transition.
+- **Years 30-50+:** The institution may have multiple active roles held by different persons. The RACI matrix becomes the operational backbone of multi-person governance. Federation Partner roles may be activated. The role framework must evolve to accommodate governance structures that were only theoretical at founding.
+
+## 9. Commentary Section
+
+*This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.*
+
+**2026-02-16 -- Founding Entry:**
+I have defined six current roles, all held by me. The discipline of writing them separately -- defining the System Administrator as a distinct function from the Security Officer, even though I am both -- has already proven valuable. It has revealed that I tend to conflate system administration and security, performing both with the same mindset. That conflation is dangerous. The system administrator wants the system to run. The security officer wants the system to be secure. These goals overlap most of the time but diverge at critical moments, and it is exactly at those moments that role clarity matters most.
+
+The RACI matrix looks absurd for a single person. Every cell in the current-state matrix would read "R, A." I have instead written the target-state matrix, which describes how responsibilities would be distributed if different people held different roles. This forward-looking matrix is more useful, because it tells a future successor or partner exactly which pieces of the institution they are responsible for and which they should leave to others.
+
+## 10. References
+
+- ETH-001 -- Ethical Foundations of the Institution (the principles that constrain all roles)
+- CON-001 -- The Founding Mandate (the mission that all roles serve)
+- GOV-001 -- Authority Model (the tier system that defines role authority boundaries)
+- SEC-001 -- Threat Model and Security Philosophy (access control for role activation)
+- GOV-003 -- Dispute Resolution Procedures (disputes between role-holders)
+- GOV-004 -- Succession Planning and Execution (role transfer during succession)
+- GOV-005 -- Emergency Governance Protocols (role behavior during emergencies)
+- GOV-007 -- Institutional Health Assessment (role health as a governance metric)
+- OPS-001 -- Operations Philosophy (the operational tempo that distributes role activities)
+- Stage 1 Documentation Framework (documentation standards for role definitions)
+
+---
+
+---
+
+# GOV-007 -- Institutional Health Assessment
+
+**Document ID:** GOV-007
+**Domain:** 2 -- Governance & Authority
+**Version:** 1.0.0
+**Date:** 2026-02-16
+**Status:** Ratified
+**Depends On:** ETH-001, CON-001, GOV-001, SEC-001, OPS-001, GOV-003, GOV-004, GOV-005, GOV-006
+**Depended Upon By:** All articles. This article defines the assessment framework that evaluates every domain's health.
+
+---
+
+## 1. Purpose
+
+This article defines how the institution evaluates its own health. An institution, like a body, can appear functional while harboring conditions that will eventually cause failure. A backup system can run for years before anyone discovers the backups are empty. A governance process can be followed for a decade before anyone realizes the decisions it produces have drifted far from the institution's founding principles. A security posture can feel solid while a slowly expanding vulnerability goes unnoticed.
+
+The purpose of institutional health assessment is to detect these slow-moving failures before they become irreversible. It provides a systematic, repeatable process for examining every dimension of the institution's operations and governance, identifying weaknesses, and prescribing corrective action. It is the institutional equivalent of a medical examination: regular, comprehensive, and honest about what it finds.
+
+This article defines the metrics, indicators, and warning signs that constitute institutional health. It defines the quarterly health review (a focused check on key indicators) and the annual comprehensive assessment (a thorough examination of all twenty domains). It defines what to do when health scores decline. And it provides the framework for an institution that is honest with itself about its own condition -- which, per ETH-001 Principle 6, is not optional but foundational.
+
+## 2. Scope
+
+This article covers:
+
+- The definition of institutional health and its dimensions.
+- Health indicators for all twenty domains.
+- The quarterly health review procedure.
+- The annual comprehensive assessment procedure.
+- Warning signs, thresholds, and escalation triggers.
+- Corrective action frameworks for declining health.
+- The relationship between health assessment and the other governance articles.
+
+This article does not cover the specific technical metrics for individual systems (those belong in the relevant domain articles). It covers the governance-level assessment of whether the institution as a whole is fulfilling its mission, maintaining its integrity, and operating sustainably.
+
+## 3. Background
+
+Most personal technology projects have no concept of health assessment. They either work or they do not. When they work, no assessment is needed. When they fail, it is too late for assessment. This binary view of system health is adequate for short-lived projects but catastrophic for institutions designed to last decades.
+
+Institutional health is not binary. It is a spectrum. An institution can be fully functional in its daily operations while its documentation is falling behind, its governance discipline is eroding, its security posture is degrading, and its succession preparations are nonexistent. By every immediate measure, the institution is healthy. By every long-term measure, it is dying.
+
+The purpose of health assessment is to make the long-term measures visible to the short-term operator. It forces the operator to step back from daily operations and evaluate the institution from a higher vantage point, using criteria that reflect the institution's fifty-year mission rather than its today's functionality.
+
+Health assessment is also the primary mechanism for institutional learning. Each assessment produces a record of the institution's condition at a point in time. Over years, these records reveal trends that no individual assessment can detect. Is documentation quality improving or declining? Is the governance process becoming more disciplined or more perfunctory? Are security drills revealing new vulnerabilities or confirming that the same vulnerabilities persist? Trend data is the institution's most valuable diagnostic tool, and it can only be produced through consistent, periodic assessment.
+
+## 4. System Model
+
+### 4.1 Dimensions of Institutional Health
+
+Institutional health is assessed across five dimensions, each of which encompasses multiple domains:
+
+**Dimension 1: Governance Health.**
+Is the institution being governed according to its own rules? Are decisions being made at the correct tier? Are waiting periods being respected? Is the decision log current? Are disputes being resolved through the formal process? Is the succession plan current?
+
+Domains assessed: 1 (Constitution), 2 (Governance), 20 (Institutional Memory).
+
+Key indicators:
+- Decision log currency: are entries current within one week?
+- Tier compliance: have decisions been classified and processed at the correct tier?
+- Waiting period compliance: have all required waiting periods been observed?
+- Succession Readiness Package: has it been updated within the past twelve months?
+- Dispute resolution: have any unresolved disputes persisted beyond 90 days?
+
+**Dimension 2: Technical Health.**
+Are the institution's technical systems operating correctly, maintaining data integrity, and performing within expected parameters?
+
+Domains assessed: 4 (Infrastructure), 5 (Platform), 6 (Data), 7 (Intelligence), 8 (Automation), 9 (Education).
+
+Key indicators:
+- System uptime: are all critical systems operational?
+- Hardware health: are SMART data, temperature readings, and other hardware indicators within normal ranges?
+- Data integrity: have all scheduled integrity checks passed?
+- Backup verification: has the most recent backup been tested through restoration?
+- Capacity utilization: are storage, compute, and power resources within sustainable ranges?
+- Software currency: is all software at documented, intentional versions?
+
+**Dimension 3: Security Health.**
+Is the institution's security posture being maintained? Are threats being monitored? Are defenses being tested?
+
+Domains assessed: 3 (Security), 18 (Import & Quarantine).
+
+Key indicators:
+- Air-gap integrity: has the air gap been maintained without breach since the last assessment?
+- Security drill execution: have all scheduled drills been completed?
+- Threat model currency: has the threat model been reviewed within the past twelve months?
+- Access control: are all credentials current and properly secured?
+- Quarantine compliance: has all incoming media passed through the quarantine process?
+
+**Dimension 4: Operational Health.**
+Is the institution being operated according to its operational philosophy? Is the maintenance tempo being sustained? Is documentation keeping pace with operations?
+
+Domains assessed: 10 (Operations), 11 (Workflow), 12 (Disaster Recovery), 13 (Content Production), 14 (Research), 16 (Maintenance), 17 (Testing).
+
+Key indicators:
+- Operational tempo compliance: have daily, weekly, monthly, and quarterly cycles been completed?
+- Documentation currency: is documentation current within 30 days of any system change?
+- Complexity budget: has the quarterly complexity assessment been completed? Is the budget balanced?
+- Maintenance backlog: are there overdue maintenance items? How many? How old?
+- Recovery procedure testing: have recovery procedures been tested within the past twelve months?
+
+**Dimension 5: Philosophical Health.**
+Is the institution still aligned with its founding principles? Is it still fulfilling its mission? Is the operator still engaged with the institution's purpose?
+
+Domains assessed: 1 (Constitution), 15 (Ethics), 19 (Evolution), 20 (Institutional Memory).
+
+Key indicators:
+- Mission alignment: can the operator articulate how every active system serves the institutional mission?
+- Ethical compliance: have any ethical principle exceptions been logged in the past twelve months? Were they reviewed?
+- Evolution coherence: are changes to the institution deliberate and documented, or reactive and ad hoc?
+- Operator engagement: does the operator experience the institution as meaningful work, routine obligation, or burdensome duty?
+- Commentary Section vitality: are Commentary Sections receiving new entries? Are they being consulted?
+
+### 4.2 Health Scoring
+
+Each indicator within each dimension is assessed on a three-level scale:
+
+**Green: Healthy.** The indicator is within expected parameters. No corrective action needed. Continue current practices.
+
+**Amber: Warning.** The indicator shows degradation or partial non-compliance. Corrective action is recommended within 90 days. The specific concern should be documented in the assessment record.
+
+**Red: Critical.** The indicator shows significant failure or non-compliance. Corrective action is required immediately. The concern must be documented and addressed as a minimum Tier 3 governance decision, with higher tiers as appropriate for the severity.
+
+The overall dimension score is the worst score among its indicators. If any indicator within Governance Health is Red, the Governance Health dimension is Red. This is deliberately conservative. It ensures that a single critical failure is not hidden by otherwise healthy indicators.
+
+The overall institutional health score is the collection of all five dimension scores. There is intentionally no single aggregate score. An institution that is technically healthy but philosophically adrift is in a different kind of trouble than an institution that is philosophically sound but technically failing. The dimensions must be assessed individually to be useful.
+
+### 4.3 The Quarterly Health Review
+
+The quarterly health review is conducted as part of the quarterly operations cycle defined in OPS-001, Section 4.1. It takes approximately half a day and focuses on the most time-sensitive indicators.
+
+**Quarterly review procedure:**
+
+1. **Prepare.** Gather the decision log, operational log, and the previous quarter's health assessment. Review any notes or concerns flagged during weekly and monthly operations.
+
+2. **Assess Governance Health.** Review decision log for currency, tier compliance, and waiting period compliance. Check the status of the succession plan. Review any disputes logged during the quarter.
+
+3. **Assess Technical Health.** Review system health reports from the monthly operations cycle. Check backup verification results. Review any hardware warnings or anomalies.
+
+4. **Assess Security Health.** Confirm that air-gap integrity has been maintained. Review any security-relevant events from the quarter. Confirm that scheduled drills have been completed.
+
+5. **Assess Operational Health.** Review operational tempo compliance. Check documentation currency. Conduct the complexity budget assessment. Review the maintenance backlog.
+
+6. **Assess Philosophical Health.** This is the most subjective dimension and the most important to perform honestly. Ask: Am I still aligned with the mission? Am I still engaged? Am I cutting corners? Am I honest with myself about the institution's condition?
+
+7. **Score and record.** Assign Green/Amber/Red scores to each indicator. Record the complete assessment in the governance health log. Compare with the previous quarter's assessment to identify trends.
+
+8. **Plan corrective actions.** For any Amber or Red indicators, draft a corrective action plan with a timeline. For Red indicators, initiate the appropriate governance decision immediately.
+
+### 4.4 The Annual Comprehensive Assessment
+
+The annual comprehensive assessment is conducted during the annual operations cycle defined in OPS-001, Section 4.1. It takes two to three days and covers every domain in depth.
+
+The annual assessment includes everything in the quarterly review, plus:
+
+- **Full domain-by-domain review.** Each of the twenty domains is assessed against its domain philosophy article (the D-001 articles from Stage 2). Is each domain fulfilling its stated purpose? Are the principles in the domain philosophy being followed?
+- **Cross-domain integration assessment.** Are the domains working together coherently? Are there conflicts between domain practices that have not been addressed?
+- **Trend analysis.** Review all quarterly assessments from the past year. Identify trends. Are dimensions improving, stable, or declining? Pay particular attention to dimensions that have been Amber for multiple quarters -- chronic Amber is often worse than acute Red because it indicates a problem that is being tolerated rather than addressed.
+- **Root document review.** Re-read all five root documents (ETH-001, CON-001, GOV-001, SEC-001, OPS-001). Are they still relevant? Are their Commentary Sections receiving new entries? Are any amendments needed?
+- **Strategic assessment.** Where should the institution evolve in the coming year? What capabilities should be added, modified, or removed? What is the state of the complexity budget? What is the succession plan status?
+- **External perspective.** If a Technical Advisor or External Auditor role has been activated (see GOV-006), their input should be solicited for the annual assessment. If no external perspective is available, the operator should attempt to assess the institution as a newcomer would, using the Succession Readiness Package as a test of external comprehensibility.
+
+The annual assessment produces a comprehensive written report that is stored in the institutional governance archive. This report becomes part of the institutional record and is available to future operators.
+
+### 4.5 Responding to Declining Health
+
+When health scores decline, the response depends on the severity and pattern:
+
+**Single Amber indicator:** Address within 90 days as part of normal operations. No escalation needed unless the indicator persists across two consecutive quarterly reviews.
+
+**Multiple Amber indicators in the same dimension:** The dimension has a systemic issue. Escalate to a Tier 3 governance decision. Draft a remediation plan that addresses the root cause, not just the individual indicators.
+
+**Any Red indicator:** Immediate escalation. If the Red indicator involves data integrity, security, or system availability, assess whether an emergency declaration (GOV-005) is warranted. If not, initiate a Tier 3 minimum governance decision to address the issue.
+
+**Persistent Amber (same indicator Amber for three or more consecutive quarters):** Escalate to Tier 2. Persistent Amber indicates a structural problem that routine corrective action has failed to resolve. The assessment should consider whether the institution's architecture, procedures, or resource allocation needs fundamental change.
+
+**Declining trend across multiple dimensions:** This is the most serious pattern. It suggests institutional decay. The response should be a full strategic review (Tier 2 minimum) that considers whether the institution's operational model is sustainable. Review OPS-001's sustainability requirement. Consider whether the institution has grown beyond the operator's capacity. Consider whether the operator needs to activate minimum viable governance (GOV-006, Section 4.5) to stabilize before rebuilding.
+
+**Philosophical Health decline:** This deserves special attention because it is the hardest to address and the most consequential to ignore. If the operator is no longer engaged with the institution's mission, no technical fix will help. The response should begin with re-reading the root documents, especially the Commentary Sections. If the disengagement persists, the operator should consider whether the institution needs to evolve (through the amendment process in GOV-001) or whether the operator needs to initiate succession (through GOV-004).
+
+## 5. Rules & Constraints
+
+- **R-GOV-07-01:** The quarterly health review must be completed within one week of the end of each calendar quarter. The results must be recorded in the governance health log.
+- **R-GOV-07-02:** The annual comprehensive assessment must be completed within 30 days of the institution's founding anniversary each year. The written report must be stored in the governance archive.
+- **R-GOV-07-03:** Red indicators must be addressed through a formal governance decision (Tier 3 minimum) within 30 days of identification.
+- **R-GOV-07-04:** Persistent Amber indicators (three or more consecutive quarters) must be escalated to Tier 2 governance.
+- **R-GOV-07-05:** The health assessment scoring must be honest. Scoring an indicator Green when it is actually Amber, or Amber when it is actually Red, is a governance violation of the same severity as the underlying issue. ETH-001, Principle 6 (Honest Accounting of Limitations) applies directly.
+- **R-GOV-07-06:** Health assessment records may not be modified or deleted. If an assessment score is later determined to be incorrect, a correction entry must be appended to the governance health log, referencing the original entry.
+- **R-GOV-07-07:** The annual comprehensive assessment must include a comparison with the previous year's assessment, with explicit commentary on trends.
+
+## 6. Failure Modes
+
+- **Assessment theater.** The health review is performed as a ritual without genuine engagement. Scores are assigned quickly, everything is marked Green, and the operator moves on. The assessment produces paperwork without producing insight. Mitigation: R-GOV-07-05 makes dishonest scoring a governance violation. The quarterly review procedure in Section 4.3 includes a philosophical health assessment that is explicitly designed to resist mechanical execution.
+- **Indicator fixation.** The operator focuses on indicators that are easy to measure and ignores those that are difficult. Technical health is assessed rigorously because it has clear metrics. Philosophical health is assessed superficially because it requires honest self-reflection. The easiest dimensions crowd out the most important ones. Mitigation: the annual comprehensive assessment includes all five dimensions with equal weight.
+- **Corrective action fatigue.** The operator identifies problems in every assessment but never follows through on corrections. The health log becomes a catalogue of known issues rather than a tool for improvement. Mitigation: the quarterly review includes a review of the previous quarter's corrective action plans. Incomplete corrective actions should trigger a reassessment of whether the plans were realistic or the operator needs structural support.
+- **Score manipulation.** The operator -- consciously or unconsciously -- adjusts scoring criteria to avoid Red indicators. "It is not really Red; it is a high Amber." Over time, the scoring scale inflates, and Red conditions are routinely classified as Amber. Mitigation: the scoring criteria in Section 4.2 are deliberately simple (three levels, no ambiguous boundaries). The annual assessment includes a calibration step where previous scores are reviewed for consistency.
+- **Assessment avoidance.** The operator skips assessments entirely, either because they are too busy, too demoralized by the results, or too confident that everything is fine. Mitigation: the operational tempo in OPS-001 explicitly schedules assessment time. Skipping an assessment is itself an Amber indicator on the Governance Health dimension and will be flagged in the next assessment that does occur.
+
+## 7. Recovery Procedures
+
+1. **If health assessments have been skipped:** Conduct an immediate quarterly review covering the current quarter. Do not attempt to retroactively score missed quarters; the data is unreliable. Record the gap in the governance health log. Going forward, adhere to the assessment schedule. If assessments were skipped due to workload, evaluate whether the operational tempo needs adjustment (Tier 3 decision).
+2. **If assessments have been performed dishonestly:** Re-assess the affected quarters as honestly as possible. Record the re-assessment in the governance health log with a note explaining the dishonesty and its cause. Treat this as a Philosophical Health Red indicator and address it accordingly. The institutional culture of honest self-assessment must be restored; without it, the entire governance framework is compromised.
+3. **If corrective actions have accumulated without completion:** Prioritize the list. Address Red items first, then persistent Amber items, then recent Amber items. If the list is too long to address within a single quarter, draft a multi-quarter remediation plan as a Tier 3 decision. Consider whether minimum viable governance (GOV-006, Section 4.5) would allow focus on the most critical corrections.
+4. **If institutional health is declining across multiple dimensions:** This is a institutional crisis. Initiate a full strategic review as a Tier 2 decision. The review should consider radical simplification, operational tempo reduction, or succession initiation. Read CON-001 Section 7 (Recovery Procedures) and ETH-001 Section 7 (Recovery Procedures) for guidance on institutional recovery. An institution that acknowledges its decline has already begun to recover. An institution that denies its decline cannot.
+
+## 8. Evolution Path
+
+- **Years 0-5:** The health assessment framework is being calibrated. Early assessments will reveal which indicators are useful and which are not. Expect to refine the indicator list and scoring criteria based on operational experience. The first annual assessment will be the most difficult and the most valuable.
+- **Years 5-15:** The framework should be stable. Trend data becomes available. The most valuable insight comes not from individual assessments but from comparing assessments across years. The operator should develop a sense for the institution's natural rhythm -- which dimensions fluctuate seasonally and which are stable.
+- **Years 15-30:** The assessment framework serves double duty: evaluating institutional health and preparing for succession. The comprehensive assessment report becomes a key document for successor orientation. A successor who reads five years of annual assessments understands the institution's trajectory in a way that no single document can convey.
+- **Years 30-50+:** The assessment archive spans decades. It is a record of institutional evolution, challenges, and resilience. New operators should read the full archive as part of their training. The framework itself may need amendment, but the practice of regular, honest self-assessment should be among the institution's most durable traditions.
+
+## 9. Commentary Section
+
+*This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.*
+
+**2026-02-16 -- Founding Entry:**
+The hardest indicator to assess honestly will be Philosophical Health. Technical systems either work or they do not. Governance procedures are either followed or they are not. But whether I am still aligned with the institution's mission, still engaged with its purpose, still finding meaning in the work -- those questions require a level of self-honesty that is difficult to maintain over years.
+
+I have tried to build safeguards against self-deception into the assessment framework. The three-level scoring system is simple enough that there is little room for creative interpretation. The requirement to compare with previous assessments creates accountability across time. The rule that dishonest scoring is itself a governance violation creates a structural incentive for honesty.
+
+But ultimately, the integrity of the health assessment depends on the integrity of the assessor. No procedure can force a person to be honest with themselves. All it can do is create space for honesty and make the consequences of dishonesty visible. That is what this article attempts to do. The rest is character.
+
+I expect the first quarterly assessment to reveal many Amber indicators. The institution is newly founded. Many systems are not yet built. Many procedures are not yet tested. That is expected and acceptable. The assessment framework is not designed to produce perfect scores. It is designed to produce honest ones.
+
+## 10. References
+
+- ETH-001 -- Ethical Foundations of the Institution (Principle 6: Honest Accounting of Limitations)
+- CON-001 -- The Founding Mandate (the mission against which institutional health is measured)
+- GOV-001 -- Authority Model (the governance framework that health assessment monitors)
+- SEC-001 -- Threat Model and Security Philosophy (security health indicators)
+- OPS-001 -- Operations Philosophy (operational tempo that schedules assessments; sustainability requirement)
+- GOV-003 -- Dispute Resolution Procedures (disputes arising from assessment findings)
+- GOV-004 -- Succession Planning and Execution (succession readiness as a health indicator)
+- GOV-005 -- Emergency Governance Protocols (emergency patterns as a health indicator)
+- GOV-006 -- Role Definitions and Responsibility Matrix (role health, RACI compliance)
+- Domain 3 -- Security & Integrity (security-specific health metrics)
+- Domain 4 -- Infrastructure & Power (hardware health metrics)
+- Domain 6 -- Data & Archives (data integrity metrics)
+- Domain 10 -- User Operations (operational compliance metrics)
+- Domain 12 -- Disaster Recovery (recovery readiness metrics)
+- Domain 20 -- Institutional Memory (institutional record health)
+
+---
+
+---
+
+*End of Stage 3 Governance Operations -- Five Operational Doctrine Articles*
+
+**Document Total:** 5 articles (GOV-003 through GOV-007)
+**Combined Estimated Word Count:** ~14,500 words
+**Status:** All five articles ratified as of 2026-02-16.
+**Previous Stage:** Stage 2 Core Charter (ETH-001, CON-001, GOV-001, SEC-001, OPS-001)
+**Next:** Stage 3 continues with operational doctrine articles for additional domains.
