@@ -205,15 +205,28 @@ async function main() {
   console.log(`Parsed ${parsed} documents, skipped ${skipped}`);
 
   if (documents.length > 0) {
-    await collection.insertMany(documents);
-    console.log(`Inserted ${documents.length} documents into MongoDB`);
+    // Use bulkWrite with upsert to handle duplicate docIds in manifest
+    const ops = documents.map(doc => ({
+      updateOne: {
+        filter: { docId: doc.docId },
+        update: { $set: doc },
+        upsert: true
+      }
+    }));
+    const result = await collection.bulkWrite(ops);
+    console.log(`Upserted ${result.upsertedCount} new, updated ${result.modifiedCount} existing documents`);
   }
 
   // Create indexes
-  await collection.createIndex({ docId: 1 }, { unique: true });
+  await collection.createIndex({ docId: 1 }, { unique: true }).catch(() => {
+    console.warn('Unique index on docId failed, creating non-unique');
+    return collection.createIndex({ docId: 1 });
+  });
   await collection.createIndex({ tags: 1 });
   await collection.createIndex({ domain: 1 });
-  await collection.createIndex({ title: 'text', content: 'text' });
+  await collection.createIndex({ title: 'text', content: 'text' }).catch(e => {
+    console.warn('Text index creation:', e.codeName);
+  });
   console.log('Indexes created');
 
   await client.close();

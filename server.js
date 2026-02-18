@@ -14,12 +14,21 @@ async function connectDB() {
   db = client.db();
   console.log('Connected to MongoDB');
 
-  // Create indexes
+  // Create indexes (skip unique if duplicates exist from import)
   const docs = db.collection('documents');
-  await docs.createIndex({ docId: 1 }, { unique: true });
+  try {
+    await docs.createIndex({ docId: 1 }, { unique: true });
+  } catch (e) {
+    console.warn('docId unique index failed (duplicates exist), creating non-unique:', e.codeName);
+    await docs.createIndex({ docId: 1 });
+  }
   await docs.createIndex({ tags: 1 });
   await docs.createIndex({ domain: 1 });
-  await docs.createIndex({ title: 'text', content: 'text' });
+  try {
+    await docs.createIndex({ title: 'text', content: 'text' });
+  } catch (e) {
+    console.warn('Text index may already exist:', e.codeName);
+  }
   console.log('Indexes created');
 }
 
