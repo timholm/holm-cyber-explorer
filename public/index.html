@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOLM VAULT</title>
+<style>
+:root {
+  --bg-primary: #1e1e2e;
+  --bg-secondary: #181825;
+  --bg-tertiary: #11111b;
+  --bg-surface: #313244;
+  --bg-hover: #45475a;
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --text-muted: #6c7086;
+  --accent: #89b4fa;
+  --accent-dim: #2a3a5c;
+  --green: #a6e3a1;
+  --red: #f38ba8;
+  --yellow: #f9e2af;
+  --peach: #fab387;
+  --mauve: #cba6f7;
+  --teal: #94e2d5;
+  --pink: #f5c2e7;
+  --border: #313244;
+  --sidebar-width: 260px;
+  --backlinks-width: 240px;
+  --header-height: 48px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* HEADER */
+.header {
+  height: var(--header-height);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 100;
+}
+.header-brand {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.search-box {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+}
+.search-box input {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  padding: 6px 12px 6px 32px;
+  font-size: 13px;
+  outline: none;
+}
+.search-box input:focus { border-color: var(--accent); }
+.search-box::before {
+  content: '⌕';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-top: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+  display: none;
+  z-index: 200;
+}
+.search-results.active { display: block; }
+.search-result-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.search-result-item:hover { background: var(--bg-hover); }
+.search-result-item .sr-id { color: var(--accent); font-size: 11px; font-weight: 600; }
+.search-result-item .sr-title { font-size: 13px; }
+.header-actions { display: flex; gap: 8px; margin-left: auto; }
+.header-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.header-btn:hover { background: var(--bg-hover); }
+.header-btn.active { background: var(--accent-dim); border-color: var(--accent); }
+
+/* LAYOUT */
+.layout {
+  display: flex;
+  height: calc(100vh - var(--header-height));
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  transition: transform 0.2s;
+}
+.sidebar-section {
+  margin-bottom: 2px;
+}
+.sidebar-section-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  user-select: none;
+}
+.sidebar-section-header:hover { color: var(--text-primary); }
+.sidebar-section-header .arrow {
+  margin-right: 6px;
+  font-size: 10px;
+  transition: transform 0.15s;
+  display: inline-block;
+  width: 12px;
+}
+.sidebar-section.collapsed .arrow { transform: rotate(-90deg); }
+.sidebar-section.collapsed .sidebar-items { display: none; }
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px 4px 28px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.sidebar-item.active { background: var(--accent-dim); color: var(--accent); }
+.sidebar-item .doc-id {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: monospace;
+  margin-right: 8px;
+  min-width: 56px;
+}
+.sidebar-item .doc-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-count {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 48px;
+  min-width: 0;
+}
+.welcome {
+  max-width: 600px;
+  margin: 80px auto;
+  text-align: center;
+}
+.welcome h1 { font-size: 28px; margin-bottom: 12px; color: var(--accent); }
+.welcome p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+.welcome .stats { margin-top: 24px; display: flex; gap: 24px; justify-content: center; }
+.welcome .stat { text-align: center; }
+.welcome .stat-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+.welcome .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+
+/* DOC VIEWER */
+.doc-viewer { display: none; max-width: 860px; }
+.doc-viewer.active { display: block; }
+.doc-header { margin-bottom: 24px; }
+.doc-header h1 { font-size: 24px; line-height: 1.3; margin-bottom: 8px; }
+.doc-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.doc-meta .badge {
+  background: var(--bg-surface);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.doc-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.doc-toolbar button {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.doc-toolbar button:hover { color: var(--text-primary); background: var(--bg-surface); }
+.doc-toolbar button.active { color: var(--accent); border-color: var(--accent); }
+.doc-body {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+.doc-body h1 { font-size: 22px; margin: 24px 0 12px; color: var(--text-primary); }
+.doc-body h2 { font-size: 18px; margin: 20px 0 10px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.doc-body h3 { font-size: 15px; margin: 16px 0 8px; color: var(--peach); }
+.doc-body p { margin: 8px 0; }
+.doc-body ul, .doc-body ol { margin: 8px 0 8px 24px; }
+.doc-body li { margin: 4px 0; }
+.doc-body em { color: var(--yellow); font-style: italic; }
+.doc-body strong { color: var(--text-primary); font-weight: 700; }
+.doc-body blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 8px 16px;
+  margin: 12px 0;
+  background: var(--bg-secondary);
+  border-radius: 0 4px 4px 0;
+}
+.doc-body code {
+  background: var(--bg-surface);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.doc-body pre {
+  background: var(--bg-tertiary);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+.doc-body pre code { background: none; padding: 0; }
+.doc-body table { border-collapse: collapse; margin: 12px 0; width: 100%; }
+.doc-body th, .doc-body td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 13px;
+  text-align: left;
+}
+.doc-body th { background: var(--bg-surface); font-weight: 600; }
+.doc-body .metadata { display: none; }
+.doc-body aside.metadata { display: none; }
+
+/* Edit mode */
+.edit-area {
+  display: none;
+  width: 100%;
+  min-height: 500px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 16px;
+  border-radius: 6px;
+  resize: vertical;
+}
+.edit-area.active { display: block; }
+.save-bar {
+  display: none;
+  margin-top: 12px;
+  gap: 8px;
+}
+.save-bar.active { display: flex; }
+.save-bar button {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+.save-btn { background: var(--accent); color: var(--bg-tertiary); font-weight: 600; }
+.cancel-btn { background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border) !important; }
+
+/* BACKLINKS PANEL */
+.backlinks-panel {
+  width: var(--backlinks-width);
+  min-width: var(--backlinks-width);
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 16px;
+  display: none;
+}
+.backlinks-panel.active { display: block; }
+.backlinks-section { margin-bottom: 20px; }
+.backlinks-section h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.backlink-item {
+  display: block;
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+}
+.backlink-item:hover { color: var(--text-primary); }
+.tag-item {
+  display: inline-block;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin: 2px 4px 2px 0;
+}
+
+/* LOADING */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-muted);
+}
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* STATUS BAR */
+.status-bar {
+  height: 24px;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+  gap: 16px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hamburger { display: block; }
+  .sidebar {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    bottom: 24px;
+    z-index: 50;
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: var(--header-height);
+    background: rgba(0,0,0,0.5);
+    z-index: 49;
+  }
+  .sidebar-overlay.active { display: block; }
+  .backlinks-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    max-height: 40vh;
+    width: 100%;
+    min-width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    z-index: 40;
+  }
+  .main-content { padding: 16px 20px; }
+  .header-actions .graph-label { display: none; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <div class="header-brand">HOLM VAULT</div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search docs..." autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="window.open('/graph.html','_blank')"><span class="graph-label">Graph </span>⬡</button>
+    <button class="header-btn" id="backlinkToggle" onclick="toggleBacklinks()">◫</button>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div id="sidebarContent">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+    <div class="doc-count" id="docCount"></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="mainContent">
+    <div class="welcome" id="welcome">
+      <h1>HOLM VAULT</h1>
+      <p>The holm.chat Documentation Institution — an Obsidian-like knowledge explorer backed by MongoDB.</p>
+      <p style="margin-top:8px;color:var(--text-muted)">Select a document from the sidebar or use search to begin.</p>
+      <div class="stats" id="welcomeStats"></div>
+    </div>
+    <div class="doc-viewer" id="docViewer">
+      <div class="doc-header">
+        <h1 id="docTitle"></h1>
+        <div class="doc-meta" id="docMeta"></div>
+      </div>
+      <div class="doc-toolbar">
+        <button class="active" onclick="setViewMode('preview')" id="btnPreview">Preview</button>
+        <button onclick="setViewMode('edit')" id="btnEdit">Edit</button>
+        <button onclick="setViewMode('raw')" id="btnRaw">Raw HTML</button>
+      </div>
+      <div class="doc-body" id="docBody"></div>
+      <textarea class="edit-area" id="editArea"></textarea>
+      <div class="save-bar" id="saveBar">
+        <button class="save-btn" onclick="saveDoc()">Save</button>
+        <button class="cancel-btn" onclick="setViewMode('preview')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKLINKS PANEL -->
+  <div class="backlinks-panel" id="backlinksPanel">
+    <div class="backlinks-section">
+      <h3>Depends On</h3>
+      <div id="dependsOnList"></div>
+    </div>
+    <div class="backlinks-section">
+      <h3>Depended Upon By</h3>
+      <div id="dependedByList"></div>
+    </div>
+    <div class="backlinks-section">
+      <h3>Tags</h3>
+      <div id="tagsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span id="statusDocs">0 docs</span>
+  <span id="statusDomain"></span>
+  <span id="statusUpdated"></span>
+</div>
+
+<script>
+// State
+let allDocs = [];
+let currentDoc = null;
+let viewMode = 'preview';
+let backlinksPanelOpen = window.innerWidth > 768;
+let docsById = {};
+
+// Domain colors for visual distinction
+const DOMAIN_COLORS = {
+  '1': '#89b4fa', '2': '#a6e3a1', '3': '#f38ba8', '4': '#fab387',
+  '5': '#cba6f7', '6': '#94e2d5', '7': '#f9e2af', '8': '#f5c2e7',
+  '9': '#89dceb', '10': '#b4befe', '11': '#74c7ec', '12': '#f38ba8',
+  '13': '#a6e3a1', '14': '#fab387', '15': '#cba6f7', '16': '#94e2d5',
+  '17': '#f9e2af', '18': '#f5c2e7', '19': '#89dceb', '20': '#b4befe',
+  'META': '#6c7086', 'FW': '#585b70', 'HIC': '#74c7ec'
+};
+
+// Init
+document.addEventListener('DOMContentLoaded', init);
+
+async function init() {
+  try {
+    const res = await fetch('/api/docs');
+    allDocs = await res.json();
+    docsById = {};
+    allDocs.forEach(d => docsById[d.docId] = d);
+    renderSidebar();
+    renderWelcomeStats();
+    if (backlinksPanelOpen) document.getElementById('backlinksPanel').classList.add('active');
+
+    // Handle URL hash for direct doc linking
+    if (window.location.hash) {
+      const id = window.location.hash.slice(1).toUpperCase();
+      if (docsById[id]) openDoc(id);
+    }
+  } catch (err) {
+    document.getElementById('sidebarContent').innerHTML =
+      '<div style="padding:16px;color:var(--red)">Failed to load docs. Is the API running?</div>';
+  }
+}
+
+function renderWelcomeStats() {
+  const domains = new Set(allDocs.map(d => d.domain));
+  document.getElementById('welcomeStats').innerHTML = `
+    <div class="stat"><div class="stat-num">${allDocs.length}</div><div class="stat-label">Documents</div></div>
+    <div class="stat"><div class="stat-num">${domains.size}</div><div class="stat-label">Domains</div></div>
+  `;
+  document.getElementById('statusDocs').textContent = `${allDocs.length} docs`;
+}
+
+function renderSidebar() {
+  // Group by domain
+  const groups = {};
+  allDocs.forEach(doc => {
+    const key = doc.domain || 'Other';
+    if (!groups[key]) groups[key] = { name: doc.domainName || key, docs: [] };
+    groups[key].docs.push(doc);
+  });
+
+  // Sort domain keys numerically where possible
+  const sortedKeys = Object.keys(groups).sort((a, b) => {
+    const na = parseInt(a), nb = parseInt(b);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    if (!isNaN(na)) return -1;
+    if (!isNaN(nb)) return 1;
+    return a.localeCompare(b);
+  });
+
+  let html = '';
+  for (const key of sortedKeys) {
+    const g = groups[key];
+    const color = DOMAIN_COLORS[key] || 'var(--text-muted)';
+    html += `<div class="sidebar-section" data-domain="${key}">
+      <div class="sidebar-section-header" onclick="toggleSection(this)" style="color:${color}">
+        <span class="arrow">▼</span>D${key} ${g.name} <span style="margin-left:auto;font-size:10px;opacity:0.6">${g.docs.length}</span>
+      </div>
+      <div class="sidebar-items">`;
+    for (const doc of g.docs) {
+      html += `<div class="sidebar-item" data-id="${doc.docId}" onclick="openDoc('${doc.docId}')">
+        <span class="doc-id">${doc.docId}</span>
+        <span class="doc-title">${escHtml(doc.title)}</span>
+      </div>`;
+    }
+    html += '</div></div>';
+  }
+  document.getElementById('sidebarContent').innerHTML = html;
+  document.getElementById('docCount').textContent = `${allDocs.length} documents`;
+}
+
+function toggleSection(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+
+async function openDoc(id) {
+  try {
+    const res = await fetch(`/api/docs/${id}`);
+    if (!res.ok) throw new Error('Not found');
+    currentDoc = await res.json();
+
+    // Update URL hash
+    window.location.hash = id;
+
+    // Update sidebar active state
+    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    const activeItem = document.querySelector(`.sidebar-item[data-id="${id}"]`);
+    if (activeItem) {
+      activeItem.classList.add('active');
+      activeItem.scrollIntoView({ block: 'nearest' });
+    }
+
+    // Render doc
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('docViewer').classList.add('active');
+
+    document.getElementById('docTitle').textContent = `${currentDoc.docId} — ${currentDoc.title}`;
+    document.getElementById('docMeta').innerHTML = `
+      <span class="badge" style="color:${DOMAIN_COLORS[currentDoc.domain] || 'var(--text-muted)'}">Domain ${currentDoc.domain}: ${escHtml(currentDoc.domainName)}</span>
+      ${currentDoc.version ? `<span class="badge">v${currentDoc.version}</span>` : ''}
+      ${currentDoc.status ? `<span class="badge">${currentDoc.status}</span>` : ''}
+      ${currentDoc.date ? `<span class="badge">${currentDoc.date}</span>` : ''}
+    `;
+
+    setViewMode('preview');
+    renderBacklinks();
+
+    // Status bar
+    document.getElementById('statusDomain').textContent = `Domain ${currentDoc.domain}`;
+    document.getElementById('statusUpdated').textContent = `Updated: ${new Date(currentDoc.updatedAt).toLocaleDateString()}`;
+
+    // Close mobile sidebar
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+  } catch (err) {
+    console.error('Failed to open doc:', err);
+  }
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  const body = document.getElementById('docBody');
+  const edit = document.getElementById('editArea');
+  const saveBar = document.getElementById('saveBar');
+
+  document.querySelectorAll('.doc-toolbar button').forEach(b => b.classList.remove('active'));
+
+  if (mode === 'preview') {
+    body.style.display = 'block';
+    body.innerHTML = currentDoc.content;
+    edit.classList.remove('active');
+    saveBar.classList.remove('active');
+    document.getElementById('btnPreview').classList.add('active');
+  } else if (mode === 'edit') {
+    body.style.display = 'none';
+    edit.value = currentDoc.content;
+    edit.classList.add('active');
+    saveBar.classList.add('active');
+    document.getElementById('btnEdit').classList.add('active');
+  } else if (mode === 'raw') {
+    body.style.display = 'block';
+    body.innerHTML = `<pre><code>${escHtml(currentDoc.content)}</code></pre>`;
+    edit.classList.remove('active');
+    saveBar.classList.remove('active');
+    document.getElementById('btnRaw').classList.add('active');
+  }
+}
+
+async function saveDoc() {
+  if (!currentDoc) return;
+  const content = document.getElementById('editArea').value;
+  try {
+    const res = await fetch(`/api/docs/${currentDoc.docId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    });
+    if (!res.ok) throw new Error('Save failed');
+    currentDoc.content = content;
+    setViewMode('preview');
+  } catch (err) {
+    alert('Failed to save: ' + err.message);
+  }
+}
+
+function renderBacklinks() {
+  if (!currentDoc) return;
+
+  // Depends On
+  const depOn = document.getElementById('dependsOnList');
+  if (currentDoc.dependsOn && currentDoc.dependsOn.length > 0) {
+    depOn.innerHTML = currentDoc.dependsOn.map(id => {
+      const ref = docsById[id];
+      const title = ref ? ref.title : id;
+      return `<a class="backlink-item" onclick="openDoc('${id}')">${id}: ${escHtml(title)}</a>`;
+    }).join('');
+  } else {
+    depOn.innerHTML = '<span style="color:var(--text-muted);font-size:12px">None</span>';
+  }
+
+  // Depended Upon By
+  const depBy = document.getElementById('dependedByList');
+  if (currentDoc.dependedBy && currentDoc.dependedBy.length > 0) {
+    depBy.innerHTML = currentDoc.dependedBy.map(id => {
+      const ref = docsById[id];
+      const title = ref ? ref.title : id;
+      return `<a class="backlink-item" onclick="openDoc('${id}')">${id}: ${escHtml(title)}</a>`;
+    }).join('');
+  } else {
+    depBy.innerHTML = '<span style="color:var(--text-muted);font-size:12px">None</span>';
+  }
+
+  // Tags
+  const tags = document.getElementById('tagsList');
+  if (currentDoc.tags && currentDoc.tags.length > 0) {
+    tags.innerHTML = currentDoc.tags.map(t => `<span class="tag-item">#${t}</span>`).join('');
+  } else {
+    tags.innerHTML = '<span style="color:var(--text-muted);font-size:12px">No tags</span>';
+  }
+}
+
+// SEARCH
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', function() {
+  clearTimeout(searchTimeout);
+  const q = this.value.trim();
+  if (q.length < 2) {
+    document.getElementById('searchResults').classList.remove('active');
+    return;
+  }
+  searchTimeout = setTimeout(() => doSearch(q), 250);
+});
+
+document.getElementById('searchInput').addEventListener('focus', function() {
+  if (this.value.trim().length >= 2) {
+    document.getElementById('searchResults').classList.add('active');
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.search-box')) {
+    document.getElementById('searchResults').classList.remove('active');
+  }
+});
+
+async function doSearch(q) {
+  try {
+    const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+    const results = await res.json();
+    const container = document.getElementById('searchResults');
+    if (results.length === 0) {
+      container.innerHTML = '<div class="search-result-item" style="color:var(--text-muted)">No results found</div>';
+    } else {
+      container.innerHTML = results.map(r => `
+        <div class="search-result-item" onclick="openDoc('${r.docId}');document.getElementById('searchResults').classList.remove('active');">
+          <div class="sr-id">${r.docId}</div>
+          <div class="sr-title">${escHtml(r.title)}</div>
+        </div>
+      `).join('');
+    }
+    container.classList.add('active');
+  } catch (err) {
+    console.error('Search failed:', err);
+  }
+}
+
+// TOGGLE FUNCTIONS
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('active');
+}
+
+function toggleBacklinks() {
+  backlinksPanelOpen = !backlinksPanelOpen;
+  document.getElementById('backlinksPanel').classList.toggle('active', backlinksPanelOpen);
+  document.getElementById('backlinkToggle').classList.toggle('active', backlinksPanelOpen);
+}
+
+// UTILITY
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Handle hash changes (browser back/forward)
+window.addEventListener('hashchange', () => {
+  const id = window.location.hash.slice(1).toUpperCase();
+  if (id && docsById[id] && (!currentDoc || currentDoc.docId !== id)) {
+    openDoc(id);
+  }
+});
+</script>
+</body>
+</html>
