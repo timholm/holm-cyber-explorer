@@ -135,7 +135,7 @@ function generateTags(entry, domainName) {
 }
 
 async function main() {
-  console.log('Starting HOLM Vault import...');
+  console.log('Starting holm.chat import...');
   console.log(`MongoDB: ${MONGODB_URI}`);
 
   const client = new MongoClient(MONGODB_URI);

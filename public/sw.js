@@ -1,18 +1,17 @@
 // HOLM Vault — Service Worker
 // Cache-first for static assets, network-first for API calls
 
-var CACHE_VERSION = 'holm-vault-v1';
+var CACHE_VERSION = 'holm-chat-v2';
 
 var PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/graph.html',
   '/manifest.json',
   '/icons/icon-192.svg',
   '/icons/icon-512.svg'
 ];
 
-var API_ROUTES = ['/api/docs', '/api/graph', '/api/tags'];
+var API_ROUTES = ['/api/docs', '/api/graph', '/api/tags', '/api/comments', '/api/health', '/api/search'];
 
 // ─── Install: precache static assets ────────────────────────────────
 self.addEventListener('install', function(event) {

@@ -40,6 +40,8 @@ async function connectDB() {
   } catch (e) {
     console.warn('Text index may already exist:', e.codeName);
   }
+  await db.collection('comments').createIndex({ docId: 1 });
+  await db.collection('comments').createIndex({ createdAt: -1 });
   console.log('Indexes created');
 }
 
@@ -266,6 +268,72 @@ app.get('/api/tags', async (req, res) => {
   }
 });
 
+// List comments for a document
+app.get('/api/docs/:id/comments', async (req, res) => {
+  try {
+    const comments = await db.collection('comments')
+      .find({ docId: req.params.id.toUpperCase() })
+      .sort({ createdAt: -1 })
+      .toArray();
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add a comment (no auth required - public comments)
+app.post('/api/docs/:id/comments', async (req, res) => {
+  try {
+    const { author, text } = req.body;
+    if (!text || !text.trim()) return res.status(400).json({ error: 'Comment text is required' });
+    if (!author || !author.trim()) return res.status(400).json({ error: 'Author name is required' });
+    const comment = {
+      docId: req.params.id.toUpperCase(),
+      author: author.trim().slice(0, 50),
+      text: text.trim().slice(0, 2000),
+      createdAt: new Date()
+    };
+    const result = await db.collection('comments').insertOne(comment);
+    comment._id = result.insertedId;
+    res.status(201).json(comment);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete a comment (auth required)
+app.delete('/api/comments/:id', authMiddleware, async (req, res) => {
+  try {
+    const result = await db.collection('comments').deleteOne({ _id: new ObjectId(req.params.id) });
+    if (result.deletedCount === 0) return res.status(404).json({ error: 'Comment not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Domain health summary
+app.get('/api/health', async (req, res) => {
+  try {
+    const docs = await db.collection('documents')
+      .find({}, { projection: { docId: 1, domain: 1, domainName: 1, dependsOn: 1, dependedBy: 1, status: 1, tags: 1 } })
+      .toArray();
+    const docIds = new Set(docs.map(d => d.docId));
+    const domains = {};
+    for (const doc of docs) {
+      const key = doc.domain || 'unknown';
+      if (!domains[key]) domains[key] = { name: doc.domainName || key, total: 0, issues: 0, orphaned: 0, broken: 0 };
+      domains[key].total++;
+      const brokenDeps = (doc.dependsOn || []).filter(d => !docIds.has(d));
+      if (brokenDeps.length > 0) domains[key].broken++;
+      if ((doc.dependsOn || []).length === 0 && (doc.dependedBy || []).length === 0) domains[key].orphaned++;
+    }
+    res.json({ totalDocs: docs.length, domains });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Trigger import
 app.post('/api/import', authMiddleware, async (req, res) => {
   try {
@@ -342,7 +410,7 @@ app.get('*', (req, res) => {
 // Start the HTTP server immediately so k8s probes can respond while MongoDB connects.
 // API routes return 503 until db is populated by connectWithRetry().
 app.listen(PORT, () => {
-  console.log(`HOLM Vault API running on port ${PORT}`);
+  console.log(`holm.chat running on port ${PORT}`);
 });
 
 connectWithRetry();

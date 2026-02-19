@@ -138,7 +138,7 @@ spec:
     - name: main-gateway
       namespace: default
   hostnames:
-    - "cyber.holm.chat"
+    - "holm.chat"
   rules:
     - matches:
         - path:
@@ -147,3 +147,25 @@ spec:
       backendRefs:
         - name: holm-cyber
           port: 3000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: holm-cyber-redirect
+  namespace: holm-cyber
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: default
+  hostnames:
+    - "cyber.holm.chat"
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            hostname: holm.chat
+            statusCode: 301
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
