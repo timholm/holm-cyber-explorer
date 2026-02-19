@@ -65,6 +65,41 @@ spec:
               value: "mongodb://mongodb.holm-cyber.svc:27017/holmvault"
             - name: PORT
               value: "3000"
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: holm-cyber-secrets
+                  key: api-key
+                  optional: true
+            - name: WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: holm-cyber-secrets
+                  key: webhook-secret
+                  optional: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
           volumeMounts:
             - name: app-content
               mountPath: /app

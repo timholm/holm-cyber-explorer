@@ -1,12 +1,23 @@
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/holmvault';
 
 let db;
+
+function validateGithubSignature(payload, signature, secret) {
+  const hmac = crypto.createHmac('sha256', secret);
+  const digest = 'sha256=' + hmac.update(payload).digest('hex');
+  try {
+    return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
+  } catch {
+    return false;
+  }
+}
 
 async function connectDB() {
   const client = new MongoClient(MONGODB_URI);
@@ -32,9 +43,59 @@ async function connectDB() {
   console.log('Indexes created');
 }
 
+async function connectWithRetry() {
+  const MAX_ATTEMPTS = 10;
+  const delays = [1000, 2000, 4000, 8000, 16000, 30000, 30000, 30000, 30000, 30000];
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      await connectDB();
+      return;
+    } catch (err) {
+      if (attempt === MAX_ATTEMPTS) {
+        console.error(`MongoDB connection failed after ${MAX_ATTEMPTS} attempts:`, err.message);
+        process.exit(1);
+      }
+      const delaySec = delays[attempt - 1] / 1000;
+      console.warn(
+        `Retrying MongoDB connection (attempt ${attempt}/${MAX_ATTEMPTS}) in ${delaySec}s... (${err.message})`
+      );
+      await new Promise(resolve => setTimeout(resolve, delays[attempt - 1]));
+    }
+  }
+}
+
 // Middleware
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Return 503 for /api routes while MongoDB is still connecting
+app.use('/api', (req, res, next) => {
+  if (!db) return res.status(503).json({ error: 'Database connecting...' });
+  next();
+});
+
+// API key authentication
+const API_KEY = process.env.API_KEY || (() => {
+  const generated = crypto.randomBytes(32).toString('hex');
+  console.warn(`No API_KEY set — generated for this session: ${generated}`);
+  return generated;
+})();
+
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const xApiKey = req.headers['x-api-key'];
+  let providedKey = null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    providedKey = authHeader.slice(7);
+  } else if (xApiKey) {
+    providedKey = xApiKey;
+  }
+  if (!providedKey || providedKey !== API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}
 
 // List all docs (lightweight — no content field)
 app.get('/api/docs', async (req, res) => {
@@ -65,7 +126,7 @@ app.get('/api/docs/:id', async (req, res) => {
 });
 
 // Update doc
-app.put('/api/docs/:id', async (req, res) => {
+app.put('/api/docs/:id', authMiddleware, async (req, res) => {
   try {
     const { content, tags, title } = req.body;
     const update = { $set: { updatedAt: new Date() } };
@@ -84,7 +145,7 @@ app.put('/api/docs/:id', async (req, res) => {
 });
 
 // Create doc
-app.post('/api/docs', async (req, res) => {
+app.post('/api/docs', authMiddleware, async (req, res) => {
   try {
     const { docId, title, domain, domainName, content, tags, dependsOn, dependedBy, source } = req.body;
     if (!docId || !title) return res.status(400).json({ error: 'docId and title are required' });
@@ -111,7 +172,7 @@ app.post('/api/docs', async (req, res) => {
 });
 
 // Delete doc
-app.delete('/api/docs/:id', async (req, res) => {
+app.delete('/api/docs/:id', authMiddleware, async (req, res) => {
   try {
     const result = await db.collection('documents').deleteOne({ docId: req.params.id.toUpperCase() });
     if (result.deletedCount === 0) return res.status(404).json({ error: 'Document not found' });
@@ -121,7 +182,7 @@ app.delete('/api/docs/:id', async (req, res) => {
   }
 });
 
-// Full-text search
+// Full-text search with snippets
 app.get('/api/search', async (req, res) => {
   try {
     const { q } = req.query;
@@ -129,12 +190,32 @@ app.get('/api/search', async (req, res) => {
     const docs = await db.collection('documents')
       .find(
         { $text: { $search: q } },
-        { projection: { content: 0, score: { $meta: 'textScore' } } }
+        { projection: { score: { $meta: 'textScore' } } }
       )
       .sort({ score: { $meta: 'textScore' } })
       .limit(50)
       .toArray();
-    res.json(docs);
+
+    const term = q.trim();
+    const termRe = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+
+    const results = docs.map(doc => {
+      const plain = (doc.content || '').replace(/<[^>]*>/g, '');
+      const matchIdx = plain.search(termRe);
+      let snippet = '';
+      if (matchIdx !== -1) {
+        const start = Math.max(0, matchIdx - 60);
+        const end = Math.min(plain.length, matchIdx + term.length + 90);
+        const raw = plain.slice(start, end).trim();
+        snippet = raw.replace(termRe, m => `<mark>${m}</mark>`);
+      } else {
+        snippet = plain.slice(0, 150).trim();
+      }
+      const { content, ...rest } = doc;
+      return { ...rest, snippet };
+    });
+
+    res.json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -186,7 +267,7 @@ app.get('/api/tags', async (req, res) => {
 });
 
 // Trigger import
-app.post('/api/import', async (req, res) => {
+app.post('/api/import', authMiddleware, async (req, res) => {
   try {
     const { execSync } = require('child_process');
     execSync('node import.js', { cwd: __dirname, stdio: 'pipe', timeout: 120000 });
@@ -196,17 +277,72 @@ app.post('/api/import', async (req, res) => {
   }
 });
 
+// GitHub webhook — drop collection and reimport on push to main
+app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const secret = process.env.WEBHOOK_SECRET;
+  const signature = req.headers['x-hub-signature-256'];
+
+  if (secret) {
+    if (!signature || !validateGithubSignature(req.body, signature, secret)) {
+      return res.status(401).json({ error: 'Invalid webhook signature' });
+    }
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(req.body.toString());
+  } catch {
+    return res.status(400).json({ error: 'Invalid JSON payload' });
+  }
+
+  const pushedBranch = (payload.ref || '').replace('refs/heads/', '');
+  if (pushedBranch !== 'main') {
+    return res.status(200).json({ success: true, message: 'Push to non-main branch ignored' });
+  }
+
+  res.json({ success: true, message: 'Reimport triggered' });
+
+  (async () => {
+    try {
+      const { exec } = require('child_process');
+      const { promisify } = require('util');
+      const execAsync = promisify(exec);
+
+      console.log('[webhook] Pulling latest code...');
+      await execAsync('git -C /app pull');
+
+      console.log('[webhook] Dropping documents collection...');
+      await db.collection('documents').drop().catch(() => {});
+
+      console.log('[webhook] Running import.js...');
+      await execAsync('node import.js', { cwd: __dirname, timeout: 120000 });
+
+      console.log('[webhook] Reimport completed successfully.');
+    } catch (err) {
+      console.error('[webhook] Reimport failed:', err.message);
+    }
+  })();
+});
+
+// Health check — used by Kubernetes liveness/readiness probes
+app.get('/healthz', async (req, res) => {
+  try {
+    await db.admin().ping();
+    res.status(200).json({ status: 'ok', mongo: 'connected' });
+  } catch (err) {
+    res.status(503).json({ status: 'error', mongo: 'disconnected', error: err.message });
+  }
+});
+
 // SPA fallback — serve index.html for non-API, non-file routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`HOLM Vault API running on port ${PORT}`);
-  });
-}).catch(err => {
-  console.error('Failed to connect to MongoDB:', err);
-  process.exit(1);
+// Start the HTTP server immediately so k8s probes can respond while MongoDB connects.
+// API routes return 503 until db is populated by connectWithRetry().
+app.listen(PORT, () => {
+  console.log(`HOLM Vault API running on port ${PORT}`);
 });
+
+connectWithRetry();
