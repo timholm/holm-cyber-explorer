@@ -242,6 +242,9 @@ body.offline .offline-bar { display: block; }
 /* ── Progress Bar ── */
 .progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--cyan); z-index: 200; width: 0%; transition: width 0.1s; pointer-events: none; opacity: 0; }
 .progress-bar.visible { opacity: 1; }
+/* ── Copy Button ── */
+.copy-btn { font-size: 0.65rem; color: var(--muted); padding: 0.2rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; transition: color 0.15s, border-color 0.15s; }
+.copy-btn:hover { color: var(--cyan); border-color: var(--cyan); }
 /* ── Print ── */
 @media print {
   header, .search-overlay, .toast-container, .comments, .offline-bar, .back-top, .progress-bar, .doc-nav-footer, .toc, .deps { display: none !important; }
@@ -280,7 +283,9 @@ body.offline .offline-bar { display: block; }
 
 <header>
   <span class="logo" onclick="goHome()">holm.chat</span>
+  <span id="doc-count" style="font-size:0.6rem;color:var(--dim);margin-left:-0.5rem"></span>
   <nav>
+    <button onclick="openRandom()" style="font-size:0.75rem;color:var(--muted);padding:0.3rem 0;transition:color 0.15s" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--muted)'">random</button>
     <button class="search-trigger" onclick="openSearch()">search <kbd>/</kbd></button>
   </nav>
 </header>
@@ -330,6 +335,17 @@ function toast(msg, type) {
   t.textContent = msg;
   document.getElementById('toasts').appendChild(t);
   setTimeout(function() { t.classList.add('out'); setTimeout(function() { t.remove(); }, 200); }, 3000);
+}
+
+function copyDocText() {
+  var el = document.querySelector('.doc-content');
+  if (!el) return;
+  var text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    toast('Copied to clipboard');
+  }).catch(function() {
+    toast('Copy failed', 'error');
+  });
 }
 
 function timeAgo(d) {
@@ -489,6 +505,10 @@ async function renderDoc(id) {
   html += '<span>' + esc(domainName) + '</span>';
   html += '<span class="sep">/</span>';
   html += '<span>' + esc(doc.docId) + '</span>';
+  html += '</div>';
+
+  html += '<div style="display:flex;justify-content:flex-end;margin-bottom:0.5rem">';
+  html += '<button class="copy-btn" onclick="copyDocText()">Copy text</button>';
   html += '</div>';
 
   html += '<h1>' + esc(doc.title) + '</h1>';
@@ -680,6 +700,7 @@ async function init() {
     allDocs = await res.json();
     docsById = {};
     allDocs.forEach(function(d) { docsById[d.docId] = d; });
+    document.getElementById('doc-count').textContent = allDocs.length + ' docs';
 
     var h = location.hash.slice(1);
     if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
