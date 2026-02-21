@@ -427,8 +427,18 @@ app.get('*', (req, res) => {
 
 // Start the HTTP server immediately so k8s probes can respond while MongoDB connects.
 // API routes return 503 until db is populated by connectWithRetry().
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`holm.chat running on port ${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully...');
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
+  setTimeout(() => { console.error('Forced shutdown'); process.exit(1); }, 10000);
 });
 
 connectWithRetry();
