@@ -105,6 +105,48 @@ main { max-width: var(--max-w); margin: 0 auto; padding: 1.5rem 1rem 4rem; }
   color: var(--muted);
 }
 .tag.domain { border-color: var(--cyan); color: var(--cyan); }
+/* Document Metadata Bar */
+.doc-meta-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 0.65rem; margin-bottom: 0.8rem;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+}
+.meta-badge {
+  font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.5rem;
+  border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 0.25rem;
+}
+.meta-badge.version {
+  background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--cyan);
+}
+.meta-badge.domain-badge {
+  border: 1px solid; font-weight: 500;
+}
+.status-pill {
+  font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.5rem;
+  border-radius: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 0.25rem;
+}
+.status-pill::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  display: inline-block; flex-shrink: 0;
+}
+.status-pill.active { background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.3); color: #00e676; }
+.status-pill.active::before { background: #00e676; box-shadow: 0 0 4px #00e676; }
+.status-pill.draft { background: rgba(255, 235, 59, 0.1); border: 1px solid rgba(255, 235, 59, 0.3); color: #ffeb3b; }
+.status-pill.draft::before { background: #ffeb3b; box-shadow: 0 0 4px #ffeb3b; }
+.status-pill.deprecated { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); color: #ff4444; }
+.status-pill.deprecated::before { background: #ff4444; box-shadow: 0 0 4px #ff4444; }
+.status-pill.unknown { background: rgba(102, 102, 120, 0.1); border: 1px solid rgba(102, 102, 120, 0.3); color: var(--muted); }
+.status-pill.unknown::before { background: var(--muted); }
+.meta-date {
+  font-size: 0.6rem; color: var(--muted); margin-left: auto;
+  display: inline-flex; align-items: center; gap: 0.25rem;
+}
+.meta-date .date-icon { opacity: 0.6; }
+.meta-sep { width: 1px; height: 1rem; background: var(--border); flex-shrink: 0; }
+
 
 /* Dependencies */
 .deps { margin-bottom: 1.5rem; }
@@ -312,6 +354,28 @@ body.offline main { padding-top: 2.5rem; }
 .health-fill.yellow { background: #ffcc00; box-shadow: 0 0 4px rgba(255,204,0,0.3); }
 .health-fill.red { background: #ff4444; box-shadow: 0 0 4px rgba(255,68,68,0.3); }
 .health-score { font-size: 0.6rem; color: var(--dim); min-width: 2.5rem; text-align: right; }
+
+/* ── Mini Dependency Graph ── */
+.mini-graph {
+  margin: 1rem 0 1.5rem;
+  padding: 1rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.mini-graph-label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.mini-graph svg { display: block; margin: 0 auto; }
+.mini-graph svg text { font-family: var(--font); }
+.mini-graph svg .graph-node { cursor: pointer; }
+.mini-graph svg .graph-node:hover circle { filter: brightness(1.4); }
+.mini-graph svg .graph-node:hover text { fill: #fff; }
+.mini-graph svg .graph-edge { stroke-width: 1.5; fill: none; }
 </style>
 </head>
 <body>
@@ -678,6 +742,66 @@ function setupTocObserver() {
   headings.forEach(function(h) { tocObserver.observe(h); });
 }
 
+/* ── Mini Dependency Graph ── */
+function renderMiniGraph(doc) {
+  var container = document.getElementById('mini-graph');
+  if (!container) return;
+
+  var deps = (doc.dependsOn || []).filter(function(d) { return docsById[d]; });
+  var refs = (doc.dependedBy || []).filter(function(d) { return docsById[d]; });
+  var totalNodes = deps.length + refs.length;
+  if (totalNodes === 0) { container.style.display = 'none'; return; }
+
+  var w = Math.min(460, container.clientWidth - 32);
+  var h = Math.min(320, 180 + totalNodes * 12);
+  var cx = w / 2;
+  var cy = h / 2;
+  var radius = Math.min(cx, cy) - 40;
+
+  var allConnected = [];
+  deps.forEach(function(d) { allConnected.push({ id: d, type: 'dep' }); });
+  refs.forEach(function(d) { allConnected.push({ id: d, type: 'ref' }); });
+
+  var angleStep = (2 * Math.PI) / allConnected.length;
+  var startAngle = -Math.PI / 2;
+
+  var svg = '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">';
+
+  // Draw edges from center to each connected node
+  allConnected.forEach(function(node, i) {
+    var angle = startAngle + i * angleStep;
+    var nx = cx + radius * Math.cos(angle);
+    var ny = cy + radius * Math.sin(angle);
+    var color = node.type === 'dep' ? '#ff00aa' : '#333344';
+    svg += '<line class="graph-edge" x1="' + cx + '" y1="' + cy + '" x2="' + nx + '" y2="' + ny + '" stroke="' + color + '" opacity="0.5"/>';
+  });
+
+  // Draw connected nodes with labels
+  allConnected.forEach(function(node, i) {
+    var angle = startAngle + i * angleStep;
+    var nx = cx + radius * Math.cos(angle);
+    var ny = cy + radius * Math.sin(angle);
+    var fill = node.type === 'dep' ? '#ff00aa' : '#444460';
+    var textFill = node.type === 'dep' ? '#ff00aa' : '#666678';
+    var label = node.id.length > 12 ? node.id.substring(0, 11) + '\u2026' : node.id;
+    svg += '<g class="graph-node" onclick="openDoc(\'' + esc(node.id) + '\')"><title>' + esc(node.id) + '</title>';
+    svg += '<circle cx="' + nx + '" cy="' + ny + '" r="6" fill="' + fill + '" stroke="' + fill + '" stroke-width="2" fill-opacity="0.3"/>';
+    var textAnchor = (nx < cx - 10) ? 'end' : (nx > cx + 10) ? 'start' : 'middle';
+    var textDx = (nx < cx - 10) ? -10 : (nx > cx + 10) ? 10 : 0;
+    var textDy = (Math.abs(nx - cx) <= 10) ? (ny < cy ? -12 : 18) : 4;
+    svg += '<text x="' + nx + '" y="' + ny + '" dx="' + textDx + '" dy="' + textDy + '" text-anchor="' + textAnchor + '" fill="' + textFill + '" font-size="9">' + esc(label) + '</text>';
+    svg += '</g>';
+  });
+
+  // Draw center node (current document) in cyan
+  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="10" fill="#00f0ff" fill-opacity="0.2" stroke="#00f0ff" stroke-width="2"/>';
+  var centerLabel = doc.docId.length > 14 ? doc.docId.substring(0, 13) + '\u2026' : doc.docId;
+  svg += '<text x="' + cx + '" y="' + (cy + 22) + '" text-anchor="middle" fill="#00f0ff" font-size="10" font-weight="bold">' + esc(centerLabel) + '</text>';
+
+  svg += '</svg>';
+  container.querySelector('.mini-graph-svg').innerHTML = svg;
+}
+
 async function renderDoc(id) {
   var el = document.getElementById('main');
   var doc = docsById[id];
@@ -734,10 +858,46 @@ async function renderDoc(id) {
   html += '<button id="bookmark-btn" class="bookmark-btn' + (isBookmarked(id) ? ' active' : '') + '" onclick="toggleBookmark(\'' + esc(id) + '\')">' + (isBookmarked(id) ? '\u2605' : '\u2606') + '</button>';
   html += '</div>';
 
+  // Domain color mapping
+  var domainColors = {
+    '1':'#00f0ff','2':'#ff00aa','3':'#ff4444','4':'#ff9800','5':'#00e676',
+    '6':'#7c4dff','7':'#00bcd4','8':'#ffeb3b','9':'#e040fb','10':'#76ff03',
+    '11':'#ff6e40','12':'#f44336','13':'#64ffda','14':'#448aff','15':'#ea80fc',
+    '16':'#ffd740','17':'#b388ff','18':'#84ffff','19':'#ff80ab','20':'#69f0ae',
+    'META':'#666678','FW':'#666678','HIC':'#00f0ff'
+  };
+  var dColor = domainColors[doc.domain] || 'var(--cyan)';
+
+  // Status class mapping
+  var statusRaw = (doc.status || '').toLowerCase().trim();
+  var statusClass = 'unknown';
+  if (statusRaw === 'active' || statusRaw === 'ratified' || statusRaw === 'approved' || statusRaw === 'final') statusClass = 'active';
+  else if (statusRaw === 'draft' || statusRaw === 'pending' || statusRaw === 'review') statusClass = 'draft';
+  else if (statusRaw === 'deprecated' || statusRaw === 'archived' || statusRaw === 'obsolete' || statusRaw === 'retired') statusClass = 'deprecated';
+  else if (statusRaw) statusClass = 'active';
+
+  // Format date
+  var metaDateStr = '';
+  var rawDate = doc.updatedAt || doc.date;
+  if (rawDate) {
+    var dd = new Date(rawDate);
+    if (!isNaN(dd.getTime())) {
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      metaDateStr = months[dd.getMonth()] + ' ' + dd.getDate() + ', ' + dd.getFullYear();
+    }
+  }
+
+  // Metadata bar
+  html += '<div class="doc-meta-bar">';
+  if (doc.version) html += '<span class="meta-badge version">v' + esc(doc.version) + '</span>';
+  if (doc.status) html += '<span class="status-pill ' + statusClass + '">' + esc(doc.status) + '</span>';
+  if ((doc.version || doc.status) && metaDateStr) html += '<span class="meta-sep"></span>';
+  html += '<span class="meta-badge domain-badge" style="border-color:' + dColor + ';color:' + dColor + ';background:' + dColor + '11">' + esc(domainName) + '</span>';
+  if (metaDateStr) html += '<span class="meta-date"><span class="date-icon">&#9719;</span> ' + esc(metaDateStr) + '</span>';
+  html += '</div>';
+
+  // Tags row
   html += '<div class="doc-meta">';
-  html += '<span class="tag domain">' + esc(doc.domain) + '</span>';
-  if (doc.status) html += '<span class="tag">' + esc(doc.status) + '</span>';
-  if (doc.version) html += '<span class="tag">v' + esc(doc.version) + '</span>';
   html += '<span class="tag">' + words.toLocaleString() + ' words</span>';
   html += '<span class="tag">' + readMin + ' min</span>';
   if (doc.tags) doc.tags.forEach(function(t) { html += '<span class="tag">' + esc(t) + '</span>'; });
@@ -762,6 +922,13 @@ async function renderDoc(id) {
     html += '</div></div>';
   }
 
+  if (deps.length > 0 || refs.length > 0) {
+    html += '<div id="mini-graph" class="mini-graph">';
+    html += '<div class="mini-graph-label">Dependency Graph</div>';
+    html += '<div class="mini-graph-svg"></div>';
+    html += '</div>';
+  }
+
   var tocResult = buildTOC(doc.content);
   html += tocResult.toc;
   html += '<div class="doc-content">' + (linkifyDocIds(tocResult.content) || '<p style="color:var(--dim)">No content</p>') + '</div>';
@@ -780,6 +947,7 @@ async function renderDoc(id) {
 
   html += '</div>';
   el.innerHTML = html;
+  renderMiniGraph(doc);
   window.scrollTo(0, 0);
 
   var saved = localStorage.getItem('holm-author');
