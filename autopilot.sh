@@ -107,19 +107,26 @@ except Exception as e:
 
 # ─── Dashboard helpers (fire-and-forget) ───
 post_activity() {
-  local type="$1" agent="$2" message="$3" status="${4:-info}" detail="${5:-}"
+  local ev_type="$1" ev_agent="$2" ev_message="$3" ev_status="${4:-info}" ev_detail="${5:-}"
   [ -z "$HOLM_API_KEY" ] && return 0
+  local payload
+  payload=$(python3 <<PYEOF
+import json
+d = {
+    "type": """${ev_type}""",
+    "agent": """${ev_agent}""",
+    "message": """${ev_message}"""[:500],
+    "status": """${ev_status}""",
+    "detail": """${ev_detail}"""[:2000],
+    "iteration": ${ITERATION:-0}
+}
+print(json.dumps(d))
+PYEOF
+  )
   curl -s --max-time 5 -X POST "$HOLM_API_URL/api/activity" \
     -H "Content-Type: application/json" \
     -H "X-Api-Key: $HOLM_API_KEY" \
-    -d "$(python3 -c "
-import json, sys
-print(json.dumps({
-    'type': sys.argv[1], 'agent': sys.argv[2], 'message': sys.argv[3],
-    'status': sys.argv[4], 'detail': sys.argv[5][:2000] if len(sys.argv) > 5 else '',
-    'iteration': int(sys.argv[6]) if len(sys.argv) > 6 else 0
-}))
-" "$type" "$agent" "$message" "$status" "$detail" "${ITERATION:-0}")" >/dev/null 2>&1 &
+    -d "$payload" >/dev/null 2>&1 &
 }
 
 update_agent_state() {
@@ -132,20 +139,24 @@ update_agent_state() {
 }
 
 create_work_log() {
-  local iteration="$1" summary="$2" analysis="${3:-}" duration="${4:-0}"
+  local wl_iter="$1" wl_summary="$2" wl_analysis="${3:-}" wl_duration="${4:-0}"
   [ -z "$HOLM_API_KEY" ] && return 0
+  local payload
+  payload=$(python3 <<PYEOF
+import json
+d = {
+    "iteration": ${wl_iter},
+    "summary": """${wl_summary}"""[:2000],
+    "analysis": """${wl_analysis}"""[:2000],
+    "duration": ${wl_duration}
+}
+print(json.dumps(d))
+PYEOF
+  )
   curl -s --max-time 10 -X POST "$HOLM_API_URL/api/activity/doc" \
     -H "Content-Type: application/json" \
     -H "X-Api-Key: $HOLM_API_KEY" \
-    -d "$(python3 -c "
-import json, sys
-print(json.dumps({
-    'iteration': int(sys.argv[1]),
-    'summary': sys.argv[2],
-    'analysis': sys.argv[3] if len(sys.argv) > 3 else '',
-    'duration': int(sys.argv[4]) if len(sys.argv) > 4 else 0
-}))
-" "$iteration" "$summary" "$analysis" "$duration")" >/dev/null 2>&1 &
+    -d "$payload" >/dev/null 2>&1 &
 }
 
 # ─── Credentials block injected into Claude's prompt ───
