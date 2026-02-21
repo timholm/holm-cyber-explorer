@@ -19,6 +19,10 @@ spec:
         app: holm-cyber
     spec:
       dnsPolicy: ClusterFirst
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+          - 1.1.1.1
       initContainers:
         - name: git-clone
           image: alpine/git:latest
@@ -26,9 +30,20 @@ spec:
             - sh
             - -c
             - |
-              git clone --depth 1 https://github.com/timholm/holm-cyber-explorer.git /tmp/repo
+              for i in 1 2 3 4 5; do
+                echo "Attempt $i: cloning repos..."
+                git clone --depth 1 https://github.com/timholm/holm-cyber-explorer.git /tmp/repo && break
+                echo "Clone failed, retrying in ${i}0s..."
+                sleep ${i}0
+                rm -rf /tmp/repo
+              done
               cp -r /tmp/repo/* /data/
-              git clone --depth 1 https://github.com/timholm/docs-framework.git /tmp/docs
+              for i in 1 2 3 4 5; do
+                git clone --depth 1 https://github.com/timholm/docs-framework.git /tmp/docs && break
+                echo "Docs clone failed, retrying in ${i}0s..."
+                sleep ${i}0
+                rm -rf /tmp/docs
+              done
               cp /tmp/docs/html/manifest.json /data/manifest.json
               cp -r /tmp/docs/html /data/html
           volumeMounts:

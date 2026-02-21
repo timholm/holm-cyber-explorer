@@ -14,2027 +14,562 @@
 <meta name="format-detection" content="telephone=no">
 
 <style>
-/* Self-hosted JetBrains Mono (no external dependency) */
-@font-face { font-family: 'JetBrains Mono'; src: url('/fonts/JetBrainsMono-Light.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
 @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/JetBrainsMono-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: 'JetBrains Mono'; src: url('/fonts/JetBrainsMono-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
 @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
 
-/* ═══════════════════════════════════════════════════════════════
-   CSS Variables & Reset
-   ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-surface: #1a1a2e;
-  --bg-surface-hover: #22223a;
-  --neon-cyan: #00f0ff;
-  --neon-magenta: #ff00aa;
-  --neon-blue: #4444ff;
-  --neon-cyan-dim: rgba(0, 240, 255, 0.15);
-  --neon-magenta-dim: rgba(255, 0, 170, 0.15);
-  --text-primary: #e0e0e8;
-  --text-muted: #6a6a7a;
-  --text-dim: #444455;
-  --border: #2a2a3a;
-  --border-glow: rgba(0, 240, 255, 0.2);
-  --radius: 8px;
-  --radius-lg: 12px;
-  --nav-height: 56px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --font: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a24;
+  --cyan: #00f0ff;
+  --magenta: #ff00aa;
+  --text: #d8d8e0;
+  --muted: #666678;
+  --dim: #333344;
+  --border: #222233;
+  --font: 'JetBrains Mono', monospace;
+  --max-w: 800px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html {
-  font-size: 14px;
-  -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  min-height: 100dvh;
-  overflow-x: hidden;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
-}
-
-a { color: var(--neon-cyan); text-decoration: none; }
+html { font-size: 14px; -webkit-text-size-adjust: 100%; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
+a { color: var(--cyan); text-decoration: none; }
 a:hover { text-decoration: underline; }
-button { font-family: var(--font); cursor: pointer; border: none; background: none; color: var(--text-primary); }
-.domain-card, .doc-card, .search-result-card, .connection-chip, .comment-form button, .back-btn {
-  -webkit-tap-highlight-color: transparent;
-}
+button { font-family: var(--font); cursor: pointer; border: none; background: none; color: var(--text); -webkit-tap-highlight-color: transparent; }
 input, textarea { font-family: var(--font); }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 3px; }
 
-/* Safari-specific fixes */
-@supports (-webkit-touch-callout: none) {
-  body { min-height: -webkit-fill-available; }
-  html { height: -webkit-fill-available; }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Loading Screen
-   ═══════════════════════════════════════════════════════════════ */
-#loading-screen {
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--bg-primary);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
-}
-#loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-.loading-logo {
-  font-size: 2rem; font-weight: 700; letter-spacing: 0.1em;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.2);
-  margin-bottom: 2rem;
-  animation: glitch 2.5s infinite;
-}
-
-.loading-bar-track {
-  width: min(280px, 70vw); height: 3px;
-  background: var(--border);
-  border-radius: 2px; overflow: hidden;
-}
-.loading-bar-fill {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-.loading-status {
-  margin-top: 1rem; font-size: 0.75rem;
-  color: var(--text-muted); letter-spacing: 0.05em;
-}
-
-@keyframes glitch {
-  0%, 90%, 100% { opacity: 1; transform: translate(0); }
-  92% { opacity: 0.8; transform: translate(-2px, 1px); color: var(--neon-magenta); }
-  94% { opacity: 1; transform: translate(1px, -1px); color: var(--neon-cyan); }
-  96% { opacity: 0.9; transform: translate(-1px, 0); }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Top Nav (desktop)
-   ═══════════════════════════════════════════════════════════════ */
-#top-nav {
-  display: none; /* shown on desktop via media query */
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  height: var(--nav-height);
-  background: rgba(10, 10, 15, 0.9);
-  backdrop-filter: blur(12px);
+/* ── Header ── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,15,0.92); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
-  padding: 0 1.5rem;
-  align-items: center; justify-content: space-between;
+  padding: 0 1rem; height: 48px;
+  display: flex; align-items: center; gap: 1rem;
 }
+.logo { font-weight: 700; color: var(--cyan); letter-spacing: 0.08em; font-size: 0.95rem; cursor: pointer; white-space: nowrap; }
+.logo:hover { text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+header nav { display: flex; gap: 0.75rem; align-items: center; flex: 1; justify-content: flex-end; }
+header nav button { font-size: 0.75rem; color: var(--muted); padding: 0.3rem 0; transition: color 0.15s; }
+header nav button:hover, header nav button.active { color: var(--cyan); }
+.search-trigger { display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.7rem; color: var(--muted); }
+.search-trigger:hover { border-color: var(--cyan); color: var(--cyan); }
+.search-trigger kbd { font-size: 0.6rem; background: var(--bg3); padding: 0.1rem 0.3rem; border-radius: 3px; }
 
-.top-nav-logo {
-  font-size: 1rem; font-weight: 600;
-  color: var(--neon-cyan);
-  letter-spacing: 0.08em;
-  cursor: pointer;
-}
-.top-nav-logo:hover { text-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
+/* ── Page Layout ── */
+main { max-width: var(--max-w); margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 
-.top-nav-links { display: flex; gap: 1.5rem; align-items: center; }
-.top-nav-links button {
-  font-size: 0.8rem; color: var(--text-muted);
-  padding: 0.4rem 0; letter-spacing: 0.04em;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
-}
-.top-nav-links button:hover { color: var(--text-primary); }
-.top-nav-links button.active { color: var(--neon-cyan); border-bottom-color: var(--neon-cyan); }
+/* ── Wiki Home ── */
+.wiki-home h1 { font-size: 1.3rem; font-weight: 700; color: var(--cyan); margin-bottom: 0.3rem; }
+.wiki-home .subtitle { font-size: 0.75rem; color: var(--muted); margin-bottom: 2rem; }
 
-/* ═══════════════════════════════════════════════════════════════
-   Bottom Nav (mobile)
-   ═══════════════════════════════════════════════════════════════ */
-#bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  height: calc(var(--nav-height) + var(--safe-bottom));
-  padding-bottom: var(--safe-bottom);
-  background: rgba(10, 10, 15, 0.95);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-around;
-}
-
-.bottom-nav-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 10px 16px; font-size: 0.65rem;
-  -webkit-tap-highlight-color: transparent;
-  color: var(--text-muted); letter-spacing: 0.05em;
-  transition: color 0.2s;
-}
-.bottom-nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; }
-.bottom-nav-btn.active { color: var(--neon-cyan); }
-
-/* ═══════════════════════════════════════════════════════════════
-   Main Content Area
-   ═══════════════════════════════════════════════════════════════ */
-#app {
-  padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 8px);
-  min-height: 100dvh;
-  -webkit-overflow-scrolling: touch;
-}
-
-.view { 
-  display: none;
-}
-.view.active { 
-  display: block;
-  animation: view-in 0.2s ease;
-}
-@keyframes view-in { 
-  from { opacity: 0; transform: translateY(8px); } 
-  to { opacity: 1; transform: translateY(0); } 
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Hub View
-   ═══════════════════════════════════════════════════════════════ */
-#hub-view { padding: 1rem; }
-
-.hub-header {
-  text-align: center; padding: 2rem 0 1.5rem;
-}
-.hub-title {
-  font-size: 1.4rem; font-weight: 300; color: var(--text-primary);
-  letter-spacing: 0.15em;
-}
-.hub-title span { color: var(--neon-cyan); font-weight: 600; }
-
-.hub-stats {
-  display: flex; justify-content: center; gap: 1.5rem;
-  margin-bottom: 1.5rem; flex-wrap: wrap;
-}
-.hub-stat {
-  text-align: center;
-}
-.hub-stat-value {
-  font-size: 1.5rem; font-weight: 600; color: var(--neon-cyan);
-}
-.hub-stat-label {
-  font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;
-}
-
-.domain-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 0.75rem;
-}
-
-.domain-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  cursor: pointer;
-  transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
-}
-.domain-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: var(--card-accent, var(--neon-cyan));
-  box-shadow: 0 0 8px var(--card-accent, var(--neon-cyan));
-}
-.domain-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--card-accent, var(--neon-cyan));
-  box-shadow: 0 4px 20px rgba(0, 240, 255, 0.1);
-}
-.domain-card:active { transform: translateY(0); }
-
-.domain-card-id {
-  font-size: 0.65rem; color: var(--text-muted);
-  letter-spacing: 0.1em; margin-bottom: 0.3rem;
-}
-.domain-card-name {
-  font-size: 0.85rem; font-weight: 500; color: var(--text-primary);
-  margin-bottom: 0.6rem; line-height: 1.3;
-}
-.domain-card-meta {
-  display: flex; justify-content: space-between; align-items: center;
-}
-.domain-card-count {
-  font-size: 0.7rem; color: var(--text-muted);
-}
-
-/* Health bar */
-.health-bar {
-  width: 48px; height: 4px;
-  background: var(--border); border-radius: 2px;
-  overflow: hidden;
-}
-.health-bar-fill {
-  height: 100%; border-radius: 2px;
-  transition: width 0.5s ease;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Domain View (doc list)
-   ═══════════════════════════════════════════════════════════════ */
-#domain-view { padding: 1rem; }
-
-.domain-header {
-  display: flex; align-items: center; gap: 0.75rem;
-  margin-bottom: 1rem; padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border);
-}
-.back-btn {
-  width: 36px; height: 36px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  transition: color 0.2s, border-color 0.2s;
-  flex-shrink: 0;
-}
-.back-btn:hover { color: var(--neon-cyan); border-color: var(--neon-cyan); }
-.back-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-.domain-title { font-size: 1.1rem; font-weight: 500; flex: 1; }
-.domain-health-summary {
-  font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;
-}
-
-.doc-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-}
-
-.doc-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  display: flex; align-items: center; gap: 0.75rem;
-}
-.doc-card:hover {
-  border-color: var(--neon-cyan);
-  background: var(--bg-surface);
-}
-
-.doc-card-id {
-  font-size: 0.65rem; color: var(--neon-cyan);
-  letter-spacing: 0.05em; white-space: nowrap;
-  min-width: 60px;
-}
-.doc-card-title {
-  font-size: 0.8rem; flex: 1;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.doc-card-indicators {
-  display: flex; gap: 4px; flex-shrink: 0;
-}
-.indicator {
-  width: 8px; height: 8px; border-radius: 50%;
-  flex-shrink: 0;
-}
-.indicator.broken { background: #ff4444; box-shadow: 0 0 4px #ff4444; }
-.indicator.orphan { background: #ffaa00; box-shadow: 0 0 4px #ffaa00; }
-.indicator.ok { background: #00cc66; box-shadow: 0 0 4px #00cc66; }
-
-/* ═══════════════════════════════════════════════════════════════
-   Document View
-   ═══════════════════════════════════════════════════════════════ */
-#doc-view { padding: 1rem; }
-
-.doc-nav {
-  display: flex; align-items: center; gap: 0.5rem;
-  margin-bottom: 1rem; flex-wrap: wrap;
-}
-.doc-breadcrumb {
-  font-size: 0.7rem; color: var(--text-muted);
-}
-.doc-breadcrumb a { color: var(--neon-cyan); }
-
-.doc-title-bar {
-  margin-bottom: 1rem;
-}
-.doc-title {
-  font-size: 1.3rem; font-weight: 600;
-  line-height: 1.3; margin-bottom: 0.5rem;
-}
-.doc-meta-pills {
-  display: flex; flex-wrap: wrap; gap: 0.4rem;
-}
-.pill {
-  display: inline-flex; align-items: center;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.65rem; letter-spacing: 0.03em;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-}
-.pill.domain { border-color: var(--neon-cyan); color: var(--neon-cyan); }
-.pill.status { border-color: var(--neon-magenta); color: var(--neon-magenta); }
-
-/* Connections */
-.doc-connections {
-  margin: 1rem 0; padding: 0.75rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-.connections-title {
-  font-size: 0.7rem; color: var(--text-muted);
+.domain-section { margin-bottom: 1.5rem; }
+.domain-heading {
+  font-size: 0.7rem; font-weight: 500; color: var(--muted);
   letter-spacing: 0.1em; text-transform: uppercase;
-  margin-bottom: 0.5rem;
-}
-.connection-list {
-  display: flex; flex-wrap: wrap; gap: 0.4rem;
-}
-.connection-chip {
-  display: inline-flex; align-items: center;
-  padding: 0.2rem 0.6rem; font-size: 0.7rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 4px; cursor: pointer;
-  color: var(--neon-cyan);
-  transition: border-color 0.2s, background 0.2s;
-}
-.connection-chip:hover { border-color: var(--neon-cyan); background: var(--bg-surface-hover); }
-.connection-chip.broken {
-  color: #ff4444;
-  border-color: rgba(255, 68, 68, 0.3);
-  text-decoration: line-through;
-  cursor: default;
-}
-
-/* Document Body */
-.doc-body {
-  max-width: 720px;
-  line-height: 1.7; font-size: 0.85rem;
-  word-break: break-word;
-  -webkit-hyphens: auto;
-  hyphens: auto;
-  padding: 1rem 0;
-}
-.doc-body h1 { font-size: 1.3rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--neon-cyan); }
-.doc-body h2 { font-size: 1.1rem; font-weight: 600; margin: 1.3rem 0 0.6rem; color: var(--text-primary); }
-.doc-body h3 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--text-primary); }
-.doc-body h4 { font-size: 0.85rem; font-weight: 600; margin: 0.8rem 0 0.4rem; color: var(--text-muted); }
-.doc-body p { margin-bottom: 0.75rem; }
-.doc-body ul, .doc-body ol { margin-bottom: 0.75rem; padding-left: 1.5rem; }
-.doc-body li { margin-bottom: 0.3rem; }
-.doc-body code {
-  background: var(--bg-surface); padding: 0.1rem 0.35rem;
-  border-radius: 3px; font-size: 0.8rem; color: var(--neon-magenta);
-}
-.doc-body pre {
-  background: var(--bg-secondary); padding: 1rem;
-  border-radius: var(--radius); border: 1px solid var(--border);
-  overflow-x: auto; margin-bottom: 0.75rem;
-}
-.doc-body pre code { background: none; padding: 0; color: var(--text-primary); }
-.doc-body blockquote {
-  border-left: 3px solid var(--neon-cyan);
-  padding: 0.5rem 0 0.5rem 1rem;
-  margin-bottom: 0.75rem; color: var(--text-muted);
-  background: var(--neon-cyan-dim);
-  border-radius: 0 var(--radius) var(--radius) 0;
-}
-.doc-body table { width: 100%; border-collapse: collapse; margin-bottom: 0.75rem; font-size: 0.8rem; }
-.doc-body th, .doc-body td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
-.doc-body th { background: var(--bg-surface); color: var(--neon-cyan); font-weight: 500; }
-.doc-body dl { margin-bottom: 0.75rem; }
-.doc-body dt { font-weight: 600; color: var(--neon-cyan); margin-top: 0.5rem; }
-.doc-body dd { margin-left: 1rem; margin-bottom: 0.3rem; color: var(--text-muted); }
-.doc-body mark { background: var(--neon-cyan-dim); color: var(--neon-cyan); padding: 0 0.2rem; border-radius: 2px; }
-.doc-body hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
-.doc-body a { color: var(--neon-cyan); }
-.doc-body img { max-width: 100%; border-radius: var(--radius); }
-
-/* ═══════════════════════════════════════════════════════════════
-   Comments Section
-   ═══════════════════════════════════════════════════════════════ */
-.comments-section {
-  margin-top: 2rem; padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-}
-.comments-header {
-  font-size: 0.8rem; color: var(--text-muted);
-  letter-spacing: 0.08em; text-transform: uppercase;
-  margin-bottom: 1rem;
-}
-.comments-header span { color: var(--neon-magenta); }
-
-.comment-form {
-  display: flex; flex-direction: column; gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-.comment-form input, .comment-form textarea {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.6rem 0.75rem;
-  color: var(--text-primary);
-  font-size: 0.8rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.comment-form input:focus, .comment-form textarea:focus {
-  border-color: var(--neon-magenta);
-}
-.comment-form textarea { resize: vertical; min-height: 60px; }
-.comment-form button {
-  align-self: flex-end;
-  padding: 0.5rem 1.2rem;
-  background: var(--neon-magenta-dim);
-  border: 1px solid var(--neon-magenta);
-  border-radius: var(--radius);
-  color: var(--neon-magenta);
-  font-size: 0.75rem; font-weight: 500;
-  letter-spacing: 0.05em;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-.comment-form button:hover {
-  background: rgba(255, 0, 170, 0.25);
-  box-shadow: 0 0 12px rgba(255, 0, 170, 0.2);
-}
-
-.comment-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--neon-magenta);
-  border-radius: var(--radius);
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-.comment-meta {
+  padding-bottom: 0.4rem; margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 0.3rem;
 }
-.comment-author {
-  font-size: 0.75rem; font-weight: 500;
-  color: var(--neon-magenta);
-}
-.comment-date {
-  font-size: 0.65rem; color: var(--text-dim);
-}
-.comment-text {
-  font-size: 0.8rem; color: var(--text-primary);
-  line-height: 1.5;
-}
-.no-comments {
-  font-size: 0.75rem; color: var(--text-dim);
-  text-align: center; padding: 1rem;
-}
+.domain-heading span { color: var(--dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
 
-/* ═══════════════════════════════════════════════════════════════
-   Graph View
-   ═══════════════════════════════════════════════════════════════ */
-#graph-view {
-  position: fixed; inset: 0; z-index: 50;
-  background: var(--bg-primary);
+.doc-link {
+  display: flex; align-items: baseline; gap: 0.6rem;
+  padding: 0.35rem 0; cursor: pointer;
+  transition: color 0.1s;
 }
-.graph-header {
-  position: absolute; top: 0; left: 0; right: 0;
-  display: flex; align-items: center; gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: rgba(10, 10, 15, 0.85);
-  backdrop-filter: blur(8px);
-  z-index: 2;
-}
-.graph-header h2 {
-  font-size: 0.9rem; font-weight: 500; flex: 1;
-  color: var(--neon-cyan);
-}
-.graph-stats {
-  font-size: 0.65rem; color: var(--text-muted);
-}
+.doc-link:hover { color: var(--cyan); }
+.doc-link-id { font-size: 0.65rem; color: var(--dim); min-width: 55px; flex-shrink: 0; }
+.doc-link-title { font-size: 0.8rem; }
+.doc-link:hover .doc-link-id { color: var(--muted); }
 
-#graph-canvas { width: 100%; height: 100%; display: block; }
+/* ── Document Page ── */
+.doc-page .breadcrumb {
+  font-size: 0.7rem; color: var(--muted); margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;
+}
+.breadcrumb a { color: var(--cyan); }
+.breadcrumb .sep { color: var(--dim); }
 
-.graph-tooltip {
-  position: fixed; z-index: 60;
-  background: var(--bg-surface);
-  border: 1px solid var(--neon-cyan);
-  border-radius: var(--radius);
-  padding: 0.5rem 0.75rem;
-  font-size: 0.7rem;
-  pointer-events: none;
-  display: none;
-  max-width: 220px;
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-}
-.graph-tooltip .tt-id { color: var(--neon-cyan); font-weight: 600; }
-.graph-tooltip .tt-title { color: var(--text-primary); margin-top: 2px; }
-.graph-tooltip .tt-domain { color: var(--text-muted); font-size: 0.65rem; margin-top: 2px; }
+.doc-page h1 { font-size: 1.2rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.6rem; }
 
-.graph-legend {
-  position: absolute; bottom: 70px; left: 0.75rem; z-index: 2;
-  background: rgba(10, 10, 15, 0.85);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.5rem;
-  max-height: 200px; overflow-y: auto;
-  font-size: 0.6rem;
-  backdrop-filter: blur(8px);
+.doc-meta { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1.5rem; }
+.tag {
+  font-size: 0.6rem; padding: 0.12rem 0.45rem;
+  border: 1px solid var(--border); border-radius: 12px;
+  color: var(--muted);
 }
-.graph-legend-item {
-  display: flex; align-items: center; gap: 6px;
-  padding: 2px 0; color: var(--text-muted);
-}
-.graph-legend-dot {
-  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-}
+.tag.domain { border-color: var(--cyan); color: var(--cyan); }
 
-/* ═══════════════════════════════════════════════════════════════
-   Search View
-   ═══════════════════════════════════════════════════════════════ */
-#search-view {
-  position: fixed; inset: 0; z-index: 50;
-  background: var(--bg-primary);
-  display: flex; flex-direction: column;
+/* Dependencies */
+.deps { margin-bottom: 1.5rem; }
+.deps-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.deps-list { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.dep-chip {
+  font-size: 0.7rem; padding: 0.15rem 0.5rem;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--cyan); cursor: pointer; transition: border-color 0.15s;
 }
-.search-header {
-  padding: 0.75rem 1rem;
-  display: flex; align-items: center; gap: 0.75rem;
+.dep-chip:hover { border-color: var(--cyan); }
+.dep-chip.broken { color: #f44; border-color: rgba(255,68,68,0.3); text-decoration: line-through; cursor: default; }
+
+/* Document content */
+.doc-content {
+  line-height: 1.75; font-size: 0.85rem;
+  word-break: break-word;
+}
+.doc-content h1 { font-size: 1.2rem; font-weight: 700; margin: 2rem 0 0.75rem; color: var(--cyan); }
+.doc-content h2 { font-size: 1.05rem; font-weight: 700; margin: 1.8rem 0 0.6rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+.doc-content h3 { font-size: 0.95rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+.doc-content h4 { font-size: 0.85rem; font-weight: 600; margin: 1rem 0 0.4rem; color: var(--muted); }
+.doc-content p { margin-bottom: 0.8rem; }
+.doc-content ul, .doc-content ol { margin-bottom: 0.8rem; padding-left: 1.5rem; }
+.doc-content li { margin-bottom: 0.25rem; }
+.doc-content code { background: var(--bg3); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.8rem; color: var(--magenta); }
+.doc-content pre { background: var(--bg2); padding: 1rem; border-radius: 6px; border: 1px solid var(--border); overflow-x: auto; margin-bottom: 0.8rem; }
+.doc-content pre code { background: none; padding: 0; color: var(--text); }
+.doc-content blockquote { border-left: 3px solid var(--cyan); padding: 0.5rem 1rem; margin-bottom: 0.8rem; color: var(--muted); background: rgba(0,240,255,0.05); border-radius: 0 6px 6px 0; }
+.doc-content table { width: 100%; border-collapse: collapse; margin-bottom: 0.8rem; font-size: 0.8rem; }
+.doc-content th, .doc-content td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+.doc-content th { background: var(--bg3); color: var(--cyan); font-weight: 500; }
+.doc-content dl { margin-bottom: 0.8rem; }
+.doc-content dt { font-weight: 600; color: var(--cyan); margin-top: 0.5rem; }
+.doc-content dd { margin-left: 1rem; margin-bottom: 0.3rem; color: var(--muted); }
+.doc-content a { color: var(--cyan); }
+.doc-content img { max-width: 100%; border-radius: 6px; }
+.doc-content hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+.doc-content mark { background: rgba(0,240,255,0.15); color: var(--cyan); padding: 0 0.2rem; border-radius: 2px; }
+
+/* Comments */
+.comments { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.comments-title { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+.comment-form { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.5rem; }
+.comment-form input, .comment-form textarea {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.5rem 0.7rem; color: var(--text); font-size: 0.8rem; outline: none;
+}
+.comment-form input:focus, .comment-form textarea:focus { border-color: var(--magenta); }
+.comment-form textarea { resize: vertical; min-height: 50px; }
+.comment-form button {
+  align-self: flex-end; padding: 0.4rem 1rem;
+  background: rgba(255,0,170,0.1); border: 1px solid var(--magenta); border-radius: 6px;
+  color: var(--magenta); font-size: 0.7rem; font-weight: 500; transition: background 0.15s;
+}
+.comment-form button:hover { background: rgba(255,0,170,0.2); }
+
+.comment { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--magenta); border-radius: 6px; padding: 0.6rem 0.75rem; margin-bottom: 0.5rem; }
+.comment-header { display: flex; justify-content: space-between; margin-bottom: 0.2rem; }
+.comment-author { font-size: 0.7rem; font-weight: 500; color: var(--magenta); }
+.comment-time { font-size: 0.6rem; color: var(--dim); }
+.comment-body { font-size: 0.8rem; line-height: 1.5; }
+
+/* ── Search Overlay ── */
+.search-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(10,10,15,0.95); backdrop-filter: blur(12px);
+  display: none; flex-direction: column;
+}
+.search-overlay.open { display: flex; }
+.search-bar {
+  padding: 1rem; display: flex; align-items: center; gap: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
-.search-input-wrap {
-  flex: 1; position: relative;
+.search-bar input {
+  flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem 0.8rem; color: var(--text); font-size: 0.9rem; outline: none;
 }
-.search-input-wrap input {
-  width: 100%; padding: 0.6rem 0.75rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.search-input-wrap input:focus { border-color: var(--neon-cyan); }
-.search-input-wrap input::placeholder { color: var(--text-dim); }
+.search-bar input:focus { border-color: var(--cyan); }
+.search-bar input::placeholder { color: var(--dim); }
+.search-bar .close-btn { font-size: 1.2rem; color: var(--muted); padding: 0.3rem; }
+.search-bar .close-btn:hover { color: var(--text); }
 
-.search-results {
-  flex: 1; overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.75rem 1rem;
+.search-results { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0.75rem 1rem; max-width: var(--max-w); margin: 0 auto; width: 100%; }
+.search-result {
+  padding: 0.65rem 0; border-bottom: 1px solid var(--border); cursor: pointer;
 }
+.search-result:hover .sr-title { color: var(--cyan); }
+.sr-id { font-size: 0.6rem; color: var(--cyan); letter-spacing: 0.04em; }
+.sr-title { font-size: 0.85rem; font-weight: 500; transition: color 0.1s; }
+.sr-snippet { font-size: 0.75rem; color: var(--muted); line-height: 1.4; margin-top: 0.15rem; }
+.sr-snippet mark { background: rgba(0,240,255,0.15); color: var(--cyan); padding: 0 0.1rem; border-radius: 2px; }
+.search-empty { text-align: center; padding: 3rem; color: var(--dim); font-size: 0.8rem; }
 
-.search-result-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-.search-result-card:hover { border-color: var(--neon-cyan); }
-.search-result-id { font-size: 0.65rem; color: var(--neon-cyan); letter-spacing: 0.05em; }
-.search-result-title { font-size: 0.85rem; font-weight: 500; margin: 0.2rem 0; }
-.search-result-snippet {
-  font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;
-}
-.search-result-snippet mark {
-  background: var(--neon-cyan-dim); color: var(--neon-cyan);
-  padding: 0 0.15rem; border-radius: 2px;
-}
-.search-empty {
-  text-align: center; padding: 3rem 1rem;
-  color: var(--text-dim); font-size: 0.8rem;
+/* ── Toast ── */
+.toast-container { position: fixed; bottom: calc(1rem + var(--safe-b)); left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 0.4rem; pointer-events: none; }
+.toast { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 0.9rem; font-size: 0.7rem; pointer-events: auto; animation: fade-in 0.2s ease; white-space: nowrap; }
+.toast.error { border-color: #f44; color: #f44; }
+.toast.out { animation: fade-out 0.2s ease forwards; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* ── Loading ── */
+.loading { display: flex; align-items: center; justify-content: center; min-height: 60vh; color: var(--muted); font-size: 0.8rem; }
+
+/* ── Offline ── */
+.offline-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 400; background: rgba(255,0,170,0.1); border-bottom: 1px solid var(--magenta); text-align: center; padding: 0.3rem; font-size: 0.65rem; color: var(--magenta); }
+body.offline .offline-bar { display: block; }
+
+/* ── Print ── */
+@media print {
+  header, .search-overlay, .toast-container, .comments, .offline-bar { display: none !important; }
+  body { background: white; color: black; }
+  main { max-width: none; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Toast
-   ═══════════════════════════════════════════════════════════════ */
-#toast-container {
-  position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 12px);
-  left: 50%; transform: translateX(-50%);
-  z-index: 200; display: flex; flex-direction: column; gap: 0.5rem;
-  pointer-events: none;
-}
-.toast {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.6rem 1rem;
-  font-size: 0.75rem;
-  color: var(--text-primary);
-  pointer-events: auto;
-  animation: toast-in 0.3s ease;
-  white-space: nowrap;
-}
-.toast.error { border-color: #ff4444; color: #ff4444; }
-.toast.fade-out { animation: toast-out 0.3s ease forwards; }
-@keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
-
-/* ═══════════════════════════════════════════════════════════════
-   Offline Banner
-   ═══════════════════════════════════════════════════════════════ */
-#offline-banner {
-  display: none;
-  position: fixed; top: 0; left: 0; right: 0;
-  background: var(--neon-magenta-dim);
-  border-bottom: 1px solid var(--neon-magenta);
-  text-align: center; padding: 0.4rem;
-  font-size: 0.7rem; color: var(--neon-magenta);
-  z-index: 300;
-}
-body.offline #offline-banner { display: block; }
-
-
-/* Pull to refresh */
-.ptr-indicator {
-  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
-  padding: 0.5rem 1rem; font-size: 0.7rem;
-  color: var(--neon-cyan); background: var(--bg-surface);
-  border: 1px solid var(--border); border-top: none;
-  border-radius: 0 0 var(--radius) var(--radius);
-  opacity: 0; transition: opacity 0.2s;
-  z-index: 150; pointer-events: none;
-}
-.ptr-indicator.visible { opacity: 1; }
-
-/* ═══════════════════════════════════════════════════════════════
-   Desktop Media Queries
-   ═══════════════════════════════════════════════════════════════ */
 @media (min-width: 768px) {
   html { font-size: 15px; }
-  #top-nav { display: flex; }
-  #bottom-nav { display: none; }
-  #app { padding-top: var(--nav-height); padding-bottom: 1rem; }
-  #hub-view, #domain-view, #doc-view, #stats-view { max-width: 960px; margin: 0 auto; }
-  .domain-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-  .doc-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .doc-body { font-size: 0.9rem; }
-  .graph-legend { bottom: 1rem; }
-  #graph-view { top: var(--nav-height); }
-  #search-view { top: var(--nav-height); }
-}
-
-@media (min-width: 1024px) {
-  .domain-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-  .doc-grid { grid-template-columns: 1fr 1fr 1fr; }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Print
-   ═══════════════════════════════════════════════════════════════ */
-@media print {
-  #top-nav, #bottom-nav, #toast-container, .doc-connections, .comments-section { display: none !important; }
-  body { background: white; color: black; }
-  .doc-body { max-width: none; }
+  main { padding: 2rem 1.5rem 4rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- Offline Banner -->
-<div id="offline-banner">You are offline — showing cached data</div>
-<div class="ptr-indicator" id="ptr-indicator">Release to refresh</div>
+<div class="offline-bar">Offline — showing cached data</div>
 
-<!-- Loading Screen -->
-<div id="loading-screen">
-  <div class="loading-logo">holm.chat</div>
-  <div class="loading-bar-track">
-    <div class="loading-bar-fill" id="loading-bar"></div>
-  </div>
-  <div class="loading-status" id="loading-status">initializing...</div>
-</div>
+<header>
+  <span class="logo" onclick="goHome()">holm.chat</span>
+  <nav>
+    <button class="search-trigger" onclick="openSearch()">search <kbd>/</kbd></button>
+  </nav>
+</header>
 
-<!-- Top Nav (desktop) -->
-<nav id="top-nav">
-  <div class="top-nav-logo" onclick="showHub()">holm.chat</div>
-  <div class="top-nav-links">
-    <button onclick="showHub()" data-nav="hub">Nexus</button>
-    <button onclick="openSearch()" data-nav="search">Search</button>
-    <button onclick="showGraph()" data-nav="graph">Map</button>
-    <button onclick="showStats()" data-nav="stats">Stats</button>
-  </div>
-</nav>
-
-<!-- Main App -->
-<main id="app">
-  <!-- Hub View -->
-  <div id="hub-view" class="view active">
-    <div class="hub-header">
-      <h1 class="hub-title"><span>holm</span>.chat</h1>
-    </div>
-    <div class="hub-stats" id="hub-stats"></div>
-    <div class="domain-grid" id="domain-grid"></div>
-  </div>
-
-  <!-- Domain View -->
-  <div id="domain-view" class="view">
-    <div class="domain-header">
-      <button class="back-btn" onclick="navigateBack()">
-        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <div>
-        <div class="domain-title" id="domain-title"></div>
-        <div class="domain-health-summary" id="domain-health-summary"></div>
-      </div>
-    </div>
-    <div class="doc-grid" id="doc-grid"></div>
-  </div>
-
-  <!-- Document View -->
-  <div id="doc-view" class="view">
-    <div class="doc-nav">
-      <button class="back-btn" onclick="navigateBack()">
-        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <div class="doc-breadcrumb" id="doc-breadcrumb"></div>
-    </div>
-    <div class="doc-title-bar">
-      <h1 class="doc-title" id="doc-title"></h1>
-      <div class="doc-meta-pills" id="doc-meta-pills"></div>
-    </div>
-    <div class="doc-connections" id="doc-connections"></div>
-    <div class="doc-body" id="doc-body"></div>
-    <div class="comments-section" id="comments-section">
-      <div class="comments-header">Comments <span id="comment-count"></span></div>
-      <div class="comment-form">
-        <input type="text" id="comment-author" placeholder="Your name" maxlength="50">
-        <textarea id="comment-text" placeholder="Write a comment..." maxlength="2000"></textarea>
-        <button onclick="submitComment()">Post Comment</button>
-      </div>
-      <div id="comments-list"></div>
-    </div>
-  </div>
-
-  <!-- Stats View -->
-  <div id="stats-view" class="view">
-    <div style="padding:1rem;max-width:720px;margin:0 auto">
-      <h2 style="font-size:1.2rem;font-weight:500;margin-bottom:1.5rem;color:var(--neon-cyan)">System Statistics</h2>
-      <div id="stats-content"></div>
-    </div>
-  </div>
+<main id="main">
+  <div class="loading" id="loading">loading...</div>
 </main>
 
-<!-- Graph View -->
-<div id="graph-view" class="view">
-  <div class="graph-header">
-    <button class="back-btn" onclick="closeOverlay()">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <h2>Network Map</h2>
-    <div class="graph-stats" id="graph-stats"></div>
-  </div>
-  <canvas id="graph-canvas"></canvas>
-  <div class="graph-tooltip" id="graph-tooltip">
-    <div class="tt-id"></div>
-    <div class="tt-title"></div>
-    <div class="tt-domain"></div>
-  </div>
-  <div class="graph-legend" id="graph-legend"></div>
-</div>
-
-<!-- Search View -->
-<div id="search-view" class="view">
-  <div class="search-header">
-    <button class="back-btn" onclick="closeOverlay()">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <div class="search-input-wrap">
-      <input type="text" id="search-input" placeholder="Search documents..." autocomplete="off">
-    </div>
+<div class="search-overlay" id="search-overlay">
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Search documents..." autocomplete="off">
+    <button class="close-btn" onclick="closeSearch()">&times;</button>
   </div>
   <div class="search-results" id="search-results">
     <div class="search-empty">Type to search across all documents</div>
   </div>
 </div>
 
-<!-- Bottom Nav (mobile) -->
-<nav id="bottom-nav">
-  <button class="bottom-nav-btn active" onclick="showHub()" data-nav="hub">
-    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span>Nexus</span>
-  </button>
-  <button class="bottom-nav-btn" onclick="openSearch()" data-nav="search">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span>Search</span>
-  </button>
-  <button class="bottom-nav-btn" onclick="showGraph()" data-nav="graph">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><path d="M12 8v4M7.5 17.2L10 13M16.5 17.2L14 13" stroke-linecap="round"/></svg>
-    <span>Map</span>
-  </button>
-  <button class="bottom-nav-btn" onclick="showStats()" data-nav="stats">
-    <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span>Stats</span>
-  </button>
-</nav>
-
-<!-- Toast Container -->
-<div id="toast-container"></div>
+<div class="toast-container" id="toasts"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   State
-   ═══════════════════════════════════════════════════════════════ */
+/* ── State ── */
 let allDocs = [];
 let docsById = {};
-let currentDoc = null;
-let currentDomain = null;
-let currentView = 'hub';
-let domainHealth = {};
-let navHistory = [];
-let graphData = null;
-let graphSim = null;
+let currentDocId = null;
+let histStack = [];
 
-/* ═══════════════════════════════════════════════════════════════
-   Domain Config
-   ═══════════════════════════════════════════════════════════════ */
 const DOMAIN_NAMES = {
-  '1': 'Constitution & Philosophy', '2': 'Governance & Authority',
-  '3': 'Security & Integrity', '4': 'Infrastructure & Power',
-  '5': 'Platform & Core Systems', '6': 'Data & Archives',
-  '7': 'Intelligence & Analysis', '8': 'Automation & Agents',
-  '9': 'Education & Training', '10': 'User Operations',
-  '11': 'Administration', '12': 'Disaster Recovery',
-  '13': 'Evolution & Adaptation', '14': 'Research & Theory',
-  '15': 'Ethics & Safeguards', '16': 'Federation & External',
-  '17': 'Federation Protocol', '18': 'Data Pipeline',
-  '19': 'Advanced Automation', '20': 'Meta & Documentation',
-  'META': 'Meta & Documentation', 'FW': 'Framework', 'HIC': 'HIC Architecture'
+  '1':'Constitution & Philosophy','2':'Governance & Authority','3':'Security & Integrity',
+  '4':'Infrastructure & Power','5':'Platform & Core Systems','6':'Data & Archives',
+  '7':'Intelligence & Analysis','8':'Automation & Agents','9':'Education & Training',
+  '10':'User Operations','11':'Administration','12':'Disaster Recovery',
+  '13':'Evolution & Adaptation','14':'Research & Theory','15':'Ethics & Safeguards',
+  '16':'Federation & External','17':'Federation Protocol','18':'Data Pipeline',
+  '19':'Advanced Automation','20':'Meta & Documentation',
+  'META':'Meta','FW':'Framework','HIC':'HIC Architecture'
 };
 
-const DOMAIN_COLORS = {
-  '1': '#00f0ff', '2': '#ff00aa', '3': '#ff4444', '4': '#ffaa00',
-  '5': '#00cc66', '6': '#4444ff', '7': '#aa44ff', '8': '#ff6600',
-  '9': '#44ccff', '10': '#ff44aa', '11': '#888888', '12': '#ff0000',
-  '13': '#00ff88', '14': '#8888ff', '15': '#ffcc00', '16': '#00aaff',
-  '17': '#ff8844', '18': '#44ff88', '19': '#ff44ff', '20': '#aaaaaa',
-  'META': '#aaaaaa', 'FW': '#66cccc', 'HIC': '#cc66cc'
-};
+/* ── Utilities ── */
+function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
 
-/* ═══════════════════════════════════════════════════════════════
-   Utilities
-   ═══════════════════════════════════════════════════════════════ */
-function escHtml(s) {
-  if (!s) return '';
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function toast(msg, type) {
+  var t = document.createElement('div');
+  t.className = 'toast' + (type === 'error' ? ' error' : '');
+  t.textContent = msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(function() { t.classList.add('out'); setTimeout(function() { t.remove(); }, 200); }, 3000);
 }
 
-function showToast(msg, type) {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = 'toast' + (type === 'error' ? ' error' : '');
-  toast.textContent = msg;
-  container.appendChild(toast);
-  setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); }, 3000);
-}
-
-function timeAgo(date) {
-  const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+function timeAgo(d) {
+  var s = Math.floor((Date.now() - new Date(d).getTime()) / 1000);
   if (s < 60) return 'just now';
-  if (s < 3600) return Math.floor(s / 60) + 'm ago';
-  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
-  if (s < 2592000) return Math.floor(s / 86400) + 'd ago';
-  return new Date(date).toLocaleDateString();
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
 }
 
-function healthColor(score) {
-  if (score >= 80) return '#00cc66';
-  if (score >= 50) return '#ffaa00';
-  return '#ff4444';
+/* ── Routing ── */
+function goHome() {
+  histStack = [];
+  currentDocId = null;
+  renderHome();
+  history.replaceState(null, '', '/');
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   View Router
-   ═══════════════════════════════════════════════════════════════ */
-function switchView(name, pushHistory) {
-  saveScrollPos();
-  if (pushHistory !== false && currentView !== name) {
-    navHistory.push({ view: currentView, domain: currentDomain, doc: currentDoc ? currentDoc.docId : null });
-  }
+function openDoc(id) {
+  var doc = docsById[id];
+  if (!doc) { toast('Not found: ' + id, 'error'); return; }
+  if (currentDocId) histStack.push(currentDocId);
+  currentDocId = id;
+  renderDoc(id);
+  history.pushState({ doc: id }, '', '#' + id);
+}
 
-  // Hide all main views
-  document.querySelectorAll('#app > .view').forEach(v => v.classList.remove('active'));
-
-  // Hide overlays
-  document.getElementById('graph-view').classList.remove('active');
-  document.getElementById('search-view').classList.remove('active');
-
-  if (name === 'graph') {
-    document.getElementById('graph-view').classList.add('active');
-  } else if (name === 'search') {
-    document.getElementById('search-view').classList.add('active');
+function goBack() {
+  if (histStack.length > 0) {
+    var prev = histStack.pop();
+    currentDocId = prev;
+    renderDoc(prev);
+    history.replaceState({ doc: prev }, '', '#' + prev);
   } else {
-    const el = document.getElementById(name + '-view');
-    if (el) el.classList.add('active');
+    goHome();
   }
-
-  currentView = name;
-  updateNavActive(name);
-  updateHash();
 }
 
-function updateNavActive(name) {
-  document.querySelectorAll('[data-nav]').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.nav === name);
+window.addEventListener('popstate', function() {
+  var h = location.hash.slice(1);
+  if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
+  else goHome();
+});
+
+/* ── Home Page ── */
+function renderHome() {
+  var el = document.getElementById('main');
+
+  var domains = {};
+  allDocs.forEach(function(d) {
+    var k = d.domain || 'other';
+    if (!domains[k]) domains[k] = [];
+    domains[k].push(d);
   });
-}
 
-function updateHash() {
-  let hash = '';
-  if (currentView === 'hub') hash = '';
-  else if (currentView === 'domain' && currentDomain) hash = '#domain/' + currentDomain;
-  else if (currentView === 'doc' && currentDoc) hash = '#doc/' + currentDoc.docId;
-  else if (currentView === 'graph') hash = '#graph';
-  else if (currentView === 'search') hash = '#search';
-  else if (currentView === 'stats') hash = '#stats';
-  if (location.hash !== hash && hash !== '') {
-    history.replaceState(null, '', hash);
-  } else if (hash === '' && location.hash !== '') {
-    history.replaceState(null, '', location.pathname);
-  }
-}
-
-function navigateBack() {
-  if (navHistory.length === 0) { showHub(); return; }
-  const prev = navHistory.pop();
-  if (prev.view === 'doc' && prev.doc) {
-    const doc = docsById[prev.doc];
-    if (doc) { openDoc(doc.docId, false); return; }
-  }
-  if (prev.view === 'domain' && prev.domain) {
-    openDomainView(prev.domain, false);
-    return;
-  }
-  showHub(false);
-}
-
-function closeOverlay() {
-  document.getElementById('graph-view').classList.remove('active');
-  document.getElementById('search-view').classList.remove('active');
-  // Restore previous main view
-  const mainView = currentView === 'graph' || currentView === 'search' ? 'hub' : currentView;
-  if (navHistory.length > 0) {
-    const prev = navHistory.pop();
-    if (prev.view === 'doc' && prev.doc && docsById[prev.doc]) {
-      openDoc(prev.doc, false);
-      return;
-    }
-    if (prev.view === 'domain' && prev.domain) {
-      openDomainView(prev.domain, false);
-      return;
-    }
-  }
-  showHub(false);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Loading & Init
-   ═══════════════════════════════════════════════════════════════ */
-async function init() {
-  const bar = document.getElementById('loading-bar');
-  const status = document.getElementById('loading-status');
-
-  bar.style.width = '20%';
-  status.textContent = 'connecting to nexus...';
-
-  try {
-    const res = await fetch('/api/docs');
-    if (!res.ok) throw new Error('Failed to fetch documents');
-    bar.style.width = '60%';
-    status.textContent = 'loading documents...';
-
-    allDocs = await res.json();
-    docsById = {};
-    allDocs.forEach(d => { docsById[d.docId] = d; });
-
-    bar.style.width = '80%';
-    status.textContent = 'computing health...';
-    computeDomainHealth();
-
-    bar.style.width = '100%';
-    status.textContent = 'ready';
-
-    await new Promise(r => setTimeout(r, 400));
-    document.getElementById('loading-screen').classList.add('hidden');
-
-    // Check hash routing
-    handleHash();
-  } catch (err) {
-    status.textContent = 'connection failed — retrying...';
-    console.error('Init error:', err);
-    setTimeout(init, 3000);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Domain Health
-   ═══════════════════════════════════════════════════════════════ */
-function computeDomainHealth() {
-  domainHealth = {};
-  const docIdSet = new Set(allDocs.map(d => d.docId));
-
-  for (const doc of allDocs) {
-    const key = doc.domain || 'unknown';
-    if (!domainHealth[key]) {
-      domainHealth[key] = {
-        name: doc.domainName || DOMAIN_NAMES[key] || key,
-        total: 0, broken: 0, orphaned: 0, score: 100
-      };
-    }
-    const dh = domainHealth[key];
-    dh.total++;
-
-    const brokenDeps = (doc.dependsOn || []).filter(d => !docIdSet.has(d));
-    if (brokenDeps.length > 0) dh.broken++;
-
-    if ((doc.dependsOn || []).length === 0 && (doc.dependedBy || []).length === 0) dh.orphaned++;
-  }
-
-  // Compute score: 100 - penalties
-  for (const key in domainHealth) {
-    const dh = domainHealth[key];
-    if (dh.total === 0) { dh.score = 0; continue; }
-    const brokenPct = (dh.broken / dh.total) * 50;
-    const orphanPct = (dh.orphaned / dh.total) * 30;
-    dh.score = Math.max(0, Math.round(100 - brokenPct - orphanPct));
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Hub View
-   ═══════════════════════════════════════════════════════════════ */
-function showHub(pushHistory) {
-  switchView('hub', pushHistory);
-  renderHub();
-}
-
-function renderHub() {
-  const statsEl = document.getElementById('hub-stats');
-  const gridEl = document.getElementById('domain-grid');
-
-  const domainKeys = Object.keys(domainHealth).sort((a, b) => {
-    const na = parseInt(a), nb = parseInt(b);
+  var keys = Object.keys(domains).sort(function(a, b) {
+    var na = parseInt(a), nb = parseInt(b);
     if (!isNaN(na) && !isNaN(nb)) return na - nb;
     if (!isNaN(na)) return -1;
     if (!isNaN(nb)) return 1;
     return a.localeCompare(b);
   });
 
-  const totalDocs = allDocs.length;
-  const totalDomains = domainKeys.length;
-  const avgHealth = totalDomains > 0
-    ? Math.round(domainKeys.reduce((s, k) => s + domainHealth[k].score, 0) / totalDomains)
-    : 0;
+  var html = '<div class="wiki-home">';
+  html += '<h1>holm.chat</h1>';
+  html += '<div class="subtitle">' + allDocs.length + ' documents across ' + keys.length + ' domains</div>';
 
-  statsEl.innerHTML = `
-    <div class="hub-stat"><div class="hub-stat-value">${totalDocs}</div><div class="hub-stat-label">Documents</div></div>
-    <div class="hub-stat"><div class="hub-stat-value">${totalDomains}</div><div class="hub-stat-label">Domains</div></div>
-    <div class="hub-stat"><div class="hub-stat-value">${avgHealth}%</div><div class="hub-stat-label">Health</div></div>
-  `;
-
-  gridEl.innerHTML = domainKeys.map(key => {
-    const dh = domainHealth[key];
-    const color = DOMAIN_COLORS[key] || '#00f0ff';
-    return `
-      <div class="domain-card" style="--card-accent: ${color}" onclick="openDomainView('${escHtml(key)}')">
-        <div class="domain-card-id">D${escHtml(key)}</div>
-        <div class="domain-card-name">${escHtml(dh.name)}</div>
-        <div class="domain-card-meta">
-          <span class="domain-card-count">${dh.total} docs</span>
-          <div class="health-bar">
-            <div class="health-bar-fill" style="width:${dh.score}%; background:${healthColor(dh.score)}"></div>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Domain View
-   ═══════════════════════════════════════════════════════════════ */
-function openDomainView(key, pushHistory) {
-  currentDomain = key;
-  switchView('domain', pushHistory);
-  renderDomainDocs(key);
-}
-
-function renderDomainDocs(key) {
-  const dh = domainHealth[key];
-  const color = DOMAIN_COLORS[key] || '#00f0ff';
-  document.getElementById('domain-title').textContent = dh ? dh.name : key;
-  document.getElementById('domain-health-summary').innerHTML = dh
-    ? `${dh.total} docs · Health: <span style="color:${healthColor(dh.score)}">${dh.score}%</span>` +
-      (dh.broken > 0 ? ` · <span style="color:#ff4444">${dh.broken} broken</span>` : '') +
-      (dh.orphaned > 0 ? ` · <span style="color:#ffaa00">${dh.orphaned} orphaned</span>` : '')
-    : '';
-
-  const docs = allDocs.filter(d => d.domain === key).sort((a, b) => a.docId.localeCompare(b.docId));
-  const docIdSet = new Set(allDocs.map(d => d.docId));
-  const gridEl = document.getElementById('doc-grid');
-
-  gridEl.innerHTML = docs.map(doc => {
-    const hasBroken = (doc.dependsOn || []).some(d => !docIdSet.has(d));
-    const isOrphan = (doc.dependsOn || []).length === 0 && (doc.dependedBy || []).length === 0;
-    let indicator = '<span class="indicator ok"></span>';
-    if (hasBroken) indicator = '<span class="indicator broken"></span>';
-    else if (isOrphan) indicator = '<span class="indicator orphan"></span>';
-
-    const connCount = (doc.dependsOn || []).length + (doc.dependedBy || []).length;
-    return `
-      <div class="doc-card" onclick="openDoc('${escHtml(doc.docId)}')">
-        <span class="doc-card-id">${escHtml(doc.docId)}</span>
-        <span class="doc-card-title">${escHtml(doc.title)}</span>
-        <span style="font-size:0.6rem;color:var(--text-dim);min-width:20px;text-align:right">${connCount > 0 ? connCount : ''}</span>
-        <span class="doc-card-indicators">${indicator}</span>
-      </div>`;
-  }).join('');
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Document View
-   ═══════════════════════════════════════════════════════════════ */
-async function openDoc(id, pushHistory) {
-  const doc = docsById[id];
-  if (!doc) { showToast('Document not found: ' + id, 'error'); return; }
-
-  // If we don't have content, fetch the full document
-  if (doc.content === undefined) {
-    try {
-      const res = await fetch('/api/docs/' + encodeURIComponent(id));
-      if (!res.ok) throw new Error('Failed to fetch');
-      const full = await res.json();
-      Object.assign(doc, full);
-    } catch (err) {
-      showToast('Failed to load document', 'error');
-      return;
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
+    var docs = domains[k].sort(function(a, b) { return a.docId.localeCompare(b.docId); });
+    var name = DOMAIN_NAMES[k] || (docs[0] && docs[0].domainName) || k;
+    html += '<div class="domain-section">';
+    html += '<div class="domain-heading">' + esc(name) + ' <span>' + docs.length + '</span></div>';
+    for (var j = 0; j < docs.length; j++) {
+      var d = docs[j];
+      html += '<div class="doc-link" onclick="openDoc(\'' + esc(d.docId) + '\')">';
+      html += '<span class="doc-link-id">' + esc(d.docId) + '</span>';
+      html += '<span class="doc-link-title">' + esc(d.title) + '</span>';
+      html += '</div>';
     }
+    html += '</div>';
   }
-
-  currentDoc = doc;
-  switchView('doc', pushHistory);
-  renderDocView(doc);
-  loadComments(doc.docId);
-  renderRelatedDocs(doc);
-  restoreScrollPos(doc.docId);
+  html += '</div>';
+  el.innerHTML = html;
+  window.scrollTo(0, 0);
 }
 
-function renderDocView(doc) {
-  const oldRelated = document.getElementById('related-docs'); if (oldRelated) oldRelated.remove();
-  // Breadcrumb
-  const domainName = doc.domainName || DOMAIN_NAMES[doc.domain] || doc.domain;
-  document.getElementById('doc-breadcrumb').innerHTML =
-    `<a href="#" onclick="showHub();return false">Nexus</a> / ` +
-    `<a href="#" onclick="openDomainView('${escHtml(doc.domain)}');return false">${escHtml(domainName)}</a> / ` +
-    `<span>${escHtml(doc.docId)}</span>`;
+/* ── Document Page ── */
+async function renderDoc(id) {
+  var el = document.getElementById('main');
+  var doc = docsById[id];
+  if (!doc) { el.innerHTML = '<div class="loading">Document not found</div>'; return; }
 
-  document.getElementById('doc-title').textContent = doc.title;
-
-  // Meta pills
-  const pills = [];
-  pills.push(`<span class="pill domain">${escHtml(doc.domain)}</span>`);
-  if (doc.status) pills.push(`<span class="pill status">${escHtml(doc.status)}</span>`);
-  if (doc.version) pills.push(`<span class="pill">v${escHtml(doc.version)}</span>`);
-  if (doc.date) pills.push(`<span class="pill">${escHtml(doc.date)}</span>`);
-  if (doc.tags && doc.tags.length > 0) {
-    doc.tags.forEach(t => pills.push(`<span class="pill">${escHtml(t)}</span>`));
+  if (doc.content === undefined) {
+    el.innerHTML = '<div class="loading">loading...</div>';
+    try {
+      var res = await fetch('/api/docs/' + encodeURIComponent(id));
+      if (!res.ok) throw new Error();
+      Object.assign(doc, await res.json());
+    } catch(e) { toast('Failed to load', 'error'); return; }
   }
 
-  // Word count and reading time
-  if (doc.content) {
-    const text = doc.content.replace(/<[^>]*>/g, '');
-    const words = text.split(/\s+/).filter(w => w.length > 0).length;
-    const readMin = Math.max(1, Math.ceil(words / 200));
-    pills.push('<span class="pill">' + words.toLocaleString() + ' words</span>');
-    pills.push('<span class="pill">' + readMin + ' min read</span>');
-  }
-  document.getElementById('doc-meta-pills').innerHTML = pills.join('');
+  var domainName = doc.domainName || DOMAIN_NAMES[doc.domain] || doc.domain;
+  var docIds = new Set(allDocs.map(function(d) { return d.docId; }));
+  var deps = doc.dependsOn || [];
+  var refs = doc.dependedBy || [];
 
-  // Connections
-  renderConnections(doc);
+  var plain = (doc.content || '').replace(/<[^>]*>/g, '');
+  var words = plain.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+  var readMin = Math.max(1, Math.ceil(words / 200));
 
-  // Body
-  document.getElementById('doc-body').innerHTML = doc.content || '<p style="color:var(--text-dim)">No content</p>';
-}
+  var html = '<div class="doc-page">';
 
-function renderConnections(doc) {
-  const el = document.getElementById('doc-connections');
-  const docIdSet = new Set(allDocs.map(d => d.docId));
-  const deps = doc.dependsOn || [];
-  const refs = doc.dependedBy || [];
+  html += '<div class="breadcrumb">';
+  html += '<a href="#" onclick="goHome();return false">Home</a>';
+  html += '<span class="sep">/</span>';
+  html += '<span>' + esc(domainName) + '</span>';
+  html += '<span class="sep">/</span>';
+  html += '<span>' + esc(doc.docId) + '</span>';
+  html += '</div>';
 
-  if (deps.length === 0 && refs.length === 0) {
-    el.innerHTML = '<div class="connections-title">Connections</div><div style="font-size:0.75rem;color:var(--text-dim)">No connections (orphaned document)</div>';
-    return;
-  }
+  html += '<h1>' + esc(doc.title) + '</h1>';
 
-  let html = '';
+  html += '<div class="doc-meta">';
+  html += '<span class="tag domain">' + esc(doc.domain) + '</span>';
+  if (doc.status) html += '<span class="tag">' + esc(doc.status) + '</span>';
+  if (doc.version) html += '<span class="tag">v' + esc(doc.version) + '</span>';
+  html += '<span class="tag">' + words.toLocaleString() + ' words</span>';
+  html += '<span class="tag">' + readMin + ' min</span>';
+  if (doc.tags) doc.tags.forEach(function(t) { html += '<span class="tag">' + esc(t) + '</span>'; });
+  html += '</div>';
 
   if (deps.length > 0) {
-    html += '<div class="connections-title">Depends On</div><div class="connection-list">';
-    html += deps.map(d => {
-      const exists = docIdSet.has(d);
-      return exists
-        ? `<span class="connection-chip" onclick="openDoc('${escHtml(d)}')">${escHtml(d)}</span>`
-        : `<span class="connection-chip broken" title="Document not found">${escHtml(d)}</span>`;
-    }).join('');
-    html += '</div>';
-  }
-
-  if (refs.length > 0) {
-    html += '<div class="connections-title" style="margin-top:0.75rem">Depended By</div><div class="connection-list">';
-    html += refs.map(d => {
-      const exists = docIdSet.has(d);
-      return exists
-        ? `<span class="connection-chip" onclick="openDoc('${escHtml(d)}')">${escHtml(d)}</span>`
-        : `<span class="connection-chip broken" title="Document not found">${escHtml(d)}</span>`;
-    }).join('');
-    html += '</div>';
-  }
-
-  el.innerHTML = html;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Comments
-   ═══════════════════════════════════════════════════════════════ */
-async function loadComments(docId) {
-  const listEl = document.getElementById('comments-list');
-  const countEl = document.getElementById('comment-count');
-  listEl.innerHTML = '<div class="no-comments">Loading comments...</div>';
-
-  try {
-    const res = await fetch(`/api/docs/${encodeURIComponent(docId)}/comments`);
-    if (!res.ok) throw new Error('Failed to load comments');
-    const comments = await res.json();
-    countEl.textContent = comments.length > 0 ? `(${comments.length})` : '';
-    renderComments(comments);
-  } catch (err) {
-    listEl.innerHTML = '<div class="no-comments">Failed to load comments</div>';
-    countEl.textContent = '';
-  }
-
-  // Restore author from localStorage
-  const saved = localStorage.getItem('holm-comment-author');
-  if (saved) document.getElementById('comment-author').value = saved;
-}
-
-function renderComments(comments) {
-  const listEl = document.getElementById('comments-list');
-  if (comments.length === 0) {
-    listEl.innerHTML = '<div class="no-comments">No comments yet — be the first</div>';
-    return;
-  }
-  listEl.innerHTML = comments.map(c => `
-    <div class="comment-card">
-      <div class="comment-meta">
-        <span class="comment-author">${escHtml(c.author)}</span>
-        <span class="comment-date">${timeAgo(c.createdAt)}</span>
-      </div>
-      <div class="comment-text">${escHtml(c.text)}</div>
-    </div>
-  `).join('');
-}
-
-async function submitComment() {
-  if (!currentDoc) return;
-  const authorEl = document.getElementById('comment-author');
-  const textEl = document.getElementById('comment-text');
-  const author = authorEl.value.trim();
-  const text = textEl.value.trim();
-
-  if (!author) { showToast('Enter your name', 'error'); authorEl.focus(); return; }
-  if (!text) { showToast('Enter a comment', 'error'); textEl.focus(); return; }
-
-  try {
-    const res = await fetch(`/api/docs/${encodeURIComponent(currentDoc.docId)}/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ author, text })
+    html += '<div class="deps"><div class="deps-label">Depends on</div><div class="deps-list">';
+    deps.forEach(function(d) {
+      html += docIds.has(d)
+        ? '<span class="dep-chip" onclick="openDoc(\'' + esc(d) + '\')">' + esc(d) + '</span>'
+        : '<span class="dep-chip broken">' + esc(d) + '</span>';
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Failed to post');
-    }
-    localStorage.setItem('holm-comment-author', author);
-    textEl.value = '';
-    showToast('Comment posted');
-    loadComments(currentDoc.docId);
-  } catch (err) {
-    showToast(err.message, 'error');
+    html += '</div></div>';
   }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Related Documents
-   ═══════════════════════════════════════════════════════════════ */
-function renderRelatedDocs(doc) {
-  // Find docs in same domain that share at least one tag
-  const myTags = new Set(doc.tags || []);
-  if (myTags.size === 0) return;
-
-  const related = allDocs
-    .filter(d => d.docId !== doc.docId && d.domain === doc.domain)
-    .map(d => {
-      const shared = (d.tags || []).filter(t => myTags.has(t)).length;
-      return { doc: d, shared };
-    })
-    .filter(r => r.shared > 0)
-    .sort((a, b) => b.shared - a.shared)
-    .slice(0, 5);
-
-  if (related.length === 0) return;
-
-  // Insert related docs section before comments
-  const commentsSection = document.getElementById('comments-section');
-  let relatedEl = document.getElementById('related-docs');
-  if (!relatedEl) {
-    relatedEl = document.createElement('div');
-    relatedEl.id = 'related-docs';
-    relatedEl.style.cssText = 'margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)';
-    commentsSection.parentNode.insertBefore(relatedEl, commentsSection);
+  if (refs.length > 0) {
+    html += '<div class="deps"><div class="deps-label">Referenced by</div><div class="deps-list">';
+    refs.forEach(function(d) {
+      html += docIds.has(d)
+        ? '<span class="dep-chip" onclick="openDoc(\'' + esc(d) + '\')">' + esc(d) + '</span>'
+        : '<span class="dep-chip broken">' + esc(d) + '</span>';
+    });
+    html += '</div></div>';
   }
 
-  relatedEl.innerHTML = '<div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Related Documents</div>' +
-    '<div class="doc-grid">' + related.map(r =>
-      '<div class="doc-card" onclick="openDoc(\'' + escHtml(r.doc.docId) + '\')">' +
-        '<span class="doc-card-id">' + escHtml(r.doc.docId) + '</span>' +
-        '<span class="doc-card-title">' + escHtml(r.doc.title) + '</span>' +
-      '</div>'
-    ).join('') + '</div>';
+  html += '<div class="doc-content">' + (doc.content || '<p style="color:var(--dim)">No content</p>') + '</div>';
+
+  html += '<div class="comments">';
+  html += '<div class="comments-title">Comments <span id="cc"></span></div>';
+  html += '<div class="comment-form">';
+  html += '<input type="text" id="c-author" placeholder="Name" maxlength="50">';
+  html += '<textarea id="c-text" placeholder="Write a comment..." maxlength="2000"></textarea>';
+  html += '<button onclick="postComment()">Post</button>';
+  html += '</div>';
+  html += '<div id="c-list"><div style="font-size:0.75rem;color:var(--dim);text-align:center;padding:0.5rem">Loading...</div></div>';
+  html += '</div>';
+
+  html += '</div>';
+  el.innerHTML = html;
+  window.scrollTo(0, 0);
+
+  var saved = localStorage.getItem('holm-author');
+  if (saved) document.getElementById('c-author').value = saved;
+
+  loadComments(id);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Graph View
-   ═══════════════════════════════════════════════════════════════ */
-let graphAnimId = null;
-let graphNodes = [];
-let graphEdges = [];
-let graphTransform = { x: 0, y: 0, scale: 1 };
-let graphDrag = null;
-let graphHover = null;
-
-function showGraph(pushHistory) {
-  switchView('graph', pushHistory);
-  initGraph();
-}
-
-async function initGraph() {
-  const canvas = document.getElementById('graph-canvas');
-  const ctx = canvas.getContext('2d');
-
-  // Resize canvas
-  function resize() {
-    canvas.width = canvas.clientWidth * devicePixelRatio;
-    canvas.height = canvas.clientHeight * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Fetch graph data if needed
-  if (!graphData) {
-    try {
-      const res = await fetch('/api/graph');
-      graphData = await res.json();
-    } catch (err) {
-      showToast('Failed to load graph data', 'error');
+/* ── Comments ── */
+async function loadComments(id) {
+  try {
+    var res = await fetch('/api/docs/' + encodeURIComponent(id) + '/comments');
+    var comments = await res.json();
+    var cc = document.getElementById('cc');
+    var list = document.getElementById('c-list');
+    if (cc) cc.textContent = comments.length > 0 ? '(' + comments.length + ')' : '';
+    if (!list) return;
+    if (comments.length === 0) {
+      list.innerHTML = '<div style="font-size:0.75rem;color:var(--dim);text-align:center;padding:0.5rem">No comments yet</div>';
       return;
     }
-  }
-
-  // Initialize nodes with positions
-  const w = canvas.clientWidth, h = canvas.clientHeight;
-  graphNodes = graphData.nodes.map((n, i) => ({
-    ...n, x: w / 2 + (Math.random() - 0.5) * w * 0.6,
-    y: h / 2 + (Math.random() - 0.5) * h * 0.6,
-    vx: 0, vy: 0,
-    color: DOMAIN_COLORS[n.domain] || '#00f0ff',
-    radius: 4
-  }));
-
-  const nodeMap = {};
-  graphNodes.forEach(n => { nodeMap[n.id] = n; });
-
-  graphEdges = graphData.edges.filter(e => nodeMap[e.source] && nodeMap[e.target])
-    .map(e => ({ source: nodeMap[e.source], target: nodeMap[e.target] }));
-
-  // Update stats
-  const domains = new Set(graphNodes.map(n => n.domain));
-  document.getElementById('graph-stats').textContent =
-    `${graphNodes.length} nodes · ${graphEdges.length} edges · ${domains.size} domains`;
-
-  // Build legend
-  const domainCounts = {};
-  graphNodes.forEach(n => {
-    const key = n.domain;
-    if (!domainCounts[key]) domainCounts[key] = { name: n.domainName || DOMAIN_NAMES[key] || key, count: 0, color: n.color };
-    domainCounts[key].count++;
-  });
-  document.getElementById('graph-legend').innerHTML = Object.keys(domainCounts)
-    .sort((a, b) => domainCounts[b].count - domainCounts[a].count)
-    .map(k => `<div class="graph-legend-item"><span class="graph-legend-dot" style="background:${domainCounts[k].color}"></span>${domainCounts[k].name} (${domainCounts[k].count})</div>`)
-    .join('');
-
-  // Reset transform
-  graphTransform = { x: 0, y: 0, scale: 1 };
-
-  // Force simulation
-  let iterations = 0;
-  const maxIterations = 300;
-
-  function simulate() {
-    if (iterations > maxIterations) { drawGraph(ctx, canvas); return; }
-    iterations++;
-
-    const alpha = Math.max(0.001, 1 - iterations / maxIterations);
-
-    // Repulsion using spatial grid (avoids O(n²) for distant nodes)
-    const cellSize = 120;
-    const grid = {};
-    for (const n of graphNodes) {
-      const cx = Math.floor(n.x / cellSize), cy = Math.floor(n.y / cellSize);
-      const key = cx + ',' + cy;
-      if (!grid[key]) grid[key] = [];
-      grid[key].push(n);
-    }
-    for (const n of graphNodes) {
-      const cx = Math.floor(n.x / cellSize), cy = Math.floor(n.y / cellSize);
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
-          const cell = grid[(cx + dx) + ',' + (cy + dy)];
-          if (!cell) continue;
-          for (const other of cell) {
-            if (other === n) continue;
-            let ddx = other.x - n.x, ddy = other.y - n.y;
-            let dist = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
-            const force = -300 / (dist * dist) * alpha;
-            n.vx += (ddx / dist) * force;
-            n.vy += (ddy / dist) * force;
-          }
-        }
-      }
-    }
-
-    // Attraction along edges
-    for (const e of graphEdges) {
-      let dx = e.target.x - e.source.x, dy = e.target.y - e.source.y;
-      let dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const force = (dist - 80) * 0.005 * alpha;
-      const fx = (dx / dist) * force, fy = (dy / dist) * force;
-      e.source.vx += fx; e.source.vy += fy;
-      e.target.vx -= fx; e.target.vy -= fy;
-    }
-
-    // Center gravity
-    for (const n of graphNodes) {
-      n.vx += (w / 2 - n.x) * 0.0005 * alpha;
-      n.vy += (h / 2 - n.y) * 0.0005 * alpha;
-    }
-
-    // Apply velocity with damping
-    for (const n of graphNodes) {
-      n.vx *= 0.85; n.vy *= 0.85;
-      n.x += n.vx; n.y += n.vy;
-    }
-
-    drawGraph(ctx, canvas);
-    graphAnimId = requestAnimationFrame(simulate);
-  }
-
-  if (graphAnimId) cancelAnimationFrame(graphAnimId);
-  simulate();
-
-  // Setup interactions
-  setupGraphInteractions(canvas, ctx);
+    list.innerHTML = comments.map(function(c) {
+      return '<div class="comment"><div class="comment-header"><span class="comment-author">' + esc(c.author) + '</span><span class="comment-time">' + timeAgo(c.createdAt) + '</span></div><div class="comment-body">' + esc(c.text) + '</div></div>';
+    }).join('');
+  } catch(e) { }
 }
 
-function drawGraph(ctx, canvas) {
-  const w = canvas.clientWidth, h = canvas.clientHeight;
-  ctx.clearRect(0, 0, w, h);
-  ctx.save();
-  ctx.translate(graphTransform.x, graphTransform.y);
-  ctx.scale(graphTransform.scale, graphTransform.scale);
-
-  // Draw edges
-  ctx.lineWidth = 0.5;
-  for (const e of graphEdges) {
-    const isHighlight = graphHover && (e.source.id === graphHover.id || e.target.id === graphHover.id);
-    ctx.strokeStyle = isHighlight ? 'rgba(0, 240, 255, 0.6)' : 'rgba(255, 255, 255, 0.08)';
-    ctx.lineWidth = isHighlight ? 1.5 : 0.5;
-    ctx.beginPath();
-    ctx.moveTo(e.source.x, e.source.y);
-    ctx.lineTo(e.target.x, e.target.y);
-    ctx.stroke();
-  }
-
-  // Draw nodes
-  for (const n of graphNodes) {
-    const isHover = graphHover && n.id === graphHover.id;
-    const isConnected = graphHover && graphEdges.some(e =>
-      (e.source.id === graphHover.id && e.target.id === n.id) ||
-      (e.target.id === graphHover.id && e.source.id === n.id)
-    );
-    const r = isHover ? 7 : isConnected ? 5 : n.radius;
-    const alpha = (graphHover && !isHover && !isConnected) ? 0.3 : 1;
-
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = n.color;
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-    ctx.fill();
-
-    if (isHover) {
-      ctx.strokeStyle = n.color;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, r + 3, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  ctx.restore();
+async function postComment() {
+  if (!currentDocId) return;
+  var author = document.getElementById('c-author').value.trim();
+  var text = document.getElementById('c-text').value.trim();
+  if (!author) { toast('Enter your name', 'error'); return; }
+  if (!text) { toast('Enter a comment', 'error'); return; }
+  try {
+    var res = await fetch('/api/docs/' + encodeURIComponent(currentDocId) + '/comments', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ author: author, text: text })
+    });
+    if (!res.ok) { var e = await res.json(); throw new Error(e.error); }
+    localStorage.setItem('holm-author', author);
+    document.getElementById('c-text').value = '';
+    toast('Comment posted');
+    loadComments(currentDocId);
+  } catch(e) { toast(e.message, 'error'); }
 }
 
-function setupGraphInteractions(canvas, ctx) {
-  const tooltip = document.getElementById('graph-tooltip');
-  let isDragging = false;
-  let dragNode = null;
-  let lastPos = null;
-  let touchStartTime = 0;
-  let touchStartPos = null;
+/* ── Search ── */
+var searchTimer = null;
 
-  function screenToGraph(x, y) {
-    return {
-      x: (x - graphTransform.x) / graphTransform.scale,
-      y: (y - graphTransform.y) / graphTransform.scale
-    };
-  }
-
-  function findNode(x, y) {
-    const gp = screenToGraph(x, y);
-    let closest = null, minDist = 20 / graphTransform.scale;
-    for (const n of graphNodes) {
-      const d = Math.sqrt((n.x - gp.x) ** 2 + (n.y - gp.y) ** 2);
-      if (d < minDist) { closest = n; minDist = d; }
-    }
-    return closest;
-  }
-
-  canvas.addEventListener('mousedown', e => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left, y = e.clientY - rect.top;
-    dragNode = findNode(x, y);
-    if (!dragNode) { isDragging = true; }
-    lastPos = { x: e.clientX, y: e.clientY };
-  });
-
-  canvas.addEventListener('mousemove', e => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left, y = e.clientY - rect.top;
-
-    if (dragNode && lastPos) {
-      const gp = screenToGraph(x, y);
-      dragNode.x = gp.x; dragNode.y = gp.y;
-      dragNode.vx = 0; dragNode.vy = 0;
-      drawGraph(ctx, canvas);
-    } else if (isDragging && lastPos) {
-      graphTransform.x += e.clientX - lastPos.x;
-      graphTransform.y += e.clientY - lastPos.y;
-      lastPos = { x: e.clientX, y: e.clientY };
-      drawGraph(ctx, canvas);
-    } else {
-      const node = findNode(x, y);
-      if (node !== graphHover) {
-        graphHover = node;
-        drawGraph(ctx, canvas);
-        if (node) {
-          tooltip.style.display = 'block';
-          tooltip.style.left = (e.clientX + 12) + 'px';
-          tooltip.style.top = (e.clientY - 10) + 'px';
-          tooltip.querySelector('.tt-id').textContent = node.id;
-          tooltip.querySelector('.tt-title').textContent = node.title;
-          tooltip.querySelector('.tt-domain').textContent = node.domainName || DOMAIN_NAMES[node.domain] || node.domain;
-        } else {
-          tooltip.style.display = 'none';
-        }
-      } else if (node) {
-        tooltip.style.left = (e.clientX + 12) + 'px';
-        tooltip.style.top = (e.clientY - 10) + 'px';
-      }
-    }
-  });
-
-  canvas.addEventListener('mouseup', () => {
-    isDragging = false; dragNode = null; lastPos = null;
-  });
-
-  canvas.addEventListener('dblclick', e => {
-    const rect = canvas.getBoundingClientRect();
-    const node = findNode(e.clientX - rect.left, e.clientY - rect.top);
-    if (node) {
-      closeOverlay();
-      openDoc(node.id);
-    }
-  });
-
-  canvas.addEventListener('wheel', e => {
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = Math.max(0.1, Math.min(5, graphTransform.scale * delta));
-    graphTransform.x = mx - (mx - graphTransform.x) * (newScale / graphTransform.scale);
-    graphTransform.y = my - (my - graphTransform.y) * (newScale / graphTransform.scale);
-    graphTransform.scale = newScale;
-    drawGraph(ctx, canvas);
-  }, { passive: false });
-
-  // Touch support
-  let lastTouchDist = 0;
-  let lastTouchCenter = null;
-
-  canvas.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left, y = e.touches[0].clientY - rect.top;
-      dragNode = findNode(x, y);
-      if (!dragNode) isDragging = true;
-      lastPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      touchStartTime = Date.now();
-      touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    } else if (e.touches.length === 2) {
-      const dx = e.touches[1].clientX - e.touches[0].clientX;
-      const dy = e.touches[1].clientY - e.touches[0].clientY;
-      lastTouchDist = Math.sqrt(dx * dx + dy * dy);
-      lastTouchCenter = {
-        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-      };
-    }
-  }, { passive: true });
-
-  canvas.addEventListener('touchmove', e => {
-    e.preventDefault();
-    if (e.touches.length === 1 && lastPos) {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left, y = e.touches[0].clientY - rect.top;
-      if (dragNode) {
-        const gp = screenToGraph(x, y);
-        dragNode.x = gp.x; dragNode.y = gp.y;
-        dragNode.vx = 0; dragNode.vy = 0;
-        drawGraph(ctx, canvas);
-      } else if (isDragging) {
-        graphTransform.x += e.touches[0].clientX - lastPos.x;
-        graphTransform.y += e.touches[0].clientY - lastPos.y;
-        lastPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        drawGraph(ctx, canvas);
-      }
-    } else if (e.touches.length === 2) {
-      const dx = e.touches[1].clientX - e.touches[0].clientX;
-      const dy = e.touches[1].clientY - e.touches[0].clientY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (lastTouchDist > 0) {
-        const rect = canvas.getBoundingClientRect();
-        const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
-        const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
-        const delta = dist / lastTouchDist;
-        const newScale = Math.max(0.1, Math.min(5, graphTransform.scale * delta));
-        graphTransform.x = cx - (cx - graphTransform.x) * (newScale / graphTransform.scale);
-        graphTransform.y = cy - (cy - graphTransform.y) * (newScale / graphTransform.scale);
-        graphTransform.scale = newScale;
-        drawGraph(ctx, canvas);
-      }
-      lastTouchDist = dist;
-    }
-  }, { passive: false });
-  canvas.addEventListener('touchend', e => {
-    if (touchStartPos && !dragNode && Date.now() - touchStartTime < 300) {
-      const dx = e.changedTouches[0].clientX - touchStartPos.x;
-      const dy = e.changedTouches[0].clientY - touchStartPos.y;
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
-        const rect = canvas.getBoundingClientRect();
-        const node = findNode(e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top);
-        if (node) { closeOverlay(); openDoc(node.id); }
-      }
-    }
-    isDragging = false; dragNode = null; lastPos = null; lastTouchDist = 0;
-    touchStartTime = 0; touchStartPos = null;
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Search
-   ═══════════════════════════════════════════════════════════════ */
-let searchDebounce = null;
-
-function openSearch(pushHistory) {
-  switchView('search', pushHistory);
-  const input = document.getElementById('search-input');
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+  var input = document.getElementById('search-input');
   input.value = '';
   input.focus();
-  document.getElementById('search-results').innerHTML =
-    '<div class="search-empty">Type to search across all documents</div>';
+  document.getElementById('search-results').innerHTML = '<div class="search-empty">Type to search across all documents</div>';
 }
 
-document.getElementById('search-input').addEventListener('input', e => {
-  clearTimeout(searchDebounce);
-  const q = e.target.value.trim();
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+}
+
+document.getElementById('search-input').addEventListener('input', function(e) {
+  clearTimeout(searchTimer);
+  var q = e.target.value.trim();
   if (!q) {
-    document.getElementById('search-results').innerHTML =
-      '<div class="search-empty">Type to search across all documents</div>';
+    document.getElementById('search-results').innerHTML = '<div class="search-empty">Type to search</div>';
     return;
   }
-  searchDebounce = setTimeout(() => performSearch(q), 250);
+  searchTimer = setTimeout(function() { doSearch(q); }, 250);
 });
 
-async function performSearch(q) {
-  const resultsEl = document.getElementById('search-results');
+async function doSearch(q) {
+  var el = document.getElementById('search-results');
   try {
-    const res = await fetch('/api/search?q=' + encodeURIComponent(q));
-    if (!res.ok) throw new Error('Search failed');
-    const results = await res.json();
-
-    if (results.length === 0) {
-      resultsEl.innerHTML = '<div class="search-empty">No results found</div>';
-      return;
-    }
-
-    resultsEl.innerHTML = results.map(r => `
-      <div class="search-result-card" onclick="closeOverlay();openDoc('${escHtml(r.docId)}')">
-        <div class="search-result-id">${escHtml(r.docId)} · ${escHtml(r.domainName || r.domain)}</div>
-        <div class="search-result-title">${escHtml(r.title)}</div>
-        <div class="search-result-snippet">${r.snippet || ''}</div>
-      </div>
-    `).join('');
-  } catch (err) {
-    resultsEl.innerHTML = '<div class="search-empty">Search failed — try again</div>';
-  }
+    var res = await fetch('/api/search?q=' + encodeURIComponent(q));
+    var results = await res.json();
+    if (results.length === 0) { el.innerHTML = '<div class="search-empty">No results</div>'; return; }
+    el.innerHTML = results.map(function(r) {
+      return '<div class="search-result" onclick="closeSearch();openDoc(\'' + esc(r.docId) + '\')">' +
+        '<div class="sr-id">' + esc(r.docId) + ' · ' + esc(r.domainName || r.domain) + '</div>' +
+        '<div class="sr-title">' + esc(r.title) + '</div>' +
+        '<div class="sr-snippet">' + (r.snippet || '') + '</div></div>';
+    }).join('');
+  } catch(e) { el.innerHTML = '<div class="search-empty">Search failed</div>'; }
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   Stats View
-   ═══════════════════════════════════════════════════════════════ */
-function showStats(pushHistory) {
-  switchView('stats', pushHistory);
-  renderStats();
-}
-
-function renderStats() {
-  const docIdSet = new Set(allDocs.map(d => d.docId));
-  const totalDocs = allDocs.length;
-  const totalDomains = Object.keys(domainHealth).length;
-
-  let brokenCount = 0;
-  let orphanCount = 0;
-  let totalDeps = 0;
-  const tagCounts = {};
-  const statusCounts = {};
-
-  for (const doc of allDocs) {
-    const deps = doc.dependsOn || [];
-    const refs = doc.dependedBy || [];
-    totalDeps += deps.length;
-    deps.forEach(d => { if (!docIdSet.has(d)) brokenCount++; });
-    if (deps.length === 0 && refs.length === 0) orphanCount++;
-    (doc.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
-    const st = doc.status || 'unknown';
-    statusCounts[st] = (statusCounts[st] || 0) + 1;
-  }
-
-  const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
-
-  const domainKeys = Object.keys(domainHealth).sort((a, b) => {
-    const na = parseInt(a), nb = parseInt(b);
-    if (!isNaN(na) && !isNaN(nb)) return na - nb;
-    return a.localeCompare(b);
-  });
-
-  const el = document.getElementById('stats-content');
-  el.innerHTML =
-    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;margin-bottom:2rem">' +
-      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
-        '<div style="font-size:1.8rem;font-weight:600;color:var(--neon-cyan)">' + totalDocs + '</div>' +
-        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Documents</div>' +
-      '</div>' +
-      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
-        '<div style="font-size:1.8rem;font-weight:600;color:var(--neon-cyan)">' + totalDomains + '</div>' +
-        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Domains</div>' +
-      '</div>' +
-      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
-        '<div style="font-size:1.8rem;font-weight:600;color:var(--neon-cyan)">' + totalDeps + '</div>' +
-        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Dependencies</div>' +
-      '</div>' +
-      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
-        '<div style="font-size:1.8rem;font-weight:600;color:#ff4444">' + brokenCount + '</div>' +
-        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Broken Deps</div>' +
-      '</div>' +
-      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
-        '<div style="font-size:1.8rem;font-weight:600;color:#ffaa00">' + orphanCount + '</div>' +
-        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Orphaned</div>' +
-      '</div>' +
-    '</div>' +
-    '<h3 style="font-size:0.8rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Domain Health</h3>' +
-    '<div style="margin-bottom:2rem">' +
-    domainKeys.map(function(k) {
-      var dh = domainHealth[k];
-      var color = healthColor(dh.score);
-      return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.4rem 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openDomainView(\'' + k + '\')">' +
-        '<span style="font-size:0.7rem;color:var(--text-muted);min-width:30px">D' + escHtml(k) + '</span>' +
-        '<span style="font-size:0.8rem;flex:1">' + escHtml(dh.name) + '</span>' +
-        '<span style="font-size:0.7rem;color:var(--text-muted)">' + dh.total + ' docs</span>' +
-        '<div style="width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:' + dh.score + '%;background:' + color + ';border-radius:2px"></div></div>' +
-        '<span style="font-size:0.7rem;color:' + color + ';min-width:30px;text-align:right">' + dh.score + '%</span>' +
-      '</div>';
-    }).join('') +
-    '</div>' +
-    '<h3 style="font-size:0.8rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Top Tags</h3>' +
-    '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:2rem">' +
-    topTags.map(function(pair) {
-      return '<span style="display:inline-flex;align-items:center;padding:0.2rem 0.5rem;font-size:0.7rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;color:var(--text-muted)">' +
-        escHtml(pair[0]) + ' <span style="margin-left:0.3rem;color:var(--neon-cyan)">' + pair[1] + '</span></span>';
-    }).join('') +
-    '</div>' +
-    '<h3 style="font-size:0.8rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Document Status</h3>' +
-    '<div style="margin-bottom:2rem">' +
-    Object.entries(statusCounts).sort(function(a, b) { return b[1] - a[1]; }).map(function(pair) {
-      return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.3rem 0"><span style="font-size:0.8rem;flex:1">' +
-        escHtml(pair[0]) + '</span><span style="font-size:0.8rem;color:var(--neon-cyan)">' + pair[1] + '</span></div>';
-    }).join('') +
-    '</div>';
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Hash Routing
-   ═══════════════════════════════════════════════════════════════ */
-function handleHash() {
-  const hash = location.hash;
-  if (hash.startsWith('#doc/')) {
-    const id = hash.slice(5);
-    openDoc(id, false);
-  } else if (hash.startsWith('#domain/')) {
-    const key = hash.slice(8);
-    openDomainView(key, false);
-  } else if (hash === '#graph') {
-    showGraph(false);
-  } else if (hash === '#search') {
-    openSearch(false);
-  } else if (hash === '#stats') {
-    showStats(false);
-  } else {
-    showHub(false);
-  }
-}
-
-window.addEventListener('popstate', handleHash);
-
-/* ═══════════════════════════════════════════════════════════════
-   Offline Detection
-   ═══════════════════════════════════════════════════════════════ */
-window.addEventListener('online', () => { document.body.classList.remove('offline'); showToast('Back online'); });
-window.addEventListener('offline', () => { document.body.classList.add('offline'); });
-
-/* ═══════════════════════════════════════════════════════════════
-   Service Worker
-   ═══════════════════════════════════════════════════════════════ */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW registration failed:', err));
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Boot
-   ═══════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════════
-   Keyboard Shortcuts (desktop)
-   ═══════════════════════════════════════════════════════════════ */
-document.addEventListener('keydown', e => {
-  const tag = (e.target.tagName || '').toLowerCase();
-  const inInput = tag === 'input' || tag === 'textarea';
-
+/* ── Keyboard Shortcuts ── */
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
-    if (currentView === 'graph' || currentView === 'search') closeOverlay();
-    else navigateBack();
+    if (document.getElementById('search-overlay').classList.contains('open')) closeSearch();
+    else goBack();
     return;
   }
-  if (inInput) return;
+  var tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea') return;
   if (e.key === '/' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); openSearch(); }
-  else if (e.key === 'g') showGraph();
-  else if (e.key === 'h') showHub();
-
-/* Scroll Position Memory */
-function saveScrollPos() {
-  if (currentDoc) {
-    sessionStorage.setItem('scroll-' + currentDoc.docId, window.scrollY);
-  }
-}
-
-function restoreScrollPos(docId) {
-  const saved = sessionStorage.getItem('scroll-' + docId);
-  if (saved) {
-    requestAnimationFrame(() => window.scrollTo(0, parseInt(saved)));
-  } else {
-    window.scrollTo(0, 0);
-  }
-}
-
 });
 
-/* Pull to Refresh */
-(function() {
-  let startY = 0;
-  let pulling = false;
-  const threshold = 80;
-  const indicator = document.getElementById('ptr-indicator');
-  
-  document.addEventListener('touchstart', e => {
-    if (window.scrollY === 0 && currentView === 'hub') {
-      startY = e.touches[0].clientY;
-      pulling = true;
-    }
-  }, { passive: true });
-  
-  document.addEventListener('touchmove', e => {
-    if (!pulling) return;
-    const dy = e.touches[0].clientY - startY;
-    if (dy > 30) {
-      indicator.classList.add('visible');
-      indicator.textContent = dy > threshold ? 'Release to refresh' : 'Pull to refresh';
-    }
-  }, { passive: true });
-  
-  document.addEventListener('touchend', e => {
-    if (!pulling) return;
-    const dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : 0) - startY;
-    pulling = false;
-    indicator.classList.remove('visible');
-    if (dy > threshold && currentView === 'hub') {
-      showToast('Refreshing...');
-      fetch('/api/docs').then(r => r.json()).then(docs => {
-        allDocs = docs;
-        docsById = {};
-        allDocs.forEach(d => { docsById[d.docId] = d; });
-        computeDomainHealth();
-        renderHub();
-        showToast('Refreshed');
-      }).catch(() => showToast('Refresh failed', 'error'));
-    }
-  }, { passive: true });
-})();
+/* ── Offline ── */
+window.addEventListener('online', function() { document.body.classList.remove('offline'); toast('Back online'); });
+window.addEventListener('offline', function() { document.body.classList.add('offline'); });
+
+/* ── Service Worker ── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function() {});
+}
+
+/* ── Init ── */
+async function init() {
+  try {
+    var res = await fetch('/api/docs');
+    if (!res.ok) throw new Error();
+    allDocs = await res.json();
+    docsById = {};
+    allDocs.forEach(function(d) { docsById[d.docId] = d; });
+
+    var h = location.hash.slice(1);
+    if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
+    else renderHome();
+  } catch(e) {
+    document.getElementById('loading').textContent = 'Failed to load — retrying...';
+    setTimeout(init, 3000);
+  }
+}
 
 init();
 </script>
