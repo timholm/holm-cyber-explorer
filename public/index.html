@@ -1760,6 +1760,24 @@ if ('serviceWorker' in navigator) {
 /* ═══════════════════════════════════════════════════════════════
    Boot
    ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   Keyboard Shortcuts (desktop)
+   ═══════════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  const inInput = tag === 'input' || tag === 'textarea';
+
+  if (e.key === 'Escape') {
+    if (currentView === 'graph' || currentView === 'search') closeOverlay();
+    else navigateBack();
+    return;
+  }
+  if (inInput) return;
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); openSearch(); }
+  else if (e.key === 'g') showGraph();
+  else if (e.key === 'h') showHub();
+});
+
 init();
 </script>
 </body>
