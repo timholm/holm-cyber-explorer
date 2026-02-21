@@ -22,7 +22,16 @@ function validateGithubSignature(payload, signature, secret) {
 }
 
 async function connectDB() {
-  const client = new MongoClient(MONGODB_URI);
+  const client = new MongoClient(MONGODB_URI, {
+    maxPoolSize: 10,
+    minPoolSize: 2,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 30000
+  });
+
+  client.on('connectionPoolCreated', () => console.log('[mongo] Connection pool created'));
+  client.on('connectionPoolClosed', () => console.log('[mongo] Connection pool closed'));
+  client.on('connectionCheckOutFailed', (e) => console.warn('[mongo] Connection checkout failed:', e.reason));
   await client.connect();
   db = client.db();
   console.log('Connected to MongoDB');
@@ -84,7 +93,14 @@ app.use(compression());
 
 // Middleware
 app.use(express.json({ limit: '5mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1d',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.woff2') || filePath.endsWith('.svg')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+}));
 
 // Request logging
 app.use((req, res, next) => {
