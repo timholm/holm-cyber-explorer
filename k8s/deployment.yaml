@@ -18,46 +18,11 @@ spec:
       labels:
         app: holm-cyber
     spec:
-      dnsPolicy: None
-      dnsConfig:
-        nameservers:
-          - "10.96.0.10"
-          - "8.8.8.8"
-          - "1.1.1.1"
-        searches:
-          - "holm-cyber.svc.cluster.local"
-          - "svc.cluster.local"
-          - "cluster.local"
-        options:
-          - name: ndots
-            value: "5"
-      initContainers:
-        - name: git-clone
-          image: alpine/git:latest
-          command:
-            - sh
-            - -c
-            - |
-              git clone --depth 1 https://github.com/timholm/holm-cyber-explorer.git /tmp/repo
-              cp -r /tmp/repo/* /data/
-              git clone --depth 1 https://github.com/timholm/docs-framework.git /tmp/docs
-              cp /tmp/docs/html/manifest.json /data/manifest.json
-              cp -r /tmp/docs/html /data/html
-          volumeMounts:
-            - name: app-content
-              mountPath: /data
+      dnsPolicy: ClusterFirst
       containers:
         - name: node-app
-          image: node:20-alpine
-          workingDir: /app
-          command:
-            - sh
-            - -c
-            - |
-              cd /app
-              npm install --production
-              node import.js
-              node server.js
+          image: gitea.holm.chat/tim/holm-cyber-explorer:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:
@@ -100,10 +65,6 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
             failureThreshold: 30
-          volumeMounts:
-            - name: app-content
-              mountPath: /app
-              readOnly: false
           resources:
             requests:
               memory: "256Mi"
@@ -111,9 +72,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
-      volumes:
-        - name: app-content
-          emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service

@@ -143,12 +143,16 @@ async function main() {
   const db = client.db();
   const collection = db.collection('documents');
 
-  // Check if already imported
+  // Check if already imported (skip unless --force flag is passed)
+  const forceMode = process.argv.includes('--force');
   const count = await collection.countDocuments();
-  if (count > 0) {
-    console.log(`Database already has ${count} documents. Skipping import.`);
+  if (count > 0 && !forceMode) {
+    console.log(`Database already has ${count} documents. Skipping import. Use --force to upsert.`);
     await client.close();
     return;
+  }
+  if (count > 0 && forceMode) {
+    console.log(`Force mode: upserting into existing ${count} documents.`);
   }
 
   // Read manifest

@@ -1,14 +1,19 @@
 // HOLM Vault — Service Worker
 // Cache-first for static assets, network-first for API calls
 
-var CACHE_VERSION = 'holm-chat-v3';
+var CACHE_VERSION = 'holm-chat-v4';
 
 var PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icons/icon-192.svg',
-  '/icons/icon-512.svg'
+  '/icons/icon-512.svg',
+  '/fonts/JetBrainsMono-Regular.woff2',
+  '/fonts/JetBrainsMono-Medium.woff2',
+  '/fonts/JetBrainsMono-SemiBold.woff2',
+  '/fonts/JetBrainsMono-Bold.woff2',
+  '/fonts/JetBrainsMono-Light.woff2'
 ];
 
 var API_ROUTES = ['/api/docs', '/api/graph', '/api/tags', '/api/comments', '/api/health', '/api/search'];

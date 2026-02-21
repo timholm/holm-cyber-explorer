@@ -281,16 +281,30 @@ app.get('/api/docs/:id/comments', async (req, res) => {
   }
 });
 
-// Add a comment (no auth required - public comments)
+// Add a comment (rate-limited, server-side sanitized)
+const commentRateLimit = {};
 app.post('/api/docs/:id/comments', async (req, res) => {
   try {
+    // Simple IP-based rate limiting (5 comments per minute)
+    const ip = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+    if (!commentRateLimit[ip]) commentRateLimit[ip] = [];
+    commentRateLimit[ip] = commentRateLimit[ip].filter(t => now - t < 60000);
+    if (commentRateLimit[ip].length >= 5) {
+      return res.status(429).json({ error: 'Rate limit exceeded. Try again in a minute.' });
+    }
+    commentRateLimit[ip].push(now);
+
     const { author, text } = req.body;
     if (!text || !text.trim()) return res.status(400).json({ error: 'Comment text is required' });
     if (!author || !author.trim()) return res.status(400).json({ error: 'Author name is required' });
+
+    // Server-side sanitization: strip all HTML tags
+    const stripHtml = s => s.replace(/<[^>]*>/g, '');
     const comment = {
       docId: req.params.id.toUpperCase(),
-      author: author.trim().slice(0, 50),
-      text: text.trim().slice(0, 2000),
+      author: stripHtml(author.trim()).slice(0, 50),
+      text: stripHtml(text.trim()).slice(0, 2000),
       createdAt: new Date()
     };
     const result = await db.collection('comments').insertOne(comment);
@@ -334,11 +348,13 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Trigger import
+// Trigger import (async, non-blocking)
 app.post('/api/import', authMiddleware, async (req, res) => {
   try {
-    const { execSync } = require('child_process');
-    execSync('node import.js', { cwd: __dirname, stdio: 'pipe', timeout: 120000 });
+    const { exec } = require('child_process');
+    const { promisify } = require('util');
+    const execAsync = promisify(exec);
+    await execAsync('node import.js --force', { cwd: __dirname, timeout: 120000 });
     res.json({ success: true, message: 'Import completed' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -376,14 +392,16 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
       const { promisify } = require('util');
       const execAsync = promisify(exec);
 
-      console.log('[webhook] Pulling latest code...');
-      await execAsync('git -C /app pull');
+      console.log('[webhook] Pulling latest docs...');
+      try {
+        await execAsync('git -C /app pull');
+      } catch (pullErr) {
+        console.warn('[webhook] git pull failed, re-cloning:', pullErr.message);
+        await execAsync('rm -rf /tmp/docs-update && git clone --depth 1 https://github.com/timholm/docs-framework.git /tmp/docs-update && cp /tmp/docs-update/html/manifest.json /app/manifest.json && cp -r /tmp/docs-update/html /app/html');
+      }
 
-      console.log('[webhook] Dropping documents collection...');
-      await db.collection('documents').drop().catch(() => {});
-
-      console.log('[webhook] Running import.js...');
-      await execAsync('node import.js', { cwd: __dirname, timeout: 120000 });
+      console.log('[webhook] Running upsert reimport...');
+      await execAsync('node import.js --force', { cwd: __dirname, timeout: 120000 });
 
       console.log('[webhook] Reimport completed successfully.');
     } catch (err) {
