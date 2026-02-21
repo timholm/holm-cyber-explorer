@@ -153,7 +153,9 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '1d',
   setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.woff2') || filePath.endsWith('.svg')) {
+    if (filePath.endsWith('.html') || filePath.endsWith('/')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    } else if (filePath.endsWith('.woff2') || filePath.endsWith('.svg')) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
   }
@@ -687,6 +689,13 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
       await execAsync('node import.js --force', { cwd: __dirname, timeout: 120000 });
 
       console.log('[webhook] Reimport completed successfully.');
+
+      // Check if server.js changed — if so, exit for k8s restart
+      const { stdout: changed } = await execAsync('git diff HEAD~1 --name-only');
+      if (changed && changed.includes('server.js')) {
+        console.log('[WEBHOOK] server.js changed — exiting for container restart');
+        process.exit(0);
+      }
     } catch (err) {
       console.error('[webhook] Reimport failed:', err.message);
     }
