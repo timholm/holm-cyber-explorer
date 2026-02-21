@@ -245,6 +245,12 @@ body.offline .offline-bar { display: block; }
 /* ── Copy Button ── */
 .copy-btn { font-size: 0.65rem; color: var(--muted); padding: 0.2rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; transition: color 0.15s, border-color 0.15s; }
 .copy-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+.recent { margin-bottom: 2rem; }
+.recent-title { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.recent-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.recent-chip { font-size: 0.7rem; padding: 0.2rem 0.5rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; color: var(--cyan); cursor: pointer; transition: border-color 0.15s; }
+.recent-chip:hover { border-color: var(--cyan); }
+
 /* ── Print ── */
 @media print {
   header, .search-overlay, .toast-container, .comments, .offline-bar, .back-top, .progress-bar, .doc-nav-footer, .toc, .deps { display: none !important; }
@@ -330,6 +336,17 @@ const DOMAIN_NAMES = {
 /* ── Utilities ── */
 function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
 
+function getRecent() {
+  try { return JSON.parse(sessionStorage.getItem('holm-recent') || '[]'); } catch(e) { return []; }
+}
+
+function addRecent(docId) {
+  var recent = getRecent().filter(function(id) { return id !== docId; });
+  recent.unshift(docId);
+  if (recent.length > 8) recent = recent.slice(0, 8);
+  sessionStorage.setItem('holm-recent', JSON.stringify(recent));
+}
+
 function toast(msg, type) {
   var t = document.createElement('div');
   t.className = 'toast' + (type === 'error' ? ' error' : '');
@@ -394,6 +411,7 @@ function openDoc(id) {
   if (!doc) { toast('Not found: ' + id, 'error'); return; }
   if (currentDocId) histStack.push(currentDocId);
   currentDocId = id;
+  addRecent(id);
   renderDoc(id);
   history.pushState({ doc: id }, '', '#' + id);
 }
@@ -475,6 +493,16 @@ function renderHome() {
   var html = '<div class="wiki-home">';
   html += '<h1>holm.chat</h1>';
   html += '<div class="subtitle">' + allDocs.length + ' documents across ' + keys.length + ' domains</div>';
+
+  var recent = getRecent();
+  if (recent.length > 0) {
+    html += '<div class="recent"><div class="recent-title">Recently viewed</div><div class="recent-list">';
+    recent.forEach(function(id) {
+      var d = docsById[id];
+      if (d) html += '<span class="recent-chip" onclick="openDoc(\'' + esc(id) + '\')">' + esc(d.title) + '</span>';
+    });
+    html += '</div></div>';
+  }
 
   for (var i = 0; i < keys.length; i++) {
     var k = keys[i];
