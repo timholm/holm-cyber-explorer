@@ -415,15 +415,14 @@ body.offline main { padding-top: 2.5rem; }
 .arch-layer-platform { color: var(--magenta); }
 .arch-layer-infra { color: #ff9800; }
 .arch-layer-hardware { color: #ff4444; }
-</style>
-</head>
-<body>
-
 
 /* ── Back to Top ── */
 .back-top { position: fixed; bottom: calc(1.5rem + var(--safe-b)); right: 1rem; width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, color 0.15s; z-index: 50; }
 .back-top.show { opacity: 1; pointer-events: auto; }
 .back-top:hover { color: var(--cyan); border-color: var(--cyan); }
+</style>
+</head>
+<body>
 
 <div class="progress-bar" id="progress-bar"></div>
 
@@ -469,6 +468,11 @@ const DOMAIN_NAMES = {
   '4':'Infrastructure & Power','5':'Platform & Core Systems','6':'Data & Archives',
   '7':'Intelligence & Analysis','8':'Automation & Agents','9':'Education & Training',
   '10':'User Operations','11':'Administration','12':'Disaster Recovery',
+  '13':'Evolution & Adaptation','14':'Research & Theory','15':'Ethics & Safeguards',
+  '16':'Federation & External','17':'Federation Protocol','18':'Data Pipeline',
+  '19':'Advanced Automation','20':'Meta & Documentation',
+  'META':'Meta','FW':'Framework','HIC':'HIC Architecture','PROJ':'Projects & Repositories'
+};
 
 function computeDomainHealth(docs) {
   if (!docs || docs.length === 0) return 0;
@@ -478,16 +482,13 @@ function computeDomainHealth(docs) {
   var hasDepCount = 0;
   for (var i = 0; i < docs.length; i++) {
     var d = docs[i];
-    // % active (vs draft/deprecated)
     if (d.status === 'active') activeCount++;
-    // % with no broken dependencies
     var deps = d.dependsOn || [];
     var hasBroken = false;
     for (var j = 0; j < deps.length; j++) {
       if (!allDocIds.has(deps[j])) { hasBroken = true; break; }
     }
     if (!hasBroken) noBrokenDepsCount++;
-    // % with at least one dependency (not orphaned)
     if (deps.length > 0 || (d.dependedBy && d.dependedBy.length > 0)) hasDepCount++;
   }
   var n = docs.length;
@@ -496,12 +497,6 @@ function computeDomainHealth(docs) {
   var pctConnected = hasDepCount / n;
   return Math.round((pctActive + pctNoBroken + pctConnected) / 3 * 100);
 }
-
-  '13':'Evolution & Adaptation','14':'Research & Theory','15':'Ethics & Safeguards',
-  '16':'Federation & External','17':'Federation Protocol','18':'Data Pipeline',
-  '19':'Advanced Automation','20':'Meta & Documentation',
-  'META':'Meta','FW':'Framework','HIC':'HIC Architecture','PROJ':'Projects & Repositories'
-};
 
 /* ── Utilities ── */
 function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
