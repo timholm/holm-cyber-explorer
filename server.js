@@ -951,6 +951,60 @@ app.get('/api/storage/status', async (req, res) => {
   });
 });
 
+// ── Network & DNS Status (TASK-031) ──
+app.get('/api/network/status', async (req, res) => {
+  const dns = require('dns');
+  const results = {
+    mode: 'unknown',
+    dns: { internal: [], external: [] },
+    connectivity: { lan: false, internet: false },
+    policies: {
+      networkPolicies: 'k8s/network-policies.yaml',
+      dnsConfig: 'k8s/dns-config.yaml',
+      nodeFirewall: 'scripts/holm-firewall.sh'
+    },
+    timestamp: new Date().toISOString()
+  };
+
+  // Test internal DNS resolution
+  const internalHosts = ['mongodb.holm-cyber.svc', 'holm.chat', 'kubernetes.default.svc'];
+  for (const host of internalHosts) {
+    try {
+      const addrs = await new Promise((resolve, reject) => {
+        dns.resolve4(host, (err, addresses) => err ? reject(err) : resolve(addresses));
+      });
+      results.dns.internal.push({ host, resolved: true, addresses: addrs });
+    } catch (err) {
+      results.dns.internal.push({ host, resolved: false, error: err.code });
+    }
+  }
+
+  // Test external DNS (should FAIL in air-gap mode)
+  const externalHosts = ['github.com', 'google.com'];
+  for (const host of externalHosts) {
+    try {
+      const addrs = await new Promise((resolve, reject) => {
+        dns.resolve4(host, { timeout: 2000 }, (err, addresses) => err ? reject(err) : resolve(addresses));
+      });
+      results.dns.external.push({ host, resolved: true, addresses: addrs });
+    } catch (err) {
+      results.dns.external.push({ host, resolved: false, error: err.code });
+    }
+  }
+
+  // Determine mode based on DNS results
+  const internalOk = results.dns.internal.some(r => r.resolved);
+  const externalOk = results.dns.external.some(r => r.resolved);
+  if (internalOk && !externalOk) results.mode = 'airgap';
+  else if (internalOk && externalOk) results.mode = 'transitional';
+  else if (!internalOk) results.mode = 'degraded';
+
+  results.connectivity.lan = internalOk;
+  results.connectivity.internet = externalOk;
+
+  res.json(results);
+});
+
 // Document permalink with Open Graph tags for link previews
 app.get('/doc/:id', async (req, res) => {
   try {

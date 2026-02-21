@@ -1,0 +1,118 @@
+# ═══════════════════════════════════════════════════════════════
+# HOLM Internal DNS Configuration
+# ═══════════════════════════════════════════════════════════════
+# Comprehensive CoreDNS configuration for air-gapped operation.
+# Replaces all external DNS dependencies with local resolution.
+#
+# Zone architecture:
+#   holm.chat        → Public-facing services via MetalLB VIP
+#   holm.internal    → Cluster-internal services (node addressing)
+#   8.168.192.in-addr.arpa → Reverse DNS for LAN diagnostics
+#
+# TASK-031: Local DNS and Firewall Rules
+# ═══════════════════════════════════════════════════════════════
+
+---
+# ── CoreDNS Custom Zone: holm.chat ────────────────────────────
+# All holm.chat subdomains resolve to MetalLB VIP (192.168.8.50)
+# This replaces the Cloudflare DNS dependency entirely.
+# Applied via k3s CoreDNS custom ConfigMap import.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+  labels:
+    holm.chat/layer: infrastructure
+    holm.chat/task: TASK-031
+data:
+  holm-chat.server: |
+    holm.chat:53 {
+        log
+        errors
+        hosts {
+            # ── MetalLB VIP for Envoy Gateway ──
+            192.168.8.50 holm.chat
+            192.168.8.50 dev.holm.chat
+            192.168.8.50 mind.holm.chat
+            192.168.8.50 cmd.holm.chat
+            192.168.8.50 hq.holm.chat
+            192.168.8.50 uptime.holm.chat
+            192.168.8.50 search.holm.chat
+            192.168.8.50 animus.holm.chat
+            192.168.8.50 bookforge.holm.chat
+            192.168.8.50 vault.holm.chat
+            192.168.8.50 pihole.holm.chat
+            192.168.8.50 matrix.holm.chat
+            192.168.8.50 auth.holm.chat
+            192.168.8.50 odoo.holm.chat
+            192.168.8.50 grafana.holm.chat
+            192.168.8.50 claude-action.holm.chat
+            192.168.8.50 gitea.holm.chat
+            fallthrough
+        }
+    }
+
+  holm-internal.server: |
+    holm.internal:53 {
+        log
+        errors
+        hosts {
+            # ── Cluster Nodes ──
+            192.168.8.197 rpi-1.holm.internal    control-1.holm.internal
+            192.168.8.152 cm3588.holm.internal    control-2.holm.internal
+            192.168.8.195 rpi-3.holm.internal     control-3.holm.internal
+            192.168.8.196 rpi-2.holm.internal     worker-1.holm.internal
+            192.168.8.194 rpi-4.holm.internal     worker-2.holm.internal
+            192.168.8.108 rpi-5.holm.internal     worker-3.holm.internal
+            192.168.8.235 rpi-6.holm.internal     worker-4.holm.internal
+            192.168.8.209 rpi-7.holm.internal     worker-5.holm.internal
+            192.168.8.202 rpi-8.holm.internal     worker-6.holm.internal
+            192.168.8.187 rpi-9.holm.internal     worker-7.holm.internal
+            192.168.8.210 rpi-10.holm.internal    worker-8.holm.internal
+            192.168.8.231 rpi-11.holm.internal    worker-9.holm.internal
+            192.168.8.105 rpi-12.holm.internal    worker-10.holm.internal
+
+            # ── Infrastructure VIPs ──
+            192.168.8.50  gateway.holm.internal
+            192.168.8.50  ingress.holm.internal
+
+            fallthrough
+        }
+    }
+
+  holm-reverse.server: |
+    8.168.192.in-addr.arpa:53 {
+        log
+        errors
+        hosts {
+            # ── Reverse DNS (PTR records) ──
+            192.168.8.197 rpi-1.holm.internal
+            192.168.8.152 cm3588.holm.internal
+            192.168.8.195 rpi-3.holm.internal
+            192.168.8.196 rpi-2.holm.internal
+            192.168.8.194 rpi-4.holm.internal
+            192.168.8.108 rpi-5.holm.internal
+            192.168.8.235 rpi-6.holm.internal
+            192.168.8.209 rpi-7.holm.internal
+            192.168.8.202 rpi-8.holm.internal
+            192.168.8.187 rpi-9.holm.internal
+            192.168.8.210 rpi-10.holm.internal
+            192.168.8.231 rpi-11.holm.internal
+            192.168.8.105 rpi-12.holm.internal
+            192.168.8.50  gateway.holm.internal
+            fallthrough
+        }
+    }
+
+  # ── Block External DNS Leaks ──
+  # In full air-gap mode, prevent any queries from leaking to
+  # upstream resolvers. Uncomment this block when cutting the cord.
+  # air-gap-block.server: |
+  #   .:53 {
+  #       log
+  #       errors
+  #       template ANY ANY {
+  #           rcode NXDOMAIN
+  #       }
+  #   }

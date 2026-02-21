@@ -8,9 +8,9 @@
 # Architecture:
 #   Client (LAN) → MetalLB VIP → Envoy Gateway → HTTPRoute → Service
 #
-# DNS: CoreDNS custom records resolve *.holm.chat to the
-# MetalLB-assigned IP. Clients on the LAN can also add
-# /etc/hosts entries or use Pi-hole/AdGuard for resolution.
+# DNS: See dns-config.yaml for CoreDNS zone configuration.
+# Firewall: See network-policies.yaml for k8s-level isolation.
+# Node firewall: See scripts/holm-firewall.sh for iptables rules.
 # ═══════════════════════════════════════════════════════════════
 
 ---
@@ -29,41 +29,6 @@ spec:
   # MetalLB auto-assigns from 192.168.8.50-99 pool
   # To pin a specific IP, uncomment:
   # loadBalancerIP: 192.168.8.50
-
----
-# CoreDNS custom records for local *.holm.chat resolution
-# Applies to all pods in the cluster using ClusterFirst DNS
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: coredns-custom
-  namespace: kube-system
-data:
-  holm-local.server: |
-    holm.chat:53 {
-        log
-        errors
-        hosts {
-            # MetalLB VIP for Envoy Gateway
-            # Update this IP after MetalLB assigns it, or use the pinned IP above
-            192.168.8.50 holm.chat
-            192.168.8.50 dev.holm.chat
-            192.168.8.50 mind.holm.chat
-            192.168.8.50 cmd.holm.chat
-            192.168.8.50 hq.holm.chat
-            192.168.8.50 uptime.holm.chat
-            192.168.8.50 search.holm.chat
-            192.168.8.50 animus.holm.chat
-            192.168.8.50 bookforge.holm.chat
-            192.168.8.50 vault.holm.chat
-            192.168.8.50 pihole.holm.chat
-            192.168.8.50 matrix.holm.chat
-            192.168.8.50 auth.holm.chat
-            192.168.8.50 odoo.holm.chat
-            192.168.8.50 grafana.holm.chat
-            fallthrough
-        }
-    }
 
 ---
 # NodePort fallback — direct access on cluster node IPs
