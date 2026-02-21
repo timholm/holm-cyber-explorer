@@ -1379,6 +1379,45 @@ async function submitComment() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   Related Documents
+   ═══════════════════════════════════════════════════════════════ */
+function renderRelatedDocs(doc) {
+  // Find docs in same domain that share at least one tag
+  const myTags = new Set(doc.tags || []);
+  if (myTags.size === 0) return;
+
+  const related = allDocs
+    .filter(d => d.docId !== doc.docId && d.domain === doc.domain)
+    .map(d => {
+      const shared = (d.tags || []).filter(t => myTags.has(t)).length;
+      return { doc: d, shared };
+    })
+    .filter(r => r.shared > 0)
+    .sort((a, b) => b.shared - a.shared)
+    .slice(0, 5);
+
+  if (related.length === 0) return;
+
+  // Insert related docs section before comments
+  const commentsSection = document.getElementById('comments-section');
+  let relatedEl = document.getElementById('related-docs');
+  if (!relatedEl) {
+    relatedEl = document.createElement('div');
+    relatedEl.id = 'related-docs';
+    relatedEl.style.cssText = 'margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)';
+    commentsSection.parentNode.insertBefore(relatedEl, commentsSection);
+  }
+
+  relatedEl.innerHTML = '<div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Related Documents</div>' +
+    '<div class="doc-grid">' + related.map(r =>
+      '<div class="doc-card" onclick="openDoc(\'' + escHtml(r.doc.docId) + '\')">' +
+        '<span class="doc-card-id">' + escHtml(r.doc.docId) + '</span>' +
+        '<span class="doc-card-title">' + escHtml(r.doc.title) + '</span>' +
+      '</div>'
+    ).join('') + '</div>';
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Graph View
    ═══════════════════════════════════════════════════════════════ */
 let graphAnimId = null;
