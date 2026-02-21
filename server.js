@@ -80,6 +80,18 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Request logging
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const ms = Date.now() - start;
+    if (req.path.startsWith('/api/')) {
+      console.log(`${req.method} ${req.path} ${res.statusCode} ${ms}ms`);
+    }
+  });
+  next();
+});
+
 // Return 503 for /api routes while MongoDB is still connecting
 app.use('/api', (req, res, next) => {
   if (!db) return res.status(503).json({ error: 'Database connecting...' });
