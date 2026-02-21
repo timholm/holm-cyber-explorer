@@ -461,6 +461,21 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
+
+// Random document
+app.get('/api/random', async (req, res) => {
+  try {
+    const docs = await db.collection('documents').aggregate([
+      { $sample: { size: 1 } },
+      { $project: { content: 0 } }
+    ]).toArray();
+    if (docs.length === 0) return res.status(404).json({ error: 'No documents' });
+    res.json(docs[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Trigger import (async, non-blocking)
 app.post('/api/import', authMiddleware, async (req, res) => {
   try {
