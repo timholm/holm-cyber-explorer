@@ -934,6 +934,7 @@ function healthColor(score) {
    View Router
    ═══════════════════════════════════════════════════════════════ */
 function switchView(name, pushHistory) {
+  saveScrollPos();
   if (pushHistory !== false && currentView !== name) {
     navHistory.push({ view: currentView, domain: currentDomain, doc: currentDoc ? currentDoc.docId : null });
   }
@@ -1197,6 +1198,7 @@ async function openDoc(id, pushHistory) {
   switchView('doc', pushHistory);
   renderDocView(doc);
   loadComments(doc.docId);
+  restoreScrollPos(doc.docId);
 }
 
 function renderDocView(doc) {
@@ -1533,6 +1535,8 @@ function setupGraphInteractions(canvas, ctx) {
   let isDragging = false;
   let dragNode = null;
   let lastPos = null;
+  let touchStartTime = 0;
+  let touchStartPos = null;
 
   function screenToGraph(x, y) {
     return {
@@ -1631,6 +1635,8 @@ function setupGraphInteractions(canvas, ctx) {
       dragNode = findNode(x, y);
       if (!dragNode) isDragging = true;
       lastPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      touchStartTime = Date.now();
+      touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     } else if (e.touches.length === 2) {
       const dx = e.touches[1].clientX - e.touches[0].clientX;
       const dy = e.touches[1].clientY - e.touches[0].clientY;
@@ -1676,9 +1682,19 @@ function setupGraphInteractions(canvas, ctx) {
       lastTouchDist = dist;
     }
   }, { passive: false });
-
-  canvas.addEventListener('touchend', () => {
+  canvas.addEventListener('touchend', e => {
+    if (touchStartPos && !dragNode && Date.now() - touchStartTime < 300) {
+      const dx = e.changedTouches[0].clientX - touchStartPos.x;
+      const dy = e.changedTouches[0].clientY - touchStartPos.y;
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+        const rect = canvas.getBoundingClientRect();
+        const node = findNode(e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top);
+        if (node) { closeOverlay(); openDoc(node.id); }
+      }
+    }
     isDragging = false; dragNode = null; lastPos = null; lastTouchDist = 0;
+    touchStartTime = 0; touchStartPos = null;
+  });
   });
 }
 
@@ -1785,6 +1801,23 @@ document.addEventListener('keydown', e => {
   if (e.key === '/' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); openSearch(); }
   else if (e.key === 'g') showGraph();
   else if (e.key === 'h') showHub();
+
+/* Scroll Position Memory */
+function saveScrollPos() {
+  if (currentDoc) {
+    sessionStorage.setItem('scroll-' + currentDoc.docId, window.scrollY);
+  }
+}
+
+function restoreScrollPos(docId) {
+  const saved = sessionStorage.getItem('scroll-' + docId);
+  if (saved) {
+    requestAnimationFrame(() => window.scrollTo(0, parseInt(saved)));
+  } else {
+    window.scrollTo(0, 0);
+  }
+}
+
 });
 
 init();
