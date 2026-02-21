@@ -533,6 +533,37 @@ app.get('/healthz', async (req, res) => {
   }
 });
 
+// Document permalink with Open Graph tags for link previews
+app.get('/doc/:id', async (req, res) => {
+  try {
+    const doc = await db.collection('documents').findOne(
+      { docId: req.params.id.toUpperCase() },
+      { projection: { docId: 1, title: 1, domainName: 1, content: 1 } }
+    );
+    if (!doc) {
+      return res.redirect('/#' + req.params.id.toUpperCase());
+    }
+    const plain = (doc.content || '').replace(/<[^>]*>/g, '').slice(0, 200).trim();
+    const title = doc.title + ' — holm.chat';
+    const desc = plain || doc.domainName || 'Document ' + doc.docId;
+
+    res.send(`<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>${title.replace(/"/g, '&quot;')}</title>
+<meta property="og:title" content="${title.replace(/"/g, '&quot;')}">
+<meta property="og:description" content="${desc.replace(/"/g, '&quot;')}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://holm.chat/doc/${doc.docId}">
+<meta property="og:site_name" content="holm.chat">
+<meta name="twitter:card" content="summary">
+<meta http-equiv="refresh" content="0;url=/#${doc.docId}">
+</head><body><p>Redirecting to <a href="/#${doc.docId}">${title.replace(/</g, '&lt;')}</a>...</p></body></html>`);
+  } catch (err) {
+    res.redirect('/#' + req.params.id.toUpperCase());
+  }
+});
+
 // SPA fallback — serve index.html for navigation, 404 for everything else
 app.get('*', (req, res) => {
   // Don't serve index.html for API routes that weren't matched
