@@ -9,6 +9,7 @@ const app = express();
 app.set('etag', 'strong');
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/holmvault';
+const BASE_URL = process.env.BASE_URL || 'http://holm.local';
 
 let db;
 
@@ -733,7 +734,7 @@ app.get('/doc/:id', async (req, res) => {
 <meta property="og:title" content="${title.replace(/"/g, '&quot;')}">
 <meta property="og:description" content="${desc.replace(/"/g, '&quot;')}">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://holm.chat/doc/${doc.docId}">
+<meta property="og:url" content="${BASE_URL}/doc/${doc.docId}">
 <meta property="og:site_name" content="holm.chat">
 <meta name="twitter:card" content="summary">
 <meta http-equiv="refresh" content="0;url=/#${doc.docId}">

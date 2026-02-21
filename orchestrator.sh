@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/opt/homebrew/bin/bash
 # HOLM Multi-Agent Orchestrator
 # Replaces autopilot.sh with parallel Claude Code workers
 #
@@ -37,7 +37,9 @@ rm -f "$STOP_FILE"
 # Load creds
 source "$PROJECT_DIR/.autopilot/creds.env"
 
-HOLM_API_URL="https://holm.chat"
+# Local-first: use cluster IP directly, no Cloudflare tunnel dependency
+# Override with HOLM_API_URL env var if needed
+HOLM_API_URL="${HOLM_API_URL:-http://192.168.8.50:80}"
 HOLM_API_KEY="${HOLM_API_KEY:-}"
 
 # Colors
@@ -456,6 +458,7 @@ Rules:
     claude -p \
       --dangerously-skip-permissions \
       --output-format stream-json \
+      --verbose \
       --max-budget-usd "$MAX_BUDGET_PER_TASK" \
       "$task_prompt" 2>&1 | tee "$worker_log" | parse_worker_stream "$worker_id" "$task_id"
 
@@ -661,15 +664,12 @@ while true; do
   local_active=$(count_active_workers)
 
   # ── 1. Check for pending directives → decompose ──
-  local pending_directives
   pending_directives=$(api_get "/api/directives?status=pending")
-  local pending_count
   pending_count=$(echo "$pending_directives" | python3 -c "import json,sys; print(len(json.load(sys.stdin)))" 2>/dev/null || echo "0")
 
   if [ "$pending_count" -gt 0 ]; then
     IDLE_CYCLES=0
     # Decompose first pending directive
-    local dir_id dir_intent
     dir_id=$(echo "$pending_directives" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['directiveId'])" 2>/dev/null)
     dir_intent=$(echo "$pending_directives" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['intent'])" 2>/dev/null)
 
@@ -679,9 +679,7 @@ while true; do
   fi
 
   # ── 2. Find queued tasks with met dependencies ──
-  local all_tasks
   all_tasks=$(api_get "/api/tasks")
-  local queued_tasks
   queued_tasks=$(echo "$all_tasks" | python3 -c "
 import json, sys
 tasks = json.load(sys.stdin)
@@ -696,7 +694,6 @@ for t in tasks:
 print(json.dumps(queued))
 " 2>/dev/null || echo '[]')
 
-  local queued_count
   queued_count=$(echo "$queued_tasks" | python3 -c "import json,sys; print(len(json.load(sys.stdin)))" 2>/dev/null || echo "0")
 
   # ── 3. Assign tasks to idle workers / spawn new workers ──
@@ -706,12 +703,11 @@ print(json.dumps(queued))
     # Check rate limit before spawning
     set +e
     check_rate_limit
-    local rate_status=$?
+    rate_status=$?
     set -e
 
     if [ $rate_status -lt 2 ]; then
       # Get task details for first queued task
-      local task_info
       task_info=$(echo "$queued_tasks" | python3 -c "
 import json, sys
 tasks = json.load(sys.stdin)
@@ -722,13 +718,11 @@ else:
     print('{}')
 " 2>/dev/null)
 
-      local t_id t_title t_desc
       t_id=$(echo "$task_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
       t_title=$(echo "$task_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('title',''))" 2>/dev/null)
       t_desc=$(echo "$task_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('desc',''))" 2>/dev/null)
 
       if [ -n "$t_id" ] && [ "$local_active" -lt "$MAX_WORKERS" ]; then
-        local wid
         wid=$(next_worker_id)
         if [ -n "$wid" ]; then
           # Add delay if rate limit is soft warning
@@ -746,7 +740,6 @@ else:
   fi
 
   # ── 4. Monitor heartbeats — kill stale workers ──
-  local now_epoch
   now_epoch=$(date +%s)
   for wid in "${!WORKER_PIDS[@]}"; do
     if kill -0 "${WORKER_PIDS[$wid]}" 2>/dev/null; then
@@ -758,7 +751,6 @@ else:
   done
 
   # ── 5. Check directive completion ──
-  local active_directives
   active_directives=$(api_get "/api/directives?status=active")
   echo "$active_directives" | python3 -c "
 import json, sys
