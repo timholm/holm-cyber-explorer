@@ -314,6 +314,7 @@ let allDocs = [];
 let docsById = {};
 let currentDocId = null;
 let histStack = [];
+let currentDomain = null;
 
 const DOMAIN_NAMES = {
   '1':'Constitution & Philosophy','2':'Governance & Authority','3':'Security & Integrity',
@@ -382,6 +383,7 @@ function linkifyDocIds(html) {
 function goHome() {
   histStack = [];
   currentDocId = null;
+  currentDomain = null;
   renderHome();
   history.replaceState(null, '', '/');
   progressBar.classList.remove('visible'); progressBar.style.width = '0%';
@@ -396,12 +398,49 @@ function openDoc(id) {
   history.pushState({ doc: id }, '', '#' + id);
 }
 
+function openDomain(key) {
+  currentDomain = key;
+  histStack = [];
+  currentDocId = null;
+  renderDomain(key);
+  history.pushState({ domain: key }, '', '#d/' + key);
+}
+
+function renderDomain(key) {
+  var el = document.getElementById('main');
+  var docs = allDocs.filter(function(d) { return d.domain === key; })
+    .sort(function(a, b) { return a.docId.localeCompare(b.docId); });
+  var name = DOMAIN_NAMES[key] || (docs[0] && docs[0].domainName) || key;
+
+  var html = '<div style="margin-bottom:1rem">';
+  html += '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem">';
+  html += '<button onclick="goHome()" style="color:var(--cyan);font-size:0.8rem">&larr; Home</button>';
+  html += '<h1 style="font-size:1.1rem;font-weight:600">' + esc(name) + '</h1>';
+  html += '<span style="font-size:0.7rem;color:var(--muted)">' + docs.length + ' docs</span>';
+  html += '</div>';
+
+  for (var i = 0; i < docs.length; i++) {
+    var d = docs[i];
+    html += '<div class="doc-link" onclick="openDoc(\'' + esc(d.docId) + '\')">';
+    html += '<span class="doc-link-id">' + esc(d.docId) + '</span>';
+    html += '<span class="doc-link-title">' + esc(d.title) + '</span>';
+    html += '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
 function goBack() {
   if (histStack.length > 0) {
     var prev = histStack.pop();
     currentDocId = prev;
     renderDoc(prev);
     history.replaceState({ doc: prev }, '', '#' + prev);
+  } else if (currentDomain) {
+    currentDocId = null;
+    renderDomain(currentDomain);
+    history.replaceState({ domain: currentDomain }, '', '#d/' + currentDomain);
   } else {
     goHome();
   }
@@ -409,6 +448,7 @@ function goBack() {
 
 window.addEventListener('popstate', function() {
   var h = location.hash.slice(1);
+  if (h.startsWith('d/')) { openDomain(h.slice(2)); return; }
   if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
   else goHome();
 });
@@ -441,7 +481,7 @@ function renderHome() {
     var docs = domains[k].sort(function(a, b) { return a.docId.localeCompare(b.docId); });
     var name = DOMAIN_NAMES[k] || (docs[0] && docs[0].domainName) || k;
     html += '<div class="domain-section">';
-    html += '<div class="domain-heading" onclick="this.parentElement.classList.toggle(\'collapsed\')">' + esc(name) + ' <span>' + docs.length + '</span></div>';
+    html += '<div class="domain-heading" onclick="openDomain(\'' + esc(k) + '\')">' + esc(name) + ' <span>' + docs.length + '</span></div>';
     for (var j = 0; j < docs.length; j++) {
       var d = docs[j];
       html += '<div class="doc-link" onclick="openDoc(\'' + esc(d.docId) + '\')">';
@@ -703,7 +743,8 @@ async function init() {
     document.getElementById('doc-count').textContent = allDocs.length + ' docs';
 
     var h = location.hash.slice(1);
-    if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
+    if (h.startsWith('d/')) { openDomain(h.slice(2)); }
+    else if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
     else renderHome();
   } catch(e) {
     document.getElementById('loading').textContent = 'Failed to load — retrying...';
