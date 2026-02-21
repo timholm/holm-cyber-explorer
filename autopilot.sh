@@ -1,9 +1,9 @@
 #!/bin/bash
-# HOLM Smart Autopilot
-# qwen3:8b (free, local Ollama) = the brain / orchestrator
-# Claude Code (subscription) = the executor / worker
+# HOLM Autopilot v2
+# Claude Code (subscription) = the brain AND the worker — decides tasks, executes, commits
+# qwen3:8b (free, Ollama) = the monitor — checks Claude's work, flags issues, keeps it honest
 #
-# Flow: qwen3:8b decides task → Claude executes → qwen3:8b reads output → decides next → loop
+# Flow: Claude decides + executes → Ollama reviews output → if drift/error, Ollama writes correction → loop
 #
 # Usage: ./autopilot.sh [max_iterations]
 # Stop:  touch /tmp/autopilot-stop  or  Ctrl+C
@@ -16,9 +16,9 @@ LOG_DIR="$PROJECT_DIR/.autopilot"
 STOP_FILE="/tmp/autopilot-stop"
 MAX_ITERATIONS="${1:-5}"
 ITERATION=0
-MAX_BUDGET="2.00"
+MAX_BUDGET="5.00"
 
-# Ollama (free, local) — the brain
+# Ollama (free, local) — the monitor
 OLLAMA_URL="http://192.168.8.230:11434"
 OLLAMA_MODEL="qwen3:8b"
 
@@ -40,7 +40,7 @@ NC='\033[0m'
 
 log() { echo -e "${CYAN}[autopilot]${NC} $(date '+%H:%M:%S') $*"; }
 
-# ─── Call qwen3:8b via Ollama API (free) ───
+# ─── Call qwen3:8b via Ollama API (free) — monitor role ───
 ask_ollama() {
   local system_prompt="$1"
   local user_prompt="$2"
@@ -56,7 +56,7 @@ print(json.dumps({
         {'role': 'user', 'content': sys.argv[2]}
     ],
     'stream': False,
-    'options': {'temperature': 0.3, 'num_predict': 2048}
+    'options': {'temperature': 0.3, 'num_predict': 1024}
 }))
 " "$system_prompt" "$user_prompt" "$OLLAMA_MODEL")
 
@@ -148,41 +148,66 @@ print(json.dumps({
 " "$iteration" "$summary" "$analysis" "$duration")" >/dev/null 2>&1 &
 }
 
-# ─── Project context for the brain ───
-SYSTEM_PROMPT='You are the orchestrator for the HOLM project — a cyberpunk documentation nexus and sovereign intelligence system.
-
-Project: /Users/tim/holm-cyber-explorer
-Stack: Express.js + MongoDB, deployed on k3s (192.168.8.197)
-Site: https://holm.chat
-Repo: github.com/timholm/holm-cyber-explorer
-
-Your job: decide what Claude Code should work on next, then write a clear, specific prompt.
-
-Rules:
-- Pick ONE focused task per iteration (not a laundry list)
-- Be very specific — tell Claude exactly what files to modify and what to change
-- Include the credentials Claude needs for deployment
-- Tell Claude to commit and push when done
-- Tell Claude to verify the change works (curl the site, run tests, etc.)
-- Do NOT repeat tasks that were already completed
-- Escalate complexity over time: start with fixes, then features, then architecture
-
-Always output ONLY the prompt for Claude — nothing else. No explanations, no preamble.
-Start the prompt with "TASK:" followed by a clear one-line summary.'
-
+# ─── Credentials block injected into Claude's prompt ───
 CREDS_BLOCK="
 CREDENTIALS:
 - SSH to k8s cluster: ssh rpi1@192.168.8.197 (password: $K8S_PASS)
 - GitHub push: git remote set-url origin https://timholm:${GITHUB_TOKEN}@github.com/timholm/holm-cyber-explorer.git
 - MongoDB: mongodb.holm-cyber.svc:27017
 - Site: https://holm.chat
+- holm.chat API key: $HOLM_API_KEY
 - The k8s deployment auto-redeploys when you push to main (GitHub webhook triggers reimport)
 "
 
+# ─── Claude's master prompt — it decides AND executes ───
+CLAUDE_SYSTEM="You are the Chief Systems Architect and sole developer for HOLM — a cyberpunk documentation nexus and sovereign intelligence system.
+
+Project: /Users/tim/holm-cyber-explorer
+Stack: Express.js + MongoDB, deployed on k3s (Raspberry Pi cluster at 192.168.8.197)
+Site: https://holm.chat
+Repo: github.com/timholm/holm-cyber-explorer
+
+You have full autonomy. Each iteration, YOU decide the highest-impact task and execute it completely:
+1. Assess the current state (git log, git status, CLAUDE.md, roadmap tasks)
+2. Pick ONE focused, high-impact task — prioritize from the roadmap at $HOLM_API_URL/api/tasks
+3. Implement it fully — edit files, test, commit, push
+4. Verify the change works (curl the site, check endpoints, etc.)
+5. Update the roadmap task status via the API when done
+
+Rules:
+- Do NOT repeat work already done (check git log)
+- Always commit and push when done
+- Always verify your changes work on the live site
+- Be ambitious — you have a \$${MAX_BUDGET} budget per iteration, use it
+- Fix bugs before adding features
+- Keep the cyberpunk aesthetic (dark theme, cyan/magenta neon, monospace)
+- This is a REAL production site — test before pushing
+
+$CREDS_BLOCK"
+
+# ─── Ollama monitor prompt — watches Claude, flags drift ───
+MONITOR_PROMPT='You are a quality monitor for the HOLM autopilot system. Your ONLY job is to review Claude'\''s work output and determine:
+
+1. VERDICT: Did Claude do useful, real work? (YES/NO/PARTIAL)
+2. SUMMARY: 2-3 bullet points of what was accomplished
+3. ISSUES: Any errors, regressions, or problems detected
+4. CORRECTION: If Claude drifted or failed, write a one-line correction directive. If work was good, write "NONE"
+
+Rules:
+- Be harsh. If Claude talked about what it WOULD do but didn'\''t actually write code or make commits, verdict is NO.
+- If Claude made commits and pushed, verdict is YES.
+- If there were errors but some progress, verdict is PARTIAL.
+- Keep summaries to 2-3 lines max.
+- Output in this exact format:
+  VERDICT: YES|NO|PARTIAL
+  SUMMARY: ...
+  ISSUES: ...
+  CORRECTION: ...'
+
 log "${MAGENTA}╔══════════════════════════════════════╗${NC}"
-log "${MAGENTA}║   HOLM Smart Autopilot               ║${NC}"
-log "${MAGENTA}║   Brain: qwen3:8b (free, Ollama)     ║${NC}"
-log "${MAGENTA}║   Worker: Claude Code (subscription)  ║${NC}"
+log "${MAGENTA}║   HOLM Autopilot v2                   ║${NC}"
+log "${MAGENTA}║   Claude: brain + worker (subscription)║${NC}"
+log "${MAGENTA}║   Ollama: monitor (free)               ║${NC}"
 log "${MAGENTA}╚══════════════════════════════════════╝${NC}"
 log "Project: $PROJECT_DIR"
 log "Iterations: $MAX_ITERATIONS (0=infinite)"
@@ -192,9 +217,10 @@ echo ""
 
 # Track what's been done across iterations
 WORK_LOG=""
+CORRECTION=""
 
 # ── Autopilot start event ──
-post_activity "autopilot_start" "system" "Autopilot started ($MAX_ITERATIONS iterations)" "info"
+post_activity "autopilot_start" "system" "Autopilot v2 started — Claude decides + works, Ollama monitors ($MAX_ITERATIONS iterations)" "info"
 update_agent_state "{\"autopilotRunning\":true,\"currentIteration\":0,\"maxIterations\":$MAX_ITERATIONS,\"ollamaStatus\":\"idle\",\"claudeStatus\":\"idle\",\"currentTask\":\"\",\"startedAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}"
 
 while true; do
@@ -214,69 +240,45 @@ while true; do
 
   log "${GREEN}══════ Iteration $ITERATION/$MAX_ITERATIONS ══════${NC}"
 
-  # ─── Step 1: Ask qwen3:8b what Claude should do (FREE) ───
-  log "${MAGENTA}[brain]${NC} Asking qwen3:8b to decide next task..."
-  update_agent_state "{\"currentIteration\":$ITERATION,\"ollamaStatus\":\"thinking\",\"claudeStatus\":\"idle\",\"currentTask\":\"Brain deciding next task...\"}"
-  post_activity "brain_thinking" "ollama" "Brain deciding next task (iteration $ITERATION)" "info"
+  # ─── Step 1: Build Claude's prompt with full context ───
+  update_agent_state "{\"currentIteration\":$ITERATION,\"ollamaStatus\":\"idle\",\"claudeStatus\":\"working\",\"currentTask\":\"Claude deciding and executing...\"}"
+  post_activity "claude_working" "claude" "Claude starting iteration $ITERATION (deciding + executing)" "info"
 
-  if [ "$ITERATION" -eq 1 ]; then
-    BRAIN_INPUT="This is the first iteration. No previous work has been done by the autopilot yet.
+  CLAUDE_INPUT="$CLAUDE_SYSTEM
 
-Recent git log from the project:
+--- CURRENT STATE ---
+Recent git log:
 $(cd "$PROJECT_DIR" && git log --oneline -10 2>/dev/null || echo 'no git history')
 
-Current git status:
+Git status:
 $(cd "$PROJECT_DIR" && git status --short 2>/dev/null || echo 'clean')
 
-Current files:
-$(cd "$PROJECT_DIR" && ls -la public/ 2>/dev/null)
+Previous work this session:
+${WORK_LOG:-None yet — this is the first iteration.}
+"
 
-Decide the highest-impact first task for Claude to work on. Remember to include these credentials in your prompt:
-$CREDS_BLOCK"
-  else
-    BRAIN_INPUT="Iteration #$ITERATION. Here's what was done so far:
-
-$WORK_LOG
-
-Recent git log:
-$(cd "$PROJECT_DIR" && git log --oneline -5 2>/dev/null || echo 'no git history')
-
-Current git status:
-$(cd "$PROJECT_DIR" && git status --short 2>/dev/null || echo 'clean')
-
-Decide the next task. Don't repeat anything already done. Include these credentials:
-$CREDS_BLOCK"
+  # If the monitor flagged a correction, inject it
+  if [ -n "$CORRECTION" ] && [ "$CORRECTION" != "NONE" ]; then
+    CLAUDE_INPUT="$CLAUDE_INPUT
+--- MONITOR CORRECTION FROM LAST ITERATION ---
+$CORRECTION
+--- END CORRECTION ---
+Address this correction before moving on to new work.
+"
+    log "${YELLOW}[monitor]${NC} Injecting correction: $CORRECTION"
+    post_activity "monitor_correction" "ollama" "Monitor correction: $CORRECTION" "warning"
   fi
 
-  CLAUDE_PROMPT=$(ask_ollama "$SYSTEM_PROMPT" "$BRAIN_INPUT")
+  CLAUDE_INPUT="$CLAUDE_INPUT
+Now: assess the project state, pick the highest-impact task, implement it, commit, push, and verify. Go."
 
-  if echo "$CLAUDE_PROMPT" | grep -q "^ERROR:"; then
-    log "${YELLOW}Ollama error: $CLAUDE_PROMPT${NC}"
-    log "Retrying in 30s..."
-    sleep 30
-    ITERATION=$((ITERATION - 1))
-    continue
-  fi
+  log "${GREEN}[claude]${NC} Claude is thinking and working..."
 
-  # Save the brain's decision
-  echo "=== BRAIN DECISION (iteration $ITERATION) ===" >> "$RUN_LOG"
-  echo "$CLAUDE_PROMPT" >> "$RUN_LOG"
+  echo "=== CLAUDE PROMPT (iteration $ITERATION) ===" >> "$RUN_LOG"
+  echo "$CLAUDE_INPUT" >> "$RUN_LOG"
   echo "" >> "$RUN_LOG"
 
-  # Extract task summary (first line or TASK: line)
-  TASK_SUMMARY=$(echo "$CLAUDE_PROMPT" | grep -m1 "^TASK:" | sed 's/^TASK:\s*//' || echo "$CLAUDE_PROMPT" | head -1)
-
-  log "${MAGENTA}[brain]${NC} Task decided:"
-  echo ""
-  echo -e "${DIM}$(echo "$CLAUDE_PROMPT" | head -3)${NC}"
-  echo ""
-
-  post_activity "brain_decided" "ollama" "Brain decided: $TASK_SUMMARY" "info" "$(echo "$CLAUDE_PROMPT" | head -20)"
-  update_agent_state "{\"ollamaStatus\":\"done\",\"claudeStatus\":\"working\",\"currentTask\":\"$TASK_SUMMARY\"}"
-
-  # ─── Step 2: Run Claude Code with the brain's prompt (SUBSCRIPTION) ───
-  log "${GREEN}[worker]${NC} Running Claude Code..."
-  post_activity "claude_working" "claude" "Claude starting work: $TASK_SUMMARY" "info"
+  # ─── Step 2: Run Claude — it decides AND executes ───
   START_TIME=$(date +%s)
 
   set +e
@@ -290,7 +292,7 @@ $CREDS_BLOCK"
     $RESUME_FLAG \
     --dangerously-skip-permissions \
     --max-budget-usd "$MAX_BUDGET" \
-    "$CLAUDE_PROMPT" 2>&1)
+    "$CLAUDE_INPUT" 2>&1)
   CLAUDE_EXIT=$?
   set -e
 
@@ -300,83 +302,104 @@ $CREDS_BLOCK"
   echo "=== CLAUDE OUTPUT (iteration $ITERATION, ${DURATION}s, exit=$CLAUDE_EXIT) ===" >> "$RUN_LOG"
   echo "$CLAUDE_OUTPUT" >> "$RUN_LOG"
 
-  log "${GREEN}[worker]${NC} Claude finished (${DURATION}s, exit=$CLAUDE_EXIT, $(echo "$CLAUDE_OUTPUT" | wc -l | tr -d ' ') lines)"
+  LINES=$(echo "$CLAUDE_OUTPUT" | wc -l | tr -d ' ')
+  log "${GREEN}[claude]${NC} Claude finished (${DURATION}s, exit=$CLAUDE_EXIT, $LINES lines)"
 
   if [ "$CLAUDE_EXIT" -eq 0 ]; then
-    post_activity "claude_done" "claude" "Claude finished (${DURATION}s)" "success" "" "$ITERATION"
+    post_activity "claude_done" "claude" "Claude finished iteration $ITERATION (${DURATION}s, $LINES lines)" "success"
   else
-    post_activity "claude_error" "claude" "Claude failed (exit=$CLAUDE_EXIT, ${DURATION}s)" "error" "$(echo "$CLAUDE_OUTPUT" | tail -10)"
+    post_activity "claude_error" "claude" "Claude failed iteration $ITERATION (exit=$CLAUDE_EXIT, ${DURATION}s)" "error" "$(echo "$CLAUDE_OUTPUT" | tail -10)"
   fi
-  update_agent_state "{\"claudeStatus\":\"done\",\"ollamaStatus\":\"thinking\",\"currentTask\":\"Analyzing results...\"}"
 
-  # ─── Step 3: Ask qwen3:8b to analyze what Claude did (FREE) ───
-  log "${MAGENTA}[brain]${NC} Analyzing Claude's output..."
+  # Extract what Claude said it did (first few and last few lines)
+  TASK_SUMMARY=$(echo "$CLAUDE_OUTPUT" | head -5 | tr '\n' ' ' | cut -c1-200)
 
-  # Truncate output to last 200 lines to fit in qwen3:8b context
+  # ─── Step 3: Ollama monitors Claude's output (FREE) ───
+  log "${MAGENTA}[monitor]${NC} Ollama reviewing Claude's work..."
+  update_agent_state "{\"claudeStatus\":\"done\",\"ollamaStatus\":\"monitoring\",\"currentTask\":\"Monitor reviewing Claude output...\"}"
+  post_activity "monitor_reviewing" "ollama" "Monitor reviewing Claude's work" "info"
+
   TRUNCATED_OUTPUT=$(echo "$CLAUDE_OUTPUT" | tail -200)
 
-  ANALYSIS_PROMPT="Claude Code just finished an iteration. Here's its output (last 200 lines):
+  REVIEW_INPUT="Claude Code just ran iteration $ITERATION on the HOLM project. Review its output:
 
+--- CLAUDE OUTPUT (last 200 lines) ---
 $TRUNCATED_OUTPUT
+--- END OUTPUT ---
 
 Exit code: $CLAUDE_EXIT
 Duration: ${DURATION}s
 
-Summarize in 2-3 bullet points:
-1. What was accomplished?
-2. Were there any errors or issues?
-3. What should be done next?
+Check:
+- Did Claude actually write code and make commits? (look for git commit/push output)
+- Did Claude verify changes work? (look for curl/test output)
+- Any errors or regressions?
+- Is Claude staying focused on high-impact work?
 
-Be concise. Start with 'DONE:' then the summary."
+Respond in the exact format specified."
 
-  ANALYSIS=$(ask_ollama "You are a project analyst. Summarize work done concisely." "$ANALYSIS_PROMPT")
+  REVIEW=$(ask_ollama "$MONITOR_PROMPT" "$REVIEW_INPUT")
 
-  echo "=== BRAIN ANALYSIS ===" >> "$RUN_LOG"
-  echo "$ANALYSIS" >> "$RUN_LOG"
+  echo "=== MONITOR REVIEW ===" >> "$RUN_LOG"
+  echo "$REVIEW" >> "$RUN_LOG"
 
-  log "${MAGENTA}[brain]${NC} Analysis:"
+  # Parse the review
+  VERDICT=$(echo "$REVIEW" | grep -i "^VERDICT:" | head -1 | sed 's/^VERDICT:\s*//' | tr '[:lower:]' '[:upper:]' | tr -d ' ')
+  CORRECTION=$(echo "$REVIEW" | grep -i "^CORRECTION:" | head -1 | sed 's/^CORRECTION:\s*//')
+  SUMMARY=$(echo "$REVIEW" | grep -i "^SUMMARY:" | head -1 | sed 's/^SUMMARY:\s*//')
+
+  log "${MAGENTA}[monitor]${NC} Verdict: $VERDICT"
   echo ""
-  echo -e "${DIM}$(echo "$ANALYSIS" | head -5)${NC}"
+  echo -e "${DIM}$(echo "$REVIEW" | head -6)${NC}"
   echo ""
 
-  post_activity "analysis" "ollama" "Analysis: $(echo "$ANALYSIS" | head -3 | tr '\n' ' ')" "info" "$ANALYSIS"
+  if [ "$VERDICT" = "NO" ]; then
+    post_activity "monitor_verdict" "ollama" "VERDICT: NO — Claude did not produce useful work. Correction: $CORRECTION" "warning" "$REVIEW"
+  elif [ "$VERDICT" = "PARTIAL" ]; then
+    post_activity "monitor_verdict" "ollama" "VERDICT: PARTIAL — $SUMMARY" "info" "$REVIEW"
+  else
+    post_activity "monitor_verdict" "ollama" "VERDICT: YES — $SUMMARY" "success" "$REVIEW"
+    CORRECTION=""  # Clear correction if work was good
+  fi
+
   update_agent_state "{\"ollamaStatus\":\"done\",\"claudeStatus\":\"idle\",\"currentTask\":\"\"}"
 
   # Create work log document
-  create_work_log "$ITERATION" "$TASK_SUMMARY" "$ANALYSIS" "$DURATION"
+  create_work_log "$ITERATION" "${TASK_SUMMARY:-Claude iteration $ITERATION}" "$REVIEW" "$DURATION"
 
   # Update work log for next iteration
   WORK_LOG="$WORK_LOG
---- Iteration $ITERATION (${DURATION}s) ---
-$(echo "$ANALYSIS" | head -10)
+--- Iteration $ITERATION (${DURATION}s, verdict: $VERDICT) ---
+$(echo "$REVIEW" | head -6)
 "
 
-  # ─── Check for problems ───
+  # ─── Check for billing problems ───
   if echo "$CLAUDE_OUTPUT" | grep -qi "rate limit\|billing\|unauthorized\|quota exceeded"; then
     log "${YELLOW}Billing/rate issue detected. Stopping.${NC}"
     break
   fi
 
-  log "Pausing 10s before next iteration..."
-  sleep 10
+  # Short pause — keep Claude running hot
+  log "Next iteration in 5s..."
+  sleep 5
 done
 
 # ── Autopilot stop event ──
-post_activity "autopilot_stop" "system" "Autopilot finished ($ITERATION iterations)" "info"
+post_activity "autopilot_stop" "system" "Autopilot v2 finished ($ITERATION iterations)" "info"
 update_agent_state "{\"autopilotRunning\":false,\"ollamaStatus\":\"idle\",\"claudeStatus\":\"idle\",\"currentTask\":\"\"}"
 
-# ─── Final summary from the brain ───
-log "${MAGENTA}[brain]${NC} Generating final report..."
-FINAL_REPORT=$(ask_ollama "You are a project manager. Write a brief status report." \
-  "The autopilot ran $ITERATION iterations on the HOLM project. Here's the work log:
+# ─── Final summary from the monitor ───
+log "${MAGENTA}[monitor]${NC} Generating final report..."
+FINAL_REPORT=$(ask_ollama "You are a project monitor. Write a brief status report." \
+  "The HOLM autopilot v2 ran $ITERATION iterations. Claude decided tasks and executed them. Here's the session log:
 
 $WORK_LOG
 
-Write a short status report: what was accomplished, what's pending, any issues.")
+Write a concise status report: what Claude accomplished, any issues the monitor flagged, what's pending.")
 
 echo ""
 log "${MAGENTA}╔══════════════════════════════════════╗${NC}"
-log "${MAGENTA}║   Autopilot Complete                  ║${NC}"
+log "${MAGENTA}║   Autopilot v2 Complete               ║${NC}"
 log "${MAGENTA}╚══════════════════════════════════════╝${NC}"
 echo ""
 echo -e "$FINAL_REPORT"
