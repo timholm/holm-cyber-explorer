@@ -226,8 +226,10 @@ main { max-width: var(--max-w); margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 .loading { display: flex; align-items: center; justify-content: center; min-height: 60vh; color: var(--muted); font-size: 0.8rem; }
 
 /* ── Offline ── */
-.offline-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 400; background: rgba(255,0,170,0.1); border-bottom: 1px solid var(--magenta); text-align: center; padding: 0.3rem; font-size: 0.65rem; color: var(--magenta); }
+.offline-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 400; background: var(--magenta); text-align: center; padding: 0.4rem 1rem; font-size: 0.7rem; font-weight: 700; color: #fff; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--font); box-shadow: 0 2px 12px rgba(255,0,170,0.4); }
 body.offline .offline-bar { display: block; }
+body.offline header { top: 28px; }
+body.offline main { padding-top: 2.5rem; }
 
 /* ── Table of Contents ── */
 .toc { margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; }
@@ -276,6 +278,7 @@ body.offline .offline-bar { display: block; }
   body { background: white; color: black; font-size: 12pt; }
   main { max-width: none; padding: 0; }
   .doc-page h1 { color: black; font-size: 18pt; }
+  .doc-meta-bar { display: none; }
   .doc-meta { display: none; }
   .breadcrumb { display: none; }
   .doc-content { font-size: 11pt; line-height: 1.6; }
@@ -313,7 +316,7 @@ body.offline .offline-bar { display: block; }
 
 <div class="progress-bar" id="progress-bar"></div>
 
-<div class="offline-bar">Offline — showing cached data</div>
+<div class="offline-bar" id="offline-bar">OFFLINE MODE</div>
 
 <header>
   <span class="logo" onclick="goHome()">holm.chat</span>
@@ -566,6 +569,9 @@ function renderHome() {
     var name = DOMAIN_NAMES[k] || (docs[0] && docs[0].domainName) || k;
     html += '<div class="domain-section">';
     html += '<div class="domain-heading" onclick="openDomain(\'' + esc(k) + '\')">' + esc(name) + ' <span>' + docs.length + '</span></div>';
+    var health = computeDomainHealth(docs);
+    var hClass = health > 80 ? 'green' : (health >= 50 ? 'yellow' : 'red');
+    html += '<div class="domain-health"><div class="health-bar"><div class="health-fill ' + hClass + '" style="width:' + health + '%"></div></div><span class="health-score">' + health + '%</span></div>';
     for (var j = 0; j < docs.length; j++) {
       var d = docs[j];
       html += '<div class="doc-link" onclick="openDoc(\'' + esc(d.docId) + '\')">';
@@ -605,11 +611,25 @@ async function renderDoc(id) {
 
   if (doc.content === undefined) {
     el.innerHTML = '<div class="loading">loading...</div>';
+    var cacheKey = 'holm-doc-' + id;
     try {
       var res = await fetch('/api/docs/' + encodeURIComponent(id));
       if (!res.ok) throw new Error();
-      Object.assign(doc, await res.json());
-    } catch(e) { toast('Failed to load', 'error'); return; }
+      var fetched = await res.json();
+      Object.assign(doc, fetched);
+      try { sessionStorage.setItem(cacheKey, JSON.stringify(fetched)); } catch(e) {}
+    } catch(e) {
+      // Offline or network error — try sessionStorage cache
+      try {
+        var cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          Object.assign(doc, JSON.parse(cached));
+          toast('Loaded from cache');
+        } else {
+          toast('Unavailable offline', 'error'); return;
+        }
+      } catch(e2) { toast('Failed to load', 'error'); return; }
+    }
   }
 
   var domainName = doc.domainName || DOMAIN_NAMES[doc.domain] || doc.domain;
@@ -831,8 +851,15 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* ── Offline ── */
-window.addEventListener('online', function() { document.body.classList.remove('offline'); toast('Back online'); });
-window.addEventListener('offline', function() { document.body.classList.add('offline'); });
+window.addEventListener('online', function() {
+  document.body.classList.remove('offline');
+  toast('Back online');
+});
+window.addEventListener('offline', function() {
+  document.body.classList.add('offline');
+  toast('You are offline — cached documents still available', 'error');
+});
+if (!navigator.onLine) { document.body.classList.add('offline'); }
 
 /* ── Service Worker ── */
 if ('serviceWorker' in navigator) {
@@ -863,12 +890,30 @@ async function init() {
     docsById = {};
     allDocs.forEach(function(d) { docsById[d.docId] = d; });
     document.getElementById('doc-count').textContent = allDocs.length + ' docs';
+    // Cache doc index for offline use
+    try { sessionStorage.setItem('holm-doc-index', JSON.stringify(allDocs)); } catch(e) {}
 
     var h = location.hash.slice(1);
     if (h.startsWith('d/')) { openDomain(h.slice(2)); }
     else if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
     else renderHome();
   } catch(e) {
+    // Offline fallback: try to restore from sessionStorage
+    try {
+      var cached = sessionStorage.getItem('holm-doc-index');
+      if (cached) {
+        allDocs = JSON.parse(cached);
+        docsById = {};
+        allDocs.forEach(function(d) { docsById[d.docId] = d; });
+        document.getElementById('doc-count').textContent = allDocs.length + ' docs (cached)';
+        toast('Loaded cached index');
+        var h = location.hash.slice(1);
+        if (h.startsWith('d/')) { openDomain(h.slice(2)); }
+        else if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
+        else renderHome();
+        return;
+      }
+    } catch(e2) {}
     document.getElementById('loading').textContent = 'Failed to load — retrying...';
     setTimeout(init, 3000);
   }
