@@ -79,6 +79,37 @@ async function connectDB() {
     { upsert: true }
   );
 
+  // ── Orchestrator collections ──
+
+  // Directives — user/system intentions
+  try {
+    await db.collection('directives').createIndex({ directiveId: 1 }, { unique: true });
+  } catch (e) {
+    console.warn('directives directiveId index:', e.codeName);
+    await db.collection('directives').createIndex({ directiveId: 1 });
+  }
+  await db.collection('directives').createIndex({ status: 1, priority: 1 });
+
+  // Workers — parallel Claude instances
+  await db.collection('workers').createIndex({ status: 1 });
+  await db.collection('workers').createIndex({ lastHeartbeat: 1 });
+
+  // Orchestrator state singleton
+  await db.collection('orchestrator_state').updateOne(
+    { _id: 'orchestrator' },
+    { $setOnInsert: {
+      running: false, startedAt: null, maxWorkers: 5, activeWorkers: 0,
+      totalIterations: 0, totalCost: 0,
+      rateLimitBudget: { plan: 'max200', promptsUsed: 0, promptsLimit: 900, windowResetAt: null },
+      lastUpdate: new Date()
+    }},
+    { upsert: true }
+  );
+
+  // Extended task indexes for orchestrator
+  await db.collection('tasks').createIndex({ directiveId: 1 });
+  await db.collection('tasks').createIndex({ assignedWorker: 1, status: 1 });
+
   console.log('Indexes created');
 }
 
@@ -770,9 +801,23 @@ app.get('/api/activity', async (req, res) => {
   }
 });
 
-// Get agent state
+// Get agent state — synthesizes from orchestrator_state if running
 app.get('/api/agent-state', async (req, res) => {
   try {
+    const orchState = await db.collection('orchestrator_state').findOne({ _id: 'orchestrator' });
+    if (orchState && orchState.running) {
+      // Synthesize old format from orchestrator state
+      return res.json({
+        autopilotRunning: true,
+        currentIteration: orchState.totalIterations || 0,
+        maxIterations: 0,
+        ollamaStatus: 'monitoring',
+        claudeStatus: orchState.activeWorkers > 0 ? 'working' : 'idle',
+        currentTask: `Orchestrator: ${orchState.activeWorkers || 0} workers active`,
+        lastUpdate: orchState.lastUpdate,
+        startedAt: orchState.startedAt
+      });
+    }
     const state = await db.collection('agent_state').findOne({ _id: 'current' });
     res.json(state || { autopilotRunning: false, ollamaStatus: 'idle', claudeStatus: 'idle' });
   } catch (err) {
@@ -798,11 +843,17 @@ app.put('/api/agent-state', authMiddleware, async (req, res) => {
   }
 });
 
-// List tasks (roadmap)
+// List tasks (roadmap) — supports orchestrator query filters
 app.get('/api/tasks', async (req, res) => {
   try {
+    const filter = {};
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.directiveId) filter.directiveId = req.query.directiveId;
+    if (req.query.unassigned === 'true') {
+      filter.$or = [{ assignedWorker: null }, { assignedWorker: { $exists: false } }];
+    }
     const tasks = await db.collection('tasks')
-      .find({})
+      .find(filter)
       .sort({ status: 1, priority: 1, createdAt: -1 })
       .toArray();
     res.json(tasks);
@@ -852,11 +903,13 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
   }
 });
 
-// Update task
+// Update task — extended for orchestrator fields
 app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
   try {
     const update = { $set: { updatedAt: new Date() } };
-    const allowed = ['title', 'description', 'status', 'priority', 'tags', 'iteration'];
+    const allowed = ['title', 'description', 'status', 'priority', 'tags', 'iteration',
+      'directiveId', 'assignedWorker', 'sessionId', 'dependencies', 'estimatedCost',
+      'actualCost', 'attempt', 'maxAttempts', 'output', 'startedAt', 'failureReason'];
     for (const key of allowed) {
       if (req.body[key] !== undefined) update.$set[key] = req.body[key];
     }
@@ -874,6 +927,229 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ── Directive Routes ──
+
+// List all directives
+app.get('/api/directives', async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.status) filter.status = req.query.status;
+    const directives = await db.collection('directives')
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .toArray();
+    res.json(directives);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create directive
+app.post('/api/directives', authMiddleware, async (req, res) => {
+  try {
+    const { intent, priority, source, context, maxWorkers } = req.body;
+    if (!intent) return res.status(400).json({ error: 'intent required' });
+
+    // Auto-generate DIR-NNN
+    const last = await db.collection('directives')
+      .find({}).sort({ createdAt: -1 }).limit(1).toArray();
+    let nextNum = 1;
+    if (last.length > 0 && last[0].directiveId) {
+      const m = last[0].directiveId.match(/DIR-(\d+)/);
+      if (m) nextNum = parseInt(m[1]) + 1;
+    }
+    const directiveId = 'DIR-' + String(nextNum).padStart(3, '0');
+
+    const directive = {
+      directiveId,
+      intent,
+      priority: Math.min(5, Math.max(1, parseInt(priority) || 3)),
+      status: 'pending',
+      source: source || 'user',
+      decomposition: [],
+      context: context || '',
+      maxWorkers: maxWorkers || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      completedAt: null
+    };
+    await db.collection('directives').insertOne(directive);
+    broadcastSSE('directive', directive);
+    res.status(201).json(directive);
+  } catch (err) {
+    if (err.code === 11000) return res.status(409).json({ error: 'Directive already exists' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update directive status
+app.put('/api/directives/:id', authMiddleware, async (req, res) => {
+  try {
+    const update = { $set: { updatedAt: new Date() } };
+    const allowed = ['status', 'priority', 'intent', 'context', 'maxWorkers'];
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) update.$set[key] = req.body[key];
+    }
+    if (req.body.status === 'completed') update.$set.completedAt = new Date();
+
+    const result = await db.collection('directives').updateOne(
+      { directiveId: req.params.id.toUpperCase() },
+      update
+    );
+    if (result.matchedCount === 0) return res.status(404).json({ error: 'Directive not found' });
+    const directive = await db.collection('directives').findOne({ directiveId: req.params.id.toUpperCase() });
+    broadcastSSE('directive', directive);
+    res.json(directive);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Decompose directive — accept task array, create linked tasks
+app.post('/api/directives/:id/decompose', authMiddleware, async (req, res) => {
+  try {
+    const { tasks: taskDefs } = req.body;
+    if (!Array.isArray(taskDefs) || taskDefs.length === 0) {
+      return res.status(400).json({ error: 'tasks array required' });
+    }
+    const directiveId = req.params.id.toUpperCase();
+    const directive = await db.collection('directives').findOne({ directiveId });
+    if (!directive) return res.status(404).json({ error: 'Directive not found' });
+
+    // Get next task number
+    const lastTask = await db.collection('tasks')
+      .find({}).sort({ createdAt: -1 }).limit(1).toArray();
+    let nextNum = 1;
+    if (lastTask.length > 0 && lastTask[0].taskId) {
+      const m = lastTask[0].taskId.match(/TASK-(\d+)/);
+      if (m) nextNum = parseInt(m[1]) + 1;
+    }
+
+    const createdTasks = [];
+    for (const td of taskDefs) {
+      const taskId = 'TASK-' + String(nextNum++).padStart(3, '0');
+      const task = {
+        taskId,
+        title: td.title || 'Untitled task',
+        description: td.description || '',
+        status: 'queued',
+        priority: Math.min(5, Math.max(1, parseInt(td.priority) || directive.priority)),
+        directiveId,
+        dependencies: td.dependencies || [],
+        estimatedCost: td.estimatedCost || null,
+        assignedWorker: null,
+        sessionId: null,
+        attempt: 0,
+        maxAttempts: 3,
+        output: null,
+        source: 'orchestrator',
+        tags: td.tags || [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        startedAt: null,
+        completedAt: null,
+        failureReason: null
+      };
+      await db.collection('tasks').insertOne(task);
+      broadcastSSE('task', task);
+      createdTasks.push(task);
+    }
+
+    // Link tasks to directive
+    const taskIds = createdTasks.map(t => t.taskId);
+    await db.collection('directives').updateOne(
+      { directiveId },
+      { $set: { decomposition: taskIds, status: 'active', updatedAt: new Date() } }
+    );
+    const updated = await db.collection('directives').findOne({ directiveId });
+    broadcastSSE('directive', updated);
+
+    res.status(201).json({ directive: updated, tasks: createdTasks });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Worker Routes ──
+
+// List all workers
+app.get('/api/workers', async (req, res) => {
+  try {
+    const workers = await db.collection('workers')
+      .find({})
+      .sort({ _id: 1 })
+      .toArray();
+    res.json(workers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Upsert worker state
+app.put('/api/workers/:id', authMiddleware, async (req, res) => {
+  try {
+    const workerId = req.params.id;
+    const update = { ...req.body, lastHeartbeat: new Date() };
+    delete update._id;
+    await db.collection('workers').updateOne(
+      { _id: workerId },
+      { $set: update },
+      { upsert: true }
+    );
+    const worker = await db.collection('workers').findOne({ _id: workerId });
+    broadcastSSE('worker', worker);
+    res.json(worker);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Remove stopped worker
+app.delete('/api/workers/:id', authMiddleware, async (req, res) => {
+  try {
+    const result = await db.collection('workers').deleteOne({ _id: req.params.id });
+    if (result.deletedCount === 0) return res.status(404).json({ error: 'Worker not found' });
+    broadcastSSE('worker', { _id: req.params.id, status: 'removed' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Orchestrator Routes ──
+
+// Get orchestrator state
+app.get('/api/orchestrator', async (req, res) => {
+  try {
+    const state = await db.collection('orchestrator_state').findOne({ _id: 'orchestrator' });
+    res.json(state || { running: false, activeWorkers: 0, totalCost: 0 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update orchestrator state
+app.put('/api/orchestrator', authMiddleware, async (req, res) => {
+  try {
+    const update = { ...req.body, lastUpdate: new Date() };
+    delete update._id;
+    await db.collection('orchestrator_state').updateOne(
+      { _id: 'orchestrator' },
+      { $set: update },
+      { upsert: true }
+    );
+    const state = await db.collection('orchestrator_state').findOne({ _id: 'orchestrator' });
+    broadcastSSE('orchestrator', state);
+    res.json(state);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Backward-compatible agent-state from orchestrator ──
+// Existing GET /api/agent-state already works. Extend it to also read orchestrator_state
+// for richer data when orchestrator is running.
 
 // Create work log document from autopilot
 app.post('/api/activity/doc', authMiddleware, async (req, res) => {
