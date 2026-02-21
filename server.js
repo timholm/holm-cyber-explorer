@@ -401,6 +401,66 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+
+// Aggregate statistics
+app.get('/api/stats', async (req, res) => {
+  try {
+    const docs = await db.collection('documents')
+      .find({}, { projection: { docId: 1, domain: 1, dependsOn: 1, dependedBy: 1, tags: 1, status: 1, content: 1 } })
+      .toArray();
+    
+    const docIds = new Set(docs.map(d => d.docId));
+    let totalWords = 0;
+    let brokenDeps = 0;
+    let orphaned = 0;
+    let totalDeps = 0;
+    const tagCounts = {};
+    const statusCounts = {};
+    const domainCounts = {};
+    
+    for (const doc of docs) {
+      // Word count
+      const plain = (doc.content || '').replace(/<[^>]*>/g, '');
+      totalWords += plain.split(/\s+/).filter(w => w.length > 0).length;
+      
+      // Dependencies
+      const deps = doc.dependsOn || [];
+      const refs = doc.dependedBy || [];
+      totalDeps += deps.length;
+      deps.forEach(d => { if (!docIds.has(d)) brokenDeps++; });
+      if (deps.length === 0 && refs.length === 0) orphaned++;
+      
+      // Tags
+      (doc.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+      
+      // Status
+      const st = doc.status || 'unknown';
+      statusCounts[st] = (statusCounts[st] || 0) + 1;
+      
+      // Domain
+      const dk = doc.domain || 'unknown';
+      domainCounts[dk] = (domainCounts[dk] || 0) + 1;
+    }
+    
+    const commentCount = await db.collection('comments').countDocuments();
+    
+    res.json({
+      documents: docs.length,
+      domains: Object.keys(domainCounts).length,
+      totalWords,
+      totalDependencies: totalDeps,
+      brokenDependencies: brokenDeps,
+      orphanedDocuments: orphaned,
+      comments: commentCount,
+      topTags: Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([tag, count]) => ({ tag, count })),
+      statusBreakdown: statusCounts,
+      domainBreakdown: domainCounts
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Trigger import (async, non-blocking)
 app.post('/api/import', authMiddleware, async (req, res) => {
   try {
