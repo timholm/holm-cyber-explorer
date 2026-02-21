@@ -1179,10 +1179,12 @@ function renderDomainDocs(key) {
     if (hasBroken) indicator = '<span class="indicator broken"></span>';
     else if (isOrphan) indicator = '<span class="indicator orphan"></span>';
 
+    const connCount = (doc.dependsOn || []).length + (doc.dependedBy || []).length;
     return `
       <div class="doc-card" onclick="openDoc('${escHtml(doc.docId)}')">
         <span class="doc-card-id">${escHtml(doc.docId)}</span>
         <span class="doc-card-title">${escHtml(doc.title)}</span>
+        <span style="font-size:0.6rem;color:var(--text-dim);min-width:20px;text-align:right">${connCount > 0 ? connCount : ''}</span>
         <span class="doc-card-indicators">${indicator}</span>
       </div>`;
   }).join('');
@@ -1233,6 +1235,15 @@ function renderDocView(doc) {
   if (doc.date) pills.push(`<span class="pill">${escHtml(doc.date)}</span>`);
   if (doc.tags && doc.tags.length > 0) {
     doc.tags.forEach(t => pills.push(`<span class="pill">${escHtml(t)}</span>`));
+  }
+
+  // Word count and reading time
+  if (doc.content) {
+    const text = doc.content.replace(/<[^>]*>/g, '');
+    const words = text.split(/\s+/).filter(w => w.length > 0).length;
+    const readMin = Math.max(1, Math.ceil(words / 200));
+    pills.push('<span class="pill">' + words.toLocaleString() + ' words</span>');
+    pills.push('<span class="pill">' + readMin + ' min read</span>');
   }
   document.getElementById('doc-meta-pills').innerHTML = pills.join('');
 
