@@ -408,20 +408,27 @@ app.delete('/api/comments/:id', authMiddleware, async (req, res) => {
 // Domain health summary
 app.get('/api/health', async (req, res) => {
   try {
+    const detail = req.query.detail === 'true';
     const docs = await db.collection('documents')
       .find({}, { projection: { docId: 1, domain: 1, domainName: 1, dependsOn: 1, dependedBy: 1, status: 1, tags: 1 } })
       .toArray();
     const docIds = new Set(docs.map(d => d.docId));
     const domains = {};
+    const brokenList = [];
     for (const doc of docs) {
       const key = doc.domain || 'unknown';
       if (!domains[key]) domains[key] = { name: doc.domainName || key, total: 0, issues: 0, orphaned: 0, broken: 0 };
       domains[key].total++;
       const brokenDeps = (doc.dependsOn || []).filter(d => !docIds.has(d));
-      if (brokenDeps.length > 0) domains[key].broken++;
+      if (brokenDeps.length > 0) {
+        domains[key].broken++;
+        if (detail) brokenList.push({ docId: doc.docId, domain: key, brokenRefs: brokenDeps });
+      }
       if ((doc.dependsOn || []).length === 0 && (doc.dependedBy || []).length === 0) domains[key].orphaned++;
     }
-    res.json({ totalDocs: docs.length, domains });
+    const result = { totalDocs: docs.length, domains };
+    if (detail) result.brokenDetails = brokenList;
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -481,6 +488,74 @@ app.get('/api/stats', async (req, res) => {
       topTags: Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([tag, count]) => ({ tag, count })),
       statusBreakdown: statusCounts,
       domainBreakdown: domainCounts
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Repair broken dependencies in-place
+// POST /api/repair-deps — removes broken dependsOn refs, rebuilds dependedBy from dependsOn
+app.post('/api/repair-deps', authMiddleware, async (req, res) => {
+  try {
+    const docs = await db.collection('documents')
+      .find({}, { projection: { docId: 1, dependsOn: 1, dependedBy: 1 } })
+      .toArray();
+    const validIds = new Set(docs.map(d => d.docId));
+
+    // 1) Strip broken dependsOn
+    let brokenRemoved = 0;
+    const brokenDetails = [];
+    const ops = [];
+    for (const doc of docs) {
+      const broken = (doc.dependsOn || []).filter(id => !validIds.has(id));
+      if (broken.length > 0) {
+        brokenRemoved += broken.length;
+        brokenDetails.push({ docId: doc.docId, broken });
+      }
+    }
+
+    // 2) Build dependedBy inverse map from clean dependsOn
+    const dependedByMap = {};
+    for (const doc of docs) {
+      const cleanDeps = (doc.dependsOn || []).filter(id => validIds.has(id));
+      for (const depId of cleanDeps) {
+        if (!dependedByMap[depId]) dependedByMap[depId] = new Set();
+        dependedByMap[depId].add(doc.docId);
+      }
+    }
+
+    // 3) Build bulk update ops
+    let updated = 0;
+    for (const doc of docs) {
+      const cleanDependsOn = (doc.dependsOn || []).filter(id => validIds.has(id));
+      const newDependedBy = dependedByMap[doc.docId] ? [...dependedByMap[doc.docId]].sort() : [];
+      const oldDependsOn = doc.dependsOn || [];
+      const oldDependedBy = doc.dependedBy || [];
+
+      // Only update if something changed
+      const depsChanged = JSON.stringify(cleanDependsOn) !== JSON.stringify(oldDependsOn);
+      const refsChanged = JSON.stringify(newDependedBy) !== JSON.stringify(oldDependedBy);
+      if (depsChanged || refsChanged) {
+        ops.push({
+          updateOne: {
+            filter: { docId: doc.docId },
+            update: { $set: { dependsOn: cleanDependsOn, dependedBy: newDependedBy, updatedAt: new Date() } }
+          }
+        });
+        updated++;
+      }
+    }
+
+    if (ops.length > 0) {
+      await db.collection('documents').bulkWrite(ops);
+    }
+
+    res.json({
+      totalDocs: docs.length,
+      brokenRefsRemoved: brokenRemoved,
+      docsUpdated: updated,
+      brokenDetails
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

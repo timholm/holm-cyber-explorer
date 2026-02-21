@@ -209,6 +209,43 @@ async function main() {
 
   console.log(`Parsed ${parsed} documents, skipped ${skipped}`);
 
+  // --- Dependency repair ---
+  // Build set of all valid docIds from this import batch
+  const validIds = new Set(documents.map(d => d.docId));
+
+  // Also include IDs from other sources already in DB (e.g., PROJ-, LOG- docs)
+  const existingDocs = await collection.find({}, { projection: { docId: 1 } }).toArray();
+  for (const d of existingDocs) validIds.add(d.docId);
+
+  let brokenRemoved = 0;
+  let depsRebuilt = 0;
+
+  // 1) Strip broken dependsOn references
+  for (const doc of documents) {
+    const before = doc.dependsOn.length;
+    doc.dependsOn = doc.dependsOn.filter(id => validIds.has(id));
+    brokenRemoved += before - doc.dependsOn.length;
+    // Clear dependedBy — we'll rebuild it from dependsOn
+    doc.dependedBy = [];
+  }
+
+  // 2) Rebuild dependedBy as the inverse of dependsOn
+  const dependedByMap = {}; // docId → Set of docIds that depend on it
+  for (const doc of documents) {
+    for (const depId of doc.dependsOn) {
+      if (!dependedByMap[depId]) dependedByMap[depId] = new Set();
+      dependedByMap[depId].add(doc.docId);
+    }
+  }
+  for (const doc of documents) {
+    if (dependedByMap[doc.docId]) {
+      doc.dependedBy = [...dependedByMap[doc.docId]].sort();
+      depsRebuilt++;
+    }
+  }
+
+  console.log(`Dependency repair: removed ${brokenRemoved} broken refs, rebuilt dependedBy for ${depsRebuilt} docs`);
+
   if (documents.length > 0) {
     // Use bulkWrite with upsert to handle duplicate docIds in manifest
     const ops = documents.map(doc => ({
