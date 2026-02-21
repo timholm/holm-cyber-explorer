@@ -376,6 +376,45 @@ body.offline main { padding-top: 2.5rem; }
 .mini-graph svg .graph-node:hover circle { filter: brightness(1.4); }
 .mini-graph svg .graph-node:hover text { fill: #fff; }
 .mini-graph svg .graph-edge { stroke-width: 1.5; fill: none; }
+
+/* ── Hero Section ── */
+.hero-section { text-align: center; padding: 2rem 0 2.5rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+.hero-title { font-size: 2.5rem; font-weight: 700; color: var(--cyan); letter-spacing: 0.15em; text-shadow: 0 0 30px rgba(0,240,255,0.3), 0 0 60px rgba(0,240,255,0.1); margin-bottom: 0.3rem; }
+.hero-subtitle { font-size: 0.85rem; color: var(--magenta); letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+.hero-desc { font-size: 0.75rem; color: var(--muted); max-width: 500px; margin: 0 auto 1.5rem; line-height: 1.5; }
+.hero-stats { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+.hero-stat { text-align: center; }
+.hero-stat-value { font-size: 1.3rem; font-weight: 700; color: var(--cyan); }
+.hero-stat-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ── Section Heading ── */
+.section-heading { font-size: 0.8rem; font-weight: 600; color: var(--cyan); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+
+/* ── Projects Grid ── */
+.projects-section { margin-bottom: 2.5rem; }
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
+.project-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem; cursor: pointer; transition: border-color 0.2s, transform 0.15s; }
+.project-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.project-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+.project-card-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+.project-card-status { width: 6px; height: 6px; border-radius: 50%; background: #00e676; box-shadow: 0 0 4px #00e676; flex-shrink: 0; }
+.project-card-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.4; margin-bottom: 0.6rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.project-card-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.tech-tag { font-size: 0.55rem; padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 500; letter-spacing: 0.03em; }
+.tech-tag.cat-core { background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.25); color: var(--cyan); }
+.tech-tag.cat-interface { background: rgba(255,0,170,0.1); border: 1px solid rgba(255,0,170,0.25); color: var(--magenta); }
+.tech-tag.cat-infrastructure { background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.25); color: #00ff88; }
+.tech-tag.cat-tools { background: rgba(255,235,59,0.1); border: 1px solid rgba(255,235,59,0.25); color: #ffeb3b; }
+
+/* ── Architecture Diagram ── */
+.arch-section { margin-bottom: 2.5rem; }
+.arch-diagram { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; overflow-x: auto; }
+.arch-diagram pre { margin: 0; font-size: 0.65rem; line-height: 1.4; color: var(--muted); white-space: pre; }
+.arch-layer-voice { color: #00e676; }
+.arch-layer-intel { color: var(--cyan); }
+.arch-layer-platform { color: var(--magenta); }
+.arch-layer-infra { color: #ff9800; }
+.arch-layer-hardware { color: #ff4444; }
 </style>
 </head>
 <body>
@@ -461,7 +500,7 @@ function computeDomainHealth(docs) {
   '13':'Evolution & Adaptation','14':'Research & Theory','15':'Ethics & Safeguards',
   '16':'Federation & External','17':'Federation Protocol','18':'Data Pipeline',
   '19':'Advanced Automation','20':'Meta & Documentation',
-  'META':'Meta','FW':'Framework','HIC':'HIC Architecture'
+  'META':'Meta','FW':'Framework','HIC':'HIC Architecture','PROJ':'Projects & Repositories'
 };
 
 /* ── Utilities ── */
@@ -620,6 +659,39 @@ window.addEventListener('popstate', function() {
   else goHome();
 });
 
+/* ── Projects ── */
+var projectsData = null;
+async function loadProjects() {
+  if (projectsData) return projectsData;
+  try {
+    var res = await fetch('/api/projects');
+    if (!res.ok) throw new Error();
+    projectsData = await res.json();
+    return projectsData;
+  } catch(e) { return []; }
+}
+
+function renderProjectCards(projects, container) {
+  if (!projects || projects.length === 0) {
+    container.innerHTML = '<div style="color:var(--dim);font-size:0.75rem;text-align:center;padding:1rem">No projects indexed yet. Run: node index-repos.js</div>';
+    return;
+  }
+  var catClass = { core: 'cat-core', interface: 'cat-interface', infrastructure: 'cat-infrastructure', tools: 'cat-tools' };
+  container.innerHTML = projects.map(function(p) {
+    var tags = (p.techStack || []).map(function(t) {
+      return '<span class="tech-tag ' + (catClass[p.category] || 'cat-tools') + '">' + esc(t) + '</span>';
+    }).join('');
+    return '<div class="project-card" onclick="openDoc(\'' + esc(p.docId) + '\')">' +
+      '<div class="project-card-header">' +
+        '<span class="project-card-name">' + esc(p.name) + '</span>' +
+        '<span class="project-card-status"></span>' +
+      '</div>' +
+      '<div class="project-card-desc">' + esc(p.description) + '</div>' +
+      '<div class="project-card-tags">' + tags + '</div>' +
+    '</div>';
+  }).join('');
+}
+
 /* ── Home Page ── */
 function renderHome() {
   var el = document.getElementById('main');
@@ -640,9 +712,56 @@ function renderHome() {
   });
 
   var html = '<div class="wiki-home">';
-  html += '<h1>holm.chat</h1>';
-  html += '<div class="subtitle">' + allDocs.length + ' documents across ' + keys.length + ' domains</div>';
 
+  // ── Hero Section ──
+  html += '<div class="hero-section">';
+  html += '<div class="hero-title">HOLM</div>';
+  html += '<div class="hero-subtitle">Personal Sovereign Intelligence System</div>';
+  html += '<div class="hero-desc">A fully air-gapped system interacted with through voice only. No screens, no keyboards, no phones — a private intelligence agency running on local hardware.</div>';
+  html += '<div class="hero-stats">';
+  html += '<div class="hero-stat"><div class="hero-stat-value">' + allDocs.length + '</div><div class="hero-stat-label">Documents</div></div>';
+  html += '<div class="hero-stat"><div class="hero-stat-value">' + keys.length + '</div><div class="hero-stat-label">Domains</div></div>';
+  html += '<div class="hero-stat"><div class="hero-stat-value">13</div><div class="hero-stat-label">Projects</div></div>';
+  html += '<div class="hero-stat"><div class="hero-stat-value">13</div><div class="hero-stat-label">Nodes</div></div>';
+  html += '</div></div>';
+
+  // ── Projects Grid ──
+  html += '<div class="projects-section">';
+  html += '<div class="section-heading">Active Projects</div>';
+  html += '<div class="projects-grid" id="projects-grid"><div style="color:var(--dim);font-size:0.75rem;padding:1rem">Loading projects...</div></div>';
+  html += '</div>';
+
+  // ── Architecture Diagram ──
+  html += '<div class="arch-section">';
+  html += '<div class="section-heading">System Architecture</div>';
+  html += '<div class="arch-diagram"><pre>';
+  html += '<span class="arch-layer-voice">┌─────────────────────────────────────────────────────────┐</span>\n';
+  html += '<span class="arch-layer-voice">│  VOICE LAYER                                            │</span>\n';
+  html += '<span class="arch-layer-voice">│  Whisper.cpp (STT) · Piper TTS · Wake Word Detection    │</span>\n';
+  html += '<span class="arch-layer-voice">└───────────────────────────┬─────────────────────────────┘</span>\n';
+  html += '                            │\n';
+  html += '<span class="arch-layer-intel">┌───────────────────────────┴─────────────────────────────┐</span>\n';
+  html += '<span class="arch-layer-intel">│  INTELLIGENCE LAYER                                     │</span>\n';
+  html += '<span class="arch-layer-intel">│  Local LLM (llama.cpp) · Knowledge Graph · Briefings    │</span>\n';
+  html += '<span class="arch-layer-intel">└───────────────────────────┬─────────────────────────────┘</span>\n';
+  html += '                            │\n';
+  html += '<span class="arch-layer-platform">┌───────────────────────────┴─────────────────────────────┐</span>\n';
+  html += '<span class="arch-layer-platform">│  PLATFORM LAYER                                         │</span>\n';
+  html += '<span class="arch-layer-platform">│  holm.chat · Animus · BookForge · Sentinel · Mind       │</span>\n';
+  html += '<span class="arch-layer-platform">└───────────────────────────┬─────────────────────────────┘</span>\n';
+  html += '                            │\n';
+  html += '<span class="arch-layer-infra">┌───────────────────────────┴─────────────────────────────┐</span>\n';
+  html += '<span class="arch-layer-infra">│  INFRASTRUCTURE LAYER                                   │</span>\n';
+  html += '<span class="arch-layer-infra">│  K3s · ArgoCD · Gitea · Ansible · Cloudflare            │</span>\n';
+  html += '<span class="arch-layer-infra">└───────────────────────────┬─────────────────────────────┘</span>\n';
+  html += '                            │\n';
+  html += '<span class="arch-layer-hardware">┌───────────────────────────┴─────────────────────────────┐</span>\n';
+  html += '<span class="arch-layer-hardware">│  HARDWARE LAYER                                         │</span>\n';
+  html += '<span class="arch-layer-hardware">│  13x Raspberry Pi · Longhorn Storage · Local Network    │</span>\n';
+  html += '<span class="arch-layer-hardware">└─────────────────────────────────────────────────────────┘</span>\n';
+  html += '</pre></div></div>';
+
+  // ── Bookmarks (existing) ──
   var bookmarks = getBookmarks();
   if (bookmarks.length > 0) {
     html += '<div class="bookmarks"><div class="bookmarks-title">\u2605 Bookmarks</div><div class="bookmarks-list">';
@@ -653,6 +772,7 @@ function renderHome() {
     html += '</div></div>';
   }
 
+  // ── Recently Viewed (existing) ──
   var recent = getRecent();
   if (recent.length > 0) {
     html += '<div class="recent"><div class="recent-title">Recently viewed</div><div class="recent-list">';
@@ -663,6 +783,7 @@ function renderHome() {
     html += '</div></div>';
   }
 
+  // ── Domain Sections (existing) ──
   for (var i = 0; i < keys.length; i++) {
     var k = keys[i];
     var docs = domains[k].sort(function(a, b) { return a.docId.localeCompare(b.docId); });
@@ -684,6 +805,12 @@ function renderHome() {
   html += '</div>';
   el.innerHTML = html;
   window.scrollTo(0, 0);
+
+  // Load projects async
+  loadProjects().then(function(projects) {
+    var grid = document.getElementById('projects-grid');
+    if (grid) renderProjectCards(projects, grid);
+  });
 }
 
 /* ── Document Page ── */
@@ -864,7 +991,7 @@ async function renderDoc(id) {
     '6':'#7c4dff','7':'#00bcd4','8':'#ffeb3b','9':'#e040fb','10':'#76ff03',
     '11':'#ff6e40','12':'#f44336','13':'#64ffda','14':'#448aff','15':'#ea80fc',
     '16':'#ffd740','17':'#b388ff','18':'#84ffff','19':'#ff80ab','20':'#69f0ae',
-    'META':'#666678','FW':'#666678','HIC':'#00f0ff'
+    'META':'#666678','FW':'#666678','HIC':'#00f0ff','PROJ':'#00ff88'
   };
   var dColor = domainColors[doc.domain] || 'var(--cyan)';
 
@@ -1064,7 +1191,7 @@ function domainBadgeColor(domain) {
     '6':'#8888ff','7':'#ffcc00','8':'#00ccff','9':'#ff6688','10':'#88ff00',
     '11':'#cc88ff','12':'#ff4444','13':'#00ffcc','14':'#ff88cc','15':'#88ccff',
     '16':'#ffaa44','17':'#44ffaa','18':'#aa88ff','19':'#ff6644','20':'#44aaff',
-    'META':'#888','FW':'#aaa','HIC':'#ccc'
+    'META':'#888','FW':'#aaa','HIC':'#ccc','PROJ':'#00ff88'
   };
   return colors[domain] || 'var(--muted)';
 }

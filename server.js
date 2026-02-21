@@ -3,6 +3,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
 const compression = require('compression');
 const crypto = require('crypto');
+const fs = require('fs');
 
 const app = express();
 app.set('etag', 'strong');
@@ -461,6 +462,26 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
+// Projects data (cached 5 min)
+let projectsCache = null;
+let projectsCacheTime = 0;
+app.get('/api/projects', (req, res) => {
+  const now = Date.now();
+  if (projectsCache && now - projectsCacheTime < 300000) {
+    return res.json(projectsCache);
+  }
+  const projectsPath = path.join(__dirname, 'projects.json');
+  if (!fs.existsSync(projectsPath)) {
+    return res.json([]);
+  }
+  try {
+    projectsCache = JSON.parse(fs.readFileSync(projectsPath, 'utf8'));
+    projectsCacheTime = now;
+    res.json(projectsCache);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to read projects data' });
+  }
+});
 
 // Random document
 app.get('/api/random', async (req, res) => {
@@ -527,6 +548,9 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
         console.warn('[webhook] git pull failed, re-cloning:', pullErr.message);
         await execAsync('rm -rf /tmp/docs-update && git clone --depth 1 https://github.com/timholm/docs-framework.git /tmp/docs-update && cp /tmp/docs-update/html/manifest.json /app/manifest.json && cp -r /tmp/docs-update/html /app/html');
       }
+
+      console.log('[webhook] Indexing project repos...');
+      await execAsync('node index-repos.js', { cwd: __dirname, timeout: 60000 });
 
       console.log('[webhook] Running upsert reimport...');
       await execAsync('node import.js --force', { cwd: __dirname, timeout: 120000 });

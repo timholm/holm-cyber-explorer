@@ -28,7 +28,8 @@ const DOMAIN_NAMES = {
   '20': 'Meta & Documentation',
   'META': 'Meta & Documentation',
   'FW': 'Framework',
-  'HIC': 'HIC Architecture'
+  'HIC': 'HIC Architecture',
+  'PROJ': 'Projects & Repositories'
 };
 
 /**
