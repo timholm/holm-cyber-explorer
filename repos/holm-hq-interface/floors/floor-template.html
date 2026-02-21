@@ -1,0 +1,35 @@
+<!--
+  HOLM HQ — Floor Template
+  This file is a reference template for individual floor views.
+  The actual floor rendering is done dynamically via renderer.js.
+  To add custom floor content, extend the floor data in map-data.json
+  and add rendering logic in renderer.js drawFloor().
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HOLM HQ — Floor</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <div id="viewport">
+    <div id="canvas-world">
+      <svg id="floor-svg"></svg>
+    </div>
+  </div>
+  <script src="../renderer.js"></script>
+  <script>
+    // Standalone floor viewer (for development/testing)
+    (async function() {
+      const resp = await fetch('../map-data.json');
+      const data = await resp.json();
+      const floorId = new URLSearchParams(location.search).get('id') || 'F01';
+      const floor = data.floors.find(f => f.id === floorId);
+      if (floor) {
+        Renderer.drawFloor(document.querySelector('#floor-svg'), floor, data);
+      }
+    })();
+  </script>
+</body>
+</html>

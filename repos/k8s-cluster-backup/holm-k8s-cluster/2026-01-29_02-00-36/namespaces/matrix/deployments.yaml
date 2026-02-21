@@ -1,0 +1,572 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"element-web","namespace":"matrix"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"element-web"}},"template":{"metadata":{"labels":{"app":"element-web"}},"spec":{"containers":[{"env":[{"name":"ELEMENT_WEB_PORT","value":"80"}],"image":"vectorim/element-web:latest","name":"element-web","ports":[{"containerPort":80}],"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/app/config.json","name":"config","subPath":"config.json"}]}],"enableServiceLinks":false,"volumes":[{"configMap":{"name":"element-web-config"},"name":"config"}]}}}}
+    creationTimestamp: "2026-01-25T00:48:59Z"
+    generation: 5
+    name: element-web
+    namespace: matrix
+    resourceVersion: "1018"
+    uid: 0ef8bc8e-7fbe-430e-bcc4-978ea45b55fa
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: element-web
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-25T12:25:14-08:00"
+        labels:
+          app: element-web
+      spec:
+        containers:
+        - env:
+          - name: ELEMENT_WEB_PORT
+            value: "80"
+          image: vectorim/element-web:latest
+          imagePullPolicy: Always
+          name: element-web
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config.json
+            name: config
+            subPath: config.json
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: false
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: element-web-config
+          name: config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T00:48:59Z"
+      lastUpdateTime: "2026-01-25T20:26:10Z"
+      message: ReplicaSet "element-web-8b855cf7" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T04:38:24Z"
+      lastUpdateTime: "2026-01-27T04:38:24Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "10"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"mas","namespace":"matrix"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"mas"}},"template":{"metadata":{"labels":{"app":"mas"}},"spec":{"containers":[{"args":["server","--config","/config/config.yaml"],"image":"ghcr.io/element-hq/matrix-authentication-service:latest","livenessProbe":{"httpGet":{"path":"/health","port":8081},"initialDelaySeconds":30,"periodSeconds":10},"name":"mas","ports":[{"containerPort":8080,"name":"http"},{"containerPort":8081,"name":"internal"}],"readinessProbe":{"httpGet":{"path":"/health","port":8081},"initialDelaySeconds":10,"periodSeconds":5},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/config","name":"config"}]}],"volumes":[{"configMap":{"name":"mas-config"},"name":"config"}]}}}}
+    creationTimestamp: "2026-01-25T02:45:41Z"
+    generation: 18
+    name: mas
+    namespace: matrix
+    resourceVersion: "99459"
+    uid: 4d171cae-e0b5-4f46-a1c6-059bb97de5f2
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: mas
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-25T11:57:41-08:00"
+        labels:
+          app: mas
+      spec:
+        containers:
+        - args:
+          - server
+          - --config
+          - /config/config.yaml
+          image: ghcr.io/element-hq/matrix-authentication-service:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: mas
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 8081
+            name: internal
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /config
+            name: config
+          - mountPath: /synapse-config
+            name: synapse-config
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: mas-config
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: synapse-config
+          name: synapse-config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T02:45:42Z"
+      lastUpdateTime: "2026-01-25T19:57:54Z"
+      message: ReplicaSet "mas-85f9558c44" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T06:45:40Z"
+      lastUpdateTime: "2026-01-27T06:45:40Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 18
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"matrix-postgres","namespace":"matrix"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"matrix-postgres"}},"template":{"metadata":{"labels":{"app":"matrix-postgres"}},"spec":{"containers":[{"env":[{"name":"PGDATA","value":"/var/lib/postgresql/data/pgdata"}],"envFrom":[{"secretRef":{"name":"matrix-postgres-secret"}}],"image":"postgres:15-alpine","name":"postgres","ports":[{"containerPort":5432}],"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/var/lib/postgresql/data","name":"postgres-data"}]}],"volumes":[{"name":"postgres-data","persistentVolumeClaim":{"claimName":"matrix-postgres-data"}}]}}}}
+    creationTimestamp: "2026-01-25T00:34:33Z"
+    generation: 5
+    name: matrix-postgres
+    namespace: matrix
+    resourceVersion: "1020"
+    uid: 55955cb2-dea1-4375-b4f3-74fbf2df3775
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: matrix-postgres
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: matrix-postgres
+      spec:
+        containers:
+        - env:
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+          envFrom:
+          - secretRef:
+              name: matrix-postgres-secret
+          image: postgres:15-alpine
+          imagePullPolicy: IfNotPresent
+          name: postgres
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: postgres-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: matrix-postgres-data
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T00:34:33Z"
+      lastUpdateTime: "2026-01-25T15:20:42Z"
+      message: ReplicaSet "matrix-postgres-7977cc656b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T01:12:32Z"
+      lastUpdateTime: "2026-01-27T01:12:32Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"matrix-wellknown","namespace":"matrix"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"matrix-wellknown"}},"template":{"metadata":{"labels":{"app":"matrix-wellknown"}},"spec":{"containers":[{"image":"nginx:alpine","name":"nginx","ports":[{"containerPort":80}],"volumeMounts":[{"mountPath":"/usr/share/nginx/html/.well-known/matrix","name":"wellknown-config"},{"mountPath":"/etc/nginx/conf.d","name":"nginx-config"}]}],"volumes":[{"configMap":{"name":"matrix-wellknown"},"name":"wellknown-config"},{"configMap":{"name":"matrix-wellknown-nginx"},"name":"nginx-config"}]}}}}
+    creationTimestamp: "2026-01-25T00:42:58Z"
+    generation: 5
+    name: matrix-wellknown
+    namespace: matrix
+    resourceVersion: "1021"
+    uid: d87fd2ed-242e-4937-80ed-95758f003ab5
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: matrix-wellknown
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-25T12:35:23-08:00"
+        labels:
+          app: matrix-wellknown
+      spec:
+        containers:
+        - image: nginx:alpine
+          imagePullPolicy: IfNotPresent
+          name: nginx
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /usr/share/nginx/html/.well-known/matrix
+            name: wellknown-config
+          - mountPath: /etc/nginx/conf.d
+            name: nginx-config
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: matrix-wellknown
+          name: wellknown-config
+        - configMap:
+            defaultMode: 420
+            name: matrix-wellknown-nginx
+          name: nginx-config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T00:42:58Z"
+      lastUpdateTime: "2026-01-25T20:35:26Z"
+      message: ReplicaSet "matrix-wellknown-6b6d59b88" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:43:31Z"
+      lastUpdateTime: "2026-01-27T02:43:31Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "33"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"synapse","namespace":"matrix"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"synapse"}},"template":{"metadata":{"labels":{"app":"synapse"}},"spec":{"containers":[{"env":[{"name":"SYNAPSE_CONFIG_PATH","value":"/data/homeserver.yaml"}],"image":"matrixdotorg/synapse:latest","livenessProbe":{"httpGet":{"path":"/health","port":8008},"initialDelaySeconds":60,"periodSeconds":30},"name":"synapse","ports":[{"containerPort":8008}],"readinessProbe":{"httpGet":{"path":"/health","port":8008},"initialDelaySeconds":30,"periodSeconds":10},"resources":{"limits":{"cpu":"1000m","memory":"2Gi"},"requests":{"cpu":"200m","memory":"512Mi"}},"volumeMounts":[{"mountPath":"/data","name":"synapse-data"}]}],"initContainers":[{"args":["cp /config/homeserver.yaml /data/homeserver.yaml\ncp /config/log.config /data/holm.chat.log.config\nif [ ! -f /data/holm.chat.signing.key ]; then\n  echo \"Generating signing key...\"\n  python -m synapse.app.homeserver --config-path /data/homeserver.yaml --generate-keys\nfi\nmkdir -p /data/media_store /data/uploads\nchown -R 991:991 /data\n"],"command":["/bin/sh","-c"],"image":"matrixdotorg/synapse:latest","name":"init-config","volumeMounts":[{"mountPath":"/data","name":"synapse-data"},{"mountPath":"/config","name":"synapse-config"}]}],"volumes":[{"name":"synapse-data","persistentVolumeClaim":{"claimName":"synapse-data"}},{"configMap":{"name":"synapse-config"},"name":"synapse-config"}]}}}}
+    creationTimestamp: "2026-01-25T00:37:04Z"
+    generation: 42
+    name: synapse
+    namespace: matrix
+    resourceVersion: "1798032"
+    uid: aa87f4d0-20e4-46ef-85e4-14ee15500625
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: synapse
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-29T00:02:02Z"
+        labels:
+          app: synapse
+      spec:
+        containers:
+        - env:
+          - name: SYNAPSE_CONFIG_PATH
+            value: /data/homeserver.yaml
+          image: matrixdotorg/synapse:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8008
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: synapse
+          ports:
+          - containerPort: 8008
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8008
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: synapse-data
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - |
+            cp /config/homeserver.yaml /data/homeserver.yaml
+            cp /config/log.config /data/holm.chat.log.config
+            if [ ! -f /data/holm.chat.signing.key ]; then
+              echo "Generating signing key..."
+              python -m synapse.app.homeserver --config-path /data/homeserver.yaml --generate-keys
+            fi
+            mkdir -p /data/media_store /data/uploads
+            chown -R 991:991 /data
+          command:
+          - /bin/sh
+          - -c
+          image: matrixdotorg/synapse:latest
+          imagePullPolicy: Always
+          name: init-config
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: synapse-data
+          - mountPath: /config
+            name: synapse-config
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: synapse-data
+          persistentVolumeClaim:
+            claimName: synapse-data
+        - configMap:
+            defaultMode: 420
+            name: synapse-config
+          name: synapse-config
+  status:
+    conditions:
+    - lastTransitionTime: "2026-01-25T20:57:51Z"
+      lastUpdateTime: "2026-01-25T20:57:51Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2026-01-29T00:12:04Z"
+      lastUpdateTime: "2026-01-29T00:12:04Z"
+      message: ReplicaSet "synapse-6f49d76c75" has timed out progressing.
+      reason: ProgressDeadlineExceeded
+      status: "False"
+      type: Progressing
+    observedGeneration: 42
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"synapse-admin","namespace":"matrix"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"synapse-admin"}},"template":{"metadata":{"labels":{"app":"synapse-admin"}},"spec":{"containers":[{"env":[{"name":"SYNAPSE_ADMIN_CONFIG_JSON","value":"{\n  \"restrictBaseUrl\": \"https://matrix.holm.chat\",\n  \"asManagedUsers\": [\"@admin:holm.chat\", \"@tim:holm.chat\"],\n  \"supportMailRecipient\": \"holmytim@gmail.com\"\n}\n"}],"image":"ghcr.io/etkecc/synapse-admin:latest","imagePullPolicy":"Always","name":"synapse-admin","ports":[{"containerPort":80}],"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}}]}}}}
+    creationTimestamp: "2026-01-25T15:33:49Z"
+    generation: 3
+    name: synapse-admin
+    namespace: matrix
+    resourceVersion: "1023"
+    uid: 6015382f-f067-43f0-a02c-7ac85c2a92fb
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: synapse-admin
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: synapse-admin
+      spec:
+        containers:
+        - env:
+          - name: SYNAPSE_ADMIN_CONFIG_JSON
+            value: |
+              {
+                "restrictBaseUrl": "https://matrix.holm.chat",
+                "asManagedUsers": ["@admin:holm.chat", "@tim:holm.chat"],
+                "supportMailRecipient": "holmytim@gmail.com"
+              }
+          image: ghcr.io/etkecc/synapse-admin:latest
+          imagePullPolicy: Always
+          name: synapse-admin
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T15:33:49Z"
+      lastUpdateTime: "2026-01-25T19:32:44Z"
+      message: ReplicaSet "synapse-admin-ddddcdff7" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:43:35Z"
+      lastUpdateTime: "2026-01-27T02:43:35Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

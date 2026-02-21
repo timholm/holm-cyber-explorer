@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./archive:/app/archive
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///./data/tiktok_archive.db
+      - ARCHIVE_DIR=/app/archive
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:8000
+
+  # Optional: use PostgreSQL for larger archives
+  # postgres:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_DB: tiktok_archive
+  #     POSTGRES_USER: archive
+  #     POSTGRES_PASSWORD: archivepass
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

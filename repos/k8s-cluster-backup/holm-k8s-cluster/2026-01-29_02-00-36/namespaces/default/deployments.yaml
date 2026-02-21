@@ -1,0 +1,605 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: argocd-notifications
+      meta.helm.sh/release-namespace: default
+    creationTimestamp: "2026-01-18T15:43:43Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: argocd-notifications
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argocd-notifications
+      app.kubernetes.io/version: v1.2.1
+      helm.sh/chart: argocd-notifications-1.8.1
+    name: argocd-notifications-controller
+    namespace: default
+    resourceVersion: "919"
+    uid: 46f5564b-a754-49f0-8354-ef326df1d270
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: argocd-notifications
+        app.kubernetes.io/name: argocd-notifications
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/instance: argocd-notifications
+          app.kubernetes.io/name: argocd-notifications
+      spec:
+        containers:
+        - command:
+          - /app/argocd-notifications-backend
+          - controller
+          - --loglevel=info
+          - --secret-name=argocd-notifications-secret
+          - --config-map-name=argocd-notifications-cm
+          image: argoprojlabs/argocd-notifications:v1.2.1
+          imagePullPolicy: IfNotPresent
+          name: argocd-notifications-controller
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          workingDir: /app
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+        serviceAccount: argocd-notifications-controller
+        serviceAccountName: argocd-notifications-controller
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-18T15:43:43Z"
+      lastUpdateTime: "2026-01-18T15:43:48Z"
+      message: ReplicaSet "argocd-notifications-controller-75bd57bcdb" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T04:38:32Z"
+      lastUpdateTime: "2026-01-27T04:38:32Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: bookforge:apps/Deployment:default/bookforge
+      deployment.kubernetes.io/revision: "8"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"bookforge:apps/Deployment:default/bookforge"},"labels":{"app":"bookforge"},"name":"bookforge","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"bookforge"}},"template":{"metadata":{"labels":{"app":"bookforge"}},"spec":{"containers":[{"env":[{"name":"POSTGRES_HOST","value":"postgres"},{"name":"POSTGRES_DB","value":"bookforge"},{"name":"POSTGRES_USER","value":"bookforge"},{"name":"POSTGRES_PASSWORD","value":"bookforge123"},{"name":"PORT","value":"8080"}],"envFrom":[{"configMapRef":{"name":"bookforge-config"}}],"image":"ghcr.io/timholm/bookforge:latest","imagePullPolicy":"Always","livenessProbe":{"httpGet":{"path":"/health","port":8080},"initialDelaySeconds":10,"periodSeconds":30},"name":"bookforge","ports":[{"containerPort":8080}],"readinessProbe":{"httpGet":{"path":"/health","port":8080},"initialDelaySeconds":5,"periodSeconds":10},"resources":{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/app/data","name":"data"},{"mountPath":"/app/audio","name":"audio"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"bookforge-data"}},{"emptyDir":{},"name":"audio"}]}}}}
+    creationTimestamp: "2026-01-19T13:51:33Z"
+    generation: 10
+    labels:
+      app: bookforge
+    name: bookforge
+    namespace: default
+    resourceVersion: "920"
+    uid: 9df74742-e160-4fcc-bd6d-3c4bd8cb0759
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: bookforge
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-19T15:07:22-08:00"
+        labels:
+          app: bookforge
+      spec:
+        containers:
+        - env:
+          - name: POSTGRES_HOST
+            value: postgres
+          - name: POSTGRES_DB
+            value: bookforge
+          - name: POSTGRES_USER
+            value: bookforge
+          - name: POSTGRES_PASSWORD
+            value: bookforge123
+          - name: PORT
+            value: "8080"
+          envFrom:
+          - configMapRef:
+              name: bookforge-config
+          image: ghcr.io/timholm/bookforge:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: bookforge
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/data
+            name: data
+          - mountPath: /app/audio
+            name: audio
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bookforge-data
+        - emptyDir: {}
+          name: audio
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-19T13:51:33Z"
+      lastUpdateTime: "2026-01-19T23:07:52Z"
+      message: ReplicaSet "bookforge-ff66d95d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:39:30Z"
+      lastUpdateTime: "2026-01-27T02:39:30Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 10
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: bookforge:apps/Deployment:default/bookforge-worker
+      deployment.kubernetes.io/revision: "6"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"bookforge:apps/Deployment:default/bookforge-worker"},"labels":{"app":"bookforge-worker"},"name":"bookforge-worker","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"bookforge-worker"}},"template":{"metadata":{"labels":{"app":"bookforge-worker"}},"spec":{"containers":[{"command":["python","queue_worker.py"],"env":[{"name":"POSTGRES_HOST","value":"postgres"},{"name":"POSTGRES_DB","value":"bookforge"},{"name":"POSTGRES_USER","value":"bookforge"},{"name":"POSTGRES_PASSWORD","value":"bookforge123"}],"envFrom":[{"configMapRef":{"name":"bookforge-config"}}],"image":"ghcr.io/timholm/bookforge:latest","imagePullPolicy":"Always","name":"worker","resources":{"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/app/data","name":"data"},{"mountPath":"/app/audio","name":"audio"},{"mountPath":"/app/logs","name":"logs"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"bookforge-data"}},{"emptyDir":{},"name":"audio"},{"emptyDir":{},"name":"logs"}]}}}}
+    creationTimestamp: "2026-01-19T14:39:58Z"
+    generation: 7
+    labels:
+      app: bookforge-worker
+    name: bookforge-worker
+    namespace: default
+    resourceVersion: "921"
+    uid: f49515be-bbba-4b92-90fb-d6c8570f8bb1
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: bookforge-worker
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-19T14:20:40-08:00"
+        labels:
+          app: bookforge-worker
+      spec:
+        containers:
+        - command:
+          - python
+          - queue_worker.py
+          env:
+          - name: POSTGRES_HOST
+            value: postgres
+          - name: POSTGRES_DB
+            value: bookforge
+          - name: POSTGRES_USER
+            value: bookforge
+          - name: POSTGRES_PASSWORD
+            value: bookforge123
+          envFrom:
+          - configMapRef:
+              name: bookforge-config
+          image: ghcr.io/timholm/bookforge:latest
+          imagePullPolicy: Always
+          name: worker
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/data
+            name: data
+          - mountPath: /app/audio
+            name: audio
+          - mountPath: /app/logs
+            name: logs
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bookforge-data
+        - emptyDir: {}
+          name: audio
+        - emptyDir: {}
+          name: logs
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-19T14:39:58Z"
+      lastUpdateTime: "2026-01-19T22:20:44Z"
+      message: ReplicaSet "bookforge-worker-6787dfdc99" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:39:15Z"
+      lastUpdateTime: "2026-01-27T02:39:15Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 7
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: cmd-api:apps/Deployment:default/cmd-api
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"cmd-api:apps/Deployment:default/cmd-api"},"labels":{"app.kubernetes.io/instance":"cmd-api","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"cmd-api","app.kubernetes.io/version":"1.0.0","helm.sh/chart":"cmd-api-1.0.0"},"name":"cmd-api","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"cmd-api","app.kubernetes.io/instance":"cmd-api","app.kubernetes.io/name":"cmd-api"}},"template":{"metadata":{"labels":{"app":"cmd-api","app.kubernetes.io/instance":"cmd-api","app.kubernetes.io/name":"cmd-api"}},"spec":{"containers":[{"image":"ghcr.io/timholm/cmd-api:latest","imagePullPolicy":"Always","livenessProbe":{"httpGet":{"path":"/","port":3000},"initialDelaySeconds":5,"periodSeconds":10},"name":"cmd-api","ports":[{"containerPort":3000}],"readinessProbe":{"httpGet":{"path":"/","port":3000},"initialDelaySeconds":5,"periodSeconds":5},"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}}],"serviceAccountName":"cmd-api"}}}}
+    creationTimestamp: "2026-01-20T07:09:30Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: cmd-api
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: cmd-api
+      app.kubernetes.io/version: 1.0.0
+      helm.sh/chart: cmd-api-1.0.0
+    name: cmd-api
+    namespace: default
+    resourceVersion: "836019"
+    uid: 8afbdc1b-2bfc-457b-b4a7-95c40034c099
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: cmd-api
+        app.kubernetes.io/instance: cmd-api
+        app.kubernetes.io/name: cmd-api
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: cmd-api
+          app.kubernetes.io/instance: cmd-api
+          app.kubernetes.io/name: cmd-api
+      spec:
+        containers:
+        - image: ghcr.io/timholm/cmd-api:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: cmd-api
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: cmd-api
+        serviceAccountName: cmd-api
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-20T07:09:30Z"
+      lastUpdateTime: "2026-01-20T07:10:13Z"
+      message: ReplicaSet "cmd-api-7dd8bd49c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-28T01:56:42Z"
+      lastUpdateTime: "2026-01-28T01:56:42Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"postgres"},"name":"postgres","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"postgres"}},"template":{"metadata":{"labels":{"app":"postgres"}},"spec":{"containers":[{"env":[{"name":"POSTGRES_DB","value":"bookforge"},{"name":"POSTGRES_USER","value":"bookforge"},{"name":"POSTGRES_PASSWORD","value":"bookforge123"},{"name":"PGDATA","value":"/var/lib/postgresql/data/pgdata"}],"image":"postgres:15-alpine","name":"postgres","ports":[{"containerPort":5432}],"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/var/lib/postgresql/data","name":"postgres-data"}]}],"volumes":[{"name":"postgres-data","persistentVolumeClaim":{"claimName":"postgres-data"}}]}}}}
+    creationTimestamp: "2026-01-19T22:20:25Z"
+    generation: 1
+    labels:
+      app: postgres
+    name: postgres
+    namespace: default
+    resourceVersion: "923"
+    uid: f8f2b977-df59-4c2a-a222-46accaecc217
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: postgres
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: postgres
+      spec:
+        containers:
+        - env:
+          - name: POSTGRES_DB
+            value: bookforge
+          - name: POSTGRES_USER
+            value: bookforge
+          - name: POSTGRES_PASSWORD
+            value: bookforge123
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+          image: postgres:15-alpine
+          imagePullPolicy: IfNotPresent
+          name: postgres
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: postgres-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+  status:
+    conditions:
+    - lastTransitionTime: "2026-01-19T22:20:25Z"
+      lastUpdateTime: "2026-01-19T22:20:32Z"
+      message: ReplicaSet "postgres-5486d75db5" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-25T20:57:51Z"
+      lastUpdateTime: "2026-01-25T20:57:51Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    observedGeneration: 1
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: vaultwarden:apps/Deployment:default/vaultwarden
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"vaultwarden:apps/Deployment:default/vaultwarden"},"labels":{"app":"vaultwarden"},"name":"vaultwarden","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"vaultwarden"}},"template":{"metadata":{"labels":{"app":"vaultwarden"}},"spec":{"containers":[{"env":[{"name":"DOMAIN","value":"https://vault.holm.chat"},{"name":"SIGNUPS_ALLOWED","value":"true"},{"name":"WEBSOCKET_ENABLED","value":"true"}],"image":"ghcr.io/dani-garcia/vaultwarden:latest","imagePullPolicy":"Always","livenessProbe":{"httpGet":{"path":"/alive","port":80},"initialDelaySeconds":10,"periodSeconds":30},"name":"vaultwarden","ports":[{"containerPort":80,"name":"http"},{"containerPort":3012,"name":"websocket"}],"readinessProbe":{"httpGet":{"path":"/alive","port":80},"initialDelaySeconds":5,"periodSeconds":10},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/data","name":"data"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"vaultwarden-data"}}]}}}}
+    creationTimestamp: "2026-01-20T10:13:14Z"
+    generation: 9
+    labels:
+      app: vaultwarden
+    name: vaultwarden
+    namespace: default
+    resourceVersion: "924"
+    uid: acd2acdc-dbeb-4273-a201-b9ab2379c16f
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: vaultwarden
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: vaultwarden
+      spec:
+        containers:
+        - env:
+          - name: DOMAIN
+            value: https://vault.holm.chat
+          - name: SIGNUPS_ALLOWED
+            value: "true"
+          - name: WEBSOCKET_ENABLED
+            value: "true"
+          image: ghcr.io/dani-garcia/vaultwarden:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /alive
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: vaultwarden
+          ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+          - containerPort: 3012
+            name: websocket
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /alive
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: vaultwarden-data
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-20T10:31:31Z"
+      lastUpdateTime: "2026-01-20T10:34:52Z"
+      message: ReplicaSet "vaultwarden-5f77d46bf6" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:44:04Z"
+      lastUpdateTime: "2026-01-27T02:44:04Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 9
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argo
+
+# Reference upstream Argo Workflows directly
+resources:
+  - https://github.com/argoproj/argo-workflows/releases/download/v3.5.0/install.yaml
+  - namespace.yaml
+  - service-nodeport.yaml
+  # Note: Ingress routing is now handled by Envoy Gateway HTTPRoutes
+
+# Patch argo-server to run in HTTP mode (not HTTPS) for gateway integration
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: argo-server
+    path: argo-server-patch.yaml

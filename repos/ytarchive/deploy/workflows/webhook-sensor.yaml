@@ -1,0 +1,313 @@
+# Webhook EventSource and Sensor for triggering workflows
+# This enables external triggers via HTTP webhooks
+---
+# EventSource: Webhook endpoint for receiving external triggers
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: ytarchive-webhook
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: eventsource
+spec:
+  service:
+    ports:
+    - port: 12000
+      targetPort: 12000
+  webhook:
+    # Endpoint: /webhook/sync - Triggers full download for a channel
+    sync:
+      port: "12000"
+      endpoint: /webhook/sync
+      method: POST
+    # Endpoint: /webhook/retry - Triggers retry of failed videos
+    retry:
+      port: "12000"
+      endpoint: /webhook/retry
+      method: POST
+    # Endpoint: /webhook/cleanup - Triggers cleanup report generation
+    cleanup:
+      port: "12000"
+      endpoint: /webhook/cleanup
+      method: POST
+---
+# EventBus: Transport for events (NATS-based)
+apiVersion: argoproj.io/v1alpha1
+kind: EventBus
+metadata:
+  name: default
+  namespace: ytarchive
+spec:
+  nats:
+    native:
+      replicas: 3
+      auth: token
+---
+# Sensor: Responds to webhook events and triggers workflows
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: ytarchive-webhook-sensor
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: sensor
+spec:
+  dependencies:
+  # Dependency for sync webhook
+  - name: sync-trigger
+    eventSourceName: ytarchive-webhook
+    eventName: sync
+    filters:
+      data:
+      - path: body.channel_url
+        type: string
+        comparator: "!="
+        value: '""'
+  # Dependency for retry webhook
+  - name: retry-trigger
+    eventSourceName: ytarchive-webhook
+    eventName: retry
+  # Dependency for cleanup webhook
+  - name: cleanup-trigger
+    eventSourceName: ytarchive-webhook
+    eventName: cleanup
+
+  triggers:
+  # Trigger: Full Download Workflow (from /webhook/sync)
+  - template:
+      name: trigger-full-download
+      conditions: sync-trigger
+      argoWorkflow:
+        operation: submit
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: webhook-full-download-
+              namespace: ytarchive
+              labels:
+                app: ytarchive
+                workflow-type: full-download
+                triggered-by: webhook
+            spec:
+              workflowTemplateRef:
+                name: ytarchive-full-download
+              arguments:
+                parameters:
+                - name: channel-url
+                  value: ""  # Will be overwritten by parameters
+                - name: batch-size
+                  value: "10"
+                - name: max-workers
+                  value: "20"
+        parameters:
+        - src:
+            dependencyName: sync-trigger
+            dataKey: body.channel_url
+          dest: spec.arguments.parameters.0.value
+        - src:
+            dependencyName: sync-trigger
+            dataKey: body.batch_size
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}10{{ end }}"
+          dest: spec.arguments.parameters.1.value
+        - src:
+            dependencyName: sync-trigger
+            dataKey: body.max_workers
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}20{{ end }}"
+          dest: spec.arguments.parameters.2.value
+      retryStrategy:
+        steps: 3
+        duration: "30s"
+        factor: 2
+
+  # Trigger: Retry Failed Workflow (from /webhook/retry)
+  - template:
+      name: trigger-retry-failed
+      conditions: retry-trigger
+      argoWorkflow:
+        operation: submit
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: webhook-retry-failed-
+              namespace: ytarchive
+              labels:
+                app: ytarchive
+                workflow-type: retry-failed
+                triggered-by: webhook
+            spec:
+              workflowTemplateRef:
+                name: ytarchive-retry-failed
+              arguments:
+                parameters:
+                - name: channel-id
+                  value: ""
+                - name: batch-size
+                  value: "5"
+                - name: max-workers
+                  value: "10"
+                - name: max-retries
+                  value: "3"
+        parameters:
+        - src:
+            dependencyName: retry-trigger
+            dataKey: body.channel_id
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}{{ end }}"
+          dest: spec.arguments.parameters.0.value
+        - src:
+            dependencyName: retry-trigger
+            dataKey: body.batch_size
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}5{{ end }}"
+          dest: spec.arguments.parameters.1.value
+        - src:
+            dependencyName: retry-trigger
+            dataKey: body.max_workers
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}10{{ end }}"
+          dest: spec.arguments.parameters.2.value
+        - src:
+            dependencyName: retry-trigger
+            dataKey: body.max_retries
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}3{{ end }}"
+          dest: spec.arguments.parameters.3.value
+      retryStrategy:
+        steps: 3
+        duration: "30s"
+        factor: 2
+
+  # Trigger: Cleanup Report Workflow (from /webhook/cleanup)
+  - template:
+      name: trigger-cleanup-report
+      conditions: cleanup-trigger
+      argoWorkflow:
+        operation: submit
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: webhook-cleanup-report-
+              namespace: ytarchive
+              labels:
+                app: ytarchive
+                workflow-type: cleanup-report
+                triggered-by: webhook
+            spec:
+              workflowTemplateRef:
+                name: ytarchive-cleanup-report
+              arguments:
+                parameters:
+                - name: scan-path
+                  value: "/data/videos"
+                - name: report-duplicates
+                  value: "true"
+                - name: report-orphans
+                  value: "true"
+        parameters:
+        - src:
+            dependencyName: cleanup-trigger
+            dataKey: body.scan_path
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}/data/videos{{ end }}"
+          dest: spec.arguments.parameters.0.value
+        - src:
+            dependencyName: cleanup-trigger
+            dataKey: body.report_duplicates
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}true{{ end }}"
+          dest: spec.arguments.parameters.1.value
+        - src:
+            dependencyName: cleanup-trigger
+            dataKey: body.report_orphans
+            dataTemplate: "{{ if .Input }}{{ .Input }}{{ else }}true{{ end }}"
+          dest: spec.arguments.parameters.2.value
+      retryStrategy:
+        steps: 3
+        duration: "30s"
+        factor: 2
+---
+# Service to expose the webhook EventSource
+apiVersion: v1
+kind: Service
+metadata:
+  name: ytarchive-webhook-svc
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: webhook
+spec:
+  type: ClusterIP
+  ports:
+  - port: 12000
+    targetPort: 12000
+    protocol: TCP
+    name: webhook
+  selector:
+    eventsource-name: ytarchive-webhook
+---
+# Ingress for external webhook access (optional, configure as needed)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ytarchive-webhook-ingress
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: webhook
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Add authentication if needed
+    # nginx.ingress.kubernetes.io/auth-type: basic
+    # nginx.ingress.kubernetes.io/auth-secret: webhook-auth
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ytarchive-webhook.example.com  # Change to your domain
+    http:
+      paths:
+      - path: /webhook
+        pathType: Prefix
+        backend:
+          service:
+            name: ytarchive-webhook-svc
+            port:
+              number: 12000
+---
+# RBAC for EventSource and Sensor
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ytarchive-events
+  namespace: ytarchive
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ytarchive-events-role
+  namespace: ytarchive
+rules:
+- apiGroups: ["argoproj.io"]
+  resources: ["workflows", "workflowtemplates"]
+  verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+- apiGroups: ["argoproj.io"]
+  resources: ["eventsources", "sensors", "eventbus"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods", "pods/log", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ytarchive-events-binding
+  namespace: ytarchive
+subjects:
+- kind: ServiceAccount
+  name: ytarchive-events
+  namespace: ytarchive
+roleRef:
+  kind: Role
+  name: ytarchive-events-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,20 @@
+defaultBaseImage: cgr.dev/chainguard/static:latest
+
+# Override base image for worker to include ffmpeg for merging video/audio streams
+# Using mwader/static-ffmpeg which is minimal and multi-arch
+baseImageOverrides:
+  github.com/timholm/ytarchive/cmd/worker: mwader/static-ffmpeg:7.1
+
+builds:
+- id: controller
+  main: ./cmd/controller
+  ldflags:
+    - -s -w
+- id: worker
+  main: ./cmd/worker
+  ldflags:
+    - -s -w
+- id: collector
+  main: ./cmd/collector
+  ldflags:
+    - -s -w

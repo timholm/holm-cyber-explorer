@@ -1,0 +1,19 @@
+# Shared storage PVC using SMB for ReadWriteMany access
+# All workers and controller share this single volume
+# SMB/CIFS supports multiple pods accessing the same storage simultaneously
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ytarchive-data
+  namespace: ytarchive
+  labels:
+    app.kubernetes.io/name: storage
+    app.kubernetes.io/component: data
+    app.kubernetes.io/part-of: ytarchive
+spec:
+  storageClassName: smb
+  accessModes:
+    - ReadWriteMany  # RWX - multiple pods can read/write simultaneously
+  resources:
+    requests:
+      storage: 500Gi

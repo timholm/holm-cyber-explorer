@@ -1,0 +1,237 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: animus-dashboard:apps/Deployment:animus/animus-api
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"animus-dashboard:apps/Deployment:animus/animus-api"},"labels":{"app.kubernetes.io/component":"api","app.kubernetes.io/name":"animus-dashboard"},"name":"animus-api","namespace":"animus"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"api","app.kubernetes.io/name":"animus-dashboard"}},"template":{"metadata":{"labels":{"app.kubernetes.io/component":"api","app.kubernetes.io/name":"animus-dashboard"}},"spec":{"containers":[{"env":[{"name":"PORT","value":"8080"},{"name":"LOKI_URL","value":"http://loki.monitoring.svc.cluster.local:3100"},{"name":"SSH_KEY_PATH","value":"/etc/animus/ssh/id_ed25519"},{"name":"SSH_USER","value":"rpi1"},{"name":"ANSIBLE_PATH","value":"/app/ansible/playbooks"},{"name":"INVENTORY_PATH","value":"/etc/animus/ansible/inventory.ini"},{"name":"CORS_ORIGINS","value":"*"}],"image":"ghcr.io/timholm/animus-dashboard-api:latest","imagePullPolicy":"Always","livenessProbe":{"httpGet":{"path":"/health","port":"http"},"initialDelaySeconds":10,"periodSeconds":10},"name":"api","ports":[{"containerPort":8080,"name":"http"}],"readinessProbe":{"httpGet":{"path":"/health","port":"http"},"initialDelaySeconds":5,"periodSeconds":5},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/etc/animus/ssh","name":"ssh-key","readOnly":true},{"mountPath":"/etc/animus/ansible","name":"ansible-inventory","readOnly":true}]}],"serviceAccountName":"animus-dashboard","volumes":[{"name":"ssh-key","secret":{"defaultMode":384,"secretName":"animus-ssh-key"}},{"configMap":{"name":"animus-ansible-inventory"},"name":"ansible-inventory"}]}}}}
+    creationTimestamp: "2026-01-26T01:32:06Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: api
+      app.kubernetes.io/name: animus-dashboard
+    name: animus-api
+    namespace: animus
+    resourceVersion: "899"
+    uid: 73c6c623-6968-43af-924f-4a6d48919f59
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: api
+        app.kubernetes.io/name: animus-dashboard
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: api
+          app.kubernetes.io/name: animus-dashboard
+      spec:
+        containers:
+        - env:
+          - name: PORT
+            value: "8080"
+          - name: LOKI_URL
+            value: http://loki.monitoring.svc.cluster.local:3100
+          - name: SSH_KEY_PATH
+            value: /etc/animus/ssh/id_ed25519
+          - name: SSH_USER
+            value: rpi1
+          - name: ANSIBLE_PATH
+            value: /app/ansible/playbooks
+          - name: INVENTORY_PATH
+            value: /etc/animus/ansible/inventory.ini
+          - name: CORS_ORIGINS
+            value: '*'
+          image: ghcr.io/timholm/animus-dashboard-api:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: api
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/animus/ssh
+            name: ssh-key
+            readOnly: true
+          - mountPath: /etc/animus/ansible
+            name: ansible-inventory
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: animus-dashboard
+        serviceAccountName: animus-dashboard
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: ssh-key
+          secret:
+            defaultMode: 384
+            secretName: animus-ssh-key
+        - configMap:
+            defaultMode: 420
+            name: animus-ansible-inventory
+          name: ansible-inventory
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-26T01:56:50Z"
+      lastUpdateTime: "2026-01-26T01:56:50Z"
+      message: ReplicaSet "animus-api-5c474bdd44" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:44:31Z"
+      lastUpdateTime: "2026-01-27T02:44:31Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: animus-dashboard:apps/Deployment:animus/animus-frontend
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"animus-dashboard:apps/Deployment:animus/animus-frontend"},"labels":{"app.kubernetes.io/component":"frontend","app.kubernetes.io/name":"animus-dashboard"},"name":"animus-frontend","namespace":"animus"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"frontend","app.kubernetes.io/name":"animus-dashboard"}},"template":{"metadata":{"labels":{"app.kubernetes.io/component":"frontend","app.kubernetes.io/name":"animus-dashboard"}},"spec":{"containers":[{"env":[{"name":"BACKEND_URL","value":"http://animus-api.animus.svc.cluster.local:8080"},{"name":"NEXT_PUBLIC_API_URL","value":""},{"name":"NEXT_PUBLIC_WS_URL","value":""}],"image":"ghcr.io/timholm/animus-dashboard-frontend:latest","imagePullPolicy":"Always","livenessProbe":{"httpGet":{"path":"/","port":"http"},"initialDelaySeconds":10,"periodSeconds":10},"name":"frontend","ports":[{"containerPort":3000,"name":"http"}],"readinessProbe":{"httpGet":{"path":"/","port":"http"},"initialDelaySeconds":5,"periodSeconds":5},"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}}]}}}}
+    creationTimestamp: "2026-01-26T01:32:06Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/name: animus-dashboard
+    name: animus-frontend
+    namespace: animus
+    resourceVersion: "900"
+    uid: 60feabcd-6a1b-4186-b091-5b35f9ab898c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/name: animus-dashboard
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: frontend
+          app.kubernetes.io/name: animus-dashboard
+      spec:
+        containers:
+        - env:
+          - name: BACKEND_URL
+            value: http://animus-api.animus.svc.cluster.local:8080
+          - name: NEXT_PUBLIC_API_URL
+          - name: NEXT_PUBLIC_WS_URL
+          image: ghcr.io/timholm/animus-dashboard-frontend:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: frontend
+          ports:
+          - containerPort: 3000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-26T01:56:04Z"
+      lastUpdateTime: "2026-01-26T01:56:04Z"
+      message: ReplicaSet "animus-frontend-657799c9b8" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:39:24Z"
+      lastUpdateTime: "2026-01-27T02:39:24Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

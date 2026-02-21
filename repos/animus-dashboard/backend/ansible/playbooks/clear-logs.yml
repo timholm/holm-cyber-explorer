@@ -1,0 +1,80 @@
+---
+- name: Clear old log files
+  hosts: "{{ target_hosts | default('all') }}"
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Get disk usage before cleanup
+      command: df -h /
+      register: disk_before
+      changed_when: false
+
+    - name: Display disk usage before
+      debug:
+        msg: "{{ disk_before.stdout_lines }}"
+
+    - name: Rotate and compress logs
+      command: logrotate -f /etc/logrotate.conf
+      ignore_errors: yes
+
+    - name: Clear journal logs older than 3 days
+      command: journalctl --vacuum-time=3d
+      register: journal_cleanup
+      changed_when: "'Vacuuming done' in journal_cleanup.stdout"
+
+    - name: Display journal cleanup result
+      debug:
+        msg: "{{ journal_cleanup.stdout_lines }}"
+
+    - name: Remove old log files
+      find:
+        paths:
+          - /var/log
+        patterns:
+          - "*.gz"
+          - "*.old"
+          - "*.1"
+          - "*.2"
+          - "*.3"
+          - "*.4"
+          - "*.5"
+        age: 7d
+        recurse: yes
+      register: old_logs
+
+    - name: Delete old log files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_logs.files }}"
+      when: old_logs.files | length > 0
+
+    - name: Clear apt cache
+      apt:
+        autoclean: yes
+        autoremove: yes
+
+    - name: Remove orphaned packages
+      command: apt-get autoremove -y
+      register: autoremove
+      changed_when: "'0 upgraded' not in autoremove.stdout"
+
+    - name: Clear thumbnail cache (if exists)
+      file:
+        path: /home/{{ ansible_user }}/.cache/thumbnails
+        state: absent
+      ignore_errors: yes
+
+    - name: Get disk usage after cleanup
+      command: df -h /
+      register: disk_after
+      changed_when: false
+
+    - name: Display disk usage after
+      debug:
+        msg: "{{ disk_after.stdout_lines }}"
+
+    - name: Calculate space freed
+      debug:
+        msg: "Cleanup completed. Check disk usage above for space recovered."

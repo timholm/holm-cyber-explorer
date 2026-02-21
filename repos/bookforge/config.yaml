@@ -1,0 +1,107 @@
+# BookForge Configuration File
+# ============================
+# This file contains the default configuration for BookForge.
+# Values can be overridden by environment variables (BOOKFORGE_SECTION__KEY)
+# or command line arguments.
+
+# Database Configuration
+database:
+  # Path to the SQLite database file
+  path: /home/tim/bookforge/data/bookforge.db
+
+# Ollama LLM Configuration
+ollama:
+  # Ollama API server URL
+  host: http://localhost:11434
+  # Default model for text generation
+  default_model: llama3.2
+  # Request timeout in seconds
+  timeout: 300
+  # Maximum retry attempts for failed requests
+  max_retries: 3
+
+# Piper TTS Configuration
+piper:
+  # Path to the Piper ONNX voice model
+  voice_model_path: /home/tim/bookforge/models/piper/en_US-lessac-medium.onnx
+  # Path to voice config JSON (auto-derived if empty)
+  voice_config_path: ""
+  # Speaker ID for multi-speaker models
+  speaker_id: 0
+  # Speech speed multiplier (lower = faster, 1.0 = normal)
+  length_scale: 1.0
+  # Phoneme noise scale
+  noise_scale: 0.667
+  # Phoneme width noise scale
+  noise_w: 0.8
+
+# Audio Output Configuration
+audio:
+  # Directory for generated audio files
+  output_dir: /home/tim/bookforge/output/audio
+  # Output format: mp3, wav, or ogg
+  format: mp3
+  # Audio sample rate in Hz
+  sample_rate: 22050
+  # MP3/OGG bitrate
+  bitrate: 192k
+
+# Worker Configuration
+worker:
+  # Number of parallel workers for generation tasks
+  num_workers: 4
+  # Timeout per chunk in seconds
+  chunk_timeout: 600
+  # Maximum queue size for pending tasks
+  max_queue_size: 100
+  # Whether to retry failed chunks
+  retry_failed: true
+  # Maximum retry attempts per chunk
+  max_retries: 3
+
+# Content Generation Defaults
+content:
+  # Default number of chapters per book
+  default_chapter_count: 10
+  # Target words per chapter
+  words_per_chapter: 3000
+  # Target words per section/scene
+  words_per_section: 500
+  # Minimum allowed word count
+  min_word_count: 100
+  # Maximum allowed word count
+  max_word_count: 10000
+  # Default genre for new books
+  default_genre: fiction
+  # Default writing style
+  default_style: descriptive
+
+# Web Server Configuration
+server:
+  # Server bind address (0.0.0.0 for all interfaces)
+  host: 0.0.0.0
+  # Server port number
+  port: 5000
+  # Enable debug mode (disable in production!)
+  debug: false
+  # Enable threaded request handling
+  threaded: true
+  # Secret key for sessions (leave empty to auto-generate)
+  secret_key: ""
+  # Maximum upload file size in bytes (16MB)
+  max_content_length: 16777216
+
+# Logging Configuration
+log:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: INFO
+  # Path to log file
+  path: /home/tim/bookforge/logs/bookforge.log
+  # Log message format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  # Maximum log file size in bytes (10MB)
+  max_bytes: 10485760
+  # Number of backup log files to keep
+  backup_count: 5
+  # Enable console output
+  console_output: true

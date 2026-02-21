@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "holm-mind.fullname" . }}
+  labels:
+    {{- include "holm-mind.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "holm-mind.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config-server: {{ include (print $.Template.BasePath "/configmap-server.yaml") . | sha256sum }}
+        checksum/config-html: {{ include (print $.Template.BasePath "/configmap-html.yaml") . | sha256sum }}
+      labels:
+        {{- include "holm-mind.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "holm-mind.serviceAccountName" . }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "{{ .Values.service.targetPort }}"
+        - name: AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.auth.secretName }}
+              key: {{ .Values.auth.secretKey }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.probes.liveness.path }}
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.probes.readiness.path }}
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+        volumeMounts:
+        - name: server-code
+          mountPath: /app/server.js
+          subPath: server.js
+        - name: html-code
+          mountPath: /app/public/index.html
+          subPath: index.html
+        {{- with .Values.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      volumes:
+      - name: server-code
+        configMap:
+          name: {{ include "holm-mind.fullname" . }}-server
+      - name: html-code
+        configMap:
+          name: {{ include "holm-mind.fullname" . }}-html

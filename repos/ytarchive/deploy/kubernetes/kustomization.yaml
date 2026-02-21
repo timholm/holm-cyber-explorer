@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ytarchive
+
+metadata:
+  labels:
+    app.kubernetes.io/part-of: ytarchive
+    app.kubernetes.io/managed-by: kustomize
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - rbac.yaml
+  # PVC: Uses existing ytarchive-data-qnap (QNAP iSCSI)
+  - redis.yaml
+  - postgres.yaml   # PostgreSQL for metadata and collection tracking
+  - collector.yaml  # Storage collector - single pod with iSCSI mount
+  - controller.yaml
+  - controller-service.yaml
+  - controller-nodeport.yaml
+  - worker-deployment.yaml
+  - httproute.yaml
+  - hpa.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: ytarchive
+
+images:
+  - name: ko://github.com/timholm/ytarchive/cmd/controller
+    newName: ko://github.com/timholm/ytarchive/cmd/controller
+  - name: ko://github.com/timholm/ytarchive/cmd/worker
+    newName: ko://github.com/timholm/ytarchive/cmd/worker
+  - name: ko://github.com/timholm/ytarchive/cmd/collector
+    newName: ko://github.com/timholm/ytarchive/cmd/collector
+
+# Uncomment to use a specific image tag
+# images:
+#   - name: ko://github.com/timholm/ytarchive/cmd/controller
+#     newTag: v1.0.0
+#   - name: ko://github.com/timholm/ytarchive/cmd/worker
+#     newTag: v1.0.0

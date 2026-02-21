@@ -1,0 +1,361 @@
+# Full Channel Download Workflow Template
+# This workflow downloads all videos from a YouTube channel
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ytarchive-full-download
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: workflow
+spec:
+  entrypoint: download-channel
+  serviceAccountName: ytarchive-workflow
+
+  # Workflow-level retry strategy
+  retryStrategy:
+    limit: 3
+    retryPolicy: "Always"
+    backoff:
+      duration: "30s"
+      factor: 2
+      maxDuration: "10m"
+
+  # Volume configuration for iSCSI PVC
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+  - name: logs-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+
+  arguments:
+    parameters:
+    - name: channel-url
+      description: "YouTube channel URL to download"
+    - name: batch-size
+      value: "10"
+      description: "Number of videos per batch"
+    - name: max-workers
+      value: "20"
+      description: "Maximum number of parallel download workers"
+    - name: channel-id
+      value: ""
+      description: "Internal channel ID (optional, will be resolved from URL)"
+
+  templates:
+  # Main workflow entry point
+  - name: download-channel
+    steps:
+    # Step 1: Fetch the list of all videos from the channel
+    - - name: fetch-video-list
+        template: fetch-videos
+        arguments:
+          parameters:
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+
+    # Step 2: Calculate batches based on video count
+    - - name: calculate-batches
+        template: split-batches
+        arguments:
+          parameters:
+          - name: video-list
+            value: "{{steps.fetch-video-list.outputs.parameters.video-list}}"
+          - name: batch-size
+            value: "{{workflow.parameters.batch-size}}"
+          - name: max-workers
+            value: "{{workflow.parameters.max-workers}}"
+
+    # Step 3: Download videos in parallel batches
+    - - name: download-batch
+        template: download-worker
+        withParam: "{{steps.calculate-batches.outputs.result}}"
+        arguments:
+          parameters:
+          - name: batch-data
+            value: "{{item}}"
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+
+    # Step 4: Verify all downloads completed successfully
+    - - name: verify-downloads
+        template: verify
+        arguments:
+          parameters:
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+          - name: expected-count
+            value: "{{steps.fetch-video-list.outputs.parameters.video-count}}"
+
+    # Step 5: Update channel status in database
+    - - name: update-status
+        template: update-channel-status
+        arguments:
+          parameters:
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+          - name: status
+            value: "completed"
+          - name: verification-result
+            value: "{{steps.verify-downloads.outputs.parameters.result}}"
+
+  # Template: Fetch all videos from a YouTube channel
+  - name: fetch-videos
+    inputs:
+      parameters:
+      - name: channel-url
+    outputs:
+      parameters:
+      - name: video-list
+        valueFrom:
+          path: /tmp/video-list.json
+      - name: video-count
+        valueFrom:
+          path: /tmp/video-count.txt
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "30s"
+        factor: 2
+        maxDuration: "5m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=fetch"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--output=/tmp/video-list.json"
+      - "--count-output=/tmp/video-count.txt"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
+  # Template: Split video list into batches for parallel processing
+  - name: split-batches
+    inputs:
+      parameters:
+      - name: video-list
+      - name: batch-size
+      - name: max-workers
+    script:
+      image: python:3.11-alpine
+      command: [python]
+      source: |
+        import json
+        import sys
+
+        video_list = json.loads('''{{inputs.parameters.video-list}}''')
+        batch_size = int({{inputs.parameters.batch-size}})
+        max_workers = int({{inputs.parameters.max-workers}})
+
+        # Split videos into batches
+        batches = []
+        for i in range(0, len(video_list), batch_size):
+            batch = video_list[i:i + batch_size]
+            batches.append({
+                "batch_id": len(batches),
+                "videos": batch,
+                "count": len(batch)
+            })
+
+        # Limit to max_workers concurrent batches
+        # If more batches than workers, they'll be processed in rounds
+        output = json.dumps(batches[:max_workers] if len(batches) > max_workers else batches)
+        print(output)
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+
+  # Template: Download a batch of videos
+  - name: download-worker
+    inputs:
+      parameters:
+      - name: batch-data
+      - name: channel-url
+    outputs:
+      parameters:
+      - name: result
+        valueFrom:
+          path: /tmp/download-result.json
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "1m"
+        factor: 2
+        maxDuration: "15m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/worker
+      command: ["/ko-app/worker"]
+      args:
+      - "--mode=download"
+      - "--batch-data={{inputs.parameters.batch-data}}"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--output-dir=/data/videos"
+      - "--result-file=/tmp/download-result.json"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: YTDLP_FORMAT
+        value: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "2Gi"
+          cpu: "1000m"
+
+  # Template: Verify all downloads completed
+  - name: verify
+    inputs:
+      parameters:
+      - name: channel-url
+      - name: expected-count
+    outputs:
+      parameters:
+      - name: result
+        valueFrom:
+          path: /tmp/verification-result.json
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/worker
+      command: ["/ko-app/worker"]
+      args:
+      - "--mode=verify"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--expected-count={{inputs.parameters.expected-count}}"
+      - "--data-dir=/data/videos"
+      - "--result-file=/tmp/verification-result.json"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "256Mi"
+          cpu: "250m"
+
+  # Template: Update channel status in database
+  - name: update-channel-status
+    inputs:
+      parameters:
+      - name: channel-url
+      - name: status
+      - name: verification-result
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=status-update"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--status={{inputs.parameters.status}}"
+      - "--verification-result={{inputs.parameters.verification-result}}"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      volumeMounts:
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+---
+# RBAC for the workflow
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ytarchive-workflow
+  namespace: ytarchive
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ytarchive-workflow-role
+  namespace: ytarchive
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: ["argoproj.io"]
+  resources: ["workflows", "workflowtemplates"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ytarchive-workflow-binding
+  namespace: ytarchive
+subjects:
+- kind: ServiceAccount
+  name: ytarchive-workflow
+  namespace: ytarchive
+roleRef:
+  kind: Role
+  name: ytarchive-workflow-role
+  apiGroup: rbac.authorization.k8s.io

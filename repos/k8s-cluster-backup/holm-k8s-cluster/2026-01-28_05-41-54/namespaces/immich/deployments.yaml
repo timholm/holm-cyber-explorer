@@ -1,0 +1,336 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: immich:apps/Deployment:immich/immich-machine-learning
+      deployment.kubernetes.io/revision: "11"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"immich:apps/Deployment:immich/immich-machine-learning"},"labels":{"app.kubernetes.io/controller":"main","app.kubernetes.io/instance":"immich","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"machine-learning","app.kubernetes.io/version":"v2.0.0","helm.sh/chart":"immich-0.10.3"},"name":"immich-machine-learning","namespace":"immich"},"spec":{"replicas":1,"revisionHistoryLimit":3,"selector":{"matchLabels":{"app.kubernetes.io/controller":"main","app.kubernetes.io/instance":"immich","app.kubernetes.io/name":"machine-learning"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app.kubernetes.io/controller":"main","app.kubernetes.io/instance":"immich","app.kubernetes.io/name":"machine-learning"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"HF_XET_CACHE","value":"/cache/huggingface-xet"},{"name":"IMMICH_MACHINE_LEARNING_URL","value":"http://immich-machine-learning:3003"},{"name":"MPLCONFIGDIR","value":"/cache/matplotlib-config"},{"name":"REDIS_HOSTNAME","value":"immich-valkey"},{"name":"TRANSFORMERS_CACHE","value":"/cache"}],"image":"ghcr.io/immich-app/immich-machine-learning:v2.5.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/ping","port":"http"},"initialDelaySeconds":0,"periodSeconds":10,"timeoutSeconds":1},"name":"main","ports":[{"containerPort":3003,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/ping","port":"http"},"initialDelaySeconds":0,"periodSeconds":10,"timeoutSeconds":1},"startupProbe":{"failureThreshold":60,"httpGet":{"path":"/ping","port":"http"},"initialDelaySeconds":0,"periodSeconds":10,"timeoutSeconds":1},"volumeMounts":[{"mountPath":"/cache","name":"cache"}]}],"dnsPolicy":"ClusterFirst","enableServiceLinks":false,"hostIPC":false,"hostNetwork":false,"hostPID":false,"serviceAccountName":"default","volumes":[{"name":"cache","persistentVolumeClaim":{"claimName":"immich-ml-cache"}}]}}}}
+    creationTimestamp: "2026-01-19T05:06:53Z"
+    generation: 11
+    labels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: immich
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: machine-learning
+      app.kubernetes.io/version: v2.0.0
+      helm.sh/chart: immich-0.10.3
+    name: immich-machine-learning
+    namespace: immich
+    resourceVersion: "925538"
+    uid: 47668596-dbe0-47b1-95ad-b607bb05d146
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: immich
+        app.kubernetes.io/name: machine-learning
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-27T05:31:35-08:00"
+        labels:
+          app.kubernetes.io/controller: main
+          app.kubernetes.io/instance: immich
+          app.kubernetes.io/name: machine-learning
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - env:
+          - name: HF_XET_CACHE
+            value: /cache/huggingface-xet
+          - name: IMMICH_MACHINE_LEARNING_URL
+            value: http://immich-machine-learning:3003
+          - name: MPLCONFIGDIR
+            value: /cache/matplotlib-config
+          - name: REDIS_HOSTNAME
+            value: immich-valkey
+          - name: TRANSFORMERS_CACHE
+            value: /cache
+          image: ghcr.io/immich-app/immich-machine-learning:v2.5.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: main
+          ports:
+          - containerPort: 3003
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /ping
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /cache
+            name: cache
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: false
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: default
+        serviceAccountName: default
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: immich-ml-cache
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-27T14:07:26Z"
+      lastUpdateTime: "2026-01-27T19:56:38Z"
+      message: ReplicaSet "immich-machine-learning-66dd544bd8" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-28T04:05:47Z"
+      lastUpdateTime: "2026-01-28T04:05:47Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 11
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"immich-redis","namespace":"immich"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"immich-redis"}},"template":{"metadata":{"labels":{"app":"immich-redis"}},"spec":{"containers":[{"image":"redis:7","name":"redis","ports":[{"containerPort":6379}]}]}}}}
+    creationTimestamp: "2026-01-19T05:06:55Z"
+    generation: 1
+    name: immich-redis
+    namespace: immich
+    resourceVersion: "1001"
+    uid: 43c7e7d2-7fe9-4898-80c7-9a6643168adc
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: immich-redis
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: immich-redis
+      spec:
+        containers:
+        - image: redis:7
+          imagePullPolicy: IfNotPresent
+          name: redis
+          ports:
+          - containerPort: 6379
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-19T05:06:55Z"
+      lastUpdateTime: "2026-01-19T05:07:41Z"
+      message: ReplicaSet "immich-redis-64fcdccc4b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T01:12:26Z"
+      lastUpdateTime: "2026-01-27T01:12:26Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: immich:apps/Deployment:immich/immich-server
+      deployment.kubernetes.io/revision: "20"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"immich:apps/Deployment:immich/immich-server"},"labels":{"app.kubernetes.io/controller":"main","app.kubernetes.io/instance":"immich","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"server","app.kubernetes.io/version":"v2.0.0","helm.sh/chart":"immich-0.10.3"},"name":"immich-server","namespace":"immich"},"spec":{"replicas":1,"revisionHistoryLimit":3,"selector":{"matchLabels":{"app.kubernetes.io/controller":"main","app.kubernetes.io/instance":"immich","app.kubernetes.io/name":"server"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app.kubernetes.io/controller":"main","app.kubernetes.io/instance":"immich","app.kubernetes.io/name":"server"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"IMMICH_MACHINE_LEARNING_URL","value":"http://immich-machine-learning:3003"},{"name":"REDIS_HOSTNAME","value":"immich-valkey"}],"image":"ghcr.io/immich-app/immich-server:v2.5.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/server/ping","port":"http"},"initialDelaySeconds":0,"periodSeconds":10,"timeoutSeconds":1},"name":"main","ports":[{"containerPort":2283,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/api/server/ping","port":"http"},"initialDelaySeconds":0,"periodSeconds":10,"timeoutSeconds":1},"startupProbe":{"failureThreshold":30,"httpGet":{"path":"/api/server/ping","port":"http"},"initialDelaySeconds":0,"periodSeconds":10,"timeoutSeconds":1},"volumeMounts":[{"mountPath":"/data","name":"data"}]}],"dnsPolicy":"ClusterFirst","enableServiceLinks":false,"hostIPC":false,"hostNetwork":false,"hostPID":false,"serviceAccountName":"default","volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"immich-library-iscsi"}}]}}}}
+    creationTimestamp: "2026-01-19T05:06:53Z"
+    generation: 30
+    labels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: immich
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: server
+      app.kubernetes.io/version: v2.0.0
+      helm.sh/chart: immich-0.10.3
+    name: immich-server
+    namespace: immich
+    resourceVersion: "925424"
+    uid: 786987be-2f49-4e17-a8f5-2b835fb6d50c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: immich
+        app.kubernetes.io/name: server
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-28T00:04:02Z"
+        labels:
+          app.kubernetes.io/controller: main
+          app.kubernetes.io/instance: immich
+          app.kubernetes.io/name: server
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - env:
+          - name: IMMICH_MACHINE_LEARNING_URL
+            value: http://immich-machine-learning:3003
+          - name: REDIS_HOSTNAME
+            value: immich-valkey
+          - name: DB_HOSTNAME
+            value: immich-postgres
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_USER
+                name: immich-postgres-secret
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_PASSWORD
+                name: immich-postgres-secret
+          - name: DB_DATABASE_NAME
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_DB
+                name: immich-postgres-secret
+          image: ghcr.io/immich-app/immich-server:v2.5.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: main
+          ports:
+          - containerPort: 2283
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /api/server/ping
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: false
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: default
+        serviceAccountName: default
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: immich-library-iscsi
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-28T01:44:01Z"
+      lastUpdateTime: "2026-01-28T01:50:01Z"
+      message: ReplicaSet "immich-server-5478c68ff8" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-28T04:05:42Z"
+      lastUpdateTime: "2026-01-28T04:05:42Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 30
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

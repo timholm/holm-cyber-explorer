@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "claude-code-gitea-actions.fullname" . }}
+  labels:
+    {{- include "claude-code-gitea-actions.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.targetPort }}
+    protocol: TCP
+  selector:
+    {{- include "claude-code-gitea-actions.selectorLabels" . | nindent 4 }}

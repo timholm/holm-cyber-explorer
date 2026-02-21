@@ -1,0 +1,502 @@
+# Cleanup Report Workflow Template
+# This workflow analyzes storage usage, finds duplicates, and generates reports
+# IMPORTANT: This workflow NEVER auto-deletes files - it only generates reports
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ytarchive-cleanup-report
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: workflow
+spec:
+  entrypoint: generate-cleanup-report
+  serviceAccountName: ytarchive-workflow
+
+  # Volume configuration for iSCSI PVC
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+  - name: logs-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+
+  arguments:
+    parameters:
+    - name: scan-path
+      value: "/data/videos"
+      description: "Path to scan for videos"
+    - name: report-duplicates
+      value: "true"
+      description: "Include duplicate file detection in report"
+    - name: report-orphans
+      value: "true"
+      description: "Include orphaned files (not in database) in report"
+    - name: report-storage
+      value: "true"
+      description: "Include storage usage analysis"
+    - name: report-format
+      value: "json"
+      description: "Report format (json, html, markdown)"
+
+  templates:
+  # Main workflow entry point
+  - name: generate-cleanup-report
+    steps:
+    # Step 1: Scan storage usage
+    - - name: scan-storage
+        template: analyze-storage
+        arguments:
+          parameters:
+          - name: scan-path
+            value: "{{workflow.parameters.scan-path}}"
+
+    # Step 2: Find duplicate files (in parallel with orphan detection)
+    - - name: find-duplicates
+        template: detect-duplicates
+        when: "{{workflow.parameters.report-duplicates}} == true"
+        arguments:
+          parameters:
+          - name: scan-path
+            value: "{{workflow.parameters.scan-path}}"
+      - name: find-orphans
+        template: detect-orphans
+        when: "{{workflow.parameters.report-orphans}} == true"
+        arguments:
+          parameters:
+          - name: scan-path
+            value: "{{workflow.parameters.scan-path}}"
+
+    # Step 3: Generate comprehensive report
+    - - name: compile-report
+        template: generate-report
+        arguments:
+          parameters:
+          - name: storage-data
+            value: "{{steps.scan-storage.outputs.parameters.storage-report}}"
+          - name: duplicates-data
+            value: "{{steps.find-duplicates.outputs.parameters.duplicates}}"
+          - name: orphans-data
+            value: "{{steps.find-orphans.outputs.parameters.orphans}}"
+          - name: report-format
+            value: "{{workflow.parameters.report-format}}"
+
+    # Step 4: Post report to Web UI
+    - - name: post-to-webui
+        template: publish-report
+        arguments:
+          parameters:
+          - name: report
+            value: "{{steps.compile-report.outputs.parameters.final-report}}"
+          - name: report-type
+            value: "cleanup-analysis"
+
+  # Template: Analyze storage usage
+  - name: analyze-storage
+    inputs:
+      parameters:
+      - name: scan-path
+    outputs:
+      parameters:
+      - name: storage-report
+        valueFrom:
+          path: /tmp/storage-report.json
+    retryStrategy:
+      limit: 2
+      retryPolicy: "Always"
+      backoff:
+        duration: "30s"
+        factor: 2
+        maxDuration: "5m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/worker
+      command: ["/ko-app/worker"]
+      args:
+      - "--mode=analyze"
+      - "--scan-path={{inputs.parameters.scan-path}}"
+      - "--output=/tmp/storage-report.json"
+      - "--log-dir=/data/logs"
+      - "--analysis-type=storage-usage"
+      env:
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+        readOnly: true  # Read-only to prevent accidental modifications
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "100m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+
+  # Template: Detect duplicate files using hash comparison
+  - name: detect-duplicates
+    inputs:
+      parameters:
+      - name: scan-path
+    outputs:
+      parameters:
+      - name: duplicates
+        valueFrom:
+          path: /tmp/duplicates.json
+          default: "[]"
+    retryStrategy:
+      limit: 2
+      retryPolicy: "Always"
+      backoff:
+        duration: "30s"
+        factor: 2
+        maxDuration: "5m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/worker
+      command: ["/ko-app/worker"]
+      args:
+      - "--mode=analyze"
+      - "--scan-path={{inputs.parameters.scan-path}}"
+      - "--output=/tmp/duplicates.json"
+      - "--log-dir=/data/logs"
+      - "--analysis-type=find-duplicates"
+      - "--hash-algorithm=xxhash"  # Fast hashing for large files
+      env:
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+        readOnly: true  # Read-only to prevent accidental modifications
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "2Gi"
+          cpu: "1000m"
+
+  # Template: Detect orphaned files (files not in database)
+  - name: detect-orphans
+    inputs:
+      parameters:
+      - name: scan-path
+    outputs:
+      parameters:
+      - name: orphans
+        valueFrom:
+          path: /tmp/orphans.json
+          default: "[]"
+    retryStrategy:
+      limit: 2
+      retryPolicy: "Always"
+      backoff:
+        duration: "30s"
+        factor: 2
+        maxDuration: "5m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/worker
+      command: ["/ko-app/worker"]
+      args:
+      - "--mode=analyze"
+      - "--scan-path={{inputs.parameters.scan-path}}"
+      - "--output=/tmp/orphans.json"
+      - "--log-dir=/data/logs"
+      - "--analysis-type=find-orphans"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+        readOnly: true  # Read-only to prevent accidental modifications
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
+  # Template: Generate comprehensive cleanup report
+  - name: generate-report
+    inputs:
+      parameters:
+      - name: storage-data
+      - name: duplicates-data
+      - name: orphans-data
+      - name: report-format
+    outputs:
+      parameters:
+      - name: final-report
+        valueFrom:
+          path: /tmp/final-report.json
+      artifacts:
+      - name: cleanup-report
+        path: /tmp/cleanup-report
+        archive:
+          none: {}
+    script:
+      image: python:3.11-alpine
+      command: [python]
+      source: |
+        import json
+        import os
+        from datetime import datetime
+
+        # Parse input data
+        storage_data = json.loads('''{{inputs.parameters.storage-data}}''') if '''{{inputs.parameters.storage-data}}''' else {}
+        duplicates_data = json.loads('''{{inputs.parameters.duplicates-data}}''') if '''{{inputs.parameters.duplicates-data}}''' else []
+        orphans_data = json.loads('''{{inputs.parameters.orphans-data}}''') if '''{{inputs.parameters.orphans-data}}''' else []
+        report_format = '{{inputs.parameters.report-format}}'
+
+        # Calculate summary statistics
+        total_duplicate_size = sum(d.get('size', 0) * (d.get('count', 1) - 1) for d in duplicates_data)
+        total_orphan_size = sum(o.get('size', 0) for o in orphans_data)
+        potential_savings = total_duplicate_size + total_orphan_size
+
+        # Build comprehensive report
+        report = {
+            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "report_type": "cleanup-analysis",
+            "summary": {
+                "total_storage_used": storage_data.get("total_size", 0),
+                "total_files": storage_data.get("total_files", 0),
+                "total_videos": storage_data.get("video_count", 0),
+                "duplicate_sets": len(duplicates_data),
+                "duplicate_files": sum(d.get("count", 0) - 1 for d in duplicates_data),
+                "duplicate_size_bytes": total_duplicate_size,
+                "orphaned_files": len(orphans_data),
+                "orphan_size_bytes": total_orphan_size,
+                "potential_savings_bytes": potential_savings,
+                "potential_savings_readable": format_size(potential_savings)
+            },
+            "storage_breakdown": storage_data.get("breakdown", {}),
+            "duplicates": {
+                "description": "Files with identical content (by hash comparison)",
+                "note": "REVIEW BEFORE TAKING ANY ACTION - NO AUTO-DELETE",
+                "items": duplicates_data[:100]  # Limit to first 100 for report size
+            },
+            "orphans": {
+                "description": "Files on disk not tracked in database",
+                "note": "REVIEW BEFORE TAKING ANY ACTION - NO AUTO-DELETE",
+                "items": orphans_data[:100]  # Limit to first 100 for report size
+            },
+            "recommendations": generate_recommendations(storage_data, duplicates_data, orphans_data),
+            "disclaimer": "This report is for analysis only. NO files have been or will be automatically deleted. Manual review and confirmation is required before any cleanup actions."
+        }
+
+        # Write JSON report
+        with open('/tmp/final-report.json', 'w') as f:
+            json.dump(report, f, indent=2)
+
+        # Create report directory
+        os.makedirs('/tmp/cleanup-report', exist_ok=True)
+
+        # Write in requested format
+        if report_format == 'json':
+            with open('/tmp/cleanup-report/report.json', 'w') as f:
+                json.dump(report, f, indent=2)
+        elif report_format == 'markdown':
+            md_content = generate_markdown(report)
+            with open('/tmp/cleanup-report/report.md', 'w') as f:
+                f.write(md_content)
+        elif report_format == 'html':
+            html_content = generate_html(report)
+            with open('/tmp/cleanup-report/report.html', 'w') as f:
+                f.write(html_content)
+
+        # Always include JSON for programmatic access
+        with open('/tmp/cleanup-report/report.json', 'w') as f:
+            json.dump(report, f, indent=2)
+
+        print(f"Report generated: {len(duplicates_data)} duplicate sets, {len(orphans_data)} orphans")
+        print(f"Potential savings: {format_size(potential_savings)}")
+
+        def format_size(bytes_size):
+            for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+                if bytes_size < 1024:
+                    return f"{bytes_size:.2f} {unit}"
+                bytes_size /= 1024
+            return f"{bytes_size:.2f} PB"
+
+        def generate_recommendations(storage, duplicates, orphans):
+            recommendations = []
+            if len(duplicates) > 0:
+                recommendations.append({
+                    "priority": "medium",
+                    "action": "Review duplicate files",
+                    "description": f"Found {len(duplicates)} sets of duplicate files. Review and manually remove duplicates if appropriate."
+                })
+            if len(orphans) > 0:
+                recommendations.append({
+                    "priority": "low",
+                    "action": "Review orphaned files",
+                    "description": f"Found {len(orphans)} files not tracked in database. These may be incomplete downloads or manually added files."
+                })
+            if storage.get("total_size", 0) > 1099511627776:  # > 1TB
+                recommendations.append({
+                    "priority": "info",
+                    "action": "Consider archival strategy",
+                    "description": "Storage exceeds 1TB. Consider implementing cold storage for older videos."
+                })
+            return recommendations
+
+        def generate_markdown(report):
+            md = f"""# YouTube Archiver Cleanup Report
+
+        Generated: {report['generated_at']}
+
+        ## Summary
+
+        | Metric | Value |
+        |--------|-------|
+        | Total Storage Used | {format_size(report['summary']['total_storage_used'])} |
+        | Total Files | {report['summary']['total_files']} |
+        | Total Videos | {report['summary']['total_videos']} |
+        | Duplicate Sets | {report['summary']['duplicate_sets']} |
+        | Orphaned Files | {report['summary']['orphaned_files']} |
+        | **Potential Savings** | **{report['summary']['potential_savings_readable']}** |
+
+        ## Important Notice
+
+        {report['disclaimer']}
+
+        ## Recommendations
+
+        """
+            for rec in report.get('recommendations', []):
+                md += f"- **[{rec['priority'].upper()}]** {rec['action']}: {rec['description']}\n"
+
+            return md
+
+        def generate_html(report):
+            return f"""<!DOCTYPE html>
+        <html>
+        <head><title>Cleanup Report</title></head>
+        <body>
+        <h1>YouTube Archiver Cleanup Report</h1>
+        <p>Generated: {report['generated_at']}</p>
+        <h2>Summary</h2>
+        <ul>
+        <li>Total Storage: {format_size(report['summary']['total_storage_used'])}</li>
+        <li>Duplicate Sets: {report['summary']['duplicate_sets']}</li>
+        <li>Orphaned Files: {report['summary']['orphaned_files']}</li>
+        <li><strong>Potential Savings: {report['summary']['potential_savings_readable']}</strong></li>
+        </ul>
+        <p><em>{report['disclaimer']}</em></p>
+        </body>
+        </html>"""
+      volumeMounts:
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "250m"
+
+  # Template: Publish report to Web UI
+  - name: publish-report
+    inputs:
+      parameters:
+      - name: report
+      - name: report-type
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "10s"
+        factor: 2
+        maxDuration: "2m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=report"
+      - "--publish-mode=true"
+      - "--report-data={{inputs.parameters.report}}"
+      - "--report-type={{inputs.parameters.report-type}}"
+      - "--log-dir=/data/logs"
+      - "--target=webui"
+      - "--save-to-disk=/data/reports"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: WEBUI_URL
+        valueFrom:
+          configMapKeyRef:
+            name: ytarchive-config
+            key: webui-url
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+---
+# CronWorkflow for scheduled cleanup reports (weekly)
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: ytarchive-weekly-cleanup-report
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: cron-workflow
+spec:
+  # Run every Sunday at 2 AM UTC
+  schedule: "0 2 * * 0"
+  timezone: "UTC"
+  concurrencyPolicy: Forbid  # Don't run if previous still running
+  successfulJobsHistoryLimit: 4  # Keep last 4 weeks
+  failedJobsHistoryLimit: 2
+  startingDeadlineSeconds: 600
+  suspend: false
+
+  workflowSpec:
+    workflowTemplateRef:
+      name: ytarchive-cleanup-report
+    arguments:
+      parameters:
+      - name: scan-path
+        value: "/data/videos"
+      - name: report-duplicates
+        value: "true"
+      - name: report-orphans
+        value: "true"
+      - name: report-storage
+        value: "true"
+      - name: report-format
+        value: "json"

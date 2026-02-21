@@ -1,0 +1,181 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-20T01:19:09Z"
+    name: kube-root-ca.crt
+    namespace: kube-sentinel
+    resourceVersion: "774"
+    uid: e4e5fe11-4aa9-44a7-b603-d085e15673a4
+- apiVersion: v1
+  data:
+    config.yaml: |
+      loki:
+        url: http://loki.monitoring.svc.cluster.local:3100
+        query: '{namespace=~".+"} |~ "(?i)(error|fatal|panic|exception|fail)"'
+        poll_interval: 30s
+        lookback: 5m
+
+      kubernetes:
+        in_cluster: true
+
+      web:
+        listen: ":8080"
+        base_path: /kube-sentinel
+
+      remediation:
+        enabled: true
+        dry_run: false
+        max_actions_per_hour: 50
+        excluded_namespaces:
+          - kube-system
+          - kube-public
+          - monitoring
+          - logging
+          - kube-sentinel
+
+      rules_file: /etc/kube-sentinel/rules.yaml
+
+      store:
+        type: memory
+    rules.yaml: |
+      rules:
+        # P1 - Critical errors requiring immediate attention
+        - name: crashloop-backoff
+          match:
+            pattern: "CrashLoopBackOff|Back-off restarting failed container"
+          priority: P1
+          remediation:
+            action: restart-pod
+            cooldown: 5m
+          enabled: true
+
+        - name: oom-killed
+          match:
+            pattern: "OOMKilled|Out of memory|memory cgroup out of memory"
+          priority: P1
+          remediation:
+            action: none
+            cooldown: 10m
+          enabled: true
+
+        - name: panic
+          match:
+            pattern: "panic:|runtime error:|fatal error:"
+          priority: P1
+          remediation:
+            action: none
+            cooldown: 5m
+          enabled: true
+
+        # P2 - High priority errors
+        - name: image-pull-error
+          match:
+            pattern: "ImagePullBackOff|ErrImagePull|failed to pull image"
+          priority: P2
+          remediation:
+            action: none
+            cooldown: 5m
+          enabled: true
+
+        - name: probe-failed
+          match:
+            pattern: "Readiness probe failed|Liveness probe failed"
+          priority: P2
+          remediation:
+            action: restart-pod
+            cooldown: 3m
+          enabled: true
+
+        - name: volume-mount-failed
+          match:
+            pattern: "Unable to attach or mount|FailedMount"
+          priority: P2
+          remediation:
+            action: none
+            cooldown: 5m
+          enabled: true
+
+        # P3 - Medium priority errors
+        - name: dns-error
+          match:
+            pattern: "EAI_AGAIN|NXDOMAIN|no such host"
+          priority: P3
+          remediation:
+            action: none
+            cooldown: 2m
+          enabled: true
+
+        - name: connection-refused
+          match:
+            pattern: "connection refused|ECONNREFUSED"
+          priority: P3
+          remediation:
+            action: none
+            cooldown: 2m
+          enabled: true
+
+        - name: timeout-error
+          match:
+            pattern: "timeout|timed out|deadline exceeded"
+          priority: P3
+          remediation:
+            action: none
+            cooldown: 2m
+          enabled: true
+
+        # P4 - Low priority / Informational
+        - name: generic-error
+          match:
+            pattern: "error"
+          priority: P4
+          remediation:
+            action: none
+            cooldown: 5m
+          enabled: true
+
+        # Default catch-all rule - MUST BE LAST
+        - name: default
+          match:
+            pattern: "."
+          priority: P4
+          remediation:
+            action: none
+            cooldown: 5m
+          enabled: true
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: kube-sentinel:/ConfigMap:kube-sentinel/kube-sentinel-config
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.yaml":"loki:\n  url: http://loki.monitoring.svc.cluster.local:3100\n  query: '{namespace=~\".+\"} |~ \"(?i)(error|fatal|panic|exception|fail)\"'\n  poll_interval: 30s\n  lookback: 5m\n\nkubernetes:\n  in_cluster: true\n\nweb:\n  listen: \":8080\"\n  base_path: /kube-sentinel\n\nremediation:\n  enabled: true\n  dry_run: false\n  max_actions_per_hour: 50\n  excluded_namespaces:\n    - kube-system\n    - kube-public\n    - monitoring\n    - logging\n    - kube-sentinel\n\nrules_file: /etc/kube-sentinel/rules.yaml\n\nstore:\n  type: memory\n","rules.yaml":"rules:\n  # P1 - Critical errors requiring immediate attention\n  - name: crashloop-backoff\n    match:\n      pattern: \"CrashLoopBackOff|Back-off restarting failed container\"\n    priority: P1\n    remediation:\n      action: restart-pod\n      cooldown: 5m\n    enabled: true\n\n  - name: oom-killed\n    match:\n      pattern: \"OOMKilled|Out of memory|memory cgroup out of memory\"\n    priority: P1\n    remediation:\n      action: none\n      cooldown: 10m\n    enabled: true\n\n  - name: panic\n    match:\n      pattern: \"panic:|runtime error:|fatal error:\"\n    priority: P1\n    remediation:\n      action: none\n      cooldown: 5m\n    enabled: true\n\n  # P2 - High priority errors\n  - name: image-pull-error\n    match:\n      pattern: \"ImagePullBackOff|ErrImagePull|failed to pull image\"\n    priority: P2\n    remediation:\n      action: none\n      cooldown: 5m\n    enabled: true\n\n  - name: probe-failed\n    match:\n      pattern: \"Readiness probe failed|Liveness probe failed\"\n    priority: P2\n    remediation:\n      action: restart-pod\n      cooldown: 3m\n    enabled: true\n\n  - name: volume-mount-failed\n    match:\n      pattern: \"Unable to attach or mount|FailedMount\"\n    priority: P2\n    remediation:\n      action: none\n      cooldown: 5m\n    enabled: true\n\n  # P3 - Medium priority errors\n  - name: dns-error\n    match:\n      pattern: \"EAI_AGAIN|NXDOMAIN|no such host\"\n    priority: P3\n    remediation:\n      action: none\n      cooldown: 2m\n    enabled: true\n\n  - name: connection-refused\n    match:\n      pattern: \"connection refused|ECONNREFUSED\"\n    priority: P3\n    remediation:\n      action: none\n      cooldown: 2m\n    enabled: true\n\n  - name: timeout-error\n    match:\n      pattern: \"timeout|timed out|deadline exceeded\"\n    priority: P3\n    remediation:\n      action: none\n      cooldown: 2m\n    enabled: true\n\n  # P4 - Low priority / Informational\n  - name: generic-error\n    match:\n      pattern: \"error\"\n    priority: P4\n    remediation:\n      action: none\n      cooldown: 5m\n    enabled: true\n\n  # Default catch-all rule - MUST BE LAST\n  - name: default\n    match:\n      pattern: \".\"\n    priority: P4\n    remediation:\n      action: none\n      cooldown: 5m\n    enabled: true\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"kube-sentinel:/ConfigMap:kube-sentinel/kube-sentinel-config"},"labels":{"app.kubernetes.io/managed-by":"kustomize","app.kubernetes.io/name":"kube-sentinel","app.kubernetes.io/version":"1.0.0"},"name":"kube-sentinel-config","namespace":"kube-sentinel"}}
+    creationTimestamp: "2026-01-25T01:46:36Z"
+    labels:
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/name: kube-sentinel
+      app.kubernetes.io/version: 1.0.0
+    name: kube-sentinel-config
+    namespace: kube-sentinel
+    resourceVersion: "775"
+    uid: 60f1427d-67ce-4140-951a-cdd4231a7ca3
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,283 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"element-web","namespace":"signal-web"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"element-web"}},"template":{"metadata":{"labels":{"app":"element-web"}},"spec":{"containers":[{"image":"vectorim/element-web:latest","name":"element-web","ports":[{"containerPort":80}],"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/app/config.json","name":"config","subPath":"config.json"}]}],"volumes":[{"configMap":{"name":"element-config"},"name":"config"}]}}}}
+    creationTimestamp: "2026-01-25T16:03:53Z"
+    generation: 1
+    name: element-web
+    namespace: signal-web
+    resourceVersion: "1038"
+    uid: 989c9ad7-dae6-4b9c-9207-9c822b198291
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: element-web
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: element-web
+      spec:
+        containers:
+        - image: vectorim/element-web:latest
+          imagePullPolicy: Always
+          name: element-web
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config.json
+            name: config
+            subPath: config.json
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: element-config
+          name: config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T16:03:53Z"
+      lastUpdateTime: "2026-01-25T16:05:07Z"
+      message: ReplicaSet "element-web-74dfb8c7d6" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T03:15:46Z"
+      lastUpdateTime: "2026-01-27T03:15:46Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"postgres","namespace":"signal-web"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"postgres"}},"template":{"metadata":{"labels":{"app":"postgres"}},"spec":{"containers":[{"env":[{"name":"POSTGRES_USER","value":"synapse"},{"name":"POSTGRES_PASSWORD","value":"synapse123"},{"name":"POSTGRES_DB","value":"synapse"}],"image":"postgres:15-alpine","name":"postgres","ports":[{"containerPort":5432}],"volumeMounts":[{"mountPath":"/var/lib/postgresql/data","name":"data"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"synapse-postgres"}}]}}}}
+    creationTimestamp: "2026-01-25T16:03:52Z"
+    generation: 1
+    name: postgres
+    namespace: signal-web
+    resourceVersion: "15198"
+    uid: 7740e715-7936-4b74-a192-0801cae70ab2
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: postgres
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: postgres
+      spec:
+        containers:
+        - env:
+          - name: POSTGRES_USER
+            value: synapse
+          - name: POSTGRES_PASSWORD
+            value: synapse123
+          - name: POSTGRES_DB
+            value: synapse
+          image: postgres:15-alpine
+          imagePullPolicy: IfNotPresent
+          name: postgres
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: synapse-postgres
+  status:
+    conditions:
+    - lastTransitionTime: "2026-01-25T16:03:52Z"
+      lastUpdateTime: "2026-01-25T16:04:18Z"
+      message: ReplicaSet "postgres-674d4f5c9" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T04:48:08Z"
+      lastUpdateTime: "2026-01-27T04:48:08Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    observedGeneration: 1
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"synapse","namespace":"signal-web"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"synapse"}},"template":{"metadata":{"labels":{"app":"synapse"}},"spec":{"containers":[{"env":[{"name":"SYNAPSE_CONFIG_PATH","value":"/data/homeserver.yaml"}],"image":"matrixdotorg/synapse:latest","name":"synapse","ports":[{"containerPort":8008}],"resources":{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/data","name":"data"}]}],"initContainers":[{"args":["if [ ! -f /data/homeserver.yaml ]; then\n  cp /config/homeserver.yaml /data/homeserver.yaml\nfi\nif [ ! -f /data/signal.local.signing.key ]; then\n  python -m synapse.app.homeserver --generate-keys -c /data/homeserver.yaml\nfi\nif [ ! -f /data/signal.local.log.config ]; then\n  cat \u003e /data/signal.local.log.config \u003c\u003c 'LOGEOF'\nversion: 1\nformatters:\n  precise:\n    format: '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s'\nhandlers:\n  console:\n    class: logging.StreamHandler\n    formatter: precise\nroot:\n  level: INFO\n  handlers: [console]\nLOGEOF\nfi\n"],"command":["/bin/sh","-c"],"image":"matrixdotorg/synapse:latest","name":"init-config","volumeMounts":[{"mountPath":"/data","name":"data"},{"mountPath":"/config","name":"config"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"synapse-data"}},{"configMap":{"name":"synapse-config"},"name":"config"}]}}}}
+    creationTimestamp: "2026-01-25T16:03:52Z"
+    generation: 1
+    name: synapse
+    namespace: signal-web
+    resourceVersion: "1040"
+    uid: 67b448f3-4198-4620-a535-e72388717f3c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: synapse
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: synapse
+      spec:
+        containers:
+        - env:
+          - name: SYNAPSE_CONFIG_PATH
+            value: /data/homeserver.yaml
+          image: matrixdotorg/synapse:latest
+          imagePullPolicy: Always
+          name: synapse
+          ports:
+          - containerPort: 8008
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - |
+            if [ ! -f /data/homeserver.yaml ]; then
+              cp /config/homeserver.yaml /data/homeserver.yaml
+            fi
+            if [ ! -f /data/signal.local.signing.key ]; then
+              python -m synapse.app.homeserver --generate-keys -c /data/homeserver.yaml
+            fi
+            if [ ! -f /data/signal.local.log.config ]; then
+              cat > /data/signal.local.log.config << 'LOGEOF'
+            version: 1
+            formatters:
+              precise:
+                format: '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s'
+            handlers:
+              console:
+                class: logging.StreamHandler
+                formatter: precise
+            root:
+              level: INFO
+              handlers: [console]
+            LOGEOF
+            fi
+          command:
+          - /bin/sh
+          - -c
+          image: matrixdotorg/synapse:latest
+          imagePullPolicy: Always
+          name: init-config
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+          - mountPath: /config
+            name: config
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: synapse-data
+        - configMap:
+            defaultMode: 420
+            name: synapse-config
+          name: config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T16:03:53Z"
+      lastUpdateTime: "2026-01-25T16:04:53Z"
+      message: ReplicaSet "synapse-7f7985bb77" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T03:29:33Z"
+      lastUpdateTime: "2026-01-27T03:29:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

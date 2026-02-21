@@ -1,0 +1,113 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: "2026-01-20T17:13:23Z"
+    finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+    labels:
+      app.kubernetes.io/component: proxy
+      app.kubernetes.io/managed-by: envoy-gateway
+      app.kubernetes.io/name: envoy
+      gateway.envoyproxy.io/owning-gateway-name: main-gateway
+      gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+    name: envoy-envoy-gateway-system-main-gateway-c3508b54
+    namespace: envoy-gateway-system
+    resourceVersion: "10158"
+    uid: 8bcdcf0d-10ca-4aed-94ba-4fcb3dd4d06e
+  spec:
+    allocateLoadBalancerNodePorts: true
+    clusterIP: 10.43.218.128
+    clusterIPs:
+    - 10.43.218.128
+    externalTrafficPolicy: Local
+    healthCheckNodePort: 30883
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-80
+      nodePort: 30826
+      port: 80
+      protocol: TCP
+      targetPort: 10080
+    - name: https-443
+      nodePort: 31572
+      port: 443
+      protocol: TCP
+      targetPort: 10443
+    selector:
+      app.kubernetes.io/component: proxy
+      app.kubernetes.io/managed-by: envoy-gateway
+      app.kubernetes.io/name: envoy
+      gateway.envoyproxy.io/owning-gateway-name: main-gateway
+      gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+    sessionAffinity: None
+    type: LoadBalancer
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 192.168.8.210
+        ipMode: VIP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      gethomepage.dev/description: API Gateway
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/group: Infrastructure
+      gethomepage.dev/href: https://holm.chat/gateway
+      gethomepage.dev/icon: envoy.svg
+      gethomepage.dev/name: Envoy Gateway
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"eg","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"gateway-helm","app.kubernetes.io/version":"latest","control-plane":"envoy-gateway","helm.sh/chart":"gateway-helm-v0.0.0-latest"},"name":"envoy-gateway","namespace":"envoy-gateway-system"},"spec":{"ports":[{"name":"grpc","port":18000,"targetPort":18000},{"name":"ratelimit","port":18001,"targetPort":18001},{"name":"wasm","port":18002,"targetPort":18002},{"name":"metrics","port":19001,"targetPort":19001}],"selector":{"app.kubernetes.io/instance":"eg","app.kubernetes.io/name":"gateway-helm","control-plane":"envoy-gateway"}}}
+    creationTimestamp: "2026-01-19T03:34:47Z"
+    labels:
+      app.kubernetes.io/instance: eg
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: gateway-helm
+      app.kubernetes.io/version: latest
+      control-plane: envoy-gateway
+      helm.sh/chart: gateway-helm-v0.0.0-latest
+    name: envoy-gateway
+    namespace: envoy-gateway-system
+    resourceVersion: "10159"
+    uid: 8e231ecf-c4a6-4799-8a4f-51d9b2197303
+  spec:
+    clusterIP: 10.43.2.250
+    clusterIPs:
+    - 10.43.2.250
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: grpc
+      port: 18000
+      protocol: TCP
+      targetPort: 18000
+    - name: ratelimit
+      port: 18001
+      protocol: TCP
+      targetPort: 18001
+    - name: wasm
+      port: 18002
+      protocol: TCP
+      targetPort: 18002
+    - name: metrics
+      port: 19001
+      protocol: TCP
+      targetPort: 19001
+    selector:
+      app.kubernetes.io/instance: eg
+      app.kubernetes.io/name: gateway-helm
+      control-plane: envoy-gateway
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

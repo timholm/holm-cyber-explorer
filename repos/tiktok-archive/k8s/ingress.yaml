@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tiktok-archive
+  namespace: tiktok-archive
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+spec:
+  rules:
+    - host: tiktok.local
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: tiktok-archive-backend
+                port:
+                  number: 8000
+          - path: /archive
+            pathType: Prefix
+            backend:
+              service:
+                name: tiktok-archive-backend
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tiktok-archive-frontend
+                port:
+                  number: 80

@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/timholm/bookforge
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ollama:
+  url: http://ollama-external:11434
+
+postgres:
+  host: postgres
+  database: bookforge
+  user: bookforge
+  password: bookforge123
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClass: ""
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 30
+  readiness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10

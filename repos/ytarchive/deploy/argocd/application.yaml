@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ytarchive
+  namespace: argocd
+  annotations:
+    # ArgoCD Image Updater configuration
+    argocd-image-updater.argoproj.io/image-list: controller=ghcr.io/timholm/ytarchive, worker=ghcr.io/timholm/ytarchive
+    argocd-image-updater.argoproj.io/controller.update-strategy: digest
+    argocd-image-updater.argoproj.io/worker.update-strategy: digest
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/timholm/ytarchive.git
+    targetRevision: main
+    path: deploy/kubernetes
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ytarchive
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

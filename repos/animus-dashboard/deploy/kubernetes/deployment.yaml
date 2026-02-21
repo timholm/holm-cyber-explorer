@@ -1,0 +1,134 @@
+---
+# Backend API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animus-api
+  namespace: animus
+  labels:
+    app.kubernetes.io/name: animus-dashboard
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: animus-dashboard
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: animus-dashboard
+        app.kubernetes.io/component: api
+    spec:
+      serviceAccountName: animus-dashboard
+      containers:
+        - name: api
+          image: ghcr.io/timholm/animus-dashboard-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: PORT
+              value: "8080"
+            - name: LOKI_URL
+              value: "http://loki.monitoring.svc.cluster.local:3100"
+            - name: SSH_KEY_PATH
+              value: "/etc/animus/ssh/id_ed25519"
+            - name: SSH_USER
+              value: "rpi1"
+            - name: ANSIBLE_PATH
+              value: "/app/ansible/playbooks"
+            - name: INVENTORY_PATH
+              value: "/etc/animus/ansible/inventory.ini"
+            - name: CORS_ORIGINS
+              value: "*"
+          volumeMounts:
+            - name: ssh-key
+              mountPath: /etc/animus/ssh
+              readOnly: true
+            - name: ansible-inventory
+              mountPath: /etc/animus/ansible
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: ssh-key
+          secret:
+            secretName: animus-ssh-key
+            defaultMode: 0600
+        - name: ansible-inventory
+          configMap:
+            name: animus-ansible-inventory
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animus-frontend
+  namespace: animus
+  labels:
+    app.kubernetes.io/name: animus-dashboard
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: animus-dashboard
+      app.kubernetes.io/component: frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: animus-dashboard
+        app.kubernetes.io/component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/timholm/animus-dashboard-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: BACKEND_URL
+              value: "http://animus-api.animus.svc.cluster.local:8080"
+            - name: NEXT_PUBLIC_API_URL
+              value: ""
+            - name: NEXT_PUBLIC_WS_URL
+              value: ""
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5

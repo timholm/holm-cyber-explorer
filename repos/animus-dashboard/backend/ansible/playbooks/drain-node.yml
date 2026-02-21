@@ -1,0 +1,73 @@
+---
+- name: Drain Kubernetes node
+  hosts: "{{ target_hosts | default('all') }}"
+  gather_facts: yes
+  serial: 1
+
+  tasks:
+    - name: Get node name
+      command: hostname
+      register: node_name
+      changed_when: false
+
+    - name: Display drain warning
+      debug:
+        msg: "Preparing to drain node {{ node_name.stdout }}"
+
+    - name: Check node status
+      delegate_to: localhost
+      command: kubectl get node {{ node_name.stdout }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+      register: node_status
+      changed_when: false
+
+    - name: Display node status
+      debug:
+        msg: "Node {{ node_name.stdout }} Ready status: {{ node_status.stdout }}"
+
+    - name: Cordon the node
+      delegate_to: localhost
+      command: kubectl cordon {{ node_name.stdout }}
+      register: cordon_result
+
+    - name: Display cordon result
+      debug:
+        msg: "{{ cordon_result.stdout }}"
+
+    - name: Get pods running on the node
+      delegate_to: localhost
+      shell: kubectl get pods --all-namespaces --field-selector spec.nodeName={{ node_name.stdout }} -o wide
+      register: pods_on_node
+      changed_when: false
+
+    - name: Display pods to be evicted
+      debug:
+        msg: "{{ pods_on_node.stdout_lines }}"
+
+    - name: Drain the node
+      delegate_to: localhost
+      command: >
+        kubectl drain {{ node_name.stdout }}
+        --ignore-daemonsets
+        --delete-emptydir-data
+        --force
+        --grace-period=60
+        --timeout=300s
+      register: drain_result
+
+    - name: Display drain result
+      debug:
+        msg: "{{ drain_result.stdout_lines }}"
+
+    - name: Verify node is drained
+      delegate_to: localhost
+      shell: kubectl get pods --all-namespaces --field-selector spec.nodeName={{ node_name.stdout }} -o wide
+      register: remaining_pods
+      changed_when: false
+
+    - name: Display remaining pods
+      debug:
+        msg: "Remaining pods (DaemonSets only): {{ remaining_pods.stdout_lines }}"
+
+    - name: Confirm drain complete
+      debug:
+        msg: "Node {{ node_name.stdout }} has been drained and is ready for maintenance"

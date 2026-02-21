@@ -1,0 +1,52 @@
+---
+- name: Restart K3s agent service
+  hosts: "{{ target_hosts | default('all') }}"
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Get current K3s version
+      command: k3s --version
+      register: k3s_version
+      changed_when: false
+
+    - name: Display K3s version
+      debug:
+        msg: "{{ k3s_version.stdout }}"
+
+    - name: Check K3s service status before restart
+      systemd:
+        name: "{{ 'k3s' if 'control-plane' in group_names else 'k3s-agent' }}"
+      register: k3s_status_before
+
+    - name: Display service status
+      debug:
+        msg: "K3s service is currently {{ k3s_status_before.status.ActiveState }}"
+
+    - name: Restart K3s agent service
+      systemd:
+        name: "{{ 'k3s' if 'control-plane' in group_names else 'k3s-agent' }}"
+        state: restarted
+      register: restart_result
+
+    - name: Wait for K3s to be ready
+      wait_for:
+        path: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
+        state: present
+        timeout: 60
+      when: "'workers' in group_names"
+
+    - name: Wait for API server (control plane only)
+      wait_for:
+        port: 6443
+        timeout: 60
+      when: "'control_plane' in group_names"
+
+    - name: Check K3s service status after restart
+      systemd:
+        name: "{{ 'k3s' if 'control-plane' in group_names else 'k3s-agent' }}"
+      register: k3s_status_after
+
+    - name: Display final status
+      debug:
+        msg: "K3s service restarted successfully. Status: {{ k3s_status_after.status.ActiveState }}"

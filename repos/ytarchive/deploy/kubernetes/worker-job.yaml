@@ -1,0 +1,92 @@
+# Worker Job Template
+# This manifest serves as a template for the controller to spawn worker jobs.
+# The controller will substitute CHANNEL_ID and WORKER_ID at runtime.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ytarchive-worker-WORKER_ID
+  namespace: ytarchive
+  labels:
+    app.kubernetes.io/name: worker
+    app.kubernetes.io/component: downloader
+    app.kubernetes.io/part-of: ytarchive
+    ytarchive.io/channel-id: CHANNEL_ID
+    ytarchive.io/worker-id: WORKER_ID
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: worker
+        app.kubernetes.io/component: downloader
+        app.kubernetes.io/part-of: ytarchive
+        ytarchive.io/channel-id: CHANNEL_ID
+        ytarchive.io/worker-id: WORKER_ID
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: ghcr-secret
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+          - name: single-request-reopen
+      containers:
+        - name: worker
+          image: ghcr.io/timholm/ytarchive/worker@sha256:cafb67403bb6fe7a840a2c19cda480219ed7fc015e3cc3223164746cf1bbde21
+          env:
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: REDIS_URL
+            - name: STORAGE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: STORAGE_PATH
+            - name: BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: BATCH_SIZE
+            - name: MAX_WORKERS
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: MAX_WORKERS
+            - name: VIDEO_FORMAT
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: VIDEO_FORMAT
+            - name: CHANNEL_ID
+              value: CHANNEL_ID
+            - name: WORKER_ID
+              value: WORKER_ID
+            - name: CONTROLLER_URL
+              value: http://ytarchive-controller.ytarchive.svc.cluster.local
+            - name: YOUTUBE_COOKIES_FILE
+              value: /etc/youtube-cookies/cookies.txt
+          resources:
+            limits:
+              memory: 1Gi
+              cpu: "1"
+            requests:
+              memory: 512Mi
+              cpu: 250m
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: youtube-cookies
+              mountPath: /etc/youtube-cookies
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ytarchive-data
+        - name: youtube-cookies
+          secret:
+            secretName: youtube-cookies
+            optional: true

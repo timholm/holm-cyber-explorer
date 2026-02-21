@@ -1,0 +1,112 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    config.json: |
+      {
+        "default_server_config": {
+          "m.homeserver": {
+            "base_url": "http://synapse:8008",
+            "server_name": "signal.local"
+          }
+        },
+        "brand": "Signal Web",
+        "disable_custom_urls": true,
+        "disable_guests": true,
+        "disable_3pid_login": true
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.json":"{\n  \"default_server_config\": {\n    \"m.homeserver\": {\n      \"base_url\": \"http://synapse:8008\",\n      \"server_name\": \"signal.local\"\n    }\n  },\n  \"brand\": \"Signal Web\",\n  \"disable_custom_urls\": true,\n  \"disable_guests\": true,\n  \"disable_3pid_login\": true\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"element-config","namespace":"signal-web"}}
+    creationTimestamp: "2026-01-25T16:03:53Z"
+    name: element-config
+    namespace: signal-web
+    resourceVersion: "814"
+    uid: 51b29785-7f65-47d6-a189-fed6b8acf4af
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-25T16:03:51Z"
+    name: kube-root-ca.crt
+    namespace: signal-web
+    resourceVersion: "815"
+    uid: f7b82286-6bda-4d19-9828-96c36a25be20
+- apiVersion: v1
+  data:
+    homeserver.yaml: |
+      server_name: "signal.local"
+      pid_file: /data/homeserver.pid
+      web_client_location: http://localhost:8080/
+      public_baseurl: http://localhost:8008/
+
+      listeners:
+        - port: 8008
+          tls: false
+          type: http
+          x_forwarded: true
+          resources:
+            - names: [client, federation]
+              compress: false
+
+      database:
+        name: psycopg2
+        args:
+          user: synapse
+          password: synapse123
+          database: synapse
+          host: postgres
+          port: 5432
+          cp_min: 5
+          cp_max: 10
+
+      log_config: "/data/signal.local.log.config"
+      media_store_path: /data/media_store
+
+      enable_registration: true
+      enable_registration_without_verification: true
+
+      registration_shared_secret: "signal-web-secret-key-change-me"
+
+      report_stats: false
+      macaroon_secret_key: "macaroon-secret-key-change-me"
+      form_secret: "form-secret-key-change-me"
+      signing_key_path: "/data/signal.local.signing.key"
+
+      trusted_key_servers:
+        - server_name: "matrix.org"
+
+      suppress_key_server_warning: true
+
+      app_service_config_files: []
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"homeserver.yaml":"server_name: \"signal.local\"\npid_file: /data/homeserver.pid\nweb_client_location: http://localhost:8080/\npublic_baseurl: http://localhost:8008/\n\nlisteners:\n  - port: 8008\n    tls: false\n    type: http\n    x_forwarded: true\n    resources:\n      - names: [client, federation]\n        compress: false\n\ndatabase:\n  name: psycopg2\n  args:\n    user: synapse\n    password: synapse123\n    database: synapse\n    host: postgres\n    port: 5432\n    cp_min: 5\n    cp_max: 10\n\nlog_config: \"/data/signal.local.log.config\"\nmedia_store_path: /data/media_store\n\nenable_registration: true\nenable_registration_without_verification: true\n\nregistration_shared_secret: \"signal-web-secret-key-change-me\"\n\nreport_stats: false\nmacaroon_secret_key: \"macaroon-secret-key-change-me\"\nform_secret: \"form-secret-key-change-me\"\nsigning_key_path: \"/data/signal.local.signing.key\"\n\ntrusted_key_servers:\n  - server_name: \"matrix.org\"\n\nsuppress_key_server_warning: true\n\napp_service_config_files: []\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"synapse-config","namespace":"signal-web"}}
+    creationTimestamp: "2026-01-25T16:03:52Z"
+    name: synapse-config
+    namespace: signal-web
+    resourceVersion: "816"
+    uid: 76630d9b-385f-436c-b887-7e4f9ffa34bb
+kind: List
+metadata:
+  resourceVersion: ""

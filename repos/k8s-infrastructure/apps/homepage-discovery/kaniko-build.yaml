@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko-homepage-discovery-build
+  namespace: homepage
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    kubernetes.io/hostname: rpi-1
+  initContainers:
+  - name: wait-for-registry
+    image: busybox
+    command:
+    - /bin/sh
+    - -c
+    - |
+      echo "Waiting for registry..."
+      until wget -qO- http://registry.holm.svc.cluster.local:5000/v2/ 2>/dev/null; do
+        echo "Registry not ready, waiting..."
+        sleep 5
+      done
+      echo "Registry is ready!"
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    args:
+    - "--dockerfile=/workspace/Dockerfile"
+    - "--context=/workspace"
+    - "--destination=registry.holm.svc.cluster.local:5000/homepage-discovery:latest"
+    - "--insecure"
+    - "--skip-tls-verify"
+    volumeMounts:
+    - name: source
+      mountPath: /workspace
+  volumes:
+  - name: source
+    configMap:
+      name: homepage-discovery-src

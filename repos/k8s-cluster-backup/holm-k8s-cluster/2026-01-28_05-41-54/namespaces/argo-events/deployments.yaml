@@ -1,0 +1,542 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: argo-events:apps/Deployment:argo-events/argo-events-controller-manager
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2026-01-20T20:55:47Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: controller-manager
+      app.kubernetes.io/instance: argo-events
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argo-events-controller-manager
+      app.kubernetes.io/part-of: argo-events
+      app.kubernetes.io/version: v1.9.2
+      helm.sh/chart: argo-events-2.4.8
+    name: argo-events-controller-manager
+    namespace: argo-events
+    resourceVersion: "165538"
+    uid: 91de16a7-d7e7-4bfa-954b-cfdcb488acc5
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 5
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: argo-events
+        app.kubernetes.io/name: argo-events-controller-manager
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/config: 73333bc3852db5bae2894568b9cbddc26e4e41a1b40f2e7629be0c3501df8f8d
+        labels:
+          app.kubernetes.io/component: controller-manager
+          app.kubernetes.io/instance: argo-events
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: argo-events-controller-manager
+          app.kubernetes.io/part-of: argo-events
+          app.kubernetes.io/version: v1.9.2
+          helm.sh/chart: argo-events-2.4.8
+      spec:
+        containers:
+        - args:
+          - controller
+          env:
+          - name: ARGO_EVENTS_IMAGE
+            value: quay.io/argoproj/argo-events:v1.9.2
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/argoproj/argo-events:v1.9.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: probe
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: controller-manager
+          ports:
+          - containerPort: 7777
+            name: metrics
+            protocol: TCP
+          - containerPort: 8081
+            name: probe
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: probe
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/argo-events
+            name: config
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: argo-events-controller-manager
+        serviceAccountName: argo-events-controller-manager
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: argo-events-controller-manager
+          name: config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-20T20:55:47Z"
+      lastUpdateTime: "2026-01-20T20:57:36Z"
+      message: ReplicaSet "argo-events-controller-manager-6b4976cfff" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T08:25:04Z"
+      lastUpdateTime: "2026-01-27T08:25:04Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      resource-spec-hash: "1897843438"
+    creationTimestamp: "2026-01-22T02:14:35Z"
+    generateName: argocd-app-events-eventsource-
+    generation: 1
+    labels:
+      controller: eventsource-controller
+      eventsource-name: argocd-app-events
+      owner-name: argocd-app-events
+    name: argocd-app-events-eventsource-pvdnq
+    namespace: argo-events
+    ownerReferences:
+    - apiVersion: argoproj.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: EventSource
+      name: argocd-app-events
+      uid: ae24a820-2c4a-4f32-98ed-23f3114fb2fb
+    resourceVersion: "902"
+    uid: c5635257-5f51-4510-9440-8e315fac7259
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        controller: eventsource-controller
+        eventsource-name: argocd-app-events
+        owner-name: argocd-app-events
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          controller: eventsource-controller
+          eventsource-name: argocd-app-events
+          owner-name: argocd-app-events
+      spec:
+        containers:
+        - args:
+          - eventsource-service
+          env:
+          - name: EVENTSOURCE_OBJECT
+            value: eyJtZXRhZGF0YSI6eyJuYW1lIjoiYXJnb2NkLWFwcC1ldmVudHMiLCJuYW1lc3BhY2UiOiJhcmdvLWV2ZW50cyIsImNyZWF0aW9uVGltZXN0YW1wIjpudWxsfSwic3BlYyI6eyJyZXNvdXJjZSI6eyJhcmdvY2QtYXBwcyI6eyJuYW1lc3BhY2UiOiJhcmdvY2QiLCJmaWx0ZXIiOnsiY3JlYXRlZEJ5IjpudWxsLCJhZnRlclN0YXJ0Ijp0cnVlfSwiZ3JvdXAiOiJhcmdvcHJvai5pbyIsInZlcnNpb24iOiJ2MWFscGhhMSIsInJlc291cmNlIjoiYXBwbGljYXRpb25zIiwiZXZlbnRUeXBlcyI6WyJVUERBVEUiXX19fSwic3RhdHVzIjp7fX0=
+          - name: EVENTBUS_SUBJECT
+            value: eventbus-argo-events
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: LEADER_ELECTION
+          - name: EVENTBUS_CONFIG
+            value: eyJuYXRzIjp7InVybCI6Im5hdHM6Ly9ldmVudGJ1cy1kZWZhdWx0LXN0YW4tc3ZjOjQyMjIiLCJjbHVzdGVySUQiOiJldmVudGJ1cy1kZWZhdWx0IiwiYXV0aCI6Im5vbmUifX0=
+          image: quay.io/argoproj/argo-events:v1.9.2
+          imagePullPolicy: Always
+          name: main
+          ports:
+          - containerPort: 7777
+            name: metrics
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tmp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-22T02:14:35Z"
+      lastUpdateTime: "2026-01-22T02:14:42Z"
+      message: ReplicaSet "argocd-app-events-eventsource-pvdnq-558569cf8d" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:39:19Z"
+      lastUpdateTime: "2026-01-27T02:39:19Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      resource-spec-hash: "2397774749"
+    creationTimestamp: "2026-01-22T03:01:47Z"
+    generateName: argocd-sync-guardian-sensor-
+    generation: 1
+    labels:
+      controller: sensor-controller
+      owner-name: argocd-sync-guardian
+      sensor-name: argocd-sync-guardian
+    name: argocd-sync-guardian-sensor-6bzj2
+    namespace: argo-events
+    ownerReferences:
+    - apiVersion: argoproj.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Sensor
+      name: argocd-sync-guardian
+      uid: 8062457d-7722-47dc-8c0d-c846c34e7c26
+    resourceVersion: "903"
+    uid: 2843a5d7-caa6-4a50-8df1-27e4ddb7f02c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        controller: sensor-controller
+        owner-name: argocd-sync-guardian
+        sensor-name: argocd-sync-guardian
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          controller: sensor-controller
+          owner-name: argocd-sync-guardian
+          sensor-name: argocd-sync-guardian
+      spec:
+        containers:
+        - args:
+          - sensor-service
+          env:
+          - name: SENSOR_OBJECT
+            value: eyJtZXRhZGF0YSI6eyJuYW1lIjoiYXJnb2NkLXN5bmMtZ3VhcmRpYW4iLCJuYW1lc3BhY2UiOiJhcmdvLWV2ZW50cyIsImNyZWF0aW9uVGltZXN0YW1wIjpudWxsfSwic3BlYyI6eyJkZXBlbmRlbmNpZXMiOlt7Im5hbWUiOiJhcmdvY2QtYXBwIiwiZXZlbnRTb3VyY2VOYW1lIjoiYXJnb2NkLWFwcC1ldmVudHMiLCJldmVudE5hbWUiOiJhcmdvY2QtYXBwcyIsImZpbHRlcnMiOnsiZXhwcnMiOlt7ImV4cHIiOiJoYXMoYm9keS5zdGF0dXMuc3luYykgXHUwMDI2XHUwMDI2IFxuYm9keS5zdGF0dXMuc3luYy5zdGF0dXMgPT0gJ091dE9mU3luYydcbiIsImZpZWxkcyI6W3sicGF0aCI6ImJvZHkiLCJuYW1lIjoiYm9keSJ9XX1dfX1dLCJ0cmlnZ2VycyI6W3sidGVtcGxhdGUiOnsibmFtZSI6InN5bmMtYXJnb2NkLWFwcCIsImFyZ29Xb3JrZmxvdyI6eyJzb3VyY2UiOnsicmVzb3VyY2UiOnsiYXBpVmVyc2lvbiI6ImFyZ29wcm9qLmlvL3YxYWxwaGExIiwia2luZCI6IldvcmtmbG93IiwibWV0YWRhdGEiOnsiZ2VuZXJhdGVOYW1lIjoiYXV0by1zeW5jLWFwcC0iLCJuYW1lc3BhY2UiOiJhcmdvIn0sInNwZWMiOnsiYXJndW1lbnRzIjp7InBhcmFtZXRlcnMiOlt7Im5hbWUiOiJhcHBfbmFtZSJ9XX0sImVudHJ5cG9pbnQiOiJzeW5jLWFwcGxpY2F0aW9uIiwib25FeGl0Ijoibm90aWZ5LWNvbXBsZXRpb24iLCJzZXJ2aWNlQWNjb3VudE5hbWUiOiJhcmdvLXdvcmtmbG93cy13b3JrZmxvdy1jb250cm9sbGVyIiwic3luY2hyb25pemF0aW9uIjp7Im11dGV4Ijp7Im5hbWUiOiJhcmdvY2Qtc3luYyJ9fSwidGVtcGxhdGVzIjpbeyJpbnB1dHMiOnsicGFyYW1ldGVycyI6W3sibmFtZSI6ImFwcF9uYW1lIn1dfSwibmFtZSI6InN5bmMtYXBwbGljYXRpb24iLCJyZXRyeVN0cmF0ZWd5Ijp7ImJhY2tvZmYiOnsiZHVyYXRpb24iOiIzMHMiLCJmYWN0b3IiOjJ9LCJsaW1pdCI6M30sInNjcmlwdCI6eyJjb21tYW5kIjpbImJhc2giXSwiaW1hZ2UiOiJiaXRuYW1pL2t1YmVjdGw6bGF0ZXN0Iiwic291cmNlIjoiQVBQPVwie3tpbnB1dHMucGFyYW1ldGVycy5hcHBfbmFtZX19XCJcbmVjaG8gXCI9PT0gU3luY2luZyBBcmdvQ0QgQXBwbGljYXRpb246ICRBUFAgPT09XCJcblxuIyBDaGVjayBjdXJyZW50IHN0YXR1c1xuU1RBVFVTPSQoa3ViZWN0bCBnZXQgYXBwbGljYXRpb24gJEFQUCAtbiBhcmdvY2QgLW8ganNvbnBhdGg9J3suc3RhdHVzLnN5bmMuc3RhdHVzfScgMlx1MDAzZS9kZXYvbnVsbClcbkhFQUxUSD0kKGt1YmVjdGwgZ2V0IGFwcGxpY2F0aW9uICRBUFAgLW4gYXJnb2NkIC1vIGpzb25wYXRoPSd7LnN0YXR1cy5oZWFsdGguc3RhdHVzfScgMlx1MDAzZS9kZXYvbnVsbClcblxuZWNobyBcIkN1cnJlbnQgU3RhdHVzOiBTeW5jPSRTVEFUVVMsIEhlYWx0aD0kSEVBTFRIXCJcblxuaWYgWyBcIiRTVEFUVVNcIiAhPSBcIk91dE9mU3luY1wiIF07IHRoZW5cbiAgZWNobyBcIkFwcGxpY2F0aW9uIGlzIGFscmVhZHkgc3luY2VkLCBza2lwcGluZ1wiXG4gIGV4aXQgMFxuZmlcblxuIyBUcmlnZ2VyIHN5bmMgdmlhIGFubm90YXRpb25cbmt1YmVjdGwgcGF0Y2ggYXBwbGljYXRpb24gJEFQUCAtbiBhcmdvY2QgLS10eXBlPW1lcmdlIC1wICd7XCJtZXRhZGF0YVwiOntcImFubm90YXRpb25zXCI6e1wiYXJnb2NkLmFyZ29wcm9qLmlvL3JlZnJlc2hcIjpcImhhcmRcIn19fSdcblxuIyBXYWl0IGFuZCBjaGVja1xuc2xlZXAgMTBcbk5FV19TVEFUVVM9JChrdWJlY3RsIGdldCBhcHBsaWNhdGlvbiAkQVBQIC1uIGFyZ29jZCAtbyBqc29ucGF0aD0ney5zdGF0dXMuc3luYy5zdGF0dXN9JyAyXHUwMDNlL2Rldi9udWxsKVxuZWNobyBcIk5ldyBTdGF0dXM6ICRORVdfU1RBVFVTXCJcbiJ9fSx7Im5hbWUiOiJub3RpZnktY29tcGxldGlvbiIsInNjcmlwdCI6eyJjb21tYW5kIjpbInNoIl0sImltYWdlIjoiY3VybGltYWdlcy9jdXJsOmxhdGVzdCIsInNvdXJjZSI6ImVjaG8gXCJBcmdvQ0QgU3luYyB3b3JrZmxvdyBjb21wbGV0ZWQ6IHt7d29ya2Zsb3cubmFtZX19IC0gU3RhdHVzOiB7e3dvcmtmbG93LnN0YXR1c319XCJcbiJ9fV19fX0sIm9wZXJhdGlvbiI6InN1Ym1pdCIsInBhcmFtZXRlcnMiOlt7InNyYyI6eyJkZXBlbmRlbmN5TmFtZSI6ImFyZ29jZC1hcHAiLCJkYXRhS2V5IjoiYm9keS5tZXRhZGF0YS5uYW1lIn0sImRlc3QiOiJzcGVjLmFyZ3VtZW50cy5wYXJhbWV0ZXJzLjAudmFsdWUifV19fX1dLCJ0ZW1wbGF0ZSI6eyJzZXJ2aWNlQWNjb3VudE5hbWUiOiJhcmdvLWV2ZW50cy1zYSJ9LCJldmVudEJ1c05hbWUiOiJkZWZhdWx0IiwibG9nZ2luZ0ZpZWxkcyI6bnVsbH0sInN0YXR1cyI6e319
+          - name: EVENTBUS_SUBJECT
+            value: eventbus-argo-events
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: LEADER_ELECTION
+          - name: EVENTBUS_CONFIG
+            value: eyJuYXRzIjp7InVybCI6Im5hdHM6Ly9ldmVudGJ1cy1kZWZhdWx0LXN0YW4tc3ZjOjQyMjIiLCJjbHVzdGVySUQiOiJldmVudGJ1cy1kZWZhdWx0IiwiYXV0aCI6Im5vbmUifX0=
+          image: quay.io/argoproj/argo-events:v1.9.2
+          imagePullPolicy: Always
+          name: main
+          ports:
+          - containerPort: 7777
+            name: metrics
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: argo-events-sa
+        serviceAccountName: argo-events-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tmp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-22T03:23:45Z"
+      lastUpdateTime: "2026-01-22T03:23:48Z"
+      message: ReplicaSet "argocd-sync-guardian-sensor-6bzj2-6449fb6749" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:39:14Z"
+      lastUpdateTime: "2026-01-27T02:39:14Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      resource-spec-hash: "4056817991"
+    creationTimestamp: "2026-01-22T02:14:21Z"
+    generateName: pod-error-events-eventsource-
+    generation: 1
+    labels:
+      controller: eventsource-controller
+      eventsource-name: pod-error-events
+      owner-name: pod-error-events
+    name: pod-error-events-eventsource-vb9nv
+    namespace: argo-events
+    ownerReferences:
+    - apiVersion: argoproj.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: EventSource
+      name: pod-error-events
+      uid: 29b04ff3-aead-43b7-8bfd-eeeb1686fa00
+    resourceVersion: "904"
+    uid: f0a44b64-d02d-4942-a79e-1439516cc56c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        controller: eventsource-controller
+        eventsource-name: pod-error-events
+        owner-name: pod-error-events
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          controller: eventsource-controller
+          eventsource-name: pod-error-events
+          owner-name: pod-error-events
+      spec:
+        containers:
+        - args:
+          - eventsource-service
+          env:
+          - name: EVENTSOURCE_OBJECT
+            value: eyJtZXRhZGF0YSI6eyJuYW1lIjoicG9kLWVycm9yLWV2ZW50cyIsIm5hbWVzcGFjZSI6ImFyZ28tZXZlbnRzIiwiY3JlYXRpb25UaW1lc3RhbXAiOm51bGx9LCJzcGVjIjp7InJlc291cmNlIjp7InBvZC1lcnJvcnMiOnsibmFtZXNwYWNlIjoiIiwiZmlsdGVyIjp7ImNyZWF0ZWRCeSI6bnVsbCwiYWZ0ZXJTdGFydCI6dHJ1ZX0sImdyb3VwIjoiIiwidmVyc2lvbiI6InYxIiwicmVzb3VyY2UiOiJwb2RzIiwiZXZlbnRUeXBlcyI6WyJVUERBVEUiXX19fSwic3RhdHVzIjp7fX0=
+          - name: EVENTBUS_SUBJECT
+            value: eventbus-argo-events
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: LEADER_ELECTION
+          - name: EVENTBUS_CONFIG
+            value: eyJuYXRzIjp7InVybCI6Im5hdHM6Ly9ldmVudGJ1cy1kZWZhdWx0LXN0YW4tc3ZjOjQyMjIiLCJjbHVzdGVySUQiOiJldmVudGJ1cy1kZWZhdWx0IiwiYXV0aCI6Im5vbmUifX0=
+          image: quay.io/argoproj/argo-events:v1.9.2
+          imagePullPolicy: Always
+          name: main
+          ports:
+          - containerPort: 7777
+            name: metrics
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tmp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-22T02:14:22Z"
+      lastUpdateTime: "2026-01-22T02:14:35Z"
+      message: ReplicaSet "pod-error-events-eventsource-vb9nv-6b4677b9bc" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:44:10Z"
+      lastUpdateTime: "2026-01-27T02:44:10Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      resource-spec-hash: "2487395220"
+    creationTimestamp: "2026-01-22T03:01:36Z"
+    generateName: pod-health-sentinel-sensor-
+    generation: 1
+    labels:
+      controller: sensor-controller
+      owner-name: pod-health-sentinel
+      sensor-name: pod-health-sentinel
+    name: pod-health-sentinel-sensor-q6bvq
+    namespace: argo-events
+    ownerReferences:
+    - apiVersion: argoproj.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Sensor
+      name: pod-health-sentinel
+      uid: f13d0014-13a7-46a0-883d-53c52b8fb315
+    resourceVersion: "605473"
+    uid: a54cf782-7f37-4386-bd87-297c420fd6f2
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        controller: sensor-controller
+        owner-name: pod-health-sentinel
+        sensor-name: pod-health-sentinel
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          controller: sensor-controller
+          owner-name: pod-health-sentinel
+          sensor-name: pod-health-sentinel
+      spec:
+        containers:
+        - args:
+          - sensor-service
+          env:
+          - name: SENSOR_OBJECT
+            value: eyJtZXRhZGF0YSI6eyJuYW1lIjoicG9kLWhlYWx0aC1zZW50aW5lbCIsIm5hbWVzcGFjZSI6ImFyZ28tZXZlbnRzIiwiY3JlYXRpb25UaW1lc3RhbXAiOm51bGx9LCJzcGVjIjp7ImRlcGVuZGVuY2llcyI6W3sibmFtZSI6InBvZC1lcnJvciIsImV2ZW50U291cmNlTmFtZSI6InBvZC1lcnJvci1ldmVudHMiLCJldmVudE5hbWUiOiJwb2QtZXJyb3JzIiwiZmlsdGVycyI6eyJkYXRhIjpbeyJwYXRoIjoiYm9keS5tZXRhZGF0YS5uYW1lc3BhY2UiLCJ0eXBlIjoic3RyaW5nIiwidmFsdWUiOlsiYXJnbyIsImFyZ28tZXZlbnRzIiwia3ViZS1zeXN0ZW0iXSwiY29tcGFyYXRvciI6IiE9In1dLCJleHBycyI6W3siZXhwciI6IiEoaGFzKGJvZHkubWV0YWRhdGEubGFiZWxzKSBcdTAwMjZcdTAwMjYgaGFzKGJvZHkubWV0YWRhdGEubGFiZWxzWyd3b3JrZmxvd3MuYXJnb3Byb2ouaW8vd29ya2Zsb3cnXSkpIiwiZmllbGRzIjpbeyJwYXRoIjoiYm9keSIsIm5hbWUiOiJib2R5In1dfSx7ImV4cHIiOiJoYXMoYm9keS5zdGF0dXMuY29udGFpbmVyU3RhdHVzZXMpIFx1MDAyNlx1MDAyNiBcbmxlbihib2R5LnN0YXR1cy5jb250YWluZXJTdGF0dXNlcykgXHUwMDNlIDAgXHUwMDI2XHUwMDI2XG4oXG4gIChoYXMoYm9keS5zdGF0dXMuY29udGFpbmVyU3RhdHVzZXNbMF0uc3RhdGUud2FpdGluZykgXHUwMDI2XHUwMDI2IFxuICAgYm9keS5zdGF0dXMuY29udGFpbmVyU3RhdHVzZXNbMF0uc3RhdGUud2FpdGluZy5yZWFzb24gaW4gWydDcmFzaExvb3BCYWNrT2ZmJywgJ0ltYWdlUHVsbEJhY2tPZmYnLCAnRXJySW1hZ2VQdWxsJ10pIHx8XG4gIChoYXMoYm9keS5zdGF0dXMuY29udGFpbmVyU3RhdHVzZXNbMF0ucmVzdGFydENvdW50KSBcdTAwMjZcdTAwMjYgXG4gICBib2R5LnN0YXR1cy5jb250YWluZXJTdGF0dXNlc1swXS5yZXN0YXJ0Q291bnQgXHUwMDNlPSAzKVxuKVxuIiwiZmllbGRzIjpbeyJwYXRoIjoiYm9keSIsIm5hbWUiOiJib2R5In1dfV0sImV4cHJMb2dpY2FsT3BlcmF0b3IiOiJhbmQifX1dLCJ0cmlnZ2VycyI6W3sidGVtcGxhdGUiOnsibmFtZSI6ImZpeC1wb2QtZXJyb3JzIiwiYXJnb1dvcmtmbG93Ijp7InNvdXJjZSI6eyJyZXNvdXJjZSI6eyJhcGlWZXJzaW9uIjoiYXJnb3Byb2ouaW8vdjFhbHBoYTEiLCJraW5kIjoiV29ya2Zsb3ciLCJtZXRhZGF0YSI6eyJnZW5lcmF0ZU5hbWUiOiJhdXRvLWZpeC1wb2QtIiwibmFtZXNwYWNlIjoiYXJnbyJ9LCJzcGVjIjp7ImFyZ3VtZW50cyI6eyJwYXJhbWV0ZXJzIjpbeyJuYW1lIjoicG9kX25hbWUifSx7Im5hbWUiOiJuYW1lc3BhY2UifSx7Im5hbWUiOiJlcnJvcl9yZWFzb24ifV19LCJlbnRyeXBvaW50IjoicmVtZWRpYXRlLXBvZCIsIm9uRXhpdCI6ImV4aXQtaGFuZGxlciIsInNlcnZpY2VBY2NvdW50TmFtZSI6ImFyZ28td29ya2Zsb3dzLXdvcmtmbG93LWNvbnRyb2xsZXIiLCJzeW5jaHJvbml6YXRpb24iOnsibXV0ZXgiOnsibmFtZSI6InBvZC1yZW1lZGlhdGlvbiJ9fSwidGVtcGxhdGVzIjpbeyJpbnB1dHMiOnsicGFyYW1ldGVycyI6W3sibmFtZSI6InBvZF9uYW1lIn0seyJuYW1lIjoibmFtZXNwYWNlIn0seyJuYW1lIjoiZXJyb3JfcmVhc29uIn1dfSwibmFtZSI6InJlbWVkaWF0ZS1wb2QiLCJzdGVwcyI6W1t7ImFyZ3VtZW50cyI6eyJwYXJhbWV0ZXJzIjpbeyJuYW1lIjoicG9kX25hbWUiLCJ2YWx1ZSI6Int7aW5wdXRzLnBhcmFtZXRlcnMucG9kX25hbWV9fSJ9LHsibmFtZSI6Im5hbWVzcGFjZSIsInZhbHVlIjoie3tpbnB1dHMucGFyYW1ldGVycy5uYW1lc3BhY2V9fSJ9XX0sIm5hbWUiOiJkaWFnbm9zZSIsInRlbXBsYXRlIjoiZGlhZ25vc2UtcG9kIn1dLFt7ImFyZ3VtZW50cyI6eyJwYXJhbWV0ZXJzIjpbeyJuYW1lIjoicG9kX25hbWUiLCJ2YWx1ZSI6Int7aW5wdXRzLnBhcmFtZXRlcnMucG9kX25hbWV9fSJ9LHsibmFtZSI6Im5hbWVzcGFjZSIsInZhbHVlIjoie3tpbnB1dHMucGFyYW1ldGVycy5uYW1lc3BhY2V9fSJ9XX0sIm5hbWUiOiJmaXgtaW1hZ2UtcHVsbCIsInRlbXBsYXRlIjoiZml4LWltYWdlLXB1bGwtZXJyb3IiLCJ3aGVuIjoiJ3t7aW5wdXRzLnBhcmFtZXRlcnMuZXJyb3JfcmVhc29ufX0nID1+ICdJbWFnZVB1bGx8RXJySW1hZ2UnIn0seyJhcmd1bWVudHMiOnsicGFyYW1ldGVycyI6W3sibmFtZSI6InBvZF9uYW1lIiwidmFsdWUiOiJ7e2lucHV0cy5wYXJhbWV0ZXJzLnBvZF9uYW1lfX0ifSx7Im5hbWUiOiJuYW1lc3BhY2UiLCJ2YWx1ZSI6Int7aW5wdXRzLnBhcmFtZXRlcnMubmFtZXNwYWNlfX0ifV19LCJuYW1lIjoiZml4LWNyYXNobG9vcCIsInRlbXBsYXRlIjoiZml4LWNyYXNobG9vcC1lcnJvciIsIndoZW4iOiIne3tpbnB1dHMucGFyYW1ldGVycy5lcnJvcl9yZWFzb259fScgPT0gJ0NyYXNoTG9vcEJhY2tPZmYnIn1dXX0seyJpbnB1dHMiOnsicGFyYW1ldGVycyI6W3sibmFtZSI6InBvZF9uYW1lIn0seyJuYW1lIjoibmFtZXNwYWNlIn1dfSwibmFtZSI6ImRpYWdub3NlLXBvZCIsInNjcmlwdCI6eyJjb21tYW5kIjpbImJhc2giXSwiaW1hZ2UiOiJiaXRuYW1pL2t1YmVjdGw6bGF0ZXN0Iiwic291cmNlIjoiZWNobyBcIj09PSBEaWFnbm9zaW5nIHBvZCB7e2lucHV0cy5wYXJhbWV0ZXJzLnBvZF9uYW1lfX0gaW4ge3tpbnB1dHMucGFyYW1ldGVycy5uYW1lc3BhY2V9fSA9PT1cIlxua3ViZWN0bCBkZXNjcmliZSBwb2Qge3tpbnB1dHMucGFyYW1ldGVycy5wb2RfbmFtZX19IC1uIHt7aW5wdXRzLnBhcmFtZXRlcnMubmFtZXNwYWNlfX0gfCB0YWlsIC0zMFxuIn19LHsiaW5wdXRzIjp7InBhcmFtZXRlcnMiOlt7Im5hbWUiOiJwb2RfbmFtZSJ9LHsibmFtZSI6Im5hbWVzcGFjZSJ9XX0sIm5hbWUiOiJmaXgtaW1hZ2UtcHVsbC1lcnJvciIsInJldHJ5U3RyYXRlZ3kiOnsiYmFja29mZiI6eyJkdXJhdGlvbiI6IjMwcyIsImZhY3RvciI6Mn0sImxpbWl0IjoyfSwic2NyaXB0Ijp7ImNvbW1hbmQiOlsiYmFzaCJdLCJpbWFnZSI6ImJpdG5hbWkva3ViZWN0bDpsYXRlc3QiLCJzb3VyY2UiOiJlY2hvIFwiQXR0ZW1wdGluZyB0byBmaXggSW1hZ2VQdWxsIGVycm9yIGZvciB7e2lucHV0cy5wYXJhbWV0ZXJzLnBvZF9uYW1lfX1cIlxuIyBEZWxldGUgdGhlIHBvZCB0byB0cmlnZ2VyIHJlLXB1bGxcbmt1YmVjdGwgZGVsZXRlIHBvZCB7e2lucHV0cy5wYXJhbWV0ZXJzLnBvZF9uYW1lfX0gLW4ge3tpbnB1dHMucGFyYW1ldGVycy5uYW1lc3BhY2V9fSAtLWdyYWNlLXBlcmlvZD0wIHx8IHRydWVcbmVjaG8gXCJQb2QgZGVsZXRlZCAtIHdpbGwgYmUgcmVjcmVhdGVkIGJ5IGNvbnRyb2xsZXJcIlxuIn19LHsiaW5wdXRzIjp7InBhcmFtZXRlcnMiOlt7Im5hbWUiOiJwb2RfbmFtZSJ9LHsibmFtZSI6Im5hbWVzcGFjZSJ9XX0sIm5hbWUiOiJmaXgtY3Jhc2hsb29wLWVycm9yIiwicmV0cnlTdHJhdGVneSI6eyJiYWNrb2ZmIjp7ImR1cmF0aW9uIjoiMzBzIiwiZmFjdG9yIjoyfSwibGltaXQiOjJ9LCJzY3JpcHQiOnsiY29tbWFuZCI6WyJiYXNoIl0sImltYWdlIjoiYml0bmFtaS9rdWJlY3RsOmxhdGVzdCIsInNvdXJjZSI6ImVjaG8gXCJBdHRlbXB0aW5nIHRvIGZpeCBDcmFzaExvb3AgZm9yIHt7aW5wdXRzLnBhcmFtZXRlcnMucG9kX25hbWV9fVwiXG4jIEdldCBvd25lciByZWZlcmVuY2Vcbk9XTkVSPSQoa3ViZWN0bCBnZXQgcG9kIHt7aW5wdXRzLnBhcmFtZXRlcnMucG9kX25hbWV9fSAtbiB7e2lucHV0cy5wYXJhbWV0ZXJzLm5hbWVzcGFjZX19IC1vIGpzb25wYXRoPSd7Lm1ldGFkYXRhLm93bmVyUmVmZXJlbmNlc1swXS5raW5kfS97Lm1ldGFkYXRhLm93bmVyUmVmZXJlbmNlc1swXS5uYW1lfScgMlx1MDAzZS9kZXYvbnVsbCB8fCBlY2hvIFwiXCIpXG5pZiBbIC1uIFwiJE9XTkVSXCIgXTsgdGhlblxuICBLSU5EPSQoZWNobyAkT1dORVIgfCBjdXQgLWQnLycgLWYxKVxuICBOQU1FPSQoZWNobyAkT1dORVIgfCBjdXQgLWQnLycgLWYyKVxuICBpZiBbIFwiJEtJTkRcIiA9IFwiUmVwbGljYVNldFwiIF07IHRoZW5cbiAgICAjIEdldCBkZXBsb3ltZW50IGZyb20gcmVwbGljYXNldFxuICAgIERFUExPWT0kKGt1YmVjdGwgZ2V0IHJzICROQU1FIC1uIHt7aW5wdXRzLnBhcmFtZXRlcnMubmFtZXNwYWNlfX0gLW8ganNvbnBhdGg9J3subWV0YWRhdGEub3duZXJSZWZlcmVuY2VzWzBdLm5hbWV9JyAyXHUwMDNlL2Rldi9udWxsIHx8IGVjaG8gXCJcIilcbiAgICBpZiBbIC1uIFwiJERFUExPWVwiIF07IHRoZW5cbiAgICAgIGVjaG8gXCJSZXN0YXJ0aW5nIGRlcGxveW1lbnQ6ICRERVBMT1lcIlxuICAgICAga3ViZWN0bCByb2xsb3V0IHJlc3RhcnQgZGVwbG95bWVudC8kREVQTE9ZIC1uIHt7aW5wdXRzLnBhcmFtZXRlcnMubmFtZXNwYWNlfX1cbiAgICBmaVxuICBmaVxuZWxzZVxuICBlY2hvIFwiRGVsZXRpbmcgc3RhbmRhbG9uZSBwb2RcIlxuICBrdWJlY3RsIGRlbGV0ZSBwb2Qge3tpbnB1dHMucGFyYW1ldGVycy5wb2RfbmFtZX19IC1uIHt7aW5wdXRzLnBhcmFtZXRlcnMubmFtZXNwYWNlfX0gLS1ncmFjZS1wZXJpb2Q9MCB8fCB0cnVlXG5maVxuIn19LHsibmFtZSI6ImV4aXQtaGFuZGxlciIsInNjcmlwdCI6eyJjb21tYW5kIjpbInNoIl0sImltYWdlIjoiY3VybGltYWdlcy9jdXJsOmxhdGVzdCIsInNvdXJjZSI6ImVjaG8gXCJXb3JrZmxvdyB7e3dvcmtmbG93Lm5hbWV9fSBjb21wbGV0ZWQgd2l0aCBzdGF0dXM6IHt7d29ya2Zsb3cuc3RhdHVzfX1cIlxuIn19XX19fSwib3BlcmF0aW9uIjoic3VibWl0IiwicGFyYW1ldGVycyI6W3sic3JjIjp7ImRlcGVuZGVuY3lOYW1lIjoicG9kLWVycm9yIiwiZGF0YUtleSI6ImJvZHkubWV0YWRhdGEubmFtZSJ9LCJkZXN0Ijoic3BlYy5hcmd1bWVudHMucGFyYW1ldGVycy4wLnZhbHVlIn0seyJzcmMiOnsiZGVwZW5kZW5jeU5hbWUiOiJwb2QtZXJyb3IiLCJkYXRhS2V5IjoiYm9keS5tZXRhZGF0YS5uYW1lc3BhY2UifSwiZGVzdCI6InNwZWMuYXJndW1lbnRzLnBhcmFtZXRlcnMuMS52YWx1ZSJ9LHsic3JjIjp7ImRlcGVuZGVuY3lOYW1lIjoicG9kLWVycm9yIiwiZGF0YUtleSI6ImJvZHkuc3RhdHVzLmNvbnRhaW5lclN0YXR1c2VzLjAuc3RhdGUud2FpdGluZy5yZWFzb24ifSwiZGVzdCI6InNwZWMuYXJndW1lbnRzLnBhcmFtZXRlcnMuMi52YWx1ZSJ9XX19fV0sInRlbXBsYXRlIjp7InNlcnZpY2VBY2NvdW50TmFtZSI6ImFyZ28tZXZlbnRzLXNhIn0sImV2ZW50QnVzTmFtZSI6ImRlZmF1bHQiLCJsb2dnaW5nRmllbGRzIjpudWxsfSwic3RhdHVzIjp7fX0=
+          - name: EVENTBUS_SUBJECT
+            value: eventbus-argo-events
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: LEADER_ELECTION
+          - name: EVENTBUS_CONFIG
+            value: eyJuYXRzIjp7InVybCI6Im5hdHM6Ly9ldmVudGJ1cy1kZWZhdWx0LXN0YW4tc3ZjOjQyMjIiLCJjbHVzdGVySUQiOiJldmVudGJ1cy1kZWZhdWx0IiwiYXV0aCI6Im5vbmUifX0=
+          image: quay.io/argoproj/argo-events:v1.9.2
+          imagePullPolicy: Always
+          name: main
+          ports:
+          - containerPort: 7777
+            name: metrics
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: argo-events-sa
+        serviceAccountName: argo-events-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tmp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-22T03:23:32Z"
+      lastUpdateTime: "2026-01-22T03:23:41Z"
+      message: ReplicaSet "pod-health-sentinel-sensor-q6bvq-846df56d8f" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T19:59:41Z"
+      lastUpdateTime: "2026-01-27T19:59:41Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

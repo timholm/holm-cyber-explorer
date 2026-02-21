@@ -1,0 +1,116 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      deprecated.daemonset.template.generation: "1"
+    creationTimestamp: "2026-01-27T00:26:43Z"
+    generation: 1
+    labels:
+      component: velero
+    name: node-agent
+    namespace: velero
+    resourceVersion: "925552"
+    uid: 6eb0951d-e771-4760-875a-cc78dc3da85c
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        name: node-agent
+    template:
+      metadata:
+        labels:
+          component: velero
+          name: node-agent
+      spec:
+        containers:
+        - args:
+          - node-agent
+          - server
+          - --features=
+          command:
+          - /velero
+          env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: VELERO_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: VELERO_SCRATCH_DIR
+            value: /scratch
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /credentials/cloud
+          - name: AWS_SHARED_CREDENTIALS_FILE
+            value: /credentials/cloud
+          - name: AZURE_CREDENTIALS_FILE
+            value: /credentials/cloud
+          - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+            value: /credentials/cloud
+          image: velero/velero:v1.15.0
+          imagePullPolicy: IfNotPresent
+          name: node-agent
+          ports:
+          - containerPort: 8085
+            name: metrics
+            protocol: TCP
+          resources: {}
+          securityContext:
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /host_pods
+            mountPropagation: HostToContainer
+            name: host-pods
+          - mountPath: /var/lib/kubelet/plugins
+            mountPropagation: HostToContainer
+            name: host-plugins
+          - mountPath: /scratch
+            name: scratch
+          - mountPath: /credentials
+            name: cloud-credentials
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsUser: 0
+        serviceAccount: velero
+        serviceAccountName: velero
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /var/lib/kubelet/pods
+            type: ""
+          name: host-pods
+        - hostPath:
+            path: /var/lib/kubelet/plugins
+            type: ""
+          name: host-plugins
+        - emptyDir: {}
+          name: scratch
+        - name: cloud-credentials
+          secret:
+            defaultMode: 420
+            secretName: cloud-credentials
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 13
+    desiredNumberScheduled: 13
+    numberAvailable: 13
+    numberMisscheduled: 0
+    numberReady: 13
+    observedGeneration: 1
+    updatedNumberScheduled: 13
+kind: List
+metadata:
+  resourceVersion: ""

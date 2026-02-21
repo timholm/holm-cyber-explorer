@@ -1,0 +1,63 @@
+---
+- name: Synchronize system time (NTP)
+  hosts: "{{ target_hosts | default('all') }}"
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Display current time
+      command: date
+      register: current_time
+      changed_when: false
+
+    - name: Show current time
+      debug:
+        msg: "Current time: {{ current_time.stdout }}"
+
+    - name: Install chrony if not present
+      apt:
+        name: chrony
+        state: present
+      register: chrony_install
+
+    - name: Ensure chrony service is enabled
+      systemd:
+        name: chrony
+        enabled: yes
+        state: started
+
+    - name: Force time synchronization
+      command: chronyc -a makestep
+      register: sync_result
+      changed_when: "'200' in sync_result.stdout or 'OK' in sync_result.stdout"
+
+    - name: Wait for sync
+      pause:
+        seconds: 2
+
+    - name: Check chrony sources
+      command: chronyc sources
+      register: chrony_sources
+      changed_when: false
+
+    - name: Display chrony sources
+      debug:
+        msg: "{{ chrony_sources.stdout_lines }}"
+
+    - name: Display new time
+      command: date
+      register: new_time
+      changed_when: false
+
+    - name: Show synchronized time
+      debug:
+        msg: "Synchronized time: {{ new_time.stdout }}"
+
+    - name: Check time synchronization status
+      command: timedatectl status
+      register: timedatectl_status
+      changed_when: false
+
+    - name: Display sync status
+      debug:
+        msg: "{{ timedatectl_status.stdout_lines }}"

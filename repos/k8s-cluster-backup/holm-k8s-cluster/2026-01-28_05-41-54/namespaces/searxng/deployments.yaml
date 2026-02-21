@@ -1,0 +1,224 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: searxng:apps/Deployment:searxng/searxng
+      deployment.kubernetes.io/revision: "4"
+    creationTimestamp: "2026-01-20T07:45:48Z"
+    generation: 4
+    labels:
+      app.kubernetes.io/instance: searxng
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: searxng
+      app.kubernetes.io/version: latest
+      helm.sh/chart: searxng-1.0.1
+    name: searxng
+    namespace: searxng
+    resourceVersion: "1036"
+    uid: f1161239-9749-4b2f-b9e3-b7df4095b9db
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: searxng
+        app.kubernetes.io/name: searxng
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/instance: searxng
+          app.kubernetes.io/name: searxng
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - env:
+          - name: AUTOCOMPLETE
+            value: "true"
+          - name: BASE_URL
+            value: https://search.holm.chat/
+          - name: INSTANCE_NAME
+            value: searxng
+          image: docker.io/searxng/searxng:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: searxng
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /config
+            name: config
+          - mountPath: /etc/searxng/settings.yml
+            name: searxng-config
+            subPath: settings.yml
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: true
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: default
+        serviceAccountName: default
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: searxng-config
+        - name: searxng-config
+          secret:
+            defaultMode: 420
+            secretName: searxng-config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-20T07:45:48Z"
+      lastUpdateTime: "2026-01-20T08:04:12Z"
+      message: ReplicaSet "searxng-85996cbdc8" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:59:52Z"
+      lastUpdateTime: "2026-01-27T02:59:52Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 4
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: searxng:apps/Deployment:searxng/searxng-redis
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2026-01-20T07:45:48Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: searxng
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/version: 6.2.6
+      helm.sh/chart: redis-0.0.3
+    name: searxng-redis
+    namespace: searxng
+    resourceVersion: "1037"
+    uid: 6e2ff22d-90b6-4e79-b28a-2f11afcb6e41
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: searxng
+        app.kubernetes.io/name: redis
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/instance: searxng
+          app.kubernetes.io/name: redis
+      spec:
+        containers:
+        - env:
+          - name: TZ
+            value: UTC
+          image: redis:6.2.6
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: redis
+          ports:
+          - containerPort: 6379
+            name: http
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: default
+        serviceAccountName: default
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-20T07:45:48Z"
+      lastUpdateTime: "2026-01-20T07:46:29Z"
+      message: ReplicaSet "searxng-redis-97977d9f4" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T04:38:44Z"
+      lastUpdateTime: "2026-01-27T04:38:44Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

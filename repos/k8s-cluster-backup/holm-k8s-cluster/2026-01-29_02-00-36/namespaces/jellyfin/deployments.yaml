@@ -1,0 +1,199 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: jellyfin:apps/Deployment:jellyfin/jellyfin
+      deployment.kubernetes.io/revision: "4"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"jellyfin:apps/Deployment:jellyfin/jellyfin"},"labels":{"app.kubernetes.io/instance":"jellyfin","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"jellyfin","app.kubernetes.io/version":"10.11.5","helm.sh/chart":"jellyfin-2.7.0"},"name":"jellyfin","namespace":"jellyfin"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/instance":"jellyfin","app.kubernetes.io/name":"jellyfin"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app.kubernetes.io/instance":"jellyfin","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"jellyfin","app.kubernetes.io/version":"10.11.5","helm.sh/chart":"jellyfin-2.7.0"}},"spec":{"containers":[{"image":"docker.io/jellyfin/jellyfin:10.10.7","imagePullPolicy":"IfNotPresent","livenessProbe":{"initialDelaySeconds":10,"tcpSocket":{"port":"http"}},"name":"jellyfin","ports":[{"containerPort":8096,"name":"http","protocol":"TCP"}],"readinessProbe":{"initialDelaySeconds":10,"tcpSocket":{"port":"http"}},"resources":{},"securityContext":{},"volumeMounts":[{"mountPath":"/config","name":"config"},{"mountPath":"/media","name":"media"},{"mountPath":"/media/movies-external","name":"movies-external","readOnly":true},{"mountPath":"/media/movies-filebot","name":"movies-filebot","readOnly":true},{"mountPath":"/media/HD01","name":"movies-hd01","readOnly":true},{"mountPath":"/media/HD02","name":"movies-hd02","readOnly":true},{"mountPath":"/media/HD03","name":"movies-hd03","readOnly":true},{"mountPath":"/media/HD04","name":"movies-hd04","readOnly":true},{"mountPath":"/media/HD05","name":"movies-hd05","readOnly":true},{"mountPath":"/media/HD06","name":"movies-hd06","readOnly":true},{"mountPath":"/media/HD07","name":"movies-hd07","readOnly":true},{"mountPath":"/media/HD08","name":"movies-hd08","readOnly":true},{"mountPath":"/media/HD09","name":"movies-hd09","readOnly":true},{"mountPath":"/media/HD10","name":"movies-hd10","readOnly":true},{"mountPath":"/media/HD11","name":"movies-hd11","readOnly":true},{"mountPath":"/media/HD12","name":"movies-hd12","readOnly":true}]}],"securityContext":{},"serviceAccountName":"jellyfin","volumes":[{"name":"config","persistentVolumeClaim":{"claimName":"jellyfin-config"}},{"name":"media","persistentVolumeClaim":{"claimName":"jellyfin-media"}},{"name":"movies-external","persistentVolumeClaim":{"claimName":"movies-external"}},{"name":"movies-filebot","persistentVolumeClaim":{"claimName":"movies-filebot"}},{"name":"movies-hd01","persistentVolumeClaim":{"claimName":"movies-hd01"}},{"name":"movies-hd02","persistentVolumeClaim":{"claimName":"movies-hd02"}},{"name":"movies-hd03","persistentVolumeClaim":{"claimName":"movies-hd03"}},{"name":"movies-hd04","persistentVolumeClaim":{"claimName":"movies-hd04"}},{"name":"movies-hd05","persistentVolumeClaim":{"claimName":"movies-hd05"}},{"name":"movies-hd06","persistentVolumeClaim":{"claimName":"movies-hd06"}},{"name":"movies-hd07","persistentVolumeClaim":{"claimName":"movies-hd07"}},{"name":"movies-hd08","persistentVolumeClaim":{"claimName":"movies-hd08"}},{"name":"movies-hd09","persistentVolumeClaim":{"claimName":"movies-hd09"}},{"name":"movies-hd10","persistentVolumeClaim":{"claimName":"movies-hd10"}},{"name":"movies-hd11","persistentVolumeClaim":{"claimName":"movies-hd11"}},{"name":"movies-hd12","persistentVolumeClaim":{"claimName":"movies-hd12"}}]}}}}
+    creationTimestamp: "2026-01-25T01:42:05Z"
+    generation: 8
+    labels:
+      app.kubernetes.io/instance: jellyfin
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jellyfin
+      app.kubernetes.io/version: 10.11.5
+      helm.sh/chart: jellyfin-2.7.0
+    name: jellyfin
+    namespace: jellyfin
+    resourceVersion: "1003"
+    uid: ab791e37-f221-4f89-84df-8a62b05f2d52
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: jellyfin
+        app.kubernetes.io/name: jellyfin
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-25T02:31:27Z"
+        labels:
+          app.kubernetes.io/instance: jellyfin
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: jellyfin
+          app.kubernetes.io/version: 10.11.5
+          helm.sh/chart: jellyfin-2.7.0
+      spec:
+        containers:
+        - image: docker.io/jellyfin/jellyfin:10.10.7
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: http
+            timeoutSeconds: 1
+          name: jellyfin
+          ports:
+          - containerPort: 8096
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: http
+            timeoutSeconds: 1
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /config
+            name: config
+          - mountPath: /media
+            name: media
+          - mountPath: /media/movies-external
+            name: movies-external
+            readOnly: true
+          - mountPath: /media/movies-filebot
+            name: movies-filebot
+            readOnly: true
+          - mountPath: /media/HD01
+            name: movies-hd01
+            readOnly: true
+          - mountPath: /media/HD02
+            name: movies-hd02
+            readOnly: true
+          - mountPath: /media/HD03
+            name: movies-hd03
+            readOnly: true
+          - mountPath: /media/HD04
+            name: movies-hd04
+            readOnly: true
+          - mountPath: /media/HD05
+            name: movies-hd05
+            readOnly: true
+          - mountPath: /media/HD06
+            name: movies-hd06
+            readOnly: true
+          - mountPath: /media/HD07
+            name: movies-hd07
+            readOnly: true
+          - mountPath: /media/HD08
+            name: movies-hd08
+            readOnly: true
+          - mountPath: /media/HD09
+            name: movies-hd09
+            readOnly: true
+          - mountPath: /media/HD10
+            name: movies-hd10
+            readOnly: true
+          - mountPath: /media/HD11
+            name: movies-hd11
+            readOnly: true
+          - mountPath: /media/HD12
+            name: movies-hd12
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: jellyfin
+        serviceAccountName: jellyfin
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: jellyfin-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: jellyfin-media
+        - name: movies-external
+          persistentVolumeClaim:
+            claimName: movies-external
+        - name: movies-filebot
+          persistentVolumeClaim:
+            claimName: movies-filebot
+        - name: movies-hd01
+          persistentVolumeClaim:
+            claimName: movies-hd01
+        - name: movies-hd02
+          persistentVolumeClaim:
+            claimName: movies-hd02
+        - name: movies-hd03
+          persistentVolumeClaim:
+            claimName: movies-hd03
+        - name: movies-hd04
+          persistentVolumeClaim:
+            claimName: movies-hd04
+        - name: movies-hd05
+          persistentVolumeClaim:
+            claimName: movies-hd05
+        - name: movies-hd06
+          persistentVolumeClaim:
+            claimName: movies-hd06
+        - name: movies-hd07
+          persistentVolumeClaim:
+            claimName: movies-hd07
+        - name: movies-hd08
+          persistentVolumeClaim:
+            claimName: movies-hd08
+        - name: movies-hd09
+          persistentVolumeClaim:
+            claimName: movies-hd09
+        - name: movies-hd10
+          persistentVolumeClaim:
+            claimName: movies-hd10
+        - name: movies-hd11
+          persistentVolumeClaim:
+            claimName: movies-hd11
+        - name: movies-hd12
+          persistentVolumeClaim:
+            claimName: movies-hd12
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T02:53:25Z"
+      lastUpdateTime: "2026-01-25T03:06:40Z"
+      message: ReplicaSet "jellyfin-797896f6cb" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T03:33:55Z"
+      lastUpdateTime: "2026-01-27T03:33:55Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 8
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

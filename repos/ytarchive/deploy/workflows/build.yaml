@@ -1,0 +1,74 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ytarchive-build
+  namespace: argo
+  labels:
+    app: ytarchive
+spec:
+  entrypoint: build
+  serviceAccountName: default
+  arguments:
+    parameters:
+      - name: revision
+        value: main
+  templates:
+    - name: build
+      dag:
+        tasks:
+          - name: build-controller
+            template: ko-build
+            arguments:
+              parameters:
+                - name: component
+                  value: controller
+          - name: build-worker
+            template: ko-build
+            arguments:
+              parameters:
+                - name: component
+                  value: worker
+
+    - name: ko-build
+      inputs:
+        parameters:
+          - name: component
+      container:
+        image: golang:1.21-alpine
+        command: [sh, -c]
+        args:
+          - |
+            set -e
+            apk add --no-cache git
+            go install github.com/google/ko@latest
+
+            git clone https://github.com/timholm/ytarchive.git /src
+            cd /src
+            git checkout {{workflow.parameters.revision}}
+
+            export KO_DOCKER_REPO=ghcr.io/timholm/ytarchive
+            export DOCKER_CONFIG=/docker
+
+            echo "Building {{inputs.parameters.component}}..."
+            DIGEST=$(/root/go/bin/ko build ./cmd/{{inputs.parameters.component}} --platform=linux/arm64 --bare --push)
+            echo "Built: $DIGEST"
+        env:
+          - name: DOCKER_CONFIG
+            value: /docker
+        volumeMounts:
+          - name: docker-config
+            mountPath: /docker
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 500m
+          limits:
+            memory: 2Gi
+            cpu: 2000m
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: ghcr-auth
+            items:
+              - key: .dockerconfigjson
+                path: config.json

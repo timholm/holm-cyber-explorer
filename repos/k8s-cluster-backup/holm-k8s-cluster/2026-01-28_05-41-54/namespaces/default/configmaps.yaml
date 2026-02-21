@@ -1,0 +1,4447 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: argo-rollouts
+      meta.helm.sh/release-namespace: default
+    creationTimestamp: "2026-01-18T15:46:55Z"
+    labels:
+      app.kubernetes.io/component: rollouts-controller
+      app.kubernetes.io/instance: argo-rollouts
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argo-rollouts
+      app.kubernetes.io/part-of: argo-rollouts
+      app.kubernetes.io/version: v1.8.3
+      helm.sh/chart: argo-rollouts-2.40.5
+    name: argo-rollouts-config
+    namespace: default
+    resourceVersion: "718"
+    uid: f318e330-f6a3-4519-bc9d-aeb40b9cd017
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: argo-rollouts
+      meta.helm.sh/release-namespace: default
+    creationTimestamp: "2026-01-18T15:46:55Z"
+    labels:
+      app.kubernetes.io/component: rollouts-controller
+      app.kubernetes.io/instance: argo-rollouts
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argo-rollouts
+      app.kubernetes.io/part-of: argo-rollouts
+      app.kubernetes.io/version: v1.8.3
+      helm.sh/chart: argo-rollouts-2.40.5
+    name: argo-rollouts-notification-configmap
+    namespace: default
+    resourceVersion: "719"
+    uid: 7abea936-b2a4-45e6-a6b7-b750c2bed784
+- apiVersion: v1
+  data:
+    context: "argocdUrl: \n"
+    service.slack: |
+      token: $slack-token
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: argocd-notifications
+      meta.helm.sh/release-namespace: default
+    creationTimestamp: "2026-01-18T15:43:42Z"
+    labels:
+      app.kubernetes.io/instance: argocd-notifications
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argocd-notifications
+      app.kubernetes.io/version: v1.2.1
+      helm.sh/chart: argocd-notifications-1.8.1
+    name: argocd-notifications-cm
+    namespace: default
+    resourceVersion: "720"
+    uid: 81cf4f37-1fd4-41c7-9982-b21b045962ff
+- apiVersion: v1
+  data:
+    BOOKFORGE_LOG_LEVEL: INFO
+    BOOKFORGE_NUM_WORKERS: "4"
+    OLLAMA_MODEL: mistral-nemo
+    OLLAMA_URL: http://192.168.8.230:11434
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"BOOKFORGE_LOG_LEVEL":"INFO","BOOKFORGE_NUM_WORKERS":"4","OLLAMA_MODEL":"mistral-nemo","OLLAMA_URL":"http://192.168.8.230:11434"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"bookforge-config","namespace":"default"}}
+    creationTimestamp: "2026-01-19T21:25:23Z"
+    name: bookforge-config
+    namespace: default
+    resourceVersion: "721"
+    uid: 6c071834-41a5-44c0-bee6-3e4475cf0694
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}
+          #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}
+          #terminal.live-mode{border-left:3px solid #4ade80}
+          .mode-indicator{font-size:.7rem;padding:.2rem .5rem;border-radius:3px;background:#4ade80;color:#000;margin-left:.5rem}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="terminal" tabindex="0">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below OR click terminal and type directly!
+
+      TIP: Click anywhere in this terminal to type directly into Claude.</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+          <button id="stop" onclick="stopClaude()" style="background:#dc2626">Stop</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('/api/resume', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Resuming', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function startLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            // Poll every 1 second for live updates
+            refreshInterval = setInterval(refreshOutput, 1000);
+          }
+
+          function stopLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading');
+              // Start live polling to see Claude's response in real-time
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          // Live terminal keyboard input
+          let liveMode = false;
+
+          terminal.addEventListener('focus', () => {
+            liveMode = true;
+            terminal.classList.add('live-mode');
+            setStatus('Live Mode - Type directly!', 'ok');
+          });
+
+          terminal.addEventListener('blur', () => {
+            liveMode = false;
+            terminal.classList.remove('live-mode');
+            setStatus('Ready', '');
+          });
+
+          terminal.addEventListener('keydown', async (e) => {
+            if (!liveMode) return;
+
+            // Prevent default for most keys to avoid browser shortcuts
+            const allowDefault = ['F5', 'F12']; // Allow refresh and devtools
+            if (!allowDefault.includes(e.key)) {
+              e.preventDefault();
+            }
+
+            // Handle Ctrl+C specially
+            if (e.ctrlKey && e.key === 'c') {
+              await sendKeys('C-c');
+              return;
+            }
+
+            // Handle Ctrl+D
+            if (e.ctrlKey && e.key === 'd') {
+              await sendKeys('C-d');
+              return;
+            }
+
+            // Handle Ctrl+Z
+            if (e.ctrlKey && e.key === 'z') {
+              await sendKeys('C-z');
+              return;
+            }
+
+            // Skip modifier-only keys
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+            // Send the key
+            await sendKeys(e.key);
+          });
+
+          async function sendKeys(keys) {
+            try {
+              await fetch('/api/keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keys })
+              });
+            } catch (e) {
+              console.error('Failed to send keys:', e);
+            }
+          }
+
+          async function stopClaude() {
+            setStatus('Stopping...', 'loading');
+            await sendKeys('C-c');
+            setTimeout(() => {
+              refreshOutput();
+              setStatus('Stopped', 'ok');
+            }, 500);
+          }
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          // Start claude with --dangerously-skip-permissions
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', (req, res) => {
+        try {
+          // Kill existing session and start claude with --resume
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Return immediately - frontend will poll /api/output for live updates
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      // Send raw keystrokes to tmux (for live terminal interaction)
+      app.post('/api/keys', (req, res) => {
+        try {
+          const { keys } = req.body;
+          if (!keys) return res.status(400).json({ error: 'Keys required' });
+
+          // Handle special keys
+          const keyMap = {
+            'Backspace': 'BSpace',
+            'Delete': 'DC',
+            'Escape': 'Escape',
+            'Tab': 'Tab',
+            'ArrowUp': 'Up',
+            'ArrowDown': 'Down',
+            'ArrowLeft': 'Left',
+            'ArrowRight': 'Right',
+            'Home': 'Home',
+            'End': 'End',
+            'PageUp': 'PPage',
+            'PageDown': 'NPage'
+          };
+
+          const tmuxKey = keyMap[keys] || keys;
+
+          if (keyMap[keys]) {
+            // Special key
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);
+          } else if (keys === 'Enter') {
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          } else {
+            // Regular text - escape single quotes
+            const escaped = keys.replace(/'/g, "'\\''");
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);
+          }
+
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T02:47:39Z"
+    name: claude-webui-source-v10
+    namespace: default
+    resourceVersion: "722"
+    uid: 6014017a-05f0-47b1-ab3c-4ad2d457eb70
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}
+          #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}
+          #terminal.live-mode{border-left:3px solid #4ade80}
+          .mode-indicator{font-size:.7rem;padding:.2rem .5rem;border-radius:3px;background:#4ade80;color:#000;margin-left:.5rem}
+          #session-picker{display:none;background:#16213e;border-bottom:1px solid #0f3460;padding:.5rem;max-height:200px;overflow-y:auto}
+          #session-picker.show{display:block}
+          #session-picker h3{font-size:.9rem;color:#e94560;margin-bottom:.5rem}
+          .session-btn{display:block;width:100%;text-align:left;padding:.5rem .8rem;margin:.3rem 0;background:#0f3460;border:none;border-radius:4px;color:#eee;cursor:pointer;font-size:.8rem}
+          .session-btn:hover{background:#1a4a7a}
+          .session-btn .time{color:#888;font-size:.7rem;margin-left:.5rem}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="session-picker">
+          <h3>Select a session to resume:</h3>
+          <div id="session-list"></div>
+        </div>
+
+        <div id="terminal" tabindex="0">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below OR click terminal and type directly!
+
+      TIP: Click anywhere in this terminal to type directly into Claude.</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+          <button id="stop" onclick="stopClaude()" style="background:#dc2626">Stop</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          let inResumeMode = false;
+          let parsedSessions = [];
+
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('/api/resume', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              inResumeMode = true;
+              setStatus('Loading sessions...', 'loading');
+              // Wait for session list to appear, then parse it
+              setTimeout(async () => {
+                await refreshOutput();
+                parseAndShowSessions();
+              }, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function parseAndShowSessions() {
+            const output = terminal.textContent;
+            // Look for session lines - they have format: "  description\n  X ago · Y messages"
+            // or with arrow: "↓ description" or "> description"
+            const lines = output.split('\n');
+            const sessions = [];
+
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              const nextLine = lines[i + 1] || '';
+
+              // Check if next line contains time pattern like "X ago · Y messages"
+              if (nextLine.match(/\d+\s+(minutes?|hours?|days?)\s+ago\s+·\s+\d+\s+messages?/i)) {
+                // This line is a session description
+                let desc = line.trim();
+                // Remove leading markers like ↓ or >
+                desc = desc.replace(/^[↓>]\s*/, '').trim();
+                if (desc && desc.length > 2) {
+                  const timeMatch = nextLine.match(/(\d+\s+(?:minutes?|hours?|days?)\s+ago)/i);
+                  const msgMatch = nextLine.match(/(\d+)\s+messages?/i);
+                  sessions.push({
+                    description: desc.substring(0, 60) + (desc.length > 60 ? '...' : ''),
+                    time: timeMatch ? timeMatch[1] : '',
+                    messages: msgMatch ? msgMatch[1] : '0',
+                    index: sessions.length
+                  });
+                }
+              }
+            }
+
+            parsedSessions = sessions;
+
+            if (sessions.length > 0) {
+              showSessionPicker(sessions);
+              setStatus('Select a session', 'ok');
+            } else {
+              setStatus('No sessions found', 'error');
+            }
+          }
+
+          function showSessionPicker(sessions) {
+            const picker = document.getElementById('session-picker');
+            const list = document.getElementById('session-list');
+            list.innerHTML = '';
+
+            sessions.forEach((s, idx) => {
+              const btn = document.createElement('button');
+              btn.className = 'session-btn';
+              btn.innerHTML = `${s.description} <span class="time">${s.time} · ${s.messages} msgs</span>`;
+              btn.onclick = () => selectSession(idx);
+              list.appendChild(btn);
+            });
+
+            picker.classList.add('show');
+          }
+
+          async function selectSession(index) {
+            setStatus('Selecting session...', 'loading');
+            document.getElementById('session-picker').classList.remove('show');
+
+            // First, send Escape to clear any search text, then navigate
+            await sendKeys('Escape');
+            await sleep(200);
+
+            // Send Down arrow 'index' times to reach the session
+            for (let i = 0; i < index; i++) {
+              await sendKeys('ArrowDown');
+              await sleep(100);
+            }
+
+            // Press Enter to select
+            await sleep(200);
+            await sendKeys('Enter');
+
+            inResumeMode = false;
+            setStatus('Session loaded!', 'ok');
+            setTimeout(refreshOutput, 1000);
+          }
+
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          function startLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            // Poll every 1 second for live updates
+            refreshInterval = setInterval(refreshOutput, 1000);
+          }
+
+          function stopLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading');
+              // Start live polling to see Claude's response in real-time
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          // Live terminal keyboard input
+          let liveMode = false;
+
+          terminal.addEventListener('focus', () => {
+            liveMode = true;
+            terminal.classList.add('live-mode');
+            setStatus('Live Mode - Type directly!', 'ok');
+          });
+
+          terminal.addEventListener('blur', () => {
+            liveMode = false;
+            terminal.classList.remove('live-mode');
+            setStatus('Ready', '');
+          });
+
+          terminal.addEventListener('keydown', async (e) => {
+            if (!liveMode) return;
+
+            // Prevent default for most keys to avoid browser shortcuts
+            const allowDefault = ['F5', 'F12']; // Allow refresh and devtools
+            if (!allowDefault.includes(e.key)) {
+              e.preventDefault();
+            }
+
+            // Handle Ctrl+C specially
+            if (e.ctrlKey && e.key === 'c') {
+              await sendKeys('C-c');
+              return;
+            }
+
+            // Handle Ctrl+D
+            if (e.ctrlKey && e.key === 'd') {
+              await sendKeys('C-d');
+              return;
+            }
+
+            // Handle Ctrl+Z
+            if (e.ctrlKey && e.key === 'z') {
+              await sendKeys('C-z');
+              return;
+            }
+
+            // Skip modifier-only keys
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+            // Send the key
+            await sendKeys(e.key);
+          });
+
+          async function sendKeys(keys) {
+            try {
+              await fetch('/api/keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keys })
+              });
+            } catch (e) {
+              console.error('Failed to send keys:', e);
+            }
+          }
+
+          async function stopClaude() {
+            setStatus('Stopping...', 'loading');
+            await sendKeys('C-c');
+            setTimeout(() => {
+              refreshOutput();
+              setStatus('Stopped', 'ok');
+            }, 500);
+          }
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          // Start claude with --dangerously-skip-permissions
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', (req, res) => {
+        try {
+          // Kill existing session and start claude with --resume
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Return immediately - frontend will poll /api/output for live updates
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      // Send raw keystrokes to tmux (for live terminal interaction)
+      app.post('/api/keys', (req, res) => {
+        try {
+          const { keys } = req.body;
+          if (!keys) return res.status(400).json({ error: 'Keys required' });
+
+          // Handle special keys
+          const keyMap = {
+            'Backspace': 'BSpace',
+            'Delete': 'DC',
+            'Escape': 'Escape',
+            'Tab': 'Tab',
+            'ArrowUp': 'Up',
+            'ArrowDown': 'Down',
+            'ArrowLeft': 'Left',
+            'ArrowRight': 'Right',
+            'Home': 'Home',
+            'End': 'End',
+            'PageUp': 'PPage',
+            'PageDown': 'NPage'
+          };
+
+          const tmuxKey = keyMap[keys] || keys;
+
+          if (keyMap[keys]) {
+            // Special key
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);
+          } else if (keys === 'Enter') {
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          } else {
+            // Regular text - escape single quotes
+            const escaped = keys.replace(/'/g, "'\\''");
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);
+          }
+
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T02:58:56Z"
+    name: claude-webui-source-v11
+    namespace: default
+    resourceVersion: "723"
+    uid: 6e6259c7-e1cc-445d-97e6-fb886abf991d
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}
+          #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}
+          #terminal.live-mode{border-left:3px solid #4ade80}
+          .mode-indicator{font-size:.7rem;padding:.2rem .5rem;border-radius:3px;background:#4ade80;color:#000;margin-left:.5rem}
+          #session-picker{display:none;background:#16213e;border-bottom:1px solid #0f3460;padding:.5rem;max-height:200px;overflow-y:auto}
+          #session-picker.show{display:block}
+          #session-picker h3{font-size:.9rem;color:#e94560;margin-bottom:.5rem}
+          .session-btn{display:block;width:100%;text-align:left;padding:.5rem .8rem;margin:.3rem 0;background:#0f3460;border:none;border-radius:4px;color:#eee;cursor:pointer;font-size:.8rem}
+          .session-btn:hover{background:#1a4a7a}
+          .session-btn .time{color:#888;font-size:.7rem;margin-left:.5rem}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="session-picker">
+          <h3>Select a session to resume:</h3>
+          <div id="session-list"></div>
+        </div>
+
+        <div id="terminal" tabindex="0">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below OR click terminal and type directly!
+
+      TIP: Click anywhere in this terminal to type directly into Claude.</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+          <button id="stop" onclick="stopClaude()" style="background:#dc2626">Stop</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          let inResumeMode = false;
+          let parsedSessions = [];
+
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('/api/resume', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              inResumeMode = true;
+              setStatus('Loading sessions...', 'loading');
+              // Wait for session list to appear, then parse it
+              setTimeout(async () => {
+                await refreshOutput();
+                parseAndShowSessions();
+              }, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function parseAndShowSessions() {
+            const output = terminal.textContent;
+            // Look for session lines - they have format: "  description\n  X ago · Y messages"
+            // or with arrow: "↓ description" or "> description"
+            const lines = output.split('\n');
+            const sessions = [];
+
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              const nextLine = lines[i + 1] || '';
+
+              // Check if next line contains time pattern like "X ago · Y messages"
+              if (nextLine.match(/\d+\s+(minutes?|hours?|days?)\s+ago\s+·\s+\d+\s+messages?/i)) {
+                // This line is a session description
+                let desc = line.trim();
+                // Remove leading markers like ↓ or >
+                desc = desc.replace(/^[↓>]\s*/, '').trim();
+                if (desc && desc.length > 2) {
+                  const timeMatch = nextLine.match(/(\d+\s+(?:minutes?|hours?|days?)\s+ago)/i);
+                  const msgMatch = nextLine.match(/(\d+)\s+messages?/i);
+                  sessions.push({
+                    description: desc.substring(0, 60) + (desc.length > 60 ? '...' : ''),
+                    time: timeMatch ? timeMatch[1] : '',
+                    messages: msgMatch ? msgMatch[1] : '0',
+                    index: sessions.length
+                  });
+                }
+              }
+            }
+
+            parsedSessions = sessions;
+
+            if (sessions.length > 0) {
+              showSessionPicker(sessions);
+              setStatus('Select a session', 'ok');
+            } else {
+              setStatus('No sessions found', 'error');
+            }
+          }
+
+          function showSessionPicker(sessions) {
+            const picker = document.getElementById('session-picker');
+            const list = document.getElementById('session-list');
+            list.innerHTML = '';
+
+            sessions.forEach((s, idx) => {
+              const btn = document.createElement('button');
+              btn.className = 'session-btn';
+              btn.innerHTML = `${s.description} <span class="time">${s.time} · ${s.messages} msgs</span>`;
+              btn.onclick = () => selectSession(idx);
+              list.appendChild(btn);
+            });
+
+            picker.classList.add('show');
+          }
+
+          async function selectSession(index) {
+            setStatus('Selecting session...', 'loading');
+            document.getElementById('session-picker').classList.remove('show');
+
+            // First go back to top with Up arrows (in case we scrolled down before)
+            for (let i = 0; i < 20; i++) {
+              await sendKeys('ArrowUp');
+              await sleep(50);
+            }
+
+            // Now send Down arrow 'index' times to reach the session
+            for (let i = 0; i < index; i++) {
+              await sendKeys('ArrowDown');
+              await sleep(100);
+            }
+
+            // Press Enter to select
+            await sleep(300);
+            await sendKeys('Enter');
+
+            inResumeMode = false;
+            setStatus('Session loaded!', 'ok');
+            setTimeout(refreshOutput, 2000);
+          }
+
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          function startLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            // Poll every 1 second for live updates
+            refreshInterval = setInterval(refreshOutput, 1000);
+          }
+
+          function stopLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading');
+              // Start live polling to see Claude's response in real-time
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          // Live terminal keyboard input
+          let liveMode = false;
+
+          terminal.addEventListener('focus', () => {
+            liveMode = true;
+            terminal.classList.add('live-mode');
+            setStatus('Live Mode - Type directly!', 'ok');
+          });
+
+          terminal.addEventListener('blur', () => {
+            liveMode = false;
+            terminal.classList.remove('live-mode');
+            setStatus('Ready', '');
+          });
+
+          terminal.addEventListener('keydown', async (e) => {
+            if (!liveMode) return;
+
+            // Prevent default for most keys to avoid browser shortcuts
+            const allowDefault = ['F5', 'F12']; // Allow refresh and devtools
+            if (!allowDefault.includes(e.key)) {
+              e.preventDefault();
+            }
+
+            // Handle Ctrl+C specially
+            if (e.ctrlKey && e.key === 'c') {
+              await sendKeys('C-c');
+              return;
+            }
+
+            // Handle Ctrl+D
+            if (e.ctrlKey && e.key === 'd') {
+              await sendKeys('C-d');
+              return;
+            }
+
+            // Handle Ctrl+Z
+            if (e.ctrlKey && e.key === 'z') {
+              await sendKeys('C-z');
+              return;
+            }
+
+            // Skip modifier-only keys
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+            // Send the key
+            await sendKeys(e.key);
+          });
+
+          async function sendKeys(keys) {
+            try {
+              await fetch('/api/keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keys })
+              });
+            } catch (e) {
+              console.error('Failed to send keys:', e);
+            }
+          }
+
+          async function stopClaude() {
+            setStatus('Stopping...', 'loading');
+            await sendKeys('C-c');
+            setTimeout(() => {
+              refreshOutput();
+              setStatus('Stopped', 'ok');
+            }, 500);
+          }
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          // Start claude with --dangerously-skip-permissions
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', (req, res) => {
+        try {
+          // Kill existing session and start claude with --resume
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Return immediately - frontend will poll /api/output for live updates
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      // Send raw keystrokes to tmux (for live terminal interaction)
+      app.post('/api/keys', (req, res) => {
+        try {
+          const { keys } = req.body;
+          if (!keys) return res.status(400).json({ error: 'Keys required' });
+
+          // Handle special keys
+          const keyMap = {
+            'Backspace': 'BSpace',
+            'Delete': 'DC',
+            'Escape': 'Escape',
+            'Tab': 'Tab',
+            'ArrowUp': 'Up',
+            'ArrowDown': 'Down',
+            'ArrowLeft': 'Left',
+            'ArrowRight': 'Right',
+            'Home': 'Home',
+            'End': 'End',
+            'PageUp': 'PPage',
+            'PageDown': 'NPage'
+          };
+
+          const tmuxKey = keyMap[keys] || keys;
+
+          if (keyMap[keys]) {
+            // Special key
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);
+          } else if (keys === 'Enter') {
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          } else {
+            // Regular text - escape single quotes
+            const escaped = keys.replace(/'/g, "'\\''");
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);
+          }
+
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T03:04:19Z"
+    name: claude-webui-source-v12
+    namespace: default
+    resourceVersion: "724"
+    uid: fe950930-9d8c-4c55-bda9-929067aa67e7
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}
+          #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}
+          #terminal.live-mode{border-left:3px solid #4ade80}
+          .mode-indicator{font-size:.7rem;padding:.2rem .5rem;border-radius:3px;background:#4ade80;color:#000;margin-left:.5rem}
+          #session-picker{display:none;background:#16213e;border-bottom:1px solid #0f3460;padding:.5rem;max-height:200px;overflow-y:auto}
+          #session-picker.show{display:block}
+          #session-picker h3{font-size:.9rem;color:#e94560;margin-bottom:.5rem}
+          .session-btn{display:block;width:100%;text-align:left;padding:.5rem .8rem;margin:.3rem 0;background:#0f3460;border:none;border-radius:4px;color:#eee;cursor:pointer;font-size:.8rem}
+          .session-btn:hover{background:#1a4a7a}
+          .session-btn .time{color:#888;font-size:.7rem;margin-left:.5rem}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="session-picker">
+          <h3>Select a session to resume:</h3>
+          <div id="session-list"></div>
+        </div>
+
+        <div id="terminal" tabindex="0">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below OR click terminal and type directly!
+
+      TIP: Click anywhere in this terminal to type directly into Claude.</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+          <button id="stop" onclick="stopClaude()" style="background:#dc2626">Stop</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          let inResumeMode = false;
+          let parsedSessions = [];
+
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('/api/resume', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              inResumeMode = true;
+              setStatus('Loading sessions...', 'loading');
+              // Wait for session list to appear, then parse it
+              setTimeout(async () => {
+                await refreshOutput();
+                parseAndShowSessions();
+              }, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function parseAndShowSessions() {
+            const output = terminal.textContent;
+            // Look for session lines - they have format: "  description\n  X ago · Y messages"
+            // or with arrow: "↓ description" or "> description"
+            const lines = output.split('\n');
+            const sessions = [];
+
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              const nextLine = lines[i + 1] || '';
+
+              // Check if next line contains time pattern like "X ago · Y messages"
+              if (nextLine.match(/\d+\s+(minutes?|hours?|days?)\s+ago\s+·\s+\d+\s+messages?/i)) {
+                // This line is a session description
+                let desc = line.trim();
+                // Remove leading markers like ↓ or >
+                desc = desc.replace(/^[↓>]\s*/, '').trim();
+                if (desc && desc.length > 2) {
+                  const timeMatch = nextLine.match(/(\d+\s+(?:minutes?|hours?|days?)\s+ago)/i);
+                  const msgMatch = nextLine.match(/(\d+)\s+messages?/i);
+                  sessions.push({
+                    description: desc.substring(0, 60) + (desc.length > 60 ? '...' : ''),
+                    time: timeMatch ? timeMatch[1] : '',
+                    messages: msgMatch ? msgMatch[1] : '0',
+                    index: sessions.length
+                  });
+                }
+              }
+            }
+
+            parsedSessions = sessions;
+
+            if (sessions.length > 0) {
+              showSessionPicker(sessions);
+              setStatus('Select a session', 'ok');
+            } else {
+              setStatus('No sessions found', 'error');
+            }
+          }
+
+          function showSessionPicker(sessions) {
+            const picker = document.getElementById('session-picker');
+            const list = document.getElementById('session-list');
+            list.innerHTML = '';
+
+            sessions.forEach((s, idx) => {
+              const btn = document.createElement('button');
+              btn.className = 'session-btn';
+              btn.innerHTML = `${s.description} <span class="time">${s.time} · ${s.messages} msgs</span>`;
+              btn.onclick = () => selectSession(idx);
+              list.appendChild(btn);
+            });
+
+            picker.classList.add('show');
+          }
+
+          async function selectSession(index) {
+            setStatus('Selecting session...', 'loading');
+            document.getElementById('session-picker').classList.remove('show');
+
+            // First go back to top with Up arrows (in case we scrolled down before)
+            for (let i = 0; i < 20; i++) {
+              await sendKeys('ArrowUp');
+              await sleep(50);
+            }
+
+            // Now send Down arrow 'index' times to reach the session
+            for (let i = 0; i < index; i++) {
+              await sendKeys('ArrowDown');
+              await sleep(100);
+            }
+
+            // Press Enter to select
+            await sleep(300);
+            await sendKeys('Enter');
+
+            inResumeMode = false;
+            setStatus('Session loaded!', 'ok');
+            setTimeout(refreshOutput, 2000);
+          }
+
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          function startLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            // Poll every 1 second for live updates
+            refreshInterval = setInterval(refreshOutput, 1000);
+          }
+
+          function stopLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading');
+              // Start live polling to see Claude's response in real-time
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          // Live terminal keyboard input
+          let liveMode = false;
+
+          terminal.addEventListener('focus', () => {
+            liveMode = true;
+            terminal.classList.add('live-mode');
+            setStatus('Live Mode - Type directly!', 'ok');
+          });
+
+          terminal.addEventListener('blur', () => {
+            liveMode = false;
+            terminal.classList.remove('live-mode');
+            setStatus('Ready', '');
+          });
+
+          terminal.addEventListener('keydown', async (e) => {
+            if (!liveMode) return;
+
+            // Prevent default for most keys to avoid browser shortcuts
+            const allowDefault = ['F5', 'F12']; // Allow refresh and devtools
+            if (!allowDefault.includes(e.key)) {
+              e.preventDefault();
+            }
+
+            // Handle Ctrl+C specially
+            if (e.ctrlKey && e.key === 'c') {
+              await sendKeys('C-c');
+              return;
+            }
+
+            // Handle Ctrl+D
+            if (e.ctrlKey && e.key === 'd') {
+              await sendKeys('C-d');
+              return;
+            }
+
+            // Handle Ctrl+Z
+            if (e.ctrlKey && e.key === 'z') {
+              await sendKeys('C-z');
+              return;
+            }
+
+            // Skip modifier-only keys
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+            // Send the key
+            await sendKeys(e.key);
+          });
+
+          async function sendKeys(keys) {
+            try {
+              await fetch('/api/keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keys })
+              });
+            } catch (e) {
+              console.error('Failed to send keys:', e);
+            }
+          }
+
+          async function stopClaude() {
+            setStatus('Stopping...', 'loading');
+            await sendKeys('C-c');
+            setTimeout(() => {
+              refreshOutput();
+              setStatus('Stopped', 'ok');
+            }, 500);
+          }
+
+          // Handle tab visibility changes - restart polling when tab becomes active
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              console.log('Tab active - refreshing...');
+              refreshOutput();
+              startLivePolling();
+            }
+          });
+
+          // Also handle window focus
+          window.addEventListener('focus', () => {
+            console.log('Window focused - refreshing...');
+            refreshOutput();
+            startLivePolling();
+          });
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          // Start claude with --dangerously-skip-permissions
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', (req, res) => {
+        try {
+          // Kill existing session and start claude with --resume
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Return immediately - frontend will poll /api/output for live updates
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      // Send raw keystrokes to tmux (for live terminal interaction)
+      app.post('/api/keys', (req, res) => {
+        try {
+          const { keys } = req.body;
+          if (!keys) return res.status(400).json({ error: 'Keys required' });
+
+          // Handle special keys
+          const keyMap = {
+            'Backspace': 'BSpace',
+            'Delete': 'DC',
+            'Escape': 'Escape',
+            'Tab': 'Tab',
+            'ArrowUp': 'Up',
+            'ArrowDown': 'Down',
+            'ArrowLeft': 'Left',
+            'ArrowRight': 'Right',
+            'Home': 'Home',
+            'End': 'End',
+            'PageUp': 'PPage',
+            'PageDown': 'NPage'
+          };
+
+          const tmuxKey = keyMap[keys] || keys;
+
+          if (keyMap[keys]) {
+            // Special key
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);
+          } else if (keys === 'Enter') {
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          } else {
+            // Regular text - escape single quotes
+            const escaped = keys.replace(/'/g, "'\\''");
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);
+          }
+
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T03:18:49Z"
+    name: claude-webui-source-v13
+    namespace: default
+    resourceVersion: "725"
+    uid: b1999c20-e43f-4806-bc62-8335c972c652
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}
+          #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}
+          #terminal.live-mode{border-left:3px solid #4ade80}
+          .mode-indicator{font-size:.7rem;padding:.2rem .5rem;border-radius:3px;background:#4ade80;color:#000;margin-left:.5rem}
+          #session-picker{display:none;background:#16213e;border-bottom:1px solid #0f3460;padding:.5rem;max-height:200px;overflow-y:auto}
+          #session-picker.show{display:block}
+          #session-picker h3{font-size:.9rem;color:#e94560;margin-bottom:.5rem}
+          .session-btn{display:block;width:100%;text-align:left;padding:.5rem .8rem;margin:.3rem 0;background:#0f3460;border:none;border-radius:4px;color:#eee;cursor:pointer;font-size:.8rem}
+          .session-btn:hover{background:#1a4a7a}
+          .session-btn .time{color:#888;font-size:.7rem;margin-left:.5rem}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="session-picker">
+          <h3>Select a session to resume:</h3>
+          <div id="session-list"></div>
+        </div>
+
+        <div id="terminal" tabindex="0">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below OR click terminal and type directly!
+
+      TIP: Click anywhere in this terminal to type directly into Claude.</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+          <button id="stop" onclick="stopClaude()" style="background:#dc2626">Stop</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          let inResumeMode = false;
+          let parsedSessions = [];
+
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('api/resume', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              inResumeMode = true;
+              setStatus('Loading sessions...', 'loading');
+              // Wait for session list to appear, then parse it
+              setTimeout(async () => {
+                await refreshOutput();
+                parseAndShowSessions();
+              }, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function parseAndShowSessions() {
+            const output = terminal.textContent;
+            // Look for session lines - they have format: "  description\n  X ago · Y messages"
+            // or with arrow: "↓ description" or "> description"
+            const lines = output.split('\n');
+            const sessions = [];
+
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              const nextLine = lines[i + 1] || '';
+
+              // Check if next line contains time pattern like "X ago · Y messages"
+              if (nextLine.match(/\d+\s+(minutes?|hours?|days?)\s+ago\s+·\s+\d+\s+messages?/i)) {
+                // This line is a session description
+                let desc = line.trim();
+                // Remove leading markers like ↓ or >
+                desc = desc.replace(/^[↓>]\s*/, '').trim();
+                if (desc && desc.length > 2) {
+                  const timeMatch = nextLine.match(/(\d+\s+(?:minutes?|hours?|days?)\s+ago)/i);
+                  const msgMatch = nextLine.match(/(\d+)\s+messages?/i);
+                  sessions.push({
+                    description: desc.substring(0, 60) + (desc.length > 60 ? '...' : ''),
+                    time: timeMatch ? timeMatch[1] : '',
+                    messages: msgMatch ? msgMatch[1] : '0',
+                    index: sessions.length
+                  });
+                }
+              }
+            }
+
+            parsedSessions = sessions;
+
+            if (sessions.length > 0) {
+              showSessionPicker(sessions);
+              setStatus('Select a session', 'ok');
+            } else {
+              setStatus('No sessions found', 'error');
+            }
+          }
+
+          function showSessionPicker(sessions) {
+            const picker = document.getElementById('session-picker');
+            const list = document.getElementById('session-list');
+            list.innerHTML = '';
+
+            sessions.forEach((s, idx) => {
+              const btn = document.createElement('button');
+              btn.className = 'session-btn';
+              btn.innerHTML = `${s.description} <span class="time">${s.time} · ${s.messages} msgs</span>`;
+              btn.onclick = () => selectSession(idx);
+              list.appendChild(btn);
+            });
+
+            picker.classList.add('show');
+          }
+
+          async function selectSession(index) {
+            setStatus('Selecting session...', 'loading');
+            document.getElementById('session-picker').classList.remove('show');
+
+            // First go back to top with Up arrows (in case we scrolled down before)
+            for (let i = 0; i < 20; i++) {
+              await sendKeys('ArrowUp');
+              await sleep(50);
+            }
+
+            // Now send Down arrow 'index' times to reach the session
+            for (let i = 0; i < index; i++) {
+              await sendKeys('ArrowDown');
+              await sleep(100);
+            }
+
+            // Press Enter to select
+            await sleep(300);
+            await sendKeys('Enter');
+
+            inResumeMode = false;
+            setStatus('Session loaded!', 'ok');
+            setTimeout(refreshOutput, 2000);
+          }
+
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          function startLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            // Poll every 1 second for live updates
+            refreshInterval = setInterval(refreshOutput, 1000);
+          }
+
+          function stopLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading');
+              // Start live polling to see Claude's response in real-time
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          // Live terminal keyboard input
+          let liveMode = false;
+
+          terminal.addEventListener('focus', () => {
+            liveMode = true;
+            terminal.classList.add('live-mode');
+            setStatus('Live Mode - Type directly!', 'ok');
+          });
+
+          terminal.addEventListener('blur', () => {
+            liveMode = false;
+            terminal.classList.remove('live-mode');
+            setStatus('Ready', '');
+          });
+
+          terminal.addEventListener('keydown', async (e) => {
+            if (!liveMode) return;
+
+            // Prevent default for most keys to avoid browser shortcuts
+            const allowDefault = ['F5', 'F12']; // Allow refresh and devtools
+            if (!allowDefault.includes(e.key)) {
+              e.preventDefault();
+            }
+
+            // Handle Ctrl+C specially
+            if (e.ctrlKey && e.key === 'c') {
+              await sendKeys('C-c');
+              return;
+            }
+
+            // Handle Ctrl+D
+            if (e.ctrlKey && e.key === 'd') {
+              await sendKeys('C-d');
+              return;
+            }
+
+            // Handle Ctrl+Z
+            if (e.ctrlKey && e.key === 'z') {
+              await sendKeys('C-z');
+              return;
+            }
+
+            // Skip modifier-only keys
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+            // Send the key
+            await sendKeys(e.key);
+          });
+
+          async function sendKeys(keys) {
+            try {
+              await fetch('api/keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keys })
+              });
+            } catch (e) {
+              console.error('Failed to send keys:', e);
+            }
+          }
+
+          async function stopClaude() {
+            setStatus('Stopping...', 'loading');
+            await sendKeys('C-c');
+            setTimeout(() => {
+              refreshOutput();
+              setStatus('Stopped', 'ok');
+            }, 500);
+          }
+
+          // Handle tab visibility changes - restart polling when tab becomes active
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              console.log('Tab active - refreshing...');
+              refreshOutput();
+              startLivePolling();
+            }
+          });
+
+          // Also handle window focus
+          window.addEventListener('focus', () => {
+            console.log('Window focused - refreshing...');
+            refreshOutput();
+            startLivePolling();
+          });
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          // Start claude with --dangerously-skip-permissions
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', (req, res) => {
+        try {
+          // Kill existing session and start claude with --resume
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Return immediately - frontend will poll /api/output for live updates
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      // Send raw keystrokes to tmux (for live terminal interaction)
+      app.post('/api/keys', (req, res) => {
+        try {
+          const { keys } = req.body;
+          if (!keys) return res.status(400).json({ error: 'Keys required' });
+
+          // Handle special keys
+          const keyMap = {
+            'Backspace': 'BSpace',
+            'Delete': 'DC',
+            'Escape': 'Escape',
+            'Tab': 'Tab',
+            'ArrowUp': 'Up',
+            'ArrowDown': 'Down',
+            'ArrowLeft': 'Left',
+            'ArrowRight': 'Right',
+            'Home': 'Home',
+            'End': 'End',
+            'PageUp': 'PPage',
+            'PageDown': 'NPage'
+          };
+
+          const tmuxKey = keyMap[keys] || keys;
+
+          if (keyMap[keys]) {
+            // Special key
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);
+          } else if (keys === 'Enter') {
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          } else {
+            // Regular text - escape single quotes
+            const escaped = keys.replace(/'/g, "'\\''");
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);
+          }
+
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T03:49:10Z"
+    name: claude-webui-source-v14
+    namespace: default
+    resourceVersion: "726"
+    uid: 1aab15a6-a867-4d55-9a08-18f239f24c49
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="terminal">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch Claude session
+      4. Type messages below and press Enter</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startAutoRefresh();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function startAutoRefresh() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(refreshOutput, 5000);
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              terminal.textContent = d.response;
+              terminal.scrollTop = terminal.scrollHeight;
+              setStatus('Ready', 'ok');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${sshConfig.claudePath}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message then Enter twice (once to type, once to submit to Claude)
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter Enter`);
+
+          // Wait longer for Claude to respond
+          setTimeout(() => {
+            const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -100`);
+            res.json({ response: output });
+          }, 8000);
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          setTimeout(() => {
+            const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -100`);
+            res.json({ response: output });
+          }, 2000);
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T02:03:55Z"
+    name: claude-webui-source-v6
+    namespace: default
+    resourceVersion: "727"
+    uid: e9f204c5-d31e-4db1-ad6b-a01c68284deb
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="terminal">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch Claude session
+      4. Type messages below and press Enter</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startAutoRefresh();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function startAutoRefresh() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(refreshOutput, 5000);
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              terminal.textContent = d.response;
+              terminal.scrollTop = terminal.scrollHeight;
+              setStatus('Ready', 'ok');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${sshConfig.claudePath}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Wait for Claude to respond
+          setTimeout(() => {
+            const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -100`);
+            res.json({ response: output });
+          }, 10000);
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          setTimeout(() => {
+            const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -100`);
+            res.json({ response: output });
+          }, 2000);
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T02:08:12Z"
+    name: claude-webui-source-v7
+    namespace: default
+    resourceVersion: "728"
+    uid: 37c16974-fe05-4342-8d8a-af2dcadd9fd9
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="terminal">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below and press Enter</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('/api/resume', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Resuming', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function startLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            // Poll every 1 second for live updates
+            refreshInterval = setInterval(refreshOutput, 1000);
+          }
+
+          function stopLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading');
+              // Start live polling to see Claude's response in real-time
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          // Start claude with --dangerously-skip-permissions
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', (req, res) => {
+        try {
+          // Kill existing session and start claude with --resume
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Return immediately - frontend will poll /api/output for live updates
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          setTimeout(() => {
+            const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -100`);
+            res.json({ response: output });
+          }, 2000);
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T02:29:46Z"
+    name: claude-webui-source-v8
+    namespace: default
+    resourceVersion: "729"
+    uid: b6298b5c-3761-4454-bed6-062a99a27fef
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      RUN apk add --no-cache openssh-client sshpass tmux
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}
+          #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}
+          #terminal.live-mode{border-left:3px solid #4ade80}
+          .mode-indicator{font-size:.7rem;padding:.2rem .5rem;border-radius:3px;background:#4ade80;color:#000;margin-left:.5rem}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+
+        <div id="terminal" tabindex="0">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below OR click terminal and type directly!
+
+      TIP: Click anywhere in this terminal to type directly into Claude.</div>
+
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+        </div>
+
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+
+          function setStatus(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+            loadSettings();
+          }
+
+          async function loadSettings() {
+            try {
+              const r = await fetch('/api/settings');
+              const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host, user, pass, claudePath })
+              });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+          }
+
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('/api/test');
+              const d = await r.json();
+              terminal.textContent = '=== SSH Test ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('/api/start', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('/api/resume', { method: 'POST' });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Resuming', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+              terminal.textContent = 'Error: ' + e.message;
+            }
+          }
+
+          function startLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            // Poll every 1 second for live updates
+            refreshInterval = setInterval(refreshOutput, 1000);
+          }
+
+          function stopLivePolling() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+
+          async function refreshOutput() {
+            try {
+              const r = await fetch('/api/output');
+              const d = await r.json();
+              if (d.output) {
+                terminal.textContent = d.output;
+                terminal.scrollTop = terminal.scrollHeight;
+              }
+            } catch (e) {}
+          }
+
+          async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+              });
+              const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading');
+              // Start live polling to see Claude's response in real-time
+              startLivePolling();
+            } catch (e) {
+              setStatus('Error', 'error');
+            }
+            document.getElementById('send').disabled = false;
+          }
+
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try {
+              await fetch('/api/reset', { method: 'POST' });
+              terminal.textContent = 'Session reset. Click Start to begin.';
+              setStatus('Ready', '');
+            } catch (e) {}
+          }
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+
+          // Live terminal keyboard input
+          let liveMode = false;
+
+          terminal.addEventListener('focus', () => {
+            liveMode = true;
+            terminal.classList.add('live-mode');
+            setStatus('Live Mode - Type directly!', 'ok');
+          });
+
+          terminal.addEventListener('blur', () => {
+            liveMode = false;
+            terminal.classList.remove('live-mode');
+            setStatus('Ready', '');
+          });
+
+          terminal.addEventListener('keydown', async (e) => {
+            if (!liveMode) return;
+
+            // Prevent default for most keys to avoid browser shortcuts
+            const allowDefault = ['F5', 'F12']; // Allow refresh and devtools
+            if (!allowDefault.includes(e.key)) {
+              e.preventDefault();
+            }
+
+            // Handle Ctrl+C specially
+            if (e.ctrlKey && e.key === 'c') {
+              await sendKeys('C-c');
+              return;
+            }
+
+            // Handle Ctrl+D
+            if (e.ctrlKey && e.key === 'd') {
+              await sendKeys('C-d');
+              return;
+            }
+
+            // Handle Ctrl+Z
+            if (e.ctrlKey && e.key === 'z') {
+              await sendKeys('C-z');
+              return;
+            }
+
+            // Skip modifier-only keys
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+
+            // Send the key
+            await sendKeys(e.key);
+          });
+
+          async function sendKeys(keys) {
+            try {
+              await fetch('/api/keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keys })
+              });
+            } catch (e) {
+              console.error('Failed to send keys:', e);
+            }
+          }
+
+          loadSettings();
+        </script>
+      </body>
+      </html>
+    package.json: |
+      {"name":"claude-web-ui","version":"4.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"express":"^4.18.2"}}
+    server.js: |
+      const express = require('express');
+      const { execSync } = require('child_process');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '$TAH19209746h',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Prepend common paths for macOS
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        const sshCmd = `sshpass -p '${sshConfig.pass}' ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ${sshConfig.user}@${sshConfig.host} "${fullCmd.replace(/"/g, '\\"')}"`;
+        try {
+          return execSync(sshCmd, { encoding: 'utf8', timeout });
+        } catch (e) {
+          return e.stdout || e.stderr || e.message;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', (req, res) => {
+        try {
+          const result = runSSH(`echo "SSH OK" && ${sshConfig.claudePath} --version`);
+          res.json({ status: 'ok', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', (req, res) => {
+        try {
+          // Start claude with --dangerously-skip-permissions
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', (req, res) => {
+        try {
+          // Kill existing session and start claude with --resume
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          // Send message, Enter to confirm, sleep, then Enter again to submit
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+
+          // Return immediately - frontend will poll /api/output for live updates
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', (req, res) => {
+        try {
+          const output = runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', (req, res) => {
+        try {
+          runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      // Send raw keystrokes to tmux (for live terminal interaction)
+      app.post('/api/keys', (req, res) => {
+        try {
+          const { keys } = req.body;
+          if (!keys) return res.status(400).json({ error: 'Keys required' });
+
+          // Handle special keys
+          const keyMap = {
+            'Backspace': 'BSpace',
+            'Delete': 'DC',
+            'Escape': 'Escape',
+            'Tab': 'Tab',
+            'ArrowUp': 'Up',
+            'ArrowDown': 'Down',
+            'ArrowLeft': 'Left',
+            'ArrowRight': 'Right',
+            'Home': 'Home',
+            'End': 'End',
+            'PageUp': 'PPage',
+            'PageDown': 'NPage'
+          };
+
+          const tmuxKey = keyMap[keys] || keys;
+
+          if (keyMap[keys]) {
+            // Special key
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);
+          } else if (keys === 'Enter') {
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          } else {
+            // Regular text - escape single quotes
+            const escaped = keys.replace(/'/g, "'\\''");
+            runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);
+          }
+
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', (req, res) => {
+        try {
+          runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok' }));
+      app.listen(PORT, '0.0.0.0', () => console.log(`Claude Web UI v4 on port ${PORT}`));
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T02:35:01Z"
+    name: claude-webui-source-v9
+    namespace: default
+    resourceVersion: "730"
+    uid: bb04f21b-4aed-4664-9a5c-6d6c7168ce32
+- apiVersion: v1
+  data:
+    cmd_api.py: "from http.server import HTTPServer, BaseHTTPRequestHandler\nimport
+      subprocess\nimport json\n\nclass CmdHandler(BaseHTTPRequestHandler):\n    def
+      do_POST(self):\n        if self.path == '/run':\n            length = int(self.headers.get('Content-Length',
+      0))\n            body = self.rfile.read(length).decode('utf-8')\n            try:\n
+      \               data = json.loads(body)\n                cmd = data.get('cmd',
+      '')\n                result = subprocess.run(cmd, shell=True, capture_output=True,
+      text=True, timeout=30)\n                response = {'stdout': result.stdout,
+      'stderr': result.stderr, 'code': result.returncode}\n            except Exception
+      as e:\n                response = {'error': str(e)}\n            self.send_response(200)\n
+      \           self.send_header('Content-Type', 'application/json')\n            self.send_header('Access-Control-Allow-Origin',
+      '*')\n            self.end_headers()\n            self.wfile.write(json.dumps(response).encode())\n
+      \       else:\n            self.send_response(404)\n            self.end_headers()\n
+      \   \n    def do_GET(self):\n        if self.path == '/':\n            self.send_response(200)\n
+      \           self.send_header('Content-Type', 'text/plain')\n            self.end_headers()\n
+      \           self.wfile.write(b'Command API running on Kubernetes. POST to /run
+      with {\"cmd\": \"your command\"}')\n        elif self.path == '/health':\n            self.send_response(200)\n
+      \           self.end_headers()\n        else:\n            self.send_response(404)\n
+      \           self.end_headers()\n\n    def log_message(self, format, *args):\n
+      \       print(f\"{args[0]} {args[1]}\")\n\nprint(\"Starting command API on port
+      8080...\")\nHTTPServer(('0.0.0.0', 8080), CmdHandler).serve_forever()\n"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"cmd_api.py":"from http.server import HTTPServer, BaseHTTPRequestHandler\nimport subprocess\nimport json\n\nclass CmdHandler(BaseHTTPRequestHandler):\n    def do_POST(self):\n        if self.path == '/run':\n            length = int(self.headers.get('Content-Length', 0))\n            body = self.rfile.read(length).decode('utf-8')\n            try:\n                data = json.loads(body)\n                cmd = data.get('cmd', '')\n                result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)\n                response = {'stdout': result.stdout, 'stderr': result.stderr, 'code': result.returncode}\n            except Exception as e:\n                response = {'error': str(e)}\n            self.send_response(200)\n            self.send_header('Content-Type', 'application/json')\n            self.send_header('Access-Control-Allow-Origin', '*')\n            self.end_headers()\n            self.wfile.write(json.dumps(response).encode())\n        else:\n            self.send_response(404)\n            self.end_headers()\n    \n    def do_GET(self):\n        if self.path == '/':\n            self.send_response(200)\n            self.send_header('Content-Type', 'text/plain')\n            self.end_headers()\n            self.wfile.write(b'Command API running on Kubernetes. POST to /run with {\"cmd\": \"your command\"}')\n        elif self.path == '/health':\n            self.send_response(200)\n            self.end_headers()\n        else:\n            self.send_response(404)\n            self.end_headers()\n\n    def log_message(self, format, *args):\n        print(f\"{args[0]} {args[1]}\")\n\nprint(\"Starting command API on port 8080...\")\nHTTPServer(('0.0.0.0', 8080), CmdHandler).serve_forever()\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"cmd-api-script","namespace":"default"}}
+    creationTimestamp: "2026-01-18T20:41:55Z"
+    name: cmd-api-script
+    namespace: default
+    resourceVersion: "731"
+    uid: d017b769-4e3a-4461-ab82-d727a3b3e2aa
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-15T16:27:59Z"
+    name: kube-root-ca.crt
+    namespace: default
+    resourceVersion: "732"
+    uid: 7993e79c-c399-4b77-a074-deb19f17be68
+kind: List
+metadata:
+  resourceVersion: ""

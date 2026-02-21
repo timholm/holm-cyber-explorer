@@ -1,0 +1,56 @@
+---
+- name: Safely reboot node
+  hosts: "{{ target_hosts | default('all') }}"
+  become: yes
+  gather_facts: yes
+  serial: 1
+
+  tasks:
+    - name: Get hostname
+      command: hostname
+      register: hostname_result
+      changed_when: false
+
+    - name: Display reboot warning
+      debug:
+        msg: "Preparing to reboot {{ hostname_result.stdout }}"
+
+    - name: Drain node (for Kubernetes)
+      delegate_to: localhost
+      become: no
+      shell: |
+        kubectl drain {{ hostname_result.stdout }} \
+          --ignore-daemonsets \
+          --delete-emptydir-data \
+          --force \
+          --grace-period=60 \
+          --timeout=120s
+      register: drain_result
+      ignore_errors: yes
+
+    - name: Display drain result
+      debug:
+        msg: "{{ drain_result.stdout_lines | default(['Node drained']) }}"
+
+    - name: Reboot the node
+      reboot:
+        reboot_timeout: 300
+        pre_reboot_delay: 5
+        post_reboot_delay: 30
+        msg: "Rebooting initiated by Animus Dashboard"
+
+    - name: Wait for node to be ready
+      wait_for_connection:
+        delay: 30
+        timeout: 300
+
+    - name: Uncordon node
+      delegate_to: localhost
+      become: no
+      shell: kubectl uncordon {{ hostname_result.stdout }}
+      register: uncordon_result
+      ignore_errors: yes
+
+    - name: Display completion message
+      debug:
+        msg: "Node {{ hostname_result.stdout }} has been rebooted and is back online"

@@ -1,0 +1,251 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: homepage:apps/Deployment:homepage/homepage
+      deployment.kubernetes.io/revision: "19210"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"homepage:apps/Deployment:homepage/homepage","values-checksum":"780e8a0828af285bde552056f47edcdceee27cb5e12e509d1cc1b73399f0ce6b"},"labels":{"app.kubernetes.io/instance":"homepage","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"homepage","app.kubernetes.io/version":"v1.2.0","helm.sh/chart":"homepage-2.1.0"},"name":"homepage","namespace":"homepage"},"spec":{"replicas":1,"revisionHistoryLimit":3,"selector":{"matchLabels":{"app.kubernetes.io/instance":"homepage","app.kubernetes.io/name":"homepage"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"checksum/secrets":"4141e6981f3b767e75a4e744858b9ff414dba5d0ef6afd761f7700061fb6e32e","values-checksum":"780e8a0828af285bde552056f47edcdceee27cb5e12e509d1cc1b73399f0ce6b"},"labels":{"app.kubernetes.io/instance":"homepage","app.kubernetes.io/name":"homepage"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"NotIn","values":["openmediavault"]}]}]}}},"automountServiceAccountToken":true,"containers":[{"env":[{"name":"HOMEPAGE_ALLOWED_HOSTS","value":"holm.chat,localhost"},{"name":"NODE_OPTIONS","value":"--dns-result-order=ipv4first"}],"image":"ghcr.io/gethomepage/homepage:latest","imagePullPolicy":null,"livenessProbe":{"failureThreshold":3,"initialDelaySeconds":0,"periodSeconds":10,"tcpSocket":{"port":3000},"timeoutSeconds":1},"name":"homepage","ports":[{"containerPort":3000,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"initialDelaySeconds":0,"periodSeconds":10,"tcpSocket":{"port":3000},"timeoutSeconds":1},"startupProbe":{"failureThreshold":30,"initialDelaySeconds":0,"periodSeconds":5,"tcpSocket":{"port":3000},"timeoutSeconds":1},"volumeMounts":[{"mountPath":"/app/config","name":"homepage-base-config"},{"mountPath":"/app/config/bookmarks.yaml","name":"homepage-config","subPath":"bookmarks.yaml"},{"mountPath":"/app/config/docker.yaml","name":"homepage-config","subPath":"docker.yaml"},{"mountPath":"/app/config/kubernetes.yaml","name":"homepage-config","subPath":"kubernetes.yaml"},{"mountPath":"/app/config/services.yaml","name":"homepage-config","subPath":"services.yaml"},{"mountPath":"/app/config/settings.yaml","name":"homepage-config","subPath":"settings.yaml"},{"mountPath":"/app/config/widgets.yaml","name":"homepage-config","subPath":"widgets.yaml"},{"mountPath":"/app/config/logs","name":"logs"}]}],"dnsConfig":{"options":[{"name":"ndots","value":"2"},{"name":"timeout","value":"5"},{"name":"attempts","value":"3"}]},"dnsPolicy":"ClusterFirst","enableServiceLinks":true,"serviceAccountName":"homepage","tolerations":[{"effect":"NoSchedule","key":"node.cilium.io/agent-not-ready","operator":"Exists"}],"volumes":[{"emptyDir":{},"name":"homepage-base-config"},{"configMap":{"name":"homepage"},"name":"homepage-config"},{"emptyDir":{},"name":"logs"}]}}}}
+      values-checksum: 780e8a0828af285bde552056f47edcdceee27cb5e12e509d1cc1b73399f0ce6b
+    creationTimestamp: "2026-01-20T02:17:51Z"
+    generation: 43436
+    labels:
+      app.kubernetes.io/instance: homepage
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: homepage
+      app.kubernetes.io/version: v1.2.0
+      helm.sh/chart: homepage-2.1.0
+    name: homepage
+    namespace: homepage
+    resourceVersion: "38124"
+    uid: 31854502-1adf-4ced-9a35-a4deb4fb3fe7
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: homepage
+        app.kubernetes.io/name: homepage
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/secrets: 4141e6981f3b767e75a4e744858b9ff414dba5d0ef6afd761f7700061fb6e32e
+          homepage-discovery/restartedAt: "2026-01-25T15:16:24Z"
+          kubectl.kubernetes.io/restartedAt: "2026-01-26T21:24:38-08:00"
+          values-checksum: 780e8a0828af285bde552056f47edcdceee27cb5e12e509d1cc1b73399f0ce6b
+        labels:
+          app.kubernetes.io/instance: homepage
+          app.kubernetes.io/name: homepage
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                  - openmediavault
+        automountServiceAccountToken: true
+        containers:
+        - env:
+          - name: HOMEPAGE_ALLOWED_HOSTS
+            value: holm.chat,localhost
+          - name: NODE_OPTIONS
+            value: --dns-result-order=ipv4first
+          image: ghcr.io/gethomepage/homepage:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          name: homepage
+          ports:
+          - containerPort: 3000
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          resources: {}
+          startupProbe:
+            failureThreshold: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config
+            name: homepage-base-config
+          - mountPath: /app/config/bookmarks.yaml
+            name: homepage-config
+            subPath: bookmarks.yaml
+          - mountPath: /app/config/docker.yaml
+            name: homepage-config
+            subPath: docker.yaml
+          - mountPath: /app/config/kubernetes.yaml
+            name: homepage-config
+            subPath: kubernetes.yaml
+          - mountPath: /app/config/services.yaml
+            name: homepage-config
+            subPath: services.yaml
+          - mountPath: /app/config/settings.yaml
+            name: homepage-config
+            subPath: settings.yaml
+          - mountPath: /app/config/widgets.yaml
+            name: homepage-config
+            subPath: widgets.yaml
+          - mountPath: /app/config/logs
+            name: logs
+        dnsConfig:
+          options:
+          - name: ndots
+            value: "2"
+          - name: timeout
+            value: "5"
+          - name: attempts
+            value: "3"
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: true
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: homepage
+        serviceAccountName: homepage
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node.cilium.io/agent-not-ready
+          operator: Exists
+        volumes:
+        - emptyDir: {}
+          name: homepage-base-config
+        - configMap:
+            defaultMode: 420
+            name: homepage
+          name: homepage-config
+        - emptyDir: {}
+          name: logs
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-27T02:44:23Z"
+      lastUpdateTime: "2026-01-27T02:44:23Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-01-25T15:16:53Z"
+      lastUpdateTime: "2026-01-27T05:26:19Z"
+      message: ReplicaSet "homepage-776f8c9746" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 43436
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "6"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"homepage-discovery"},"name":"homepage-discovery","namespace":"homepage"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"homepage-discovery"}},"template":{"metadata":{"labels":{"app":"homepage-discovery"}},"spec":{"containers":[{"env":[{"name":"HOMEPAGE_NAMESPACE","value":"homepage"},{"name":"HOMEPAGE_CONFIGMAP","value":"homepage"},{"name":"RESTART_HOMEPAGE","value":"true"}],"image":"10.42.0.192:5000/homepage-discovery:latest","imagePullPolicy":"Always","name":"controller","resources":{"limits":{"cpu":"100m","memory":"64Mi"},"requests":{"cpu":"10m","memory":"32Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":65534}}],"nodeSelector":{"kubernetes.io/hostname":"rpi-1"},"serviceAccountName":"homepage-discovery"}}}}
+    creationTimestamp: "2026-01-25T01:37:33Z"
+    generation: 7
+    labels:
+      app: homepage-discovery
+    name: homepage-discovery
+    namespace: homepage
+    resourceVersion: "999"
+    uid: cc0354f3-cbd0-42eb-8cf3-9b59f507088d
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: homepage-discovery
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-24T17:53:38-08:00"
+        labels:
+          app: homepage-discovery
+      spec:
+        containers:
+        - env:
+          - name: HOMEPAGE_NAMESPACE
+            value: homepage
+          - name: HOMEPAGE_CONFIGMAP
+            value: homepage
+          - name: RESTART_HOMEPAGE
+            value: "true"
+          image: 192.168.8.197:31500/homepage-discovery:latest
+          imagePullPolicy: Always
+          name: controller
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: rpi-1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: homepage-discovery
+        serviceAccountName: homepage-discovery
+        terminationGracePeriodSeconds: 30
+  status:
+    conditions:
+    - lastTransitionTime: "2026-01-25T01:56:24Z"
+      lastUpdateTime: "2026-01-25T01:56:24Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-01-25T01:50:14Z"
+      lastUpdateTime: "2026-01-25T01:56:24Z"
+      message: ReplicaSet "homepage-discovery-6564d9c854" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 7
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,87 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    config.yaml: |
+      # Name of the tunnel you want to run
+      tunnel: k8s
+      # The location of the secret containing the tunnel credentials
+      credentials-file: /etc/cloudflared/creds/credentials.json
+      # General purpose TCP routing for the network
+      warp-routing:
+        enabled: false
+      # Serves the metrics server under /metrics and the readiness server under /ready
+      metrics: 0.0.0.0:2000
+      # Autoupdates applied in a k8s pod will be lost when the pod is removed or restarted, so
+      # autoupdate doesn't make sense in Kubernetes. However, outside of Kubernetes, we strongly
+      # recommend using autoupdate.
+      no-autoupdate: true
+      # The `ingress` block tells cloudflared which local service to route incoming
+      # requests to. For more about ingress rules, see
+      # https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/ingress
+      ingress:
+        - hostname: animus.holm.chat
+          service: http://animus-frontend.animus.svc.cluster.local:3000
+        - hostname: odoo.holm.chat
+          service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80
+        - hostname: matrix.holm.chat
+          service: http://synapse.matrix.svc.cluster.local:8008
+        - hostname: auth.holm.chat
+          service: http://mas.matrix.svc.cluster.local:8080
+        - hostname: vault.holm.chat
+          service: http://vaultwarden.default.svc.cluster.local:80
+        - hostname: pihole.holm.chat
+          service: http://pihole-web.pihole.svc.cluster.local:80
+        - hostname: search.holm.chat
+          service: http://searxng.searxng.svc.cluster.local:8080
+        - hostname: uptime.holm.chat
+          service: http://uptime-kuma.monitoring.svc.cluster.local:3001
+        - hostname: cmd.holm.chat
+          service: http://cmd-api.default.svc.cluster.local:80
+        - hostname: holm.chat
+          service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80
+        - hostname: www.holm.chat
+          service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80
+        - hostname: dev.holm.chat
+          service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80
+        # This rule matches any traffic which didn't match a previous rule, and responds with HTTP 404.
+        - service: http_status:404
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: cloudflared:/ConfigMap:cloudflare/cloudflared-cloudflare-tunnel
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.yaml":"# Name of the tunnel you want to run\ntunnel: k8s\n# The location of the secret containing the tunnel credentials\ncredentials-file: /etc/cloudflared/creds/credentials.json\n# General purpose TCP routing for the network\nwarp-routing:\n  enabled: false\n# Serves the metrics server under /metrics and the readiness server under /ready\nmetrics: 0.0.0.0:2000\n# Autoupdates applied in a k8s pod will be lost when the pod is removed or restarted, so\n# autoupdate doesn't make sense in Kubernetes. However, outside of Kubernetes, we strongly\n# recommend using autoupdate.\nno-autoupdate: true\n# The `ingress` block tells cloudflared which local service to route incoming\n# requests to. For more about ingress rules, see\n# https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/ingress\ningress:\n  - hostname: animus.holm.chat\n    service: http://animus-frontend.animus.svc.cluster.local:3000\n  - hostname: odoo.holm.chat\n    service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80\n  - hostname: matrix.holm.chat\n    service: http://synapse.matrix.svc.cluster.local:8008\n  - hostname: auth.holm.chat\n    service: http://mas.matrix.svc.cluster.local:8080\n  - hostname: vault.holm.chat\n    service: http://vaultwarden.default.svc.cluster.local:80\n  - hostname: pihole.holm.chat\n    service: http://pihole-web.pihole.svc.cluster.local:80\n  - hostname: search.holm.chat\n    service: http://searxng.searxng.svc.cluster.local:8080\n  - hostname: uptime.holm.chat\n    service: http://uptime-kuma.monitoring.svc.cluster.local:3001\n  - hostname: cmd.holm.chat\n    service: http://cmd-api.default.svc.cluster.local:80\n  - hostname: holm.chat\n    service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80\n  - hostname: www.holm.chat\n    service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80\n  - hostname: dev.holm.chat\n    service: http://envoy-envoy-gateway-system-main-gateway-c3508b54.envoy-gateway-system.svc.cluster.local:80\n  # This rule matches any traffic which didn't match a previous rule, and responds with HTTP 404.\n  - service: http_status:404\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"cloudflared:/ConfigMap:cloudflare/cloudflared-cloudflare-tunnel"},"name":"cloudflared-cloudflare-tunnel","namespace":"cloudflare"}}
+    creationTimestamp: "2026-01-19T01:19:42Z"
+    name: cloudflared-cloudflare-tunnel
+    namespace: cloudflare
+    resourceVersion: "716"
+    uid: cc206f60-c220-4822-af3e-ffe0de73279c
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-18T23:55:41Z"
+    name: kube-root-ca.crt
+    namespace: cloudflare
+    resourceVersion: "717"
+    uid: a1a4e4b9-fdbe-402c-bddb-340a1c21be5d
+kind: List
+metadata:
+  resourceVersion: ""

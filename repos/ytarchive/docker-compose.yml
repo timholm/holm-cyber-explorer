@@ -1,0 +1,40 @@
+# Docker Compose for local development and testing
+# Run: docker compose up -d redis
+# Then: go run ./cmd/controller
+
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Optional: Run controller in container
+  # controller:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - REDIS_URL=redis:6379
+  #     - STORAGE_PATH=/data
+  #     - LOG_FORMAT=text
+  #     - LOG_LEVEL=debug
+  #   volumes:
+  #     - ./data:/data
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+volumes:
+  redis-data:

@@ -1,0 +1,90 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    xds-certificate.json: '{"resources":[{"@type":"type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.Secret","name":"xds_certificate","tls_certificate":{"certificate_chain":{"filename":"/certs/tls.crt"},"private_key":{"filename":"/certs/tls.key"}}}]}'
+    xds-trusted-ca.json: '{"resources":[{"@type":"type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.Secret","name":"xds_trusted_ca","validation_context":{"trusted_ca":{"filename":"/certs/ca.crt"},"match_typed_subject_alt_names":[{"san_type":"DNS","matcher":{"exact":"envoy-gateway"}}]}}]}'
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: "2026-01-20T17:13:22Z"
+    labels:
+      app.kubernetes.io/component: proxy
+      app.kubernetes.io/managed-by: envoy-gateway
+      app.kubernetes.io/name: envoy
+      gateway.envoyproxy.io/owning-gateway-name: main-gateway
+      gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+    name: envoy-envoy-gateway-system-main-gateway-c3508b54
+    namespace: envoy-gateway-system
+    resourceVersion: "733"
+    uid: ccd890a3-fd3d-4f06-a6d4-6c863a68b86a
+- apiVersion: v1
+  data:
+    envoy-gateway.yaml: |
+      apiVersion: gateway.envoyproxy.io/v1alpha1
+      kind: EnvoyGateway
+      gateway:
+        controllerName: gateway.envoyproxy.io/gatewayclass-controller
+      logging:
+        level:
+          default: info
+      provider:
+        kubernetes:
+          rateLimitDeployment:
+            container:
+              image: docker.io/envoyproxy/ratelimit:49af5cca
+            patch:
+              type: StrategicMerge
+              value:
+                spec:
+                  template:
+                    spec:
+                      containers:
+                      - imagePullPolicy: IfNotPresent
+                        name: envoy-ratelimit
+          shutdownManager:
+            image: envoyproxy/gateway:v1.2.2
+        type: Kubernetes
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"envoy-gateway.yaml":"apiVersion: gateway.envoyproxy.io/v1alpha1\nkind: EnvoyGateway\ngateway:\n  controllerName: gateway.envoyproxy.io/gatewayclass-controller\nlogging:\n  level:\n    default: info\nprovider:\n  kubernetes:\n    rateLimitDeployment:\n      container:\n        image: docker.io/envoyproxy/ratelimit:49af5cca\n      patch:\n        type: StrategicMerge\n        value:\n          spec:\n            template:\n              spec:\n                containers:\n                - imagePullPolicy: IfNotPresent\n                  name: envoy-ratelimit\n    shutdownManager:\n      image: envoyproxy/gateway:v1.2.2\n  type: Kubernetes\n"},"kind":"ConfigMap","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"eg","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"gateway-helm","app.kubernetes.io/version":"latest","helm.sh/chart":"gateway-helm-v0.0.0-latest"},"name":"envoy-gateway-config","namespace":"envoy-gateway-system"}}
+    creationTimestamp: "2026-01-19T03:34:46Z"
+    labels:
+      app.kubernetes.io/instance: eg
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: gateway-helm
+      app.kubernetes.io/version: latest
+      helm.sh/chart: gateway-helm-v0.0.0-latest
+    name: envoy-gateway-config
+    namespace: envoy-gateway-system
+    resourceVersion: "734"
+    uid: a01c916b-1795-4e32-bd21-17fa80429d05
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-19T03:34:46Z"
+    name: kube-root-ca.crt
+    namespace: envoy-gateway-system
+    resourceVersion: "735"
+    uid: e2c81285-ec0b-4c71-bdfd-47efcb721e04
+kind: List
+metadata:
+  resourceVersion: ""

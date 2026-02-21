@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STAGE 4: SPECIALIZED SYSTEMS -- DATA &amp; ARCHIVES (ADVANCED) - holm.chat</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%20%20%3Crect%20width=%2232%22%20height=%2232%22%20rx=%224%22%20fill=%22%231a1a2e%22/%3E%20%20%3Ctext%20x=%2216%22%20y=%2222%22%20font-family=%22monospace%22%20font-size=%2218%22%20font-weight=%22bold%22%20fill=%22%23e0e0e0%22%20text-anchor=%22middle%22%3EH%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header class="site-header">
+<div class="header-inner">
+<a href="index.html" class="site-title">holm.chat</a>
+<span class="site-subtitle">Documentation Institution</span>
+</div>
+<nav class="site-nav"><ul>
+<li><a href="index.html">Home</a></li>
+<li><a href="domains-1-5.html">Domains 1-5</a></li>
+<li><a href="domains-6-10.html">Domains 6-10</a></li>
+<li><a href="domains-11-15.html">Domains 11-15</a></li>
+<li><a href="domains-16-20.html">Domains 16-20</a></li>
+<li><a href="meta-framework.html">Meta-Framework</a></li>
+<li><a href="core-charter.html">Core Charter</a></li>
+<li><a href="philosophy-batch2.html">Philosophy Batch2</a></li>
+<li><a href="philosophy-batch3.html">Philosophy Batch3</a></li>
+<li><a href="philosophy-batch4.html">Philosophy Batch4</a></li>
+<li><a href="automation-ops.html">Automation Ops</a></li>
+<li><a href="data-ops.html">Data Ops</a></li>
+<li><a href="education-ops.html">Education Ops</a></li>
+<li><a href="ethics-quality-ops.html">Ethics Quality Ops</a></li>
+<li><a href="federation-ops.html">Federation Ops</a></li>
+<li><a href="governance-ops.html">Governance Ops</a></li>
+<li><a href="intel-ops.html">Intel Ops</a></li>
+<li><a href="interface-ops.html">Interface Ops</a></li>
+<li><a href="ops-batch1.html">Ops Batch1</a></li>
+<li><a href="ops-batch2.html">Ops Batch2</a></li>
+<li><a href="ops-batch3.html">Ops Batch3</a></li>
+<li><a href="platform-ops.html">Platform Ops</a></li>
+<li><a href="automation-advanced.html">Automation Advanced</a></li>
+<li class="active"><a href="data-advanced.html">Data Advanced</a></li>
+<li><a href="evolution-memory-advanced.html">Evolution Memory Advanced</a></li>
+<li><a href="federation-import-advanced.html">Federation Import Advanced</a></li>
+<li><a href="hic-architecture.html">Hic Architecture</a></li>
+<li><a href="hic-interaction.html">Hic Interaction</a></li>
+<li><a href="hic-knowledge-mapping.html">Hic Knowledge Mapping</a></li>
+<li><a href="hic-master-blueprint.html">Hic Master Blueprint</a></li>
+<li><a href="hic-offline-rendering.html">Hic Offline Rendering</a></li>
+<li><a href="hic-spatial-data.html">Hic Spatial Data</a></li>
+<li><a href="hic-visual-design.html">Hic Visual Design</a></li>
+<li><a href="infrastructure-advanced.html">Infrastructure Advanced</a></li>
+<li><a href="research-advanced.html">Research Advanced</a></li>
+<li><a href="security-advanced.html">Security Advanced</a></li>
+<li><a href="meta-batch1.html">Meta Batch1</a></li>
+<li><a href="meta-batch2.html">Meta Batch2</a></li>
+<li><a href="meta-batch3.html">Meta Batch3</a></li>
+</ul></nav>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<nav class="toc"><h2 class="toc-title">Table of Contents</h2><ul>
+<li><a href="#stage-4-specialized-systems-data-archives-advanced">STAGE 4: SPECIALIZED SYSTEMS -- DATA &amp; ARCHIVES (ADVANCED)</a></li>
+<ul>
+<li><a href="#advanced-reference-documents-for-domain-6">Advanced Reference Documents for Domain 6</a></li>
+<li><a href="#how-to-read-this-document">How to Read This Document</a></li>
+</ul>
+<li><a href="#d6-009-file-system-architecture-for-longevity">D6-009 -- File System Architecture for Longevity</a></li>
+<ul>
+<li><a href="#1-purpose">1. Purpose</a></li>
+<li><a href="#2-scope">2. Scope</a></li>
+<li><a href="#3-background">3. Background</a></li>
+<ul>
+<li><a href="#31-what-a-filesystem-actually-does">3.1 What a Filesystem Actually Does</a></li>
+<li><a href="#32-the-air-gap-implication">3.2 The Air-Gap Implication</a></li>
+<li><a href="#33-the-fifty-year-problem">3.3 The Fifty-Year Problem</a></li>
+</ul>
+<li><a href="#4-system-model">4. System Model</a></li>
+<ul>
+<li><a href="#41-evaluation-criteria">4.1 Evaluation Criteria</a></li>
+<li><a href="#42-candidate-analysis">4.2 Candidate Analysis</a></li>
+<li><a href="#43-the-institutional-decision">4.3 The Institutional Decision</a></li>
+<li><a href="#44-zfs-configuration-standards">4.4 ZFS Configuration Standards</a></li>
+<li><a href="#45-scrub-schedule">4.5 Scrub Schedule</a></li>
+<li><a href="#46-snapshot-strategy">4.6 Snapshot Strategy</a></li>
+</ul>
+<li><a href="#5-rules-constraints">5. Rules &amp; Constraints</a></li>
+<li><a href="#6-failure-modes">6. Failure Modes</a></li>
+<li><a href="#7-recovery-procedures">7. Recovery Procedures</a></li>
+<li><a href="#8-evolution-path">8. Evolution Path</a></li>
+<li><a href="#9-commentary-section">9. Commentary Section</a></li>
+<li><a href="#10-references">10. References</a></li>
+</ul>
+<li><a href="#d6-010-digital-preservation-formats-that-survive">D6-010 -- Digital Preservation: Formats That Survive</a></li>
+<ul>
+<li><a href="#1-purpose-1">1. Purpose</a></li>
+<li><a href="#2-scope-1">2. Scope</a></li>
+<li><a href="#3-background-1">3. Background</a></li>
+<ul>
+<li><a href="#31-the-history-of-format-death">3.1 The History of Format Death</a></li>
+<li><a href="#32-the-open-specification-principle">3.2 The Open Specification Principle</a></li>
+<li><a href="#33-the-simplicity-heuristic">3.3 The Simplicity Heuristic</a></li>
+</ul>
+<li><a href="#4-system-model-1">4. System Model</a></li>
+<ul>
+<li><a href="#41-the-format-risk-assessment-framework">4.1 The Format Risk Assessment Framework</a></li>
+<li><a href="#42-the-institutional-format-whitelist">4.2 The Institutional Format Whitelist</a></li>
+<li><a href="#43-the-format-watchlist">4.3 The Format Watchlist</a></li>
+<li><a href="#44-migration-triggers">4.4 Migration Triggers</a></li>
+<li><a href="#45-migration-procedure">4.5 Migration Procedure</a></li>
+</ul>
+<li><a href="#5-rules-constraints-1">5. Rules &amp; Constraints</a></li>
+<li><a href="#6-failure-modes-1">6. Failure Modes</a></li>
+<li><a href="#7-recovery-procedures-1">7. Recovery Procedures</a></li>
+<li><a href="#8-evolution-path-1">8. Evolution Path</a></li>
+<li><a href="#9-commentary-section-1">9. Commentary Section</a></li>
+<li><a href="#10-references-1">10. References</a></li>
+</ul>
+<li><a href="#d6-011-physical-backup-media-selection-and-rotation">D6-011 -- Physical Backup Media: Selection and Rotation</a></li>
+<ul>
+<li><a href="#1-purpose-2">1. Purpose</a></li>
+<li><a href="#2-scope-2">2. Scope</a></li>
+<li><a href="#3-background-2">3. Background</a></li>
+<ul>
+<li><a href="#31-the-media-longevity-problem">3.1 The Media Longevity Problem</a></li>
+<li><a href="#32-the-air-gap-media-constraint">3.2 The Air-Gap Media Constraint</a></li>
+<li><a href="#33-the-single-copy-danger">3.3 The Single-Copy Danger</a></li>
+</ul>
+<li><a href="#4-system-model-2">4. System Model</a></li>
+<ul>
+<li><a href="#41-media-type-assessment">4.1 Media Type Assessment</a></li>
+<li><a href="#42-the-institutional-media-strategy">4.2 The Institutional Media Strategy</a></li>
+<li><a href="#43-rotation-schedule">4.3 Rotation Schedule</a></li>
+<li><a href="#44-media-health-monitoring-program">4.4 Media Health Monitoring Program</a></li>
+<li><a href="#45-environmental-monitoring">4.5 Environmental Monitoring</a></li>
+</ul>
+<li><a href="#5-rules-constraints-2">5. Rules &amp; Constraints</a></li>
+<li><a href="#6-failure-modes-2">6. Failure Modes</a></li>
+<li><a href="#7-recovery-procedures-2">7. Recovery Procedures</a></li>
+<li><a href="#8-evolution-path-2">8. Evolution Path</a></li>
+<li><a href="#9-commentary-section-2">9. Commentary Section</a></li>
+<li><a href="#10-references-2">10. References</a></li>
+</ul>
+<li><a href="#d6-012-data-classification-and-handling-procedures">D6-012 -- Data Classification and Handling Procedures</a></li>
+<ul>
+<li><a href="#1-purpose-3">1. Purpose</a></li>
+<li><a href="#2-scope-3">2. Scope</a></li>
+<li><a href="#3-background-3">3. Background</a></li>
+<ul>
+<li><a href="#31-why-classification-is-not-optional">3.1 Why Classification Is Not Optional</a></li>
+<li><a href="#32-the-two-axis-classification-model">3.2 The Two-Axis Classification Model</a></li>
+<li><a href="#33-the-labeling-problem">3.3 The Labeling Problem</a></li>
+</ul>
+<li><a href="#4-system-model-3">4. System Model</a></li>
+<ul>
+<li><a href="#41-the-classification-taxonomy">4.1 The Classification Taxonomy</a></li>
+<li><a href="#42-the-classification-matrix">4.2 The Classification Matrix</a></li>
+<li><a href="#43-the-labeling-system">4.3 The Labeling System</a></li>
+<li><a href="#44-the-classification-decision-procedure">4.4 The Classification Decision Procedure</a></li>
+<li><a href="#45-the-classification-audit">4.5 The Classification Audit</a></li>
+<li><a href="#46-reclassification-procedures">4.6 Reclassification Procedures</a></li>
+</ul>
+<li><a href="#5-rules-constraints-3">5. Rules &amp; Constraints</a></li>
+<li><a href="#6-failure-modes-3">6. Failure Modes</a></li>
+<li><a href="#7-recovery-procedures-3">7. Recovery Procedures</a></li>
+<li><a href="#8-evolution-path-3">8. Evolution Path</a></li>
+<li><a href="#9-commentary-section-3">9. Commentary Section</a></li>
+<li><a href="#10-references-3">10. References</a></li>
+</ul>
+<li><a href="#d6-013-disaster-data-recovery-when-backups-fail">D6-013 -- Disaster Data Recovery: When Backups Fail</a></li>
+<ul>
+<li><a href="#1-purpose-4">1. Purpose</a></li>
+<li><a href="#2-scope-4">2. Scope</a></li>
+<li><a href="#3-background-4">3. Background</a></li>
+<ul>
+<li><a href="#31-how-backups-fail">3.1 How Backups Fail</a></li>
+<li><a href="#32-the-first-rule-of-disaster-recovery">3.2 The First Rule of Disaster Recovery</a></li>
+<li><a href="#33-the-psychological-dimension">3.3 The Psychological Dimension</a></li>
+</ul>
+<li><a href="#4-system-model-4">4. System Model</a></li>
+<ul>
+<li><a href="#41-the-disaster-assessment-procedure">4.1 The Disaster Assessment Procedure</a></li>
+<li><a href="#42-the-recovery-triage-framework">4.2 The Recovery Triage Framework</a></li>
+<li><a href="#43-partial-recovery-techniques">4.3 Partial Recovery Techniques</a></li>
+<li><a href="#44-data-reconstruction-from-fragments">4.4 Data Reconstruction from Fragments</a></li>
+<li><a href="#45-forensic-recovery-from-damaged-media">4.5 Forensic Recovery from Damaged Media</a></li>
+<li><a href="#46-the-recovery-decision-framework">4.6 The Recovery Decision Framework</a></li>
+</ul>
+<li><a href="#5-rules-constraints-4">5. Rules &amp; Constraints</a></li>
+<li><a href="#6-failure-modes-4">6. Failure Modes</a></li>
+<li><a href="#7-recovery-procedures-4">7. Recovery Procedures</a></li>
+<li><a href="#8-evolution-path-4">8. Evolution Path</a></li>
+<li><a href="#9-commentary-section-4">9. Commentary Section</a></li>
+<li><a href="#10-references-4">10. References</a></li>
+</ul></ul>
+</nav>
+</aside>
+<main class="content">
+<h1 id="stage-4-specialized-systems-data-archives-advanced">STAGE 4: SPECIALIZED SYSTEMS -- DATA & ARCHIVES (ADVANCED)</h1>
+<h2 id="advanced-reference-documents-for-domain-6">Advanced Reference Documents for Domain 6</h2>
+<p><strong>Document ID:</strong> STAGE4-DATA-ADVANCED <strong>Version:</strong> 1.0.0 <strong>Date:</strong> 2026-02-16 <strong>Status:</strong> Ratified <strong>Classification:</strong> Stage 4 -- Specialized Systems. These are advanced reference documents that provide deep technical guidance on specific aspects of data stewardship. They assume familiarity with the Stage 2 philosophy (D6-001) and Stage 3 operational procedures. They are written for the operator who needs to make complex technical decisions about long-term data survival. <strong>Depends On:</strong> ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D6-001, D6-003, D6-005, D6-006, D6-007, D6-008 <strong>Depended Upon By:</strong> All future Domain 6 implementation guides, Domain 12 disaster recovery procedures, Domain 10 daily operations involving storage and backup systems.</p>
+<hr/>
+<h2 id="how-to-read-this-document">How to Read This Document</h2>
+<p>This document contains five advanced reference articles for Domain 6: Data & Archives. These are Stage 4 documents -- specialized systems articles that go deeper than the operational procedures of Stage 3. They are written for the operator who has already internalized the data philosophy of D6-001, understands the operational tempo defined in OPS-001, and now needs detailed technical guidance on the systems that make multi-decade data survival possible.</p>
+<p>These articles deal with the hard, specific, sometimes tedious realities of keeping data alive for fifty years. They cover filesystems, file formats, physical media, classification procedures, and what to do when everything has already gone wrong. They are not philosophical. They are not inspirational. They are the articles you will reach for when a disk is failing, when a format is dying, when you need to decide which backup medium to trust your institutional memory to, or when you are staring at the wreckage of a backup strategy that did not survive contact with reality.</p>
+<p>Read D6-009 first if you are building or rebuilding storage infrastructure. Read D6-010 before making any format decisions. Read D6-011 before purchasing or rotating backup media. Read D6-012 before handling any data that requires classification. Read D6-013 when something has already gone wrong and you need to recover what you can.</p>
+<p>If you are a future operator and the specific technologies discussed here have become obsolete, do not discard these articles. The analytical frameworks -- how to evaluate a filesystem, how to assess format risk, how to think about media longevity -- will outlast the specific technologies they reference. Use the frameworks to evaluate whatever technologies exist in your time.</p>
+<hr/>
+<hr/>
+<h1 id="d6-009-file-system-architecture-for-longevity">D6-009 -- File System Architecture for Longevity</h1>
+<p><strong>Document ID:</strong> D6-009 <strong>Domain:</strong> 6 -- Data & Archives <strong>Version:</strong> 1.0.0 <strong>Date:</strong> 2026-02-16 <strong>Status:</strong> Ratified <strong>Depends On:</strong> ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-005, D6-006, D6-007 <strong>Depended Upon By:</strong> D6-010, D6-011, D6-013, all Domain 5 articles involving storage configuration, all Domain 12 disaster recovery articles involving filesystem repair.</p>
+<hr/>
+<h2 id="1-purpose">1. Purpose</h2>
+<p>This article defines how the institution selects, configures, and maintains the filesystems that underpin all data storage. A filesystem is the layer between the physical storage media and the data that lives on it. It determines how data is organized on disk, how integrity is maintained, how failures are detected and survived, and how storage can grow or shrink over time. A poor filesystem choice can silently corrupt data. A good filesystem choice, properly maintained, can detect and repair corruption before data is lost.</p>
+<p>The filesystem is the single most consequential software decision in the institution's data architecture. The operating system can be reinstalled. Applications can be replaced. But the filesystem is the structure that holds the data itself. Changing it requires moving every byte of institutional data off the old filesystem, reformatting the storage, and moving every byte back. This is not a decision to revisit casually or frequently. It must be made correctly, documented thoroughly, and maintained relentlessly.</p>
+<p>This article evaluates the major filesystem options available for Linux-based air-gapped systems as of the founding date. It establishes the criteria by which filesystems are judged, makes a specific recommendation for the institution, defines the maintenance schedules that keep the chosen filesystem healthy, and provides the migration framework for when the chosen filesystem must eventually be replaced.</p>
+<h2 id="2-scope">2. Scope</h2>
+<p>This article covers:</p>
+<ul>
+<li>The criteria for evaluating filesystems for multi-decade institutional use.</li>
+<li>Detailed analysis of ZFS, Btrfs, and ext4 as candidates.</li>
+<li>The specific filesystem configuration chosen for this institution, with rationale.</li>
+<li>Scrub schedules, snapshot strategies, and pool management procedures.</li>
+<li>Monitoring and alerting for filesystem health.</li>
+<li>The migration path when filesystem technology changes.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Physical media selection (see D6-005 and D6-011).</li>
+<li>Backup procedures (see D6-006; this article covers the filesystem that backups live on, not the backup process itself).</li>
+<li>File format selection (see D6-010).</li>
+<li>Logical directory structure and data organization (see D6-004).</li>
+<li>Encryption at rest (see SEC-003; this article notes where filesystem-level encryption intersects with filesystem choice but does not define encryption policy).</li>
+</ul>
+<h2 id="3-background">3. Background</h2>
+<h3 id="31-what-a-filesystem-actually-does">3.1 What a Filesystem Actually Does</h3>
+<p>A filesystem performs four functions that matter for longevity. First, it maps logical file names and directory structures to physical locations on storage media. Second, it manages the allocation of storage space -- tracking which blocks are in use, which are free, and how to find them efficiently. Third, it maintains metadata about files -- ownership, permissions, timestamps, and size. Fourth, and most critically for this institution, it either protects data integrity or does not.</p>
+<p>Traditional filesystems like ext4 store data and trust that the underlying hardware returns what was written. They do not independently verify that the bits on disk still match what was originally written. If a disk sector degrades silently -- a phenomenon called bit rot -- the filesystem will happily return the corrupted data without any indication that something is wrong. You will not know your data is damaged until you try to use it and discover the corruption, which may be months or years after the corruption occurred.</p>
+<p>Modern copy-on-write filesystems like ZFS and Btrfs take a fundamentally different approach. They store checksums alongside data. Every time data is read, the checksum is verified. If corruption is detected, the filesystem can report it immediately and, if configured with redundancy, repair it automatically from a good copy. This is not a minor feature. For an institution that must keep data intact for fifty years across multiple hardware generations, filesystem-level integrity checking is the difference between detecting corruption when it happens and discovering it when the data is needed and it is too late.</p>
+<h3 id="32-the-air-gap-implication">3.2 The Air-Gap Implication</h3>
+<p>In a connected environment, many filesystem management tasks can be automated and monitored remotely. Storage pools can be expanded by ordering cloud capacity. Health alerts can be routed to monitoring services. In this institution, every filesystem operation happens locally, is performed by the operator, and is monitored by the operator. The filesystem must therefore be manageable by a single person with standard command-line tools, must produce clear and interpretable health reports, and must fail in ways that are obvious rather than silent.</p>
+<h3 id="33-the-fifty-year-problem">3.3 The Fifty-Year Problem</h3>
+<p>No filesystem in use today has existed for fifty years. ext4 dates to 2008. ZFS dates to 2005. Btrfs dates to 2009. None of them have a fifty-year track record because none of them are fifty years old. The institution must therefore choose a filesystem based on design principles, community health, and institutional maturity rather than a proven half-century of operation. It must also plan for the near-certainty that the chosen filesystem will eventually be superseded and all data will need to migrate to its successor.</p>
+<h2 id="4-system-model">4. System Model</h2>
+<h3 id="41-evaluation-criteria">4.1 Evaluation Criteria</h3>
+<p>The institution evaluates filesystems against seven criteria, ranked by importance:</p>
+<p><strong>Criterion 1: Data Integrity Verification.</strong> Does the filesystem checksum data at rest and verify checksums on read? Can it detect silent corruption? Can it repair detected corruption from redundant copies? This is the most important criterion. A filesystem without integrity verification is unsuitable for institutional use regardless of its other qualities.</p>
+<p><strong>Criterion 2: Proven Stability.</strong> How long has the filesystem been in production use? How large is the user base? How frequently are data-loss bugs discovered? A filesystem with a fifteen-year track record of stable operation on production systems is preferred over one with superior theoretical design but a shorter or rockier history.</p>
+<p><strong>Criterion 3: Redundancy and Self-Healing.</strong> Can the filesystem maintain multiple copies of data and automatically repair corruption from good copies? This is distinct from backup -- it is the filesystem's ability to maintain internal redundancy and use it transparently.</p>
+<p><strong>Criterion 4: Snapshot Capability.</strong> Can the filesystem create point-in-time snapshots efficiently? Snapshots are critical for rollback after failed operations, for creating consistent backup points, and for maintaining historical states of the data without duplicating storage.</p>
+<p><strong>Criterion 5: Manageable Complexity.</strong> Can a single operator understand, configure, maintain, and troubleshoot the filesystem without specialized training? Are the command-line tools well-documented? Are error messages clear? Is the community knowledge base sufficient that problems can be solved from archived documentation?</p>
+<p><strong>Criterion 6: Hardware Flexibility.</strong> Does the filesystem work well with the types of storage media the institution uses? Can it span multiple disks? Can disks be added or replaced without reformatting? Does it handle mixed-size disks gracefully?</p>
+<p><strong>Criterion 7: Licensing and Sovereignty.</strong> Is the filesystem open-source with a license that guarantees the institution can use, modify, and distribute it without external permission? Are there legal encumbrances that could affect availability?</p>
+<h3 id="42-candidate-analysis">4.2 Candidate Analysis</h3>
+<p><strong>ZFS (OpenZFS).</strong></p>
+<p>ZFS was designed from the ground up as an integrated volume manager and filesystem with end-to-end data integrity as its core design goal. It checksums all data and metadata using SHA-256 or similar algorithms. It supports mirror and RAIDZ configurations that allow automatic self-healing when corruption is detected. Its snapshot mechanism is mature, efficient, and heavily tested. Its scrub mechanism -- a scheduled full-read verification of all data -- is the gold standard for proactive corruption detection.</p>
+<p>Strengths for this institution: Best-in-class data integrity. Proven stability across two decades of production use in enterprise environments, including storage appliances, NAS systems, and mission-critical servers. Excellent snapshot and clone support. The scrub mechanism is exactly what a longevity-focused institution needs. Send/receive functionality allows efficient transfer of snapshots between pools, which is valuable for backup workflows.</p>
+<p>Weaknesses for this institution: ZFS has a CDDL license, which creates friction with the Linux kernel's GPL license. It is not included in the mainline Linux kernel and must be installed as a separate module. This adds a maintenance burden -- kernel updates may require ZFS module rebuilds. The community has maintained compatibility reliably, but this is an ongoing dependency. ZFS pools cannot be easily shrunk -- you can add disks but removing them is limited. Memory requirements are higher than simpler filesystems, with a recommended minimum of 1 GB of RAM per terabyte of storage for optimal performance, and more for deduplication (which this institution should not use -- see Section 5).</p>
+<p><strong>Btrfs.</strong></p>
+<p>Btrfs was designed as a modern Linux-native copy-on-write filesystem with checksumming, snapshots, and integrated volume management. It is included in the mainline Linux kernel, eliminating the licensing and kernel-compatibility concerns of ZFS. It has been in development since 2009 and has been the default filesystem for some Linux distributions.</p>
+<p>Strengths for this institution: Mainline kernel inclusion means no separate module maintenance. Good snapshot support. Checksumming of data and metadata. Subvolume architecture provides flexible data organization. Can add and remove devices from a filesystem while it is mounted. Lower memory overhead than ZFS.</p>
+<p>Weaknesses for this institution: Btrfs has a more troubled stability history than ZFS. Its RAID5 and RAID6 implementations have been considered unreliable for years, with a well-documented write-hole problem. While RAID1 (mirror) is stable, this limits redundancy options. Some enterprise users (notably Red Hat) removed Btrfs support from their distributions, citing stability concerns, before partially reversing that decision. The community is smaller than ZFS's, and institutional knowledge is less deep. Scrub performance and reliability, while improving, has historically lagged behind ZFS. For an institution that must trust its filesystem with fifty years of irreplaceable data, Btrfs's stability history is a significant concern.</p>
+<p><strong>ext4.</strong></p>
+<p>ext4 is the default filesystem for most Linux distributions. It is mature, stable, extremely well-understood, and has the largest user base of any Linux filesystem. It has been in production since 2008 and its predecessor, ext3, since 2001.</p>
+<p>Strengths for this institution: Maximum stability. Maximum compatibility. Every Linux tool, every recovery utility, every diagnostic program works with ext4. If the filesystem is damaged, the probability of finding tools and documentation to repair it is higher than for any other Linux filesystem. It is simple, well-understood, and predictable.</p>
+<p>Weaknesses for this institution: ext4 does not checksum data. It checksums metadata (journal checksumming, added later), but data blocks can silently corrupt without detection. It does not support snapshots natively (snapshots require LVM, which adds another layer of complexity and another potential failure point). It does not support integrated redundancy -- RAID must be implemented at a separate layer (mdadm or hardware RAID), creating a split between the filesystem and the redundancy mechanism that complicates management and reduces the ability to do self-healing repair. For an institution where data integrity is the paramount concern, ext4's lack of data checksumming is a disqualifying weakness for primary storage.</p>
+<h3 id="43-the-institutional-decision">4.3 The Institutional Decision</h3>
+<p><strong>Primary storage: ZFS.</strong> The institution uses ZFS (OpenZFS) for all primary data storage. The data integrity guarantees, proven stability, mature scrub mechanism, and excellent snapshot support make it the strongest choice for multi-decade data survival. The licensing friction with the Linux kernel is a real cost, accepted because the alternative -- trusting unchecksummed data for fifty years -- is an unacceptable risk.</p>
+<p><strong>Backup and emergency storage: ext4.</strong> The institution maintains the ability to create and read ext4 filesystems for backup media, emergency recovery, and interoperability. If ZFS becomes unavailable due to a kernel incompatibility or community collapse, ext4 provides a fallback that can be read by any Linux system. Critical backups are stored on ext4-formatted media in addition to ZFS, ensuring that data is recoverable even if ZFS tools are lost.</p>
+<p><strong>Btrfs: Not selected.</strong> Btrfs is not selected for institutional use at founding. Its stability history does not yet meet the threshold required by Criterion 2. This decision should be revisited at each five-year review. If Btrfs achieves the stability and community maturity of ZFS, it may become the preferred choice due to its mainline kernel inclusion.</p>
+<h3 id="44-zfs-configuration-standards">4.4 ZFS Configuration Standards</h3>
+<p><strong>Pool Layout.</strong> The institution uses mirrored vdevs (mirror or RAIDZ2 for larger arrays) rather than striping. Mirrored vdevs provide the best resilience and the simplest recovery path. A mirror can be read by extracting a single disk -- no special tools are needed to access the raw data on one half of a mirror. RAIDZ2 (dual parity) is used when four or more disks are available and storage efficiency matters. RAIDZ1 (single parity) is not used -- a single-parity configuration cannot survive the combination of a disk failure and a read error during resilver, which becomes increasingly likely as disk sizes grow.</p>
+<p><strong>Recordsize.</strong> The default recordsize of 128K is used for general storage. For databases or other workloads with small random I/O patterns, the recordsize may be tuned per dataset. The recordsize decision is documented per dataset.</p>
+<p><strong>Compression.</strong> LZ4 compression is enabled by default on all datasets. LZ4 is fast enough that compression typically improves performance (less data to read from disk) and it meaningfully extends storage capacity. The compression algorithm is set per dataset, not per pool, allowing future changes without affecting existing data.</p>
+<p><strong>Copies.</strong> For Tier 1 (Institutional Memory) data, the ZFS <code>copies=2</code> property is set, instructing ZFS to store two copies of every block within the same pool. This provides protection against single-block corruption even within a non-redundant pool. It is not a substitute for mirrored vdevs but an additional layer of defense for the most critical data.</p>
+<p><strong>Checksumming.</strong> SHA-256 checksumming is used for all datasets. The default fletcher4 checksum is faster but SHA-256 provides cryptographic-strength collision resistance, which matters when data integrity is the primary design goal.</p>
+<p><strong>Ashift.</strong> The ashift value is set correctly for the physical sector size of the disks in use. For modern drives with 4K physical sectors (common as of founding), ashift=12. Incorrect ashift degrades performance and, in some configurations, can reduce data safety. This value is set at pool creation and cannot be changed afterward.</p>
+<h3 id="45-scrub-schedule">4.5 Scrub Schedule</h3>
+<p>A scrub is a complete read of every block in a ZFS pool, with checksum verification. It is the primary mechanism for detecting silent corruption before it causes data loss.</p>
+<p><strong>Schedule:</strong> Every pool is scrubbed at least once per month. Tier 1 data pools are scrubbed weekly. Scrubs are scheduled during periods of low system activity to minimize performance impact but are never deferred beyond their scheduled window. A missed scrub is an incident, documented in the operational log.</p>
+<p><strong>Duration monitoring:</strong> Scrub duration is recorded each time. A significant increase in scrub duration (greater than 25% compared to baseline) indicates potential hardware degradation and triggers a hardware health investigation per D6-005.</p>
+<p><strong>Error response:</strong> Any scrub that reports checksum errors triggers immediate investigation. If errors are repairable (ZFS repaired them from a redundant copy), the event is logged and the disk exhibiting errors is placed on watch. If errors are unrepairable, the affected data is identified, restored from backup if possible, and the disk is scheduled for replacement.</p>
+<h3 id="46-snapshot-strategy">4.6 Snapshot Strategy</h3>
+<p><strong>Automated snapshots:</strong> ZFS snapshots are created on a tiered schedule:</p>
+<ul>
+<li>Hourly snapshots of active-use datasets, retained for 48 hours.</li>
+<li>Daily snapshots of all datasets, retained for 30 days.</li>
+<li>Weekly snapshots of all datasets, retained for 12 weeks.</li>
+<li>Monthly snapshots of all datasets, retained for 24 months.</li>
+<li>Annual snapshots of Tier 1 datasets, retained permanently.</li>
+</ul>
+<p><strong>Naming convention:</strong> Snapshots are named <code>@auto-[frequency]-[YYYY-MM-DD-HHMM]</code> for automated snapshots and <code>@manual-[description]-[YYYY-MM-DD]</code> for manually created snapshots. Consistent naming enables automated cleanup and manual identification.</p>
+<p><strong>Snapshot verification:</strong> At least one snapshot per quarter is selected for restore testing. The snapshot is cloned to a temporary dataset and the data is verified against known-good checksums. This confirms that the snapshot mechanism is functioning correctly and that snapshots are usable for recovery.</p>
+<h2 id="5-rules-constraints">5. Rules & Constraints</h2>
+<ul>
+<li><strong>R-D6-09-01:</strong> All primary data storage must use a filesystem with data checksumming. Filesystems that do not checksum data at rest are prohibited for primary storage of Tier 1 or Tier 2 data.</li>
+<li><strong>R-D6-09-02:</strong> ZFS deduplication must not be enabled. Deduplication consumes enormous amounts of RAM (approximately 5 GB per TB of deduplicated data), introduces fragmentation, and creates a single point of failure in the deduplication table. The storage savings do not justify the risk or the resource cost in this institution.</li>
+<li><strong>R-D6-09-03:</strong> Every ZFS pool must be scrubbed at least monthly. Scrub results must be reviewed within 24 hours of completion. Unrepairable errors must be treated as incidents.</li>
+<li><strong>R-D6-09-04:</strong> ZFS pool configuration changes (adding vdevs, replacing disks, changing properties) must be documented in the operational log before execution, including the exact commands to be run and the expected outcome. ZFS pool operations are not reversible. A wrong command can destroy a pool.</li>
+<li><strong>R-D6-09-05:</strong> The institution must maintain at least one complete backup on ext4-formatted media at all times, ensuring data survivability even if ZFS becomes unavailable.</li>
+<li><strong>R-D6-09-06:</strong> ZFS kernel module compatibility must be verified before any kernel update is applied to production systems. Kernel updates that break ZFS are deferred until a compatible ZFS version is available.</li>
+<li><strong>R-D6-09-07:</strong> Pool capacity must never exceed 80% utilization. ZFS performance degrades significantly above this threshold, and the copy-on-write mechanism requires free space to function correctly. Exceeding 80% triggers an immediate storage expansion or data triage per D6-001.</li>
+</ul>
+<h2 id="6-failure-modes">6. Failure Modes</h2>
+<ul>
+<li><strong>Silent data corruption on non-checksumming filesystem.</strong> If ext4 or another non-checksumming filesystem is used for primary storage (violating R-D6-09-01), bit rot will go undetected. Data will degrade over years and the corruption will be discovered only when the data is needed. By that time, backups may also contain the corrupted version, having faithfully replicated the damage. Mitigation: R-D6-09-01 prohibits this configuration. D6-007 provides additional integrity verification layers.</li>
+<li><strong>ZFS pool loss due to operator error.</strong> ZFS pool operations are powerful and irrevocable. A mistyped <code>zpool destroy</code> command eliminates an entire pool. A wrong <code>zpool create</code> command can overwrite existing data. Mitigation: R-D6-09-04 requires documentation before execution. The operator must type destructive commands manually, never from scripts, and must verify the target pool name before pressing enter. The <code>zpool destroy</code> command should be aliased to require confirmation.</li>
+<li><strong>ZFS kernel module incompatibility.</strong> A kernel update breaks the ZFS module. The system boots but cannot mount ZFS pools. All data on ZFS is inaccessible. Mitigation: R-D6-09-06 requires compatibility verification before kernel updates. The institution maintains at least one previous kernel that is known to work with the installed ZFS version. The ext4 backup (R-D6-09-05) ensures data is accessible without ZFS.</li>
+<li><strong>Pool capacity exhaustion.</strong> ZFS performance degrades severely when pools approach full capacity. Copy-on-write operations fail when there is no free space, potentially corrupting metadata. Mitigation: R-D6-09-07 sets an 80% threshold. Monitoring scripts alert when any pool exceeds 70%.</li>
+<li><strong>Scrub neglect.</strong> Scrubs are deferred or forgotten. Corruption accumulates undetected. When finally discovered, the corruption may be widespread and unrecoverable. Mitigation: Scrubs are scheduled via systemd timers or cron, not dependent on operator memory. Missed scrubs generate alerts. Scrub completion is verified in the weekly operations review per OPS-001.</li>
+<li><strong>Snapshot bloat.</strong> Snapshots accumulate without cleanup. Each snapshot holds references to changed blocks, preventing space reclamation. The pool fills up with snapshot overhead. Mitigation: The automated snapshot schedule in Section 4.6 includes retention limits. A weekly script verifies that snapshot cleanup is functioning and that snapshot space consumption is within expected bounds.</li>
+</ul>
+<h2 id="7-recovery-procedures">7. Recovery Procedures</h2>
+<ol>
+<li><strong>If ZFS module fails to load after kernel update.</strong> Boot to the previous known-good kernel (per D5-002, always maintain at least two bootable kernels). Mount ZFS pools. Do not apply the new kernel to other systems. Research ZFS compatibility with the new kernel version. Either wait for a ZFS update that supports the new kernel or hold the kernel at the current version until one is available. Document the incident.</li>
+<li><strong>If a ZFS scrub reports unrepairable errors.</strong> Identify the affected files using <code>zpool status -v</code>. Check whether the affected files exist in backup. If they do, restore from backup. If they do not, attempt to read the affected files and assess the damage -- some files may be partially usable. Replace the disk exhibiting errors. After replacement, resilver the pool and run another scrub to verify. Document all affected files and their recovery status.</li>
+<li><strong>If a ZFS pool runs a degraded vdev (disk failure in mirror or RAIDZ).</strong> Replace the failed disk immediately. Initiate resilver. Do not defer this -- a degraded pool has reduced redundancy and a second failure during this period could result in data loss. During resilver, minimize I/O load on the pool. Monitor resilver progress. After resilver completes, run a full scrub. Document the failure, replacement, and verification.</li>
+<li><strong>If ZFS must be abandoned entirely.</strong> This is the nuclear option, invoked only if ZFS becomes unmaintainable (community collapse, irreconcilable kernel incompatibility, or discovery of a fundamental design flaw). The migration procedure: First, verify that the ext4 backup per R-D6-09-05 is current and complete. Second, select the replacement filesystem using the criteria in Section 4.1. Third, create the new filesystem on new or reformatted media. Fourth, copy all data from ZFS (while it still works) or from the ext4 backup to the new filesystem. Fifth, verify every file on the new filesystem against known-good checksums from D6-007. Sixth, update all procedures in this document and its dependents. This is a Tier 1 institutional event per GOV-001.</li>
+<li><strong>If pool capacity exceeds 80%.</strong> Immediately assess what can be removed. Begin with Tier 4 (transient) data per D6-001. If removal of transient data is insufficient, escalate to Tier 3 (reference) data review. If the pool cannot be brought below 80% through data removal, add storage capacity (new vdevs). Do not wait for the pool to reach 90% -- recovery becomes exponentially more difficult as free space shrinks.</li>
+</ol>
+<h2 id="8-evolution-path">8. Evolution Path</h2>
+<ul>
+<li><strong>Years 0-5:</strong> The ZFS configuration is established and proven. The primary learning is operational -- developing familiarity with scrub management, snapshot workflows, and pool monitoring. The operator builds a baseline understanding of normal scrub durations, normal error rates (which should be zero), and normal capacity growth.</li>
+<li><strong>Years 5-15:</strong> Hardware generations change. Disks are replaced. The first significant pool migrations occur -- replacing older, smaller disks with newer, larger ones. ZFS handles this through mirror replacement (replace one side of a mirror, resilver, replace the other side). The first serious evaluation of whether ZFS remains the correct choice happens at the ten-year mark.</li>
+<li><strong>Years 15-30:</strong> The filesystem landscape may have changed dramatically. New filesystems may have emerged that surpass ZFS in integrity, performance, or community health. Btrfs may have matured to the point of reliability. Entirely new technologies (persistent memory filesystems, for example) may exist. The institution must evaluate these without sentimentality -- loyalty is to the data, not to the filesystem.</li>
+<li><strong>Years 30-50+:</strong> The filesystem may have migrated one or more times. The critical requirement is that the evaluation criteria in Section 4.1 remain applicable regardless of which filesystem is current. New operators must understand why the filesystem was chosen, not just how to operate it.</li>
+<li><strong>Signpost for revision:</strong> If ZFS kernel module compatibility requires intervention more than twice per year, or if the OpenZFS community shows signs of fragmentation or decline, begin evaluating alternatives immediately rather than waiting for the scheduled review.</li>
+</ul>
+<h2 id="9-commentary-section">9. Commentary Section</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong> The ZFS decision was not easy. The licensing situation genuinely concerns me. Every kernel update carries the risk that the ZFS module will not compile, and I will spend hours troubleshooting instead of doing productive work. I chose ZFS anyway because the alternative -- trusting unchecksummed data for fifty years -- is not really an alternative at all. Bit rot is real. I have seen it. Files that look fine until you open them and discover that the image is half-corrupted, the document is garbled, the database is silently missing records. ZFS catches these problems when they happen, not when it is too late.</p>
+<p>The ext4 backup requirement is my safety net. If ZFS fails me catastrophically, I can still reach my data. It doubles the storage overhead for critical data. That is a price I am willing to pay for the ability to sleep at night.</p>
+<p>I deliberately did not recommend Btrfs, and I suspect this will age poorly. Btrfs is improving rapidly and its kernel integration solves the most annoying problem with ZFS. If you are reading this in 2035 and Btrfs has had a decade of rock-solid operation, you should seriously consider migrating. Just do it methodically, with the ext4 safety net in place throughout the migration.</p>
+<p>One warning about ZFS that the documentation does not emphasize enough: ZFS is opinionated about hardware. It wants ECC RAM. It performs best with dedicated disks, not partitions. It expects to manage the disks directly, not through a hardware RAID controller. Respect these opinions. ZFS was designed by people who thought carefully about data integrity, and fighting their design choices will cost you data.</p>
+<h2 id="10-references">10. References</h2>
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (air-gap requirement, sovereignty)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (Category 2: Data Integrity Threats)</li>
+<li>OPS-001 -- Operations Philosophy (maintenance tempo, documentation-first principle)</li>
+<li>D6-001 -- Data Philosophy (data tier system, preservation requirements, triage framework)</li>
+<li>D6-005 -- Storage Architecture: Physical Media Strategy (hardware constraints on filesystem choice)</li>
+<li>D6-006 -- Backup Doctrine (backup procedures that interact with filesystem snapshots)</li>
+<li>D6-007 -- Data Integrity & Verification (integrity verification layered above filesystem checksumming)</li>
+<li>D5-002 -- Operating System Maintenance Procedures (kernel update procedures, ZFS module compatibility)</li>
+<li>GOV-001 -- Authority Model (Tier 1 classification for filesystem migration decisions)</li>
+<li>OpenZFS Project Documentation (archived locally per D6-014)</li>
+<li>"ZFS on Linux" community knowledge base (archived locally)</li>
+<li>Bonwick, Jeff and Moore, Bill. "ZFS: The Last Word in Filesystems." Sun Microsystems, 2005. (archived)</li>
+</ul>
+<hr/>
+<hr/>
+<h1 id="d6-010-digital-preservation-formats-that-survive">D6-010 -- Digital Preservation: Formats That Survive</h1>
+<p><strong>Document ID:</strong> D6-010 <strong>Domain:</strong> 6 -- Data & Archives <strong>Version:</strong> 1.0.0 <strong>Date:</strong> 2026-02-16 <strong>Status:</strong> Ratified <strong>Depends On:</strong> ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-003, D6-007, D6-008, D6-009 <strong>Depended Upon By:</strong> D6-011, D6-012, D6-014, all Domain 8 articles involving data processing, all Domain 9 training materials on data handling.</p>
+<hr/>
+<h2 id="1-purpose-1">1. Purpose</h2>
+<p>This article provides the deep technical analysis behind the institution's file format decisions. D6-003 establishes the format longevity doctrine -- the principles. This article implements those principles with specific format evaluations, a risk assessment methodology, the institutional format whitelist, and the ongoing process for monitoring format health and triggering migrations when formats begin to die.</p>
+<p>A file format is a contract between the past and the future. When you save a file in a given format, you are making a promise to your future self -- or to whoever inherits the institution -- that the file will be readable later. Some formats honor that promise reliably. Others break it within a decade. The difference is not always obvious at the time the file is saved. A proprietary format backed by a dominant company feels safe until the company pivots, discontinues the product, or changes the format in a way that renders old files unreadable. An obscure open format feels risky until you realize that its specification is public, its parsers are simple, and it will be readable as long as anyone can write software.</p>
+<p>This article is the institution's defense against the slow death of file formats. It provides the analytical tools to distinguish formats that will survive from those that will not, and the procedural framework to act on that analysis before data is lost.</p>
+<h2 id="2-scope-1">2. Scope</h2>
+<p>This article covers:</p>
+<ul>
+<li>The format risk assessment methodology: how to evaluate any file format for longevity.</li>
+<li>The institutional format whitelist: specific formats approved for each data type.</li>
+<li>The format watchlist: formats that are approved but showing signs of concern.</li>
+<li>The format review process: how and when formats are re-evaluated.</li>
+<li>Migration triggers: the specific conditions that mandate format conversion.</li>
+<li>Format migration procedures: how to convert data safely.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophical justification for format sovereignty (see D6-001 and D6-003).</li>
+<li>Metadata standards for describing format information (see D6-008).</li>
+<li>The specific tools used for format conversion (these are documented in operational procedures and will change over time).</li>
+<li>Encryption or compression considerations (see SEC-003 for encryption; D6-009 Section 4.4 for filesystem-level compression).</li>
+</ul>
+<h2 id="3-background-1">3. Background</h2>
+<h3 id="31-the-history-of-format-death">3.1 The History of Format Death</h3>
+<p>The history of computing is littered with dead formats. WordStar documents from the 1980s. Lotus 1-2-3 spreadsheets. HyperCard stacks. RealMedia files. Flash content. Each was dominant in its era. Each is now difficult or impossible to open without specialized tools, emulation, or reverse-engineering. The pattern is consistent: a format rises to dominance, its creator loses market position or interest, the format is replaced, and the old files become orphans.</p>
+<p>Even formats that survive may change in ways that break backward compatibility. Microsoft's .doc format went through multiple incompatible internal versions. PDF has evolved through numbered versions with increasing complexity. JPEG 2000 never achieved the adoption of its predecessor despite being technically superior. Format survival is not guaranteed by technical merit, market share, or even open standardization -- though open standardization dramatically improves the odds.</p>
+<h3 id="32-the-open-specification-principle">3.2 The Open Specification Principle</h3>
+<p>D6-003 establishes that the institution may not store data in formats that require proprietary software to read. This article operationalizes that principle. A format is considered "open" for institutional purposes if and only if: the specification is publicly available without requiring payment, licensing, or agreement to restrictive terms; at least two independent implementations exist (not controlled by the same entity); and the format can be read by software that the institution can compile from source. A format that meets only one or two of these conditions is treated with caution. A format that meets none is prohibited.</p>
+<h3 id="33-the-simplicity-heuristic">3.3 The Simplicity Heuristic</h3>
+<p>A useful heuristic for format longevity: the simpler the format, the longer it survives. Plain text (UTF-8) has been readable since the 1990s and will be readable for as long as computers exist. CSV is trivially parseable by any programming language. TIFF has been stable since 1986. Formats that are simple enough to write a parser for in a weekend are formats that will survive regardless of what happens to the companies and communities that created them. Formats that require thousands of pages of specification, complex state machines, or proprietary codecs to decode are formats that may die when their ecosystem dies.</p>
+<p>This heuristic is not absolute. Some complex formats (PDF/A, for example) survive because they serve a critical need and have deep institutional support. But when choosing between two formats that serve the same purpose, the simpler one is preferred unless the complex one offers a capability that the institution genuinely requires.</p>
+<h2 id="4-system-model-1">4. System Model</h2>
+<h3 id="41-the-format-risk-assessment-framework">4.1 The Format Risk Assessment Framework</h3>
+<p>Every file format used by the institution is assessed against six risk dimensions. Each dimension is scored on a three-point scale: Low Risk (1), Moderate Risk (2), High Risk (3). The total score determines the format's risk classification.</p>
+<p><strong>Dimension 1: Specification Availability.</strong></p>
+<ul>
+<li>Low Risk (1): Full specification is publicly available, free, and unrestricted. Multiple archived copies exist.</li>
+<li>Moderate Risk (2): Specification is available but behind a paywall, or is partially documented with undocumented extensions in common use.</li>
+<li>High Risk (3): Specification is proprietary, unavailable, or requires reverse-engineering to implement.</li>
+</ul>
+<p><strong>Dimension 2: Implementation Diversity.</strong></p>
+<ul>
+<li>Low Risk (1): Three or more independent, actively maintained implementations exist, including at least one in a language the institution can compile.</li>
+<li>Moderate Risk (2): Two implementations exist, or implementations exist but maintenance activity is declining.</li>
+<li>High Risk (3): Only one implementation exists, or the canonical implementation is controlled by a single entity with no viable alternatives.</li>
+</ul>
+<p><strong>Dimension 3: Adoption Breadth.</strong></p>
+<ul>
+<li>Low Risk (1): The format is widely used across multiple industries, operating systems, and use cases. Critical mass of existing files ensures continued support.</li>
+<li>Moderate Risk (2): The format is used within a specific domain or community. Support exists but could collapse if that community loses interest.</li>
+<li>High Risk (3): The format is niche, declining, or used primarily within a single vendor's ecosystem.</li>
+</ul>
+<p><strong>Dimension 4: Complexity.</strong></p>
+<ul>
+<li>Low Risk (1): The format is simple enough that a competent programmer could write a basic parser in a week or less. The specification is under 100 pages.</li>
+<li>Moderate Risk (2): The format is moderately complex. A parser requires significant effort but is well within the capability of a skilled developer. The specification is 100-500 pages.</li>
+<li>High Risk (3): The format is highly complex. Parsing requires specialized knowledge, extensive libraries, or months of development. The specification exceeds 500 pages or is effectively unimplementable from specification alone.</li>
+</ul>
+<p><strong>Dimension 5: Backward Compatibility Track Record.</strong></p>
+<ul>
+<li>Low Risk (1): The format has maintained backward compatibility for at least fifteen years. Files created in early versions are still readable by current tools.</li>
+<li>Moderate Risk (2): The format has maintained backward compatibility with minor exceptions. Some edge cases or rarely-used features from early versions may not be fully supported.</li>
+<li>High Risk (3): The format has broken backward compatibility at least once, or has undergone major version changes that require different tools to read different vintages of files.</li>
+</ul>
+<p><strong>Dimension 6: Institutional Dependency.</strong></p>
+<ul>
+<li>Low Risk (1): The format is not controlled by any single institution. It is governed by an international standards body, or its specification is in the public domain.</li>
+<li>Moderate Risk (2): The format is associated with a specific institution but has been standardized through an independent body (e.g., ISO, IETF).</li>
+<li>High Risk (3): The format is controlled by a single company. Its future depends on that company's business decisions.</li>
+</ul>
+<p><strong>Risk Classification:</strong></p>
+<ul>
+<li>Score 6-9: <strong>Green</strong> -- Approved for unrestricted use. Review at standard five-year intervals.</li>
+<li>Score 10-13: <strong>Yellow</strong> -- Approved with monitoring. Review at two-year intervals. Maintain tested conversion path to a Green format.</li>
+<li>Score 14-18: <strong>Red</strong> -- Not approved for long-term storage. Data in this format must be converted to a Green or Yellow format before archival. May be used for active work if a tested conversion pipeline exists.</li>
+</ul>
+<h3 id="42-the-institutional-format-whitelist">4.2 The Institutional Format Whitelist</h3>
+<p>The following formats are approved for long-term institutional storage as of the founding date. Each entry includes the risk score, the data type it covers, and any conditions on its use.</p>
+<p><strong>Text:</strong></p>
+<ul>
+<li>Plain text, UTF-8 encoding (Score: 6, Green). The default format for all textual data that does not require formatting. No conditions.</li>
+<li>Markdown, CommonMark specification (Score: 7, Green). For structured text that benefits from lightweight formatting. Files must remain valid plain text -- no embedded binary content.</li>
+<li>PDF/A-2b, ISO 19005-2 (Score: 9, Green). For documents that require precise visual layout, embedded fonts, or reproduction of printed materials. PDF/A variants only -- standard PDF is Yellow due to feature creep and JavaScript embedding. All PDF/A files must be validated against the specification at creation.</li>
+<li>HTML 5, static (Score: 8, Green). For structured documents with internal linking. No JavaScript, no external dependencies, no embedded resources that are not also stored independently. Self-contained HTML files only.</li>
+</ul>
+<p><strong>Structured Data:</strong></p>
+<ul>
+<li>CSV, RFC 4180 (Score: 6, Green). For tabular data. UTF-8 encoding. Header row required. No conditions.</li>
+<li>JSON, RFC 8259 (Score: 7, Green). For structured data, configuration files, and data interchange. UTF-8 encoding.</li>
+<li>SQLite database files (Score: 8, Green). For structured data that benefits from relational queries. SQLite is a public domain file format with a single canonical implementation that is among the most-tested software in existence. The file format is documented and stable.</li>
+<li>XML 1.0, W3C Recommendation (Score: 9, Green). For structured data that requires schemas or namespaces. Avoid when JSON or CSV suffices.</li>
+</ul>
+<p><strong>Images:</strong></p>
+<ul>
+<li>TIFF, uncompressed or LZW (Score: 7, Green). The archival standard for raster images. Use for photographs, scanned documents, and any image where quality preservation is paramount.</li>
+<li>PNG (Score: 7, Green). For screenshots, diagrams, and images where lossless compression is needed and TIFF is excessive.</li>
+<li>JPEG, baseline (Score: 8, Green). For photographs where lossy compression is acceptable and the original is also preserved in TIFF. Use only the baseline profile -- progressive and arithmetic coding variants have less universal support.</li>
+<li>SVG 1.1 (Score: 8, Green). For vector graphics and diagrams. Static SVG only -- no scripting, no animation.</li>
+</ul>
+<p><strong>Audio:</strong></p>
+<ul>
+<li>FLAC (Score: 8, Green). For audio that must be preserved losslessly.</li>
+<li>WAV, PCM (Score: 7, Green). For raw audio. Larger files but maximally simple format.</li>
+<li>Ogg Vorbis (Score: 10, Yellow). For compressed audio where FLAC file sizes are impractical. Maintained on the watchlist due to narrower implementation base than MP3 or AAC.</li>
+</ul>
+<p><strong>Video:</strong></p>
+<ul>
+<li>FFV1 in Matroska container (Score: 10, Yellow). For lossless video preservation. Maintained on watchlist because the format, while gaining archival adoption, has a smaller implementation base than consumer formats.</li>
+<li>H.264/AVC in Matroska container (Score: 10, Yellow). For compressed video where lossless preservation is impractical. Watchlisted due to patent encumbrances that, while largely expired, create uncertainty about long-term tool availability. Baseline profile only.</li>
+</ul>
+<p><strong>Archives and Containers:</strong></p>
+<ul>
+<li>tar (Score: 6, Green). For file aggregation. No compression at the tar level -- compression is handled by the filesystem (D6-009) or by gzip when transferring across the air gap.</li>
+<li>gzip (Score: 7, Green). For compression when needed at the file level.</li>
+</ul>
+<h3 id="43-the-format-watchlist">4.3 The Format Watchlist</h3>
+<p>The format watchlist contains formats that are currently approved (Yellow or better) but that show one or more risk indicators that warrant closer monitoring. The watchlist is reviewed every two years. Formats on the watchlist have a documented conversion path to a Green alternative that is tested annually.</p>
+<p>As of founding, the watchlist contains:</p>
+<ul>
+<li><strong>Ogg Vorbis:</strong> Implementation diversity is lower than desired. Monitor whether adoption stabilizes or declines. Conversion path: decode to WAV/FLAC.</li>
+<li><strong>FFV1/Matroska:</strong> Archival adoption is growing but the format lacks the deep entrenchment of simpler alternatives. Monitor community health. Conversion path: transcode to uncompressed in AVI or to image sequences.</li>
+<li><strong>H.264/AVC:</strong> Patent landscape, while improving, has historically created tooling uncertainty. Monitor whether royalty-free alternatives (AV1) achieve sufficient maturity. Conversion path: transcode to FFV1 for archival or to AV1 when AV1 reaches Green status.</li>
+<li><strong>PDF/A (all variants):</strong> While the base format is Green, the increasing complexity of PDF generally is a concern. Monitor whether PDF/A validators remain available and maintained. Conversion path: extract text to Markdown, preserve original as reference.</li>
+</ul>
+<h3 id="44-migration-triggers">4.4 Migration Triggers</h3>
+<p>A format migration is triggered by any of the following conditions:</p>
+<p><strong>Trigger 1: Specification withdrawal.</strong> The standards body governing the format withdraws or deprecates the specification without a backward-compatible successor.</p>
+<p><strong>Trigger 2: Implementation collapse.</strong> The number of actively maintained implementations falls below two, or the last implementation available for the institution's operating system ceases development.</p>
+<p><strong>Trigger 3: Tool unavailability.</strong> The institution can no longer compile or run software that reads and writes the format on its current or planned hardware and software platform.</p>
+<p><strong>Trigger 4: Risk score escalation.</strong> A format's risk score increases to Red (14 or above) at a scheduled review.</p>
+<p><strong>Trigger 5: Community consensus.</strong> The broader archival and digital preservation community reaches consensus that the format is unsuitable for long-term storage, as documented in archived publications from recognized preservation institutions.</p>
+<p>When a migration trigger fires, the response timeline depends on the data tier:</p>
+<ul>
+<li>Tier 1 data: Migration begins within 30 days. Completion target: 90 days.</li>
+<li>Tier 2 data: Migration begins within 90 days. Completion target: 180 days.</li>
+<li>Tier 3 data: Migration begins within 180 days. Completion target: 365 days.</li>
+<li>Tier 4 data: Dispose if transient; migrate only if reclassified to a higher tier.</li>
+</ul>
+<h3 id="45-migration-procedure">4.5 Migration Procedure</h3>
+<ol>
+<li>Identify all files in the affected format. Use the file catalogue per D6-008 -- this is why metadata matters.</li>
+<li>Select the target format from the institutional whitelist. The target format must be Green.</li>
+<li>Test the conversion pipeline on a sample set. Verify that the converted files are faithful to the originals. For text formats, verify content identity. For images, verify visual fidelity and metadata preservation. For structured data, verify data integrity (record counts, checksums).</li>
+<li>Convert all files. Retain the original files in the old format alongside the new files until verification is complete.</li>
+<li>Verify every converted file. Automated verification (checksum comparison where applicable, file validation against format specification) plus manual spot-checks of at least 5% of files or 50 files, whichever is greater.</li>
+<li>Update the file catalogue to reflect the new format. Record the conversion date, the source format, the target format, and the tool used.</li>
+<li>Retain original files for one full review cycle (minimum two years) before disposal. This provides a rollback path if conversion errors are discovered later.</li>
+<li>Document the migration in the operational log and in the Commentary Section of this article.</li>
+</ol>
+<h2 id="5-rules-constraints-1">5. Rules & Constraints</h2>
+<ul>
+<li><strong>R-D6-10-01:</strong> No data may be stored for long-term preservation in a Red-classified format. Data in Red formats must be converted before archival.</li>
+<li><strong>R-D6-10-02:</strong> Every format on the institutional whitelist must have a tested conversion path to at least one other Green-listed format. This conversion path must be tested annually.</li>
+<li><strong>R-D6-10-03:</strong> The format whitelist must be reviewed at least every five years, with the risk assessment framework applied to every listed format. Formats on the watchlist are reviewed every two years.</li>
+<li><strong>R-D6-10-04:</strong> When multiple formats serve the same purpose, the simplest format that meets the institution's needs is preferred. Complexity is a risk factor, not a feature.</li>
+<li><strong>R-D6-10-05:</strong> Format conversion must preserve the original file until the conversion has been verified and has survived at least one review cycle. Destruction of the original before verification is an incident.</li>
+<li><strong>R-D6-10-06:</strong> Every file in institutional storage must be identifiable by format. Files with unknown or ambiguous formats must be investigated and either classified or flagged for review at the next format audit.</li>
+</ul>
+<h2 id="6-failure-modes-1">6. Failure Modes</h2>
+<ul>
+<li><strong>Format death without warning.</strong> A format that appeared healthy rapidly loses support due to a corporate decision, legal action, or community collapse. The institution discovers it can no longer open files it stored years ago. Mitigation: The watchlist process provides early warning. The requirement for multiple implementations (Dimension 2) ensures that no single entity's decision can kill format support overnight. The tested conversion paths (R-D6-10-02) provide escape routes.</li>
+<li><strong>Conversion fidelity loss.</strong> Format conversion introduces subtle errors -- metadata loss, precision reduction, encoding mismatches, visual degradation. The institution believes it has successfully migrated its data, but the converted files are degraded copies. Mitigation: Section 4.5 requires verification of every converted file. The requirement to retain originals for one review cycle provides a safety net. For lossy formats (JPEG, compressed audio/video), the institution acknowledges that conversion between lossy formats introduces generation loss and therefore stores originals in lossless formats whenever possible.</li>
+<li><strong>Whitelist stagnation.</strong> The format whitelist is not updated. New, superior formats are ignored. The institution falls behind the archival community's best practices. Mitigation: R-D6-10-03 mandates regular reviews. The Commentary Section provides a record of review decisions, including decisions not to change, with reasoning.</li>
+<li><strong>Format proliferation.</strong> The institution accumulates data in too many formats, each requiring its own toolchain, its own conversion paths, its own expertise. Management overhead becomes unsustainable. Mitigation: R-D6-10-04 favors simplicity and consolidation. The whitelist is deliberately short. Adding a format requires demonstrating that no existing whitelisted format serves the need.</li>
+<li><strong>Metadata loss during conversion.</strong> File metadata (creation date, author, classification, custom tags) is lost during format conversion because the target format does not support the same metadata fields, or because the conversion tool does not preserve metadata. Mitigation: D6-008 requires that critical metadata be stored both within files (where the format supports it) and in the external catalogue. The external catalogue preserves metadata independently of format conversions.</li>
+</ul>
+<h2 id="7-recovery-procedures-1">7. Recovery Procedures</h2>
+<ol>
+<li><strong>If files are discovered in an unreadable format.</strong> Identify the format using file signatures, file extensions, and any available metadata. Search archived documentation for the format specification. Search for archived copies of software that can read the format. If tools are found, convert the files to a whitelisted format immediately. If tools cannot be found, assess whether the format specification is available and a custom reader can be developed. Document the incident, including what data is affected and the recovery outcome.</li>
+<li><strong>If a format conversion is discovered to have introduced errors.</strong> Locate the original pre-conversion files (retained per R-D6-10-05). Verify the originals are intact. Re-run the conversion with a different tool or different settings. If no tool produces an accurate conversion, retain the originals indefinitely and document the limitation. Investigate whether the conversion errors are systematic (affecting all files) or isolated (affecting specific files).</li>
+<li><strong>If the format whitelist has not been reviewed on schedule.</strong> Conduct an emergency review immediately. Prioritize formats on the watchlist and any formats for which the institution has received informal indications of declining support. Document the gap in the review schedule and the reason for the delay.</li>
+<li><strong>If a format migration trigger fires for a format containing Tier 1 data.</strong> This is a priority incident. Assign all available time to the migration until Tier 1 data is safe. Follow the migration procedure in Section 4.5 with no shortcuts. If the migration cannot be completed within the 90-day target, document the reason and the revised timeline. Notify the governance record per GOV-001.</li>
+</ol>
+<h2 id="8-evolution-path-1">8. Evolution Path</h2>
+<ul>
+<li><strong>Years 0-5:</strong> The format whitelist is established and tested. The primary challenge is discipline -- resisting the temptation to store data in convenient but non-whitelisted formats. The format review process is new and may require tuning. Some formats on the initial whitelist may prove unnecessary and be removed.</li>
+<li><strong>Years 5-15:</strong> The first format migration triggers may fire. This is the real test of the format risk assessment framework and the migration procedures. The institution learns whether its conversion pipelines actually work at scale. Video and audio formats are the most likely candidates for early migration, as these technologies evolve rapidly.</li>
+<li><strong>Years 15-30:</strong> The format landscape will have changed significantly. Formats that seemed safe at founding may have declining support. New formats that did not exist at founding may have become dominant. The institution must balance stability (staying with proven formats) against relevance (adopting formats that the broader world has moved to). The risk assessment framework provides the analytical tool for this balance.</li>
+<li><strong>Years 30-50+:</strong> Some of the formats on the original whitelist will have been superseded two or three times. The institution's data may have been through multiple format migrations. The critical question is whether the migration procedures preserved fidelity through each transition. The verification steps in Section 4.5 are the defense against cumulative degradation across multiple migrations.</li>
+<li><strong>Signpost for revision:</strong> If the format whitelist grows beyond twenty formats, the institution is probably storing data in too many formats. Consolidate. If the format review process consistently finds no changes needed, either the process is working perfectly or it is not asking hard enough questions -- investigate which.</li>
+</ul>
+<h2 id="9-commentary-section-1">9. Commentary Section</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong> The hardest format decision was video. There is no video format that I can confidently say will be readable in fifty years. The consumer formats (H.264, H.265) are encumbered by patents. The archival formats (FFV1) are technically excellent but have narrow adoption. The open formats (VP9, AV1) are young and their long-term trajectory is unclear. I chose to approve FFV1 for archival and H.264 for practical use, both on the watchlist, and I expect future operators will need to revisit this decision multiple times.</p>
+<p>The simplicity heuristic has served me well in other contexts and I believe it will serve this institution well. Plain text is immortal. CSV is immortal. TIFF is effectively immortal. These are the formats I trust with the data that matters most. When someone asks me "what format should I use?", my first answer is always "plain text, unless you have a specific reason not to." The burden of proof is on the complex format, not on the simple one.</p>
+<p>I want to be explicit about one thing: the format whitelist is conservative by design. It does not include every good format. It includes the formats that I believe have the highest probability of surviving fifty years. I would rather miss a good format than include one that dies. Future operators should add formats to the whitelist cautiously and remove them reluctantly, because every format addition is a promise to maintain conversion paths and tooling for that format indefinitely.</p>
+<p>The risk assessment framework is deliberately quantitative. I want format decisions to be based on evidence, not on feelings or brand loyalty. A format with a high risk score may be technically superior to one with a low risk score -- but technical superiority does not help you when the tools to read the format no longer exist.</p>
+<h2 id="10-references-1">10. References</h2>
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (sovereignty, self-sufficiency)</li>
+<li>D6-001 -- Data Philosophy (format sovereignty principle, data tier system)</li>
+<li>D6-003 -- Format Longevity Doctrine (philosophical foundation for format selection)</li>
+<li>D6-007 -- Data Integrity & Verification (integrity verification of stored formats)</li>
+<li>D6-008 -- Metadata Standards & Cataloguing (metadata preservation across format conversions)</li>
+<li>D6-009 -- File System Architecture for Longevity (filesystem-level compression and storage)</li>
+<li>D6-014 -- Data Ingest Procedures (format evaluation at ingest)</li>
+<li>ISO 19005-2:2011, Document management -- Electronic document file format for long-term preservation -- Part 2: Use of ISO 32000-1 (PDF/A-2)</li>
+<li>RFC 4180 -- Common Format and MIME Type for Comma-Separated Values (CSV) Files</li>
+<li>RFC 8259 -- The JavaScript Object Notation (JSON) Data Interchange Format</li>
+<li>Library of Congress Recommended Formats Statement (archived locally)</li>
+<li>National Archives of Australia Digital Preservation Formats Policy (archived locally)</li>
+<li>"Digital Preservation Handbook" -- Digital Preservation Coalition, 2nd Edition (archived locally)</li>
+</ul>
+<hr/>
+<hr/>
+<h1 id="d6-011-physical-backup-media-selection-and-rotation">D6-011 -- Physical Backup Media: Selection and Rotation</h1>
+<p><strong>Document ID:</strong> D6-011 <strong>Domain:</strong> 6 -- Data & Archives <strong>Version:</strong> 1.0.0 <strong>Date:</strong> 2026-02-16 <strong>Status:</strong> Ratified <strong>Depends On:</strong> ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-005, D6-006, D6-007, D6-009 <strong>Depended Upon By:</strong> D6-012, D6-013, all Domain 10 articles involving backup operations, all Domain 12 disaster recovery articles.</p>
+<hr/>
+<h2 id="1-purpose-2">1. Purpose</h2>
+<p>This article provides the detailed technical assessment of physical backup media available to this institution, defines the rotation and testing schedules that keep backups viable, and establishes the media health monitoring program that detects degradation before data loss occurs. D6-005 defines the overall physical media strategy. D6-006 defines the backup doctrine. This article is the bridge between them -- the specific knowledge about which media to buy, how to store it, how to test it, how long to trust it, and when to replace it.</p>
+<p>Backup media is the institution's insurance policy. It is the thing that sits on a shelf, unused for months or years, and then must work perfectly the one time it is needed. This creates a fundamental problem: the moment you most need your backup is the moment you discover whether your backup media has been silently dying on its shelf. A backup that exists but cannot be read is worse than no backup at all, because it creates a false sense of security that prevents you from taking the protective actions you would take if you knew you had no backup.</p>
+<p>This article exists to prevent that scenario. Every backup medium degrades. Every storage technology has a limited lifespan. The question is not whether your backup media will fail but when, and whether you will detect the degradation and act before the failure becomes irreversible. This article defines how.</p>
+<h2 id="2-scope-2">2. Scope</h2>
+<p>This article covers:</p>
+<ul>
+<li>Honest technical assessment of each backup media type: magnetic tape, optical disc, hard disk drives (HDD), and solid-state drives (SSD).</li>
+<li>Expected lifespans, degradation characteristics, and failure signatures for each media type.</li>
+<li>Environmental storage requirements: temperature, humidity, light, magnetic field exposure.</li>
+<li>The rotation schedule: how often media is replaced regardless of apparent health.</li>
+<li>The media health monitoring program: how degradation is detected.</li>
+<li>The media migration procedure: how data is moved off aging media before failure.</li>
+<li>Cost and practicality considerations for a single-operator air-gapped institution.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Backup procedures and scheduling (see D6-006).</li>
+<li>Filesystem selection for backup media (see D6-009; ext4 for backup media is established there).</li>
+<li>Logical backup organization and naming (see D6-004).</li>
+<li>Off-site storage location selection and security (see SEC-001 and D6-006).</li>
+<li>Cloud or network-attached storage (prohibited by the air-gap architecture).</li>
+</ul>
+<h2 id="3-background-2">3. Background</h2>
+<h3 id="31-the-media-longevity-problem">3.1 The Media Longevity Problem</h3>
+<p>Every physical storage medium is in a state of slow decay from the moment it is manufactured. Magnetic domains weaken. Optical dye layers degrade. Flash cells lose charge. The marketing claims for media longevity are often aspirational rather than empirical -- a manufacturer claiming "100-year archival lifespan" for an optical disc is extrapolating from accelerated aging tests, not from a century of observation. The institution must treat all longevity claims with skepticism and rely instead on its own testing, the broader community's experience, and conservative replacement schedules.</p>
+<h3 id="32-the-air-gap-media-constraint">3.2 The Air-Gap Media Constraint</h3>
+<p>In a connected institution, backup might mean replication to a remote server or a cloud storage service. In this institution, backup means physical media. Every backup is a physical object that must be stored, protected, tested, and eventually replaced. This makes the choice of backup media a physical as well as a technical decision -- the media must be storable in the institution's environment, durable under the institution's conditions, and readable with the institution's equipment.</p>
+<h3 id="33-the-single-copy-danger">3.3 The Single-Copy Danger</h3>
+<p>D6-001 Rule R-D6-02 requires a minimum of three copies on at least two distinct media types. This article is about the media those copies live on. The media assessment directly determines whether the institution's backup redundancy is real or merely theoretical. Three copies on three drives from the same manufacturing batch, stored in the same location, subject to the same environmental conditions, is effectively one copy with three labels. True redundancy requires media diversity, storage diversity, and schedule diversity.</p>
+<h2 id="4-system-model-2">4. System Model</h2>
+<h3 id="41-media-type-assessment">4.1 Media Type Assessment</h3>
+<p><strong>Hard Disk Drives (HDD).</strong></p>
+<p>HDDs store data as magnetic orientations on spinning platters. They are the workhorse of digital storage and the most practical backup medium for this institution at the founding date.</p>
+<p>Expected lifespan: 3-7 years in active use; 5-10 years in powered-off archival storage. These are conservative estimates. Some drives last much longer; some fail much sooner. The institution treats 5 years as the maximum trust horizon for any individual HDD used as backup media.</p>
+<p>Degradation characteristics: HDDs can fail suddenly (mechanical failure of heads, motor, or controller board) or gradually (increasing sector errors as magnetic domains weaken). Sudden failures are catastrophic but obvious. Gradual failures are insidious -- the drive appears to work but is silently accumulating unreadable sectors. SMART (Self-Monitoring, Analysis, and Reporting Technology) attributes provide early warning for some failure modes but not all. Reallocated sector count, pending sector count, and uncorrectable error count are the most predictive SMART indicators.</p>
+<p>Environmental requirements: Store horizontally in a stable position. Temperature 15-25 degrees Celsius. Humidity 20-50% relative. Avoid vibration, strong magnetic fields, and temperature cycling. Power on the drive at least once every six months to exercise the motor and refresh any weakening sectors. This last point is critical and often overlooked -- a drive that sits unpowered for years may fail to spin up when needed.</p>
+<p>Strengths: High capacity, relatively low cost per gigabyte, fast read/write speeds, universally supported interfaces (SATA, USB). Easy to verify with standard tools. Familiar technology with well-understood failure modes.</p>
+<p>Weaknesses: Mechanical components are inherently fragile. Vulnerable to physical shock. The combination of high capacity and mechanical fragility means a single drive failure can lose a large amount of data. Power-on requirement for long-term archival is an operational burden.</p>
+<p>Institutional role: Primary backup medium. Used for the regular backup rotation defined in Section 4.3. Not relied upon for archival storage beyond the 5-year trust horizon without verified refresh.</p>
+<p><strong>Solid-State Drives (SSD).</strong></p>
+<p>SSDs store data as electrical charges in flash memory cells. They have no moving parts, which eliminates the mechanical failure modes of HDDs.</p>
+<p>Expected lifespan: Highly variable and dependent on the type of flash memory (SLC, MLC, TLC, QLC), the controller firmware, and crucially, the storage conditions when powered off. Write endurance is measured in drive writes per day over a warranty period, but for backup media, the critical question is data retention when unpowered. Manufacturer specifications typically claim 1-10 years of data retention at room temperature, with higher temperatures accelerating charge leakage.</p>
+<p>Degradation characteristics: Flash cells lose charge over time. Unlike HDDs, which degrade at the sector level, SSDs can lose entire blocks or, in extreme cases, become completely unreadable if the controller firmware cannot compensate for charge loss. The degradation is invisible during normal use -- the drive reports success until the moment it does not. SMART reporting on SSDs is less standardized and less predictive than on HDDs.</p>
+<p>Environmental requirements: Temperature is the critical factor. At 25 degrees Celsius, enterprise SSDs may retain data for years. At 40 degrees, retention drops dramatically. Store at the lowest practical temperature. Humidity is less critical than for HDDs (no mechanical components to corrode), but condensation must be avoided. Power on the drive periodically (at least annually) to allow the controller to refresh weakening cells.</p>
+<p>Strengths: No mechanical failure mode. Resistant to physical shock. Fast read speeds. Compact form factor. Silent operation.</p>
+<p>Weaknesses: Data retention when unpowered is the Achilles' heel for archival use. QLC (quad-level cell) drives, which are the cheapest and most common, have the worst retention characteristics. The technology is evolving rapidly, which means failure modes are still being discovered. The cost per gigabyte, while declining, remains higher than HDDs. Controller firmware is proprietary and complex, introducing a dependency on the controller's ability to manage cell degradation.</p>
+<p>Institutional role: Secondary backup medium. Used for portable copies that need shock resistance (transport media for off-site storage). Not relied upon as the sole backup medium. Always paired with HDD backups. The 5-year trust horizon applies, with annual power-on verification mandatory.</p>
+<p><strong>Optical Media (Blu-ray, M-DISC).</strong></p>
+<p>Optical media stores data as physical marks (pits, dye changes, or phase changes) readable by a laser. Blu-ray offers 25-100 GB per disc. M-DISC is a variant that uses a rock-like inorganic recording layer instead of organic dye, claiming significantly longer archival life.</p>
+<p>Expected lifespan: Standard Blu-ray writable discs (organic dye): 5-15 years, highly dependent on manufacturing quality and storage conditions. M-DISC: manufacturer claims hundreds of years; independent accelerated aging tests suggest at least 50-100 years under ideal conditions. These claims are inherently unverifiable at the institution's timescale, but M-DISC's inorganic recording layer is physically more stable than organic dye -- this is a real advantage, not marketing.</p>
+<p>Degradation characteristics: Organic dye discs degrade through chemical breakdown of the dye layer, accelerated by light exposure, heat, and humidity. The outer edge of the disc typically degrades first. M-DISC resists dye degradation by not using dye, but the polycarbonate substrate can still degrade (yellowing, warping, delamination) over very long periods. Read errors manifest as increasing uncorrectable error rates, detectable during verification reads.</p>
+<p>Environmental requirements: Store in jewel cases or archival-grade sleeves. Temperature 15-25 degrees Celsius. Humidity 20-50% relative. No direct light exposure -- UV light is the primary enemy of organic dye layers. Handle by edges only. Do not stack discs without separators. Vertical storage is preferred to prevent warping.</p>
+<p>Strengths: No power required for data retention. No moving parts in the medium itself (the drive has moving parts but the disc does not). Low cost per disc. M-DISC offers the best passive data retention of any medium available to consumers. Write-once nature prevents accidental overwriting. Disc-level storage creates natural data segmentation -- losing one disc does not lose everything.</p>
+<p>Weaknesses: Low capacity per disc means many discs are needed for large datasets. Optical drive availability is declining -- fewer computers include optical drives, and external drives may become difficult to source. Verification requires a working optical drive. Write speeds are slow. The ecosystem is contracting as streaming and flash storage replace optical media in consumer use. The long-term availability of compatible drives is the primary risk.</p>
+<p>Institutional role: Archival backup for Tier 1 data. M-DISC is used for the highest-value institutional memory data that must survive the longest. The institution maintains spare optical drives and stockpiles M-DISC blanks. Data on optical media is verified annually. The drive availability risk is monitored per the evolution path in Section 8.</p>
+<p><strong>Magnetic Tape (LTO).</strong></p>
+<p>LTO (Linear Tape-Open) stores data magnetically on tape media. It is the gold standard for archival storage in enterprise environments. LTO-9 offers 18 TB native capacity per cartridge.</p>
+<p>Expected lifespan: 15-30 years per cartridge under proper storage conditions. The LTO Consortium has maintained backward compatibility (each generation can read tapes from two prior generations), which provides a migration path.</p>
+<p>Degradation characteristics: Magnetic domains weaken over time. Tape substrate can deteriorate (shedding, stretching, sticky shed syndrome). Environmental conditions are critical. Tape is vulnerable to magnetic fields. Degradation is gradual and detectable through read verification.</p>
+<p>Environmental requirements: The most demanding of any medium. Temperature 16-25 degrees Celsius with minimal variation (less than 5 degrees per hour). Humidity 20-50% relative with minimal variation. Stored vertically. Acclimatized for 24 hours before use if moved between environments. Protected from magnetic fields, dust, and contaminants. Requires climate-controlled storage that the institution may or may not be able to maintain in an off-grid environment.</p>
+<p>Strengths: Highest capacity per unit. Best cost per gigabyte for large datasets. Long archival life when properly stored. Mature, well-understood technology. The write-once nature of properly managed tape prevents accidental overwriting. Industry standard for archival storage.</p>
+<p>Weaknesses: Requires specialized tape drives, which are expensive and may be difficult to maintain in an air-gapped environment. The backward compatibility guarantee extends only two generations -- eventually, older tapes must be migrated. Sequential access means slow random access to specific files. The environmental requirements are stringent and may be difficult to maintain off-grid. The cost of entry (drive plus media) is significantly higher than HDD-based backup. For a single-operator institution, the operational overhead may be disproportionate.</p>
+<p>Institutional role: Optional. If the institution's data volume grows large enough to justify the investment, LTO tape becomes the archival storage tier. At founding, the institution's data volume does not justify the expense and operational burden. This decision is revisited when total institutional data exceeds 10 TB or when the five-year review occurs, whichever comes first. If tape is adopted, the procedures in this article are extended to include tape-specific handling, verification, and migration schedules.</p>
+<h3 id="42-the-institutional-media-strategy">4.2 The Institutional Media Strategy</h3>
+<p>Based on the assessment above, the institution's backup media strategy at founding is:</p>
+<p><strong>Primary backup media:</strong> HDD. Two independent backup sets on HDDs from different manufacturers or manufacturing batches.</p>
+<p><strong>Secondary backup media:</strong> M-DISC optical. Tier 1 data is additionally backed up to M-DISC for long-term passive preservation.</p>
+<p><strong>Transport media:</strong> SSD. When data must be physically transported to an off-site location, SSDs are used for their shock resistance.</p>
+<p><strong>Future consideration:</strong> LTO tape when data volume or resource availability justifies it.</p>
+<p>This strategy satisfies R-D6-02 (three copies on two distinct media types) and provides media diversity (magnetic HDD, optical M-DISC, flash SSD), storage diversity (different physical locations per D6-006), and technology diversity (three fundamentally different storage technologies).</p>
+<h3 id="43-rotation-schedule">4.3 Rotation Schedule</h3>
+<p><strong>HDD backup rotation:</strong> The institution maintains three sets of HDD backups, labeled A, B, and C. Each set is a complete backup of all institutional data at the tier levels defined in D6-006.</p>
+<ul>
+<li>Set A: Updated weekly. Stored on-site.</li>
+<li>Set B: Updated monthly. Stored off-site at the designated secondary location.</li>
+<li>Set C: Updated quarterly. Stored off-site at the designated tertiary location (or secondary location if a third is not available, but stored separately from Set B).</li>
+</ul>
+<p>Every 5 years, all HDD backup media is replaced with new drives. Data is copied from old drives to new drives, verified, and the old drives are securely wiped and disposed of per SEC-003. This is the media refresh cycle. It is not optional. It is not deferrable. It is the mechanism that keeps backup media ahead of degradation.</p>
+<p><strong>M-DISC archival rotation:</strong> M-DISC backups of Tier 1 data are created annually. Each annual set is a complete snapshot. Previous annual sets are retained permanently (M-DISC's passive longevity makes retention cost-effective). Sets are verified annually by reading every disc and checking against known-good checksums.</p>
+<p><strong>SSD transport media:</strong> SSDs used for transport are refreshed every 3 years. Between uses, transport SSDs are stored powered-off at the on-site location and powered on quarterly for controller maintenance.</p>
+<h3 id="44-media-health-monitoring-program">4.4 Media Health Monitoring Program</h3>
+<p><strong>HDD health monitoring:</strong></p>
+<ul>
+<li>SMART attributes are checked monthly for all backup HDDs. Key indicators: Reallocated Sector Count, Current Pending Sector Count, Uncorrectable Error Count, Spin Retry Count. Any non-zero value in Reallocated Sector Count or Uncorrectable Error Count triggers immediate investigation.</li>
+<li>Full read verification (read every sector, compare against backup checksums) is performed quarterly.</li>
+<li>Any HDD that fails a SMART threshold or produces read errors during verification is retired immediately and replaced. Data is restored to the replacement drive from the remaining good copies.</li>
+</ul>
+<p><strong>M-DISC health monitoring:</strong></p>
+<ul>
+<li>Annual full-disc read with error rate reporting. Optical drives report C1/C2 error rates (or PI/PO for Blu-ray) which indicate disc quality degradation.</li>
+<li>Any disc with rising error rates is flagged. If error rates approach the correction threshold, the disc is duplicated to a new disc and the original is retired but retained for reference.</li>
+</ul>
+<p><strong>SSD health monitoring:</strong></p>
+<ul>
+<li>SMART attributes checked at each power-on (quarterly minimum). Key indicators: Percentage Used, Available Spare, Media and Data Integrity Errors.</li>
+<li>Full read verification at each power-on event.</li>
+<li>Any SSD reporting reduced spare capacity below 20% or any data integrity errors is retired immediately.</li>
+</ul>
+<h3 id="45-environmental-monitoring">4.5 Environmental Monitoring</h3>
+<p>The institution monitors the environmental conditions where backup media is stored:</p>
+<ul>
+<li>Temperature and humidity are logged continuously using a standalone data logger (a battery-operated device that does not require network connectivity).</li>
+<li>Acceptable ranges: 15-25 degrees Celsius, 20-50% relative humidity.</li>
+<li>If conditions exceed acceptable ranges for more than 24 hours, a media health check is triggered for all media stored in the affected location.</li>
+<li>If conditions consistently exceed acceptable ranges, the storage location must be changed or environmentally remediated.</li>
+</ul>
+<p>In an off-grid environment, environmental control may be challenging. The institution prioritizes media storage locations that are naturally stable -- interior rooms, below-grade spaces, locations with high thermal mass. Active climate control (air conditioning, dehumidifiers) is preferred but not always available. When active control is unavailable, passive measures (insulation, ventilation, desiccants) are employed and monitoring frequency is increased.</p>
+<h2 id="5-rules-constraints-2">5. Rules & Constraints</h2>
+<ul>
+<li><strong>R-D6-11-01:</strong> No single media type may be the sole backup medium for Tier 1 or Tier 2 data. At least two distinct media types must hold copies of all data at these tiers.</li>
+<li><strong>R-D6-11-02:</strong> HDD backup media must be replaced on a 5-year rotation cycle regardless of apparent health. No HDD older than 5 years may serve as the sole or primary backup medium for any data tier.</li>
+<li><strong>R-D6-11-03:</strong> All backup media must be verified at least quarterly through full read verification against known-good checksums. Verification results must be recorded in the operational log.</li>
+<li><strong>R-D6-11-04:</strong> Media that exhibits any sign of degradation (SMART warnings, rising error rates, read failures) must be retired immediately and replaced. "Immediately" means before the next scheduled backup rotation.</li>
+<li><strong>R-D6-11-05:</strong> Backup media must be stored in environmental conditions within the acceptable ranges defined in Section 4.5. Environmental conditions must be monitored continuously.</li>
+<li><strong>R-D6-11-06:</strong> The institution must maintain a minimum stockpile of replacement media: at least two spare HDDs of the currently-used capacity and at least fifty blank M-DISC media. Running below stockpile triggers a procurement action.</li>
+<li><strong>R-D6-11-07:</strong> Media procurement must prioritize diversity. Do not buy all backup HDDs from the same manufacturer in the same batch. Correlating failures across identical drives from the same batch is a documented phenomenon.</li>
+</ul>
+<h2 id="6-failure-modes-2">6. Failure Modes</h2>
+<ul>
+<li><strong>Simultaneous multi-drive failure.</strong> All backup HDDs fail at once because they were purchased together, are the same model, and have the same firmware bug or manufacturing defect. Mitigation: R-D6-11-07 requires procurement diversity. The M-DISC backup provides a technology-diverse fallback. The rotation schedule ensures that not all backup sets are the same age.</li>
+<li><strong>Environmental damage.</strong> A storage location experiences a temperature excursion (heat, cold, flooding) that damages all media stored there. Mitigation: Backup sets are stored at different locations (Section 4.3). Environmental monitoring provides early warning. Off-site backups survive even if the on-site location is compromised.</li>
+<li><strong>Optical drive obsolescence.</strong> Optical drives become unavailable. The institution can no longer read its M-DISC backups. Mitigation: The institution stockpiles spare optical drives (at least two). The evolution path (Section 8) monitors drive availability and triggers migration if optical drives approach end-of-availability. Data on M-DISC is also present on HDDs, so optical drive loss does not mean data loss -- it means loss of one redundancy layer.</li>
+<li><strong>Silent backup corruption.</strong> Backup media degrades without obvious symptoms. The institution discovers the corruption only when attempting to restore from backup. Mitigation: R-D6-11-03 requires quarterly verification. The ZFS scrub schedule (D6-009) catches corruption on ZFS-formatted backup media. The monitoring program (Section 4.4) detects degradation trends before they become failures.</li>
+<li><strong>Backup media stockpile depletion.</strong> The institution runs out of replacement media and cannot purchase more (supply chain disruption, technology discontinuation, financial constraints). Mitigation: R-D6-11-06 maintains a minimum stockpile. The evolution path monitors media availability. When a media type approaches end-of-availability, the institution stockpiles aggressively and begins planning migration to the successor technology.</li>
+</ul>
+<h2 id="7-recovery-procedures-2">7. Recovery Procedures</h2>
+<ol>
+<li><strong>If a backup HDD fails during verification.</strong> Identify which backup set is affected (A, B, or C). Verify that the other two sets are intact by running immediate verification on them. Replace the failed drive with a drive from the stockpile. Recreate the affected backup set from the primary data source (if the primary is intact) or from one of the two remaining good backup sets. Document the failure, including the drive model, age, SMART data at time of failure, and any environmental factors. Update the stockpile.</li>
+<li><strong>If an M-DISC is discovered to be unreadable.</strong> Attempt to read it on a different optical drive -- the problem may be the drive, not the disc. If the disc is truly unreadable, document which data was on it (using the disc catalogue per D6-008). Verify that the same data exists on other backup media (HDD backup sets). If so, recreate the M-DISC from the HDD copy. If the data does not exist on other media, this is a data loss incident -- escalate per D6-013.</li>
+<li><strong>If environmental monitoring reveals sustained out-of-range conditions.</strong> Assess how long conditions were out of range and how severe the excursion was. If mild and brief (a few degrees for a few hours), note it in the log and monitor the affected media more closely at the next verification cycle. If severe or prolonged, run immediate full verification on all media stored in the affected location. Move media to a location with acceptable conditions. If a better location is not available, investigate environmental remediation (insulation, ventilation, climate control).</li>
+<li><strong>If a media technology approaches obsolescence.</strong> When the institution identifies that a media type used for backups is approaching end-of-availability (drives becoming scarce, media production declining), initiate migration planning. Identify the successor media type. Purchase and test the successor technology. Begin migrating data from the old media type to the new one, verifying at each step. Complete migration before the old technology becomes unavailable. Stockpile spare drives or readers for the old technology as a safety margin.</li>
+<li><strong>If all backup copies of specific data are found to be corrupt.</strong> This is the nightmare scenario addressed more fully in D6-013. Immediately assess: is the primary data still intact? If yes, recreate all backup copies immediately. If the primary is also corrupt, invoke D6-013 disaster recovery procedures. Assess whether the corruption is the same across all copies (indicating the corruption occurred before backup and was replicated) or different (indicating independent media degradation). The answer determines whether the root cause is a media problem or a source data problem.</li>
+</ol>
+<h2 id="8-evolution-path-2">8. Evolution Path</h2>
+<ul>
+<li><strong>Years 0-5:</strong> The initial media strategy is established. The primary learning is whether the environmental conditions achievable in the institution's physical location are adequate for media preservation. The first rotation cycle completes. Operational rhythms for verification and monitoring are established.</li>
+<li><strong>Years 5-15:</strong> The first HDD rotation cycle completes. The institution gains real-world data on HDD longevity in its specific environment. Optical drive availability is monitored -- if the market trajectory continues toward eliminating optical drives, migration planning begins. LTO tape is re-evaluated if data volume has grown.</li>
+<li><strong>Years 15-30:</strong> Storage media technology will have changed significantly. New media types may exist that are superior to all current options. The institution must evaluate them without assuming that newer is better -- wait for a technology to prove itself before adopting it. The HDD will likely still exist but may have been superseded for archival use. The M-DISC investment pays off during this period if optical drives remain available.</li>
+<li><strong>Years 30-50+:</strong> At least one complete media technology transition will have occurred. The institution's data will have been migrated through at least one media generation change. The procedures in this article must have been updated to reflect the current media landscape. The principles -- diversity, verification, rotation, monitoring -- remain constant even as the specific media types change.</li>
+<li><strong>Signpost for revision:</strong> If any media type used by the institution can no longer be purchased new, revision of this article is mandatory. If the institution's data volume exceeds 10 TB, the LTO tape assessment in Section 4.1 must be revisited. If environmental monitoring consistently shows conditions outside acceptable ranges, the media strategy must be adapted to media types that tolerate those conditions.</li>
+</ul>
+<h2 id="9-commentary-section-2">9. Commentary Section</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong> I do not trust any single storage medium. I have lost data to every type -- HDDs that clicked and died, SSDs that simply stopped responding, CDs that turned into coasters. The only defense that actually works is redundancy across different technologies. If my HDDs and my M-DISCs and my SSDs all fail simultaneously, the coincidence is so extreme that something much larger than media failure has occurred.</p>
+<p>The M-DISC decision was made after considerable research. The claims are extraordinary -- centuries of data retention. I do not fully believe them, but I believe the underlying physics. An inorganic recording layer is more stable than an organic dye layer. That is chemistry, not marketing. Whether it lasts a hundred years or fifty, it is meaningfully more durable than a standard Blu-ray disc, and for the cost of a few dollars per disc, that insurance is worth buying.</p>
+<p>The tape decision was harder. Tape is genuinely excellent archival media. The LTO ecosystem is mature and well-managed. But the cost of entry -- a tape drive costs as much as several terabytes of HDD storage -- and the operational overhead of tape management do not currently make sense for this institution's data volume. When data volume grows, this decision should change. I left explicit criteria for when to revisit it.</p>
+<p>The thing that worries me most is not media failure. It is the slow disappearance of the drives that read the media. Optical drives are already uncommon in new computers. If that trend continues for another decade, reading an M-DISC will require vintage hardware. I have stockpiled drives, but drives fail too. This is the paradox of archival media: the medium may outlast the equipment needed to read it. Future operators should monitor drive availability more anxiously than media availability.</p>
+<h2 id="10-references-2">10. References</h2>
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (air-gap requirement, physical sovereignty)</li>
+<li>D6-001 -- Data Philosophy (data tier system, R-D6-02 redundancy requirement, triage framework)</li>
+<li>D6-005 -- Storage Architecture: Physical Media Strategy (overall media strategy)</li>
+<li>D6-006 -- Backup Doctrine (backup procedures, off-site requirements)</li>
+<li>D6-007 -- Data Integrity & Verification (checksum generation and verification)</li>
+<li>D6-008 -- Metadata Standards & Cataloguing (media catalogue, disc-level tracking)</li>
+<li>D6-009 -- File System Architecture for Longevity (filesystem choice for backup media)</li>
+<li>D6-013 -- Disaster Data Recovery (escalation when backup media fails)</li>
+<li>SEC-003 -- Cryptographic Key Management (secure media disposal procedures)</li>
+<li>LTO Consortium. "Ultrium LTO Technology" specification documents (archived locally)</li>
+<li>Millenniata, Inc. M-DISC technical white papers (archived locally)</li>
+<li>Backblaze Hard Drive Stats (annual reports, archived locally) -- empirical HDD failure rate data</li>
+<li>US National Institute of Standards and Technology (NIST). "Care and Handling of CDs and DVDs: A Guide for Librarians and Archivists." Special Publication 500-252 (archived locally)</li>
+</ul>
+<hr/>
+<hr/>
+<h1 id="d6-012-data-classification-and-handling-procedures">D6-012 -- Data Classification and Handling Procedures</h1>
+<p><strong>Document ID:</strong> D6-012 <strong>Domain:</strong> 6 -- Data & Archives <strong>Version:</strong> 1.0.0 <strong>Date:</strong> 2026-02-16 <strong>Status:</strong> Ratified <strong>Depends On:</strong> ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D6-001, D6-003, D6-006, D6-008, D6-010, D6-011 <strong>Depended Upon By:</strong> D6-013, D6-014, all Domain 10 daily operational procedures, all Domain 9 training materials involving data handling, SEC-002 access control procedures.</p>
+<hr/>
+<h2 id="1-purpose-3">1. Purpose</h2>
+<p>This article defines the detailed classification system for all data within the institution, the specific handling requirements for each classification level, and the procedures for labeling, storing, transmitting, and destroying classified data. D6-001 established the four-tier data hierarchy (Institutional Memory, Operational Data, Reference Data, Transient Data) and the philosophical basis for data stewardship. This article translates that philosophy into a complete, actionable classification and handling system.</p>
+<p>Classification without handling procedures is an academic exercise. It is not enough to know that a document is Tier 1 (Institutional Memory) if the institution does not specify exactly what that means for how the document is stored, how it is backed up, how it is labeled, who may access it, how it may be transferred, and how it is destroyed when destruction is warranted. This article provides that specificity. It is the document that an operator opens when holding a piece of data and needing to know: what do I do with this?</p>
+<p>The classification system serves three purposes. First, it enables triage -- when resources are scarce, classification tells the operator what to save and what to sacrifice. Second, it enables proportional security -- sensitive data receives more protection than routine data, avoiding both the risk of under-protection and the operational cost of over-protection. Third, it enables succession -- a future operator encountering data they did not create can understand its importance and its handling requirements from its classification alone.</p>
+<h2 id="2-scope-3">2. Scope</h2>
+<p>This article covers:</p>
+<ul>
+<li>The full data classification taxonomy, extending the four-tier system of D6-001 with sensitivity sub-classifications.</li>
+<li>Handling requirements for each classification level: storage, backup, access, transmission, and destruction.</li>
+<li>The labeling system: how classification is indicated on files, directories, and media.</li>
+<li>The classification decision procedure: how to classify data that does not fit neatly into the taxonomy.</li>
+<li>The classification audit: how the institution verifies that data is correctly classified and handled.</li>
+<li>Reclassification procedures: how data moves between classification levels.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophical basis for why certain data is more important (see D6-001).</li>
+<li>Specific file format requirements (see D6-010).</li>
+<li>Specific backup schedules and procedures (see D6-006; this article defines which backup tier applies per classification).</li>
+<li>Cryptographic methods for data protection (see SEC-003).</li>
+<li>Physical security of storage locations (see SEC-001 and SEC-002).</li>
+</ul>
+<h2 id="3-background-3">3. Background</h2>
+<h3 id="31-why-classification-is-not-optional">3.1 Why Classification Is Not Optional</h3>
+<p>Every institution that manages information must classify it. The question is whether the classification is explicit or implicit. Implicit classification means that the operator "just knows" which data is important -- it lives in their head, in their habits, in the way they organize their directories. Implicit classification works well enough for a single person managing a small amount of data. It fails catastrophically under three conditions: when the data volume grows beyond what one person can hold in their head, when the operator changes and the new operator does not share the predecessor's implicit knowledge, and when a crisis demands rapid triage of what to save and what to abandon.</p>
+<p>This institution is designed to persist for fifty years. All three conditions will occur. Explicit classification, recorded in metadata and enforced by procedure, is the only approach that survives the transition from one operator to the next and the transition from calm to crisis.</p>
+<h3 id="32-the-two-axis-classification-model">3.2 The Two-Axis Classification Model</h3>
+<p>D6-001 established a single axis of classification: the four tiers based on data importance (Institutional Memory, Operational, Reference, Transient). This article adds a second axis: sensitivity. A piece of data may be critically important but not sensitive (the institution's public-facing documentation) or relatively unimportant but highly sensitive (a temporary file containing cryptographic material). The full classification requires both axes.</p>
+<p>The importance axis determines preservation priority -- how many copies, how durable the media, how frequently verified. The sensitivity axis determines access control and handling restrictions -- who may access it, how it may be transmitted, how it must be destroyed.</p>
+<h3 id="33-the-labeling-problem">3.3 The Labeling Problem</h3>
+<p>A classification system is only useful if the classification is visible when it matters. A file classified as Tier 1, High Sensitivity is indistinguishable from a file classified as Tier 4, Low Sensitivity if neither is labeled. Labeling must be built into the data lifecycle -- applied at creation or ingest, visible during use, and preserved through archival and migration. This article defines the labeling system that makes classification actionable rather than theoretical.</p>
+<h2 id="4-system-model-3">4. System Model</h2>
+<h3 id="41-the-classification-taxonomy">4.1 The Classification Taxonomy</h3>
+<p>Every piece of institutional data receives a two-part classification: an importance tier and a sensitivity level.</p>
+<p><strong>Importance Tiers (from D6-001, operationalized here):</strong></p>
+<p><strong>Tier 1: Institutional Memory.</strong> The documentation corpus, governance records, decision logs, commentary sections, foundational policies, and the accumulated record of institutional reasoning. This data defines what the institution is. Loss is institutional death.</p>
+<ul>
+<li>Minimum copies: 3 (per R-D6-02), recommended 5 for core documents.</li>
+<li>Media types: At least 2 distinct types (per R-D6-02). Primary on ZFS (D6-009), backup on HDD and M-DISC (D6-011).</li>
+<li>Verification frequency: Monthly integrity check, quarterly full read verification.</li>
+<li>Retention: Permanent. No disposal without GOV-001 Tier 1 governance process.</li>
+</ul>
+<p><strong>Tier 2: Operational Data.</strong> System configurations, maintenance logs, active project files, correspondence, operational procedures, and working documents that support daily institutional function.</p>
+<ul>
+<li>Minimum copies: 3.</li>
+<li>Media types: At least 2 distinct types.</li>
+<li>Verification frequency: Quarterly integrity check.</li>
+<li>Retention: Duration of operational relevance plus 5-year archive period. Some Tier 2 data may be reclassified to Tier 1 if it acquires historical significance.</li>
+</ul>
+<p><strong>Tier 3: Reference Data.</strong> Research materials, archived external publications, historical records, media collections, and reference libraries. Enriches the institution but is not essential.</p>
+<ul>
+<li>Minimum copies: 2.</li>
+<li>Media types: 1 type is acceptable (HDD backup sufficient).</li>
+<li>Verification frequency: Semi-annual integrity check.</li>
+<li>Retention: As long as storage permits. Subject to triage when storage is constrained. Reviewed annually for continued relevance.</li>
+</ul>
+<p><strong>Tier 4: Transient Data.</strong> Working copies, temporary files, scratch data, intermediate calculations, cached content. Has no long-term value.</p>
+<ul>
+<li>Minimum copies: 1 (the working copy; no backup required).</li>
+<li>Media types: Any.</li>
+<li>Verification frequency: None.</li>
+<li>Retention: Maximum 90 days unless reclassified. Automated disposal recommended. Disposed first during any triage event.</li>
+</ul>
+<p><strong>Sensitivity Levels:</strong></p>
+<p><strong>S1: Open.</strong> Data that carries no sensitivity. Its exposure would cause no harm. Examples: public-facing documentation, published articles, reference materials that are themselves publicly available.</p>
+<ul>
+<li>Access: Any institutional account.</li>
+<li>Transmission: May be transmitted across the air gap on any clean media.</li>
+<li>Destruction: Standard file deletion plus single-pass overwrite. No special procedures.</li>
+</ul>
+<p><strong>S2: Internal.</strong> Data that is not sensitive individually but whose aggregate could reveal institutional patterns, capabilities, or vulnerabilities. The default classification for most operational data. Examples: operational logs, maintenance schedules, system configurations (without credentials), project working files.</p>
+<ul>
+<li>Access: Operator and administrative accounts only. Not accessible to service accounts unless specifically authorized.</li>
+<li>Transmission: Transmitted on dedicated media that is tracked. Media is wiped after transfer.</li>
+<li>Destruction: Single-pass overwrite, verified. File deletion alone is insufficient.</li>
+</ul>
+<p><strong>S3: Sensitive.</strong> Data whose exposure would cause meaningful harm to the institution or its operator. Examples: personal information, financial records, security audit results, detailed infrastructure documentation, intelligence assessments.</p>
+<ul>
+<li>Access: Operator account only. Administrative account with explicit per-access authorization.</li>
+<li>Transmission: Encrypted before transfer. Transfer media is encrypted. Media is securely wiped after transfer per SEC-003.</li>
+<li>Destruction: Multi-pass overwrite per SEC-003 or physical destruction of media.</li>
+</ul>
+<p><strong>S4: Critical.</strong> Data whose exposure would cause severe harm. This is the highest sensitivity level. Examples: cryptographic keys, authentication credentials, master passwords, encryption passphrases, the succession packet, security vulnerability assessments of the institution's own systems.</p>
+<ul>
+<li>Access: Root account or designated secure process only. Accessed only when operationally necessary.</li>
+<li>Transmission: Encrypted with the institution's strongest available encryption. Transfer media is physically controlled at all times during transfer. Media is physically destroyed after transfer unless it is a designated secure storage device.</li>
+<li>Destruction: Physical destruction of media. Degaussing (for magnetic media) plus physical destruction. Multi-pass overwrite is insufficient for S4 data -- physical media destruction is the only acceptable method.</li>
+<li>Storage: S4 data at rest must be encrypted at all times per SEC-003. S4 data must never exist unencrypted on any medium except during active use in volatile memory.</li>
+</ul>
+<h3 id="42-the-classification-matrix">4.2 The Classification Matrix</h3>
+<p>The full classification of any data item is expressed as <code>T[tier]-S[sensitivity]</code>. For example: <code>T1-S2</code> means Tier 1 importance (Institutional Memory) with Internal sensitivity. <code>T4-S4</code> means Tier 4 importance (Transient) with Critical sensitivity -- an unusual combination that might apply to a temporary file containing a decrypted key during a key rotation operation.</p>
+<p>The handling requirements are the union of the tier requirements and the sensitivity requirements. The more protective requirement prevails. A T1-S3 document receives the preservation requirements of Tier 1 AND the access and transmission requirements of S3.</p>
+<p>Common classifications at founding:</p>
+<div class="table-wrap"><table><thead><tr><th>Data Type</th><th>Classification</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>Documentation corpus (this article, etc.)</td><td>T1-S2</td><td>Irreplaceable institutional memory. Not individually sensitive but reveals institutional architecture.</td></tr>
+<tr><td>Governance decision logs</td><td>T1-S2</td><td>Institutional memory. Internal sensitivity.</td></tr>
+<tr><td>Cryptographic keys</td><td>T2-S4</td><td>Operationally essential. Highest sensitivity.</td></tr>
+<tr><td>System configuration files</td><td>T2-S3</td><td>Operational necessity. Contain infrastructure details.</td></tr>
+<tr><td>Operator's personal notes and drafts</td><td>T3-S2</td><td>Reference value. Internal sensitivity.</td></tr>
+<tr><td>Archived external publications</td><td>T3-S1</td><td>Reference value. Publicly available content.</td></tr>
+<tr><td>Temporary working files</td><td>T4-S1</td><td>No long-term value. No sensitivity.</td></tr>
+<tr><td>Succession packet</td><td>T1-S4</td><td>Irreplaceable. Highest sensitivity.</td></tr>
+</tbody></table></div>
+<h3 id="43-the-labeling-system">4.3 The Labeling System</h3>
+<p>Classification labels are applied at three levels:</p>
+<p><strong>File-level labeling.</strong> Every file's classification is recorded in the file catalogue per D6-008. For text-based files (Markdown, plain text, source code), the classification is also included in a header or front-matter block within the file itself. For binary files where embedding text is impractical, the classification exists only in the catalogue.</p>
+<p>File-level label format for text files:</p>
+<pre><code>Classification: T[tier]-S[sensitivity]
+Classified: [date]
+Classified-By: [operator identifier]</code></pre>
+<p><strong>Directory-level labeling.</strong> Directories are organized by classification when practical. The directory structure per D6-004 includes classification-aware organization. A directory inherits the highest classification of any file it contains. If a directory contains a mix of T1-S3 and T3-S1 files, the directory is treated as T1-S3 for access control purposes. This is a simplification that favors security over precision. If the simplification causes operational inconvenience, the solution is to reorganize files, not to weaken the directory's classification.</p>
+<p><strong>Media-level labeling.</strong> Physical backup media (HDDs, M-DISCs, SSDs, tapes) are labeled with the highest classification of data they contain. Labels are physically applied to the media or its case. The label includes: media identifier, date of last write, highest classification, and a brief content description.</p>
+<p>Media label format:</p>
+<pre><code>ID: [unique media identifier]
+Written: [date]
+Classification: T[tier]-S[sensitivity]
+Contents: [brief description]</code></pre>
+<h3 id="44-the-classification-decision-procedure">4.4 The Classification Decision Procedure</h3>
+<p>When classifying new data, the operator follows this decision tree:</p>
+<p><strong>Step 1: Determine importance tier.</strong></p>
+<ul>
+<li>If loss would constitute institutional death or irrecoverable loss of institutional knowledge: Tier 1.</li>
+<li>If loss would significantly disrupt operations and require substantial effort to reconstruct: Tier 2.</li>
+<li>If loss would be regrettable but the institution would continue functioning: Tier 3.</li>
+<li>If the data has no value beyond its current temporary use: Tier 4.</li>
+<li>When in doubt between two tiers, classify at the higher tier. Overclassification wastes resources but underclassification risks data loss.</li>
+</ul>
+<p><strong>Step 2: Determine sensitivity level.</strong></p>
+<ul>
+<li>If exposure would cause no harm: S1.</li>
+<li>If exposure of individual items is harmless but aggregate exposure reveals institutional patterns: S2.</li>
+<li>If exposure would cause meaningful harm (personal, financial, security): S3.</li>
+<li>If exposure would cause severe harm (compromise of security infrastructure, cryptographic material, succession): S4.</li>
+<li>When in doubt between two levels, classify at the higher level.</li>
+</ul>
+<p><strong>Step 3: Record the classification.</strong></p>
+<ul>
+<li>Apply the file-level label.</li>
+<li>Update the file catalogue per D6-008.</li>
+<li>Ensure the file is stored in a location consistent with its classification.</li>
+</ul>
+<p><strong>Step 4: If the data does not fit neatly into the taxonomy.</strong> Document the classification reasoning in the operational log. Include what the data is, why the standard categories are inadequate, and what classification was assigned despite the imperfect fit. Flag the data for review at the next classification audit. If imperfect fits accumulate, this may indicate that the taxonomy needs expansion -- see Evolution Path.</p>
+<h3 id="45-the-classification-audit">4.5 The Classification Audit</h3>
+<p>A classification audit verifies that data is correctly classified and that handling requirements are being followed. Audits are conducted on two schedules:</p>
+<p><strong>Quarterly spot audit.</strong> The operator selects a random sample of 20 files (5 from each tier) and verifies: Is the classification label present and correct? Is the file stored in a location consistent with its classification? Does the file catalogue entry match the file's actual classification? Are the backup copies consistent with the tier's requirements? For S3 and S4 data, is the access control consistent with the sensitivity level?</p>
+<p><strong>Annual comprehensive audit.</strong> The operator reviews the entire file catalogue for: files without classification labels; files whose classification may have changed due to changing circumstances (e.g., a draft that has been finalized should be reclassified from Tier 4 to its appropriate permanent tier); accumulations of Tier 4 data that have exceeded the 90-day retention limit; S4 data that is stored outside of encrypted containers; media labels that are missing, damaged, or inconsistent with the catalogue.</p>
+<p>Audit findings are documented in the operational log. Discrepancies are corrected immediately if they involve security (S3/S4 mishandling) or within 30 days for other classification issues.</p>
+<h3 id="46-reclassification-procedures">4.6 Reclassification Procedures</h3>
+<p>Data may be reclassified under the following conditions:</p>
+<p><strong>Upgrade (increase in tier or sensitivity):</strong> May be performed by the operator at any time. The new classification is applied immediately. Storage and handling are upgraded to meet the new requirements. The reclassification is recorded in the file catalogue with the date, the old classification, the new classification, and the reason.</p>
+<p><strong>Downgrade (decrease in tier or sensitivity):</strong> Requires a documented justification. The operator records why the data no longer warrants its current classification. For downgrades from S4 or S3, a 30-day waiting period applies -- the downgrade takes effect 30 days after the decision, allowing time for reconsideration. This prevents impulsive declassification of sensitive data. For tier downgrades from Tier 1, the GOV-001 governance process applies -- Tier 1 data is not downgraded casually.</p>
+<p><strong>Automatic reclassification:</strong> Tier 4 data that exceeds its 90-day retention without being reclassified or disposed is flagged automatically. The operator must either reclassify it to a higher tier (with justification) or dispose of it. This prevents Tier 4 from becoming a permanent dumping ground.</p>
+<h2 id="5-rules-constraints-3">5. Rules & Constraints</h2>
+<ul>
+<li><strong>R-D6-12-01:</strong> All data must be classified within 48 hours of creation or ingest. Unclassified data must not persist beyond 7 days.</li>
+<li><strong>R-D6-12-02:</strong> Classification labels must be present at the file level (in the file catalogue at minimum; in the file header for text-based files) and at the media level (physical label on backup media).</li>
+<li><strong>R-D6-12-03:</strong> S4 data must be encrypted at rest at all times. Unencrypted S4 data on any persistent storage medium is a security incident.</li>
+<li><strong>R-D6-12-04:</strong> Data handling must meet or exceed the requirements of its classification. Handling data below its classification requirements is a procedural violation. Handling data above its classification requirements is permitted but not required.</li>
+<li><strong>R-D6-12-05:</strong> Reclassification must be documented. Downgrades from S4 or S3 require the 30-day waiting period. Downgrades from Tier 1 require GOV-001 governance process.</li>
+<li><strong>R-D6-12-06:</strong> Quarterly spot audits and annual comprehensive audits must be completed on schedule. Missed audits are documented as incidents.</li>
+<li><strong>R-D6-12-07:</strong> When in doubt, classify higher. The cost of overclassification (extra backup copies, stricter handling) is always less than the cost of underclassification (potential data loss or exposure).</li>
+<li><strong>R-D6-12-08:</strong> Tier 4 data must not persist beyond 90 days without reclassification or disposal. Automated enforcement is preferred.</li>
+</ul>
+<h2 id="6-failure-modes-3">6. Failure Modes</h2>
+<ul>
+<li><strong>Classification drift.</strong> Over time, the operator becomes less rigorous about classifying new data. Files accumulate without classification. When triage is needed, unclassified data cannot be prioritized and critical data may be lost while trivial data is preserved. Mitigation: R-D6-12-01 sets a hard deadline. The quarterly audit catches drift. The 48-hour classification window is short enough to prevent significant accumulation.</li>
+<li><strong>Sensitivity underestimation.</strong> The operator classifies sensitive data at too low a sensitivity level, resulting in inadequate access control, encryption, or destruction procedures. The data is exposed through a handling procedure that would have been appropriate for its assigned classification but not for its actual sensitivity. Mitigation: R-D6-12-07 establishes the "when in doubt, classify higher" principle. The classification decision procedure (Section 4.4) provides structured guidance. The audit process catches systematic underestimation.</li>
+<li><strong>Classification inflation.</strong> Everything is classified Tier 1, S4. The institution cannot distinguish its truly critical data from routine data because everything is labeled critical. Handling requirements become so onerous that the operator begins ignoring them, which is worse than having no classification at all. Mitigation: The classification decision procedure provides objective criteria. The quarterly audit reviews whether classifications are proportionate. If more than 30% of data is classified Tier 1, the operator should investigate whether the criteria are being applied too loosely.</li>
+<li><strong>Label loss.</strong> File catalogue corruption or metadata loss removes classification labels. Files become unclassified in effect even though they were classified at creation. Mitigation: Classification is recorded in multiple locations (file header, file catalogue, media label). Loss of one source does not lose the classification. The file catalogue itself is Tier 1 data and receives the associated preservation treatment.</li>
+<li><strong>Destruction failure.</strong> S4 data is not destroyed according to procedure. Sensitive data persists on media that the operator believes has been wiped. Mitigation: Destruction procedures are explicit and tiered by sensitivity level. For S4, physical destruction is required, which is unambiguous -- the media either exists physically or it does not. Destruction events are logged.</li>
+</ul>
+<h2 id="7-recovery-procedures-3">7. Recovery Procedures</h2>
+<ol>
+<li><strong>If a large volume of unclassified data is discovered.</strong> Declare a classification sprint per D6-001 Recovery Procedure 1. Halt non-critical data ingest. Work through the unclassified data systematically, applying the classification decision procedure in Section 4.4 to each item. If the volume is too large for manual classification of every item, classify directories as units (assign the directory the highest classification that any contained file would warrant). Flag the classified data for individual review at the next annual audit.</li>
+<li><strong>If the file catalogue is lost or corrupted.</strong> Recover the catalogue from backup per D6-006. If no backup is available, rebuild the catalogue from the data itself -- this is why file-level labeling (headers in text files) and media-level labeling exist. They provide a secondary source of classification information that survives catalogue loss. Rebuilding the catalogue is a Tier 1 priority because the catalogue is itself Tier 1 data. Document the incident and the reconstruction process.</li>
+<li><strong>If S4 data is discovered unencrypted on persistent media.</strong> Encrypt the data immediately per SEC-003. Investigate how the data came to be unencrypted -- was encryption never applied (classification failure) or was encryption removed or bypassed (potential security incident)? If the media has been outside institutional control during the period of exposure, treat it as a compromise and invoke SEC-001 incident response. If the media was always within institutional control, document the incident, apply corrective measures, and reinforce the S4 handling requirements.</li>
+<li><strong>If classification inflation is detected (too much data at Tier 1 or S4).</strong> Review the inflated classifications against the criteria in Section 4.1. Reclassify data that does not meet the criteria for its current level. This is a downgrade, so R-D6-12-05 applies -- document the reasoning and observe the waiting period for sensitivity downgrades. Investigate why inflation occurred -- is the operator risk-averse, or are the criteria unclear? Adjust training or criteria as needed.</li>
+<li><strong>If a classification audit reveals systematic handling violations.</strong> Identify the specific violations and their scope. Correct the handling of all affected data to meet its classification requirements. Investigate the root cause: are the requirements impractical? Is the operator undertrained? Are the procedures poorly documented? Address the root cause before resuming normal operations. If the requirements are genuinely impractical, propose amendments to this article through GOV-001 rather than silently ignoring them.</li>
+</ol>
+<h2 id="8-evolution-path-3">8. Evolution Path</h2>
+<ul>
+<li><strong>Years 0-5:</strong> The classification system is being applied for the first time. The most common challenge will be edge cases -- data that does not fit neatly into the taxonomy. Document every edge case. If patterns emerge (a category of data that consistently defies classification), consider adding a sub-tier or additional sensitivity level. Resist adding complexity until the need is demonstrated by repeated edge cases, not by theoretical concerns.</li>
+<li><strong>Years 5-15:</strong> The classification system should be stable. The main challenge shifts to maintaining discipline. Classification is a daily habit, and habits erode without reinforcement. The quarterly audit is the reinforcement mechanism. If audits consistently find good classification hygiene, the system is working. If audits consistently find problems, the system needs adjustment -- not harder enforcement of bad procedures but better procedures that are natural to follow.</li>
+<li><strong>Years 15-30:</strong> A successor operator may assume responsibility. The classification system must be intuitive enough that a new operator can classify data correctly without extensive training. The two-axis model (importance and sensitivity) is designed for this intuitive clarity. If the successor finds the system confusing, that is a signal that it has become too complex and should be simplified.</li>
+<li><strong>Years 30-50+:</strong> The classification criteria may need updating to reflect changed institutional priorities, changed threat models, or changed data types that did not exist at founding. The criteria should evolve, but the fundamental structure (importance tiers and sensitivity levels) should remain stable unless a compelling reason for change is documented.</li>
+<li><strong>Signpost for revision:</strong> If the classification taxonomy requires more than five minutes of deliberation for routine data, it is too complex. If the quarterly audit consistently finds more than 10% of sampled files misclassified, the criteria need clarification or the operator needs additional training. If the institution begins handling data types not contemplated at founding (biometric data, financial instruments, legal documents with specific regulatory requirements), the sensitivity levels may need expansion.</li>
+</ul>
+<h2 id="9-commentary-section-3">9. Commentary Section</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong> I debated whether to combine importance and sensitivity into a single axis. Many classification systems do this -- they have "Confidential," "Secret," "Top Secret," and the classification implicitly carries both importance and sensitivity. I decided against it because importance and sensitivity are genuinely orthogonal. The institution's founding documents are the most important data we have (Tier 1) but are not particularly sensitive (S2) because their exposure would not cause harm -- they describe how the institution works, and transparency is a value. Conversely, cryptographic keys are operationally important (Tier 2) but maximally sensitive (S4). Collapsing these into a single axis would either under-protect the keys or over-restrict access to the documentation.</p>
+<p>The 90-day limit on Tier 4 data is deliberately aggressive. I know from personal experience that "temporary" files become permanent the moment you stop paying attention to them. A 90-day hard limit forces regular cleanup. Some operators may find this annoying. The alternative -- unbounded accumulation of unreviewed data -- is worse.</p>
+<p>The "when in doubt, classify higher" rule will occasionally result in overclassification. I am comfortable with that. The cost of an extra backup copy or an unnecessarily strict access control is measured in minutes of labor. The cost of a misclassified document that is lost in triage or exposed through inadequate handling is potentially irreversible. The asymmetry is overwhelming.</p>
+<p>One thing I want future operators to understand: classification is not bureaucracy. It is triage preparation. When the crisis comes -- and over fifty years, crises will come -- the classification system is what enables rational, principled decisions about what to save. Without it, every decision in a crisis is emotional and improvised. With it, the decisions are still hard, but the framework for making them already exists.</p>
+<h2 id="10-references-3">10. References</h2>
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 1: Sovereignty; Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (data sovereignty)</li>
+<li>GOV-001 -- Authority Model (governance process for Tier 1 reclassification, amendment procedures)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (data integrity threats, incident response)</li>
+<li>SEC-002 -- Access Control Procedures (account architecture, permission model)</li>
+<li>SEC-003 -- Cryptographic Key Management (encryption requirements for S3/S4 data, secure destruction procedures)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle, operational tempo)</li>
+<li>D6-001 -- Data Philosophy (four-tier hierarchy, R-D6-02 redundancy, triage framework)</li>
+<li>D6-003 -- Format Longevity Doctrine (format constraints on classified data)</li>
+<li>D6-006 -- Backup Doctrine (backup requirements per tier)</li>
+<li>D6-008 -- Metadata Standards & Cataloguing (file catalogue, metadata requirements)</li>
+<li>D6-010 -- Digital Preservation: Formats That Survive (format requirements for archived classified data)</li>
+<li>D6-011 -- Physical Backup Media (media labeling, media-level classification)</li>
+<li>D6-014 -- Data Ingest Procedures (classification at ingest)</li>
+<li>ISO 27001:2022, Information security management systems (classification framework concepts, archived locally)</li>
+</ul>
+<hr/>
+<hr/>
+<h1 id="d6-013-disaster-data-recovery-when-backups-fail">D6-013 -- Disaster Data Recovery: When Backups Fail</h1>
+<p><strong>Document ID:</strong> D6-013 <strong>Domain:</strong> 6 -- Data & Archives <strong>Version:</strong> 1.0.0 <strong>Date:</strong> 2026-02-16 <strong>Status:</strong> Ratified <strong>Depends On:</strong> ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-006, D6-007, D6-008, D6-009, D6-010, D6-011, D6-012 <strong>Depended Upon By:</strong> All Domain 12 disaster recovery articles. Referenced by D10-003 (incident response), GOV-001 (institutional continuity).</p>
+<hr/>
+<h2 id="1-purpose-4">1. Purpose</h2>
+<p>This article addresses the scenario that every backup doctrine is designed to prevent and that every operator hopes never to face: the moment when your backups have failed and you must recover what you can from what remains. D6-006 defines the backup doctrine. D6-011 defines the media strategy. D6-007 defines the integrity verification that catches problems early. This article is for when all of those systems have been insufficient -- when the disaster has exceeded the design parameters of the backup strategy, when multiple layers of redundancy have failed simultaneously, and when the operator is standing in front of damaged, degraded, or incomplete data and must make decisions about what can be saved.</p>
+<p>This is not a theoretical exercise. Over a fifty-year operational lifespan, the probability of at least one event that exceeds the backup strategy's design parameters approaches certainty. Fires, floods, equipment failures, human errors, cascading system failures, and scenarios no one imagined -- the history of data loss is a history of confident people who believed their backup strategy was sufficient until the day it was not.</p>
+<p>This article does not prevent disasters. The backup doctrine does that. This article handles the aftermath. It provides the triage framework for deciding what to recover first, the technical procedures for extracting data from damaged media, the reconstruction techniques for rebuilding partially lost data from fragments and context, and the difficult decision framework for when you cannot recover everything and must choose what to save.</p>
+<p>Reading this article should be uncomfortable. If it is not uncomfortable, you have not understood the scenarios it addresses. The goal is not comfort but preparation: when the crisis arrives, the operator who has read this article will act with purpose rather than panic.</p>
+<h2 id="2-scope-4">2. Scope</h2>
+<p>This article covers:</p>
+<ul>
+<li>The disaster assessment procedure: how to understand what has been lost before attempting recovery.</li>
+<li>The triage framework: how to prioritize recovery when you cannot recover everything.</li>
+<li>Partial recovery techniques: extracting usable data from partially damaged media.</li>
+<li>Data reconstruction: rebuilding lost data from fragments, context, and institutional knowledge.</li>
+<li>Forensic recovery from damaged media: technical procedures for extracting data from failed drives, corrupted filesystems, and degraded optical media.</li>
+<li>The recovery decision framework: when to continue recovery efforts and when to accept losses.</li>
+<li>Post-disaster procedures: what to do after recovery to prevent recurrence.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Normal backup and restore procedures (see D6-006 -- if your backups are intact, use that article, not this one).</li>
+<li>Physical disaster response (fire suppression, flood mitigation, structural damage) -- see Domain 12 for physical emergency response. This article assumes the physical emergency is over and the operator is now assessing data damage.</li>
+<li>Emotional and psychological response to data loss -- this is real and significant, but is outside the scope of a technical recovery article. See D9-001 for training on stress management during operational crises.</li>
+</ul>
+<h2 id="3-background-4">3. Background</h2>
+<h3 id="31-how-backups-fail">3.1 How Backups Fail</h3>
+<p>Backups fail in predictable patterns. Understanding these patterns is essential for recovery because the pattern of failure determines the recovery approach.</p>
+<p><strong>Pattern 1: Common-mode failure.</strong> All backup copies fail for the same reason. This happens when all copies are on the same media type from the same manufacturer, stored in the same location, subject to the same environmental event. A flood that destroys all drives in the same room. A firmware bug that affects all drives of the same model. A manufacturing defect in a batch of optical discs. R-D6-02 and R-D6-11-07 (media diversity) are designed to prevent this, but no diversity strategy can anticipate every common-mode failure.</p>
+<p><strong>Pattern 2: Silent corruption replication.</strong> The primary data is corrupted, and the corruption is replicated to all backup copies before detection. This happens when integrity verification (D6-007) fails to detect the corruption, or when the verification interval is too long and multiple backup cycles copy the corrupted data. By the time the corruption is detected, every copy -- primary and backup -- is damaged.</p>
+<p><strong>Pattern 3: Temporal gap.</strong> A disaster destroys current data, and the most recent surviving backup is significantly out of date. This happens when backup frequency is too low, when recent backups were not verified and turn out to be corrupt, or when the operator deferred a backup cycle. The data can be recovered, but days, weeks, or months of work since the last good backup are lost.</p>
+<p><strong>Pattern 4: Cascading failure.</strong> A disaster triggers a sequence of failures that progressively destroys more data. A power failure corrupts a filesystem, the corruption propagates to a snapshot, the operator's recovery attempt damages the remaining good copy. Each recovery step makes the situation worse because the operator is acting in haste without a clear plan. This article's primary contribution is preventing Pattern 4 by providing that plan.</p>
+<p><strong>Pattern 5: Selective destruction.</strong> The disaster destroys some data but not all. A single disk fails in a non-redundant configuration. A fire destroys one storage location but not another. Specific files are corrupted but the rest of the filesystem is intact. This is the most common pattern and the most recoverable -- but only if the operator correctly assesses what is damaged and what is intact before beginning recovery.</p>
+<h3 id="32-the-first-rule-of-disaster-recovery">3.2 The First Rule of Disaster Recovery</h3>
+<p>The first rule of disaster recovery is: do not make it worse. The instinct in a crisis is to act immediately -- to run recovery commands, to start copying data, to try to repair the damaged filesystem. This instinct must be suppressed. Every action taken on damaged data has the potential to cause further damage. A filesystem repair tool may "fix" corruption by deleting the corrupted files. A copy operation may overwrite good data with bad data. A hasty restoration may restore an older backup over newer data that survived the disaster.</p>
+<p>Before any recovery action, the operator must assess the situation, understand what is damaged and what is intact, and form a recovery plan. Only then should recovery actions begin. Section 4.1 defines the assessment procedure.</p>
+<h3 id="33-the-psychological-dimension">3.3 The Psychological Dimension</h3>
+<p>Data loss creates panic. The operator knows that every minute of delay may mean more data degrading, more corruption spreading, more recovery becoming impossible. This time pressure is real in some scenarios (a drive that is clicking and may fail completely at any moment) and illusory in others (data on a powered-off disc is not getting worse while you think). The ability to distinguish real urgency from perceived urgency is critical. This article identifies, for each recovery scenario, whether time pressure is real and how urgent action actually is.</p>
+<h2 id="4-system-model-4">4. System Model</h2>
+<h3 id="41-the-disaster-assessment-procedure">4.1 The Disaster Assessment Procedure</h3>
+<p>When a data loss event is suspected or confirmed, the operator follows this assessment procedure before taking any recovery action.</p>
+<p><strong>Step 1: Stop.</strong> Power down any actively failing hardware (clicking drives, systems exhibiting corruption). Do not attempt to read from or write to damaged media. Do not run filesystem repair tools. Do not start copying data. Stop and assess.</p>
+<p><strong>Step 2: Inventory what survives.</strong> Systematically check every copy of institutional data:</p>
+<ul>
+<li>Primary storage (ZFS pools): Can the pool be imported read-only? What does <code>zpool status</code> report? Are there degraded vdevs? Checksum errors? Completely failed vdevs?</li>
+<li>Backup Set A (on-site HDD): Is the drive physically intact? Can it be mounted? Can files be read?</li>
+<li>Backup Set B (off-site HDD): Retrieve it. Is it intact?</li>
+<li>Backup Set C (quarterly off-site HDD): Retrieve it. Is it intact?</li>
+<li>M-DISC archival copies: Are the discs physically intact? Can they be read on a working drive?</li>
+<li>Transport SSD copies: Are they intact?</li>
+</ul>
+<p>For each copy, record its status: Intact, Partially Damaged (some data readable), Severely Damaged (most data unreadable), or Destroyed (no data recoverable).</p>
+<p><strong>Step 3: Determine the scope of loss.</strong> Compare the survival inventory against the data catalogue (D6-008). Identify:</p>
+<ul>
+<li>Data that exists intact on at least one copy: this data is safe and recovery is straightforward.</li>
+<li>Data that exists only on damaged copies: this data is at risk and recovery priority.</li>
+<li>Data that exists on no surviving copy: this data may be lost. Identify it by classification (D6-012) for triage.</li>
+</ul>
+<p><strong>Step 4: Classify the disaster.</strong> Based on the assessment:</p>
+<ul>
+<li><strong>Level 1: Contained.</strong> One copy is damaged but other copies are intact. Recovery is a restore operation per D6-006. This article's advanced procedures are not needed.</li>
+<li><strong>Level 2: Significant.</strong> Multiple copies are damaged. Some data exists only on damaged copies. Advanced recovery is needed for the affected data.</li>
+<li><strong>Level 3: Severe.</strong> Most copies are damaged. Significant data exists only on damaged or degraded media. Extensive recovery and reconstruction is needed.</li>
+<li><strong>Level 4: Catastrophic.</strong> All copies of some or all data are damaged or destroyed. Total data loss for the affected data. Reconstruction from fragments, external sources, or acceptance of loss.</li>
+</ul>
+<p><strong>Step 5: Form the recovery plan.</strong> Based on the disaster level and the scope of loss, create a written recovery plan before executing any recovery action. The plan must identify: what data will be recovered, from which source, in what order, using what methods, and what data cannot be recovered.</p>
+<h3 id="42-the-recovery-triage-framework">4.2 The Recovery Triage Framework</h3>
+<p>When you cannot recover everything, you must decide what to recover first. The triage framework follows the data tier system from D6-001 and D6-012, but adds operational urgency as a factor.</p>
+<p><strong>Triage Priority 1: Tier 1 data (Institutional Memory) that is actively needed.</strong> The documentation corpus, governance records, and decision logs that the institution needs to function. If the institution cannot access its own documentation, it cannot make informed recovery decisions. Recovering institutional memory first is both a preservation priority and an operational necessity.</p>
+<p><strong>Triage Priority 2: Tier 2 data (Operational) that enables system function.</strong> System configurations, service definitions, and operational procedures needed to keep the institution's infrastructure running during recovery. Without these, the infrastructure that supports recovery itself may fail.</p>
+<p><strong>Triage Priority 3: Tier 1 data that is not immediately needed.</strong> Historical institutional memory, archived governance records, and other Tier 1 data that is irreplaceable but not needed for immediate operations. This data should be recovered as soon as operational capacity allows.</p>
+<p><strong>Triage Priority 4: Tier 2 data that is not immediately needed.</strong> Operational data that can be reconstructed or that relates to operations not currently active.</p>
+<p><strong>Triage Priority 5: Tier 3 data (Reference).</strong> Reference materials and collections. Valuable but not essential to institutional survival.</p>
+<p><strong>Triage Priority 6: Tier 4 data (Transient).</strong> Do not expend recovery effort on transient data unless it has been reclassified. Transient data is, by definition, expendable.</p>
+<p>Within each priority level, data classified at higher sensitivity levels receives priority because the handling and security requirements for recovery are more complex and the consequences of mishandling are more severe.</p>
+<h3 id="43-partial-recovery-techniques">4.3 Partial Recovery Techniques</h3>
+<p><strong>Extracting data from a degraded ZFS pool.</strong></p>
+<p>If a ZFS pool has degraded vdevs but can still be imported:</p>
+<ol>
+<li>Import the pool read-only: <code>zpool import -o readonly=on [poolname]</code>.</li>
+<li>Run <code>zpool status -v</code> to identify which vdevs are degraded and which files have checksum errors.</li>
+<li>Copy all readable data off the pool to a healthy filesystem. Start with triage Priority 1 data. Use <code>rsync</code> or <code>cp</code> and log any read errors.</li>
+<li>For files with checksum errors, attempt to read them anyway -- ZFS will report the error but may still return the data (the data may be correct with a stale checksum, or may be partially corrupt). Assess each file individually.</li>
+<li>If the pool cannot be imported, try <code>zpool import -f</code> (force import). If this fails, the pool metadata may be damaged. Proceed to forensic recovery (Section 4.5).</li>
+</ol>
+<p><strong>Extracting data from a damaged ext4 filesystem.</strong></p>
+<p>If an ext4 filesystem will not mount normally:</p>
+<ol>
+<li>Do not run <code>fsck</code> on the original. Make a bit-for-bit image first using <code>dd</code> (if the disk is readable) or <code>ddrescue</code> (if the disk has bad sectors). Work only on the image, never on the original.</li>
+<li>Attempt to mount the image read-only: <code>mount -o ro,loop image.img /mnt/recovery</code>.</li>
+<li>If the mount fails, run <code>e2fsck</code> on the image (not the original) and attempt to mount again.</li>
+<li>If the filesystem is too damaged for mounting, use <code>extundelete</code> or <code>photorec</code> to scan the image for recoverable files.</li>
+</ol>
+<p><strong>Extracting data from damaged optical media.</strong></p>
+<p>If an optical disc has read errors:</p>
+<ol>
+<li>Try a different optical drive. Some drives have better error correction than others.</li>
+<li>Use <code>ddrescue</code> to create an image, making multiple passes. <code>ddrescue</code> can recover data around bad sectors and retry failed sectors with different read strategies.</li>
+<li>If the disc is physically damaged (scratches, delamination), professional disc resurfacing may improve readability. This is an option of last resort and is not guaranteed to help.</li>
+</ol>
+<p><strong>Extracting data from a failed HDD.</strong></p>
+<p>If an HDD will not spin up or is clicking:</p>
+<ol>
+<li>Power it off immediately. Further operation may cause additional damage (head crash on platters).</li>
+<li>Allow the drive to reach room temperature if it has been stored in a cold environment. Temperature shock can cause condensation that prevents operation.</li>
+<li>Try powering on in a different orientation (horizontal versus vertical). In rare cases, this can free a stuck mechanism.</li>
+<li>Try a different SATA/USB interface. Controller failures on the interface board are sometimes recoverable by moving the drive to a different enclosure.</li>
+<li>If none of these work, the drive requires professional data recovery services or controller board transplant -- options that may not be available in an air-gapped, off-grid environment. Proceed to reconstruction (Section 4.4).</li>
+</ol>
+<h3 id="44-data-reconstruction-from-fragments">4.4 Data Reconstruction from Fragments</h3>
+<p>When data cannot be recovered from media, it may be partially or fully reconstructable from other sources.</p>
+<p><strong>Reconstruction from partial files.</strong> A corrupted file may still contain recoverable data. Text-based formats (Markdown, plain text, CSV, JSON) are the most resilient -- even a partially corrupted text file is often readable, with only the corrupted portion lost. Binary formats vary: SQLite databases have a well-documented recovery mode. Image files may be partially renderable (the top portion of a JPEG may display even if the bottom is corrupted).</p>
+<p><strong>Reconstruction from metadata.</strong> Even if a file is completely lost, its metadata in the file catalogue (D6-008) preserves information about what the file contained -- its title, classification, creation date, description, and relationships to other files. This metadata can guide reconstruction by identifying what needs to be recreated.</p>
+<p><strong>Reconstruction from derivatives.</strong> If the original file is lost but derivatives exist -- exported summaries, printed copies, quoted passages in other documents, email attachments sent before the air gap was established -- these derivatives can be used to reconstruct the original. D6-015 (Print & Physical Backup Doctrine) is specifically designed to create derivatives that survive digital media failure.</p>
+<p><strong>Reconstruction from institutional knowledge.</strong> For data that was created by the operator, the operator's memory is a recovery source. This is unreliable and degrades over time, but for recent data, the operator may be able to recreate documents, configurations, or records from memory. When reconstructing from memory: do it immediately, while memory is fresh. Record the confidence level of the reconstruction. Flag reconstructed data in the catalogue as "Reconstructed from memory -- original lost [date]" so that future operators know its provenance.</p>
+<p><strong>Reconstruction from external sources.</strong> For data that was originally imported from outside the institution (reference materials, publications, software), the original source may still exist outside the air gap. Reimporting is possible but must follow the standard quarantine and ingest procedures of D6-014.</p>
+<h3 id="45-forensic-recovery-from-damaged-media">4.5 Forensic Recovery from Damaged Media</h3>
+<p>Forensic recovery goes beyond standard tools and involves lower-level data extraction techniques. These procedures are ordered from least invasive to most invasive.</p>
+<p><strong>Level 1: Software-based recovery.</strong></p>
+<ul>
+<li>Use <code>ddrescue</code> to image damaged media, making multiple passes with increasing aggression.</li>
+<li>Use <code>testdisk</code> to scan for lost partitions on drives where the partition table is damaged.</li>
+<li>Use <code>photorec</code> to scan raw disk images for recognizable file signatures regardless of filesystem state.</li>
+<li>Use ZFS-specific recovery tools (<code>zdb</code> for ZFS debugging and metadata inspection) for damaged ZFS pools.</li>
+</ul>
+<p><strong>Level 2: Environmental manipulation.</strong></p>
+<ul>
+<li>For HDDs that will not spin up: carefully warm or cool the drive to shift mechanical tolerances. Place in a sealed bag to prevent condensation.</li>
+<li>For optical discs with surface contamination: clean with distilled water and lint-free cloth, wiping from center to edge (never circular).</li>
+<li>For SSDs that are not recognized: try different interfaces, different power supplies (voltage fluctuation can prevent SSD controller initialization).</li>
+</ul>
+<p><strong>Level 3: Component-level intervention.</strong></p>
+<ul>
+<li>For HDDs with failed controller boards: replace the controller board with an identical board from the same drive model and firmware revision. This requires a donor drive and electronic skill. It does not always work -- modern drives store adaptive calibration data on the controller board that is unique to each drive.</li>
+<li>For SSDs: chip-off recovery (desoldering flash chips and reading them directly) is theoretically possible but requires specialized equipment that the institution is unlikely to possess.</li>
+</ul>
+<p><strong>Level 4: Professional recovery services.</strong> This option exists outside the institution's air-gapped boundary and raises security concerns per SEC-001. If the data is not classified S3 or S4, and if the data loss is severe enough to justify the breach of the air gap, professional data recovery may be considered. The decision to send media to a third party for recovery is a GOV-001 Tier 1 decision, documented with full justification, and the recovered data must go through the full quarantine and ingest process per D6-014 upon return.</p>
+<h3 id="46-the-recovery-decision-framework">4.6 The Recovery Decision Framework</h3>
+<p>Recovery efforts are not infinite. At some point, the operator must decide that further recovery effort is not justified and accept the loss. This decision is made using the following framework.</p>
+<p><strong>Continue recovery when:</strong></p>
+<ul>
+<li>The affected data is Tier 1 or Tier 2 and has not been recovered from any source.</li>
+<li>Viable recovery avenues remain untried.</li>
+<li>The recovery effort is not causing additional damage to other data or systems.</li>
+<li>The operator is making measurable progress (recovering additional files or fragments with each attempt).</li>
+</ul>
+<p><strong>Pause recovery when:</strong></p>
+<ul>
+<li>The operator is fatigued and judgment is impaired. Recovery in a crisis is mentally exhausting. Mistakes made from fatigue cause more damage.</li>
+<li>A recovery approach has been tried multiple times without progress. Step back, reassess, try a different approach.</li>
+<li>Higher-priority data recovery tasks have emerged.</li>
+</ul>
+<p><strong>Accept loss when:</strong></p>
+<ul>
+<li>All viable recovery avenues have been exhausted. Every copy has been checked. Every technique in this article has been attempted. No further data can be extracted.</li>
+<li>The cost of continued recovery (time, risk to other data, hardware resources) exceeds the value of the unrecovered data. For Tier 3 and Tier 4 data, this threshold is reached quickly. For Tier 1 data, this threshold is reached only when recovery is genuinely impossible.</li>
+<li>The data can be reconstructed from other sources (Section 4.4) and reconstruction is more efficient than continued recovery attempts.</li>
+</ul>
+<p>When loss is accepted, the operator documents: what data was lost, what recovery was attempted, why recovery failed, what the impact of the loss is, and what changes to the backup strategy are needed to prevent recurrence.</p>
+<h2 id="5-rules-constraints-4">5. Rules & Constraints</h2>
+<ul>
+<li><strong>R-D6-13-01:</strong> No recovery action may be taken on damaged media before the disaster assessment procedure (Section 4.1) is completed and a written recovery plan exists. The first rule is: do not make it worse.</li>
+<li><strong>R-D6-13-02:</strong> Recovery operations must work on copies (bit-for-bit images) of damaged media, never on the original damaged media. The original is preserved as-is until recovery is complete, in case a different recovery technique needs to be tried.</li>
+<li><strong>R-D6-13-03:</strong> Recovery triage must follow the priority framework in Section 4.2. The operator may not deviate from triage priority order without documented justification.</li>
+<li><strong>R-D6-13-04:</strong> All recovery actions must be logged in real time. The log must record: what action was taken, on which media/data, at what time, what the result was, and what the next planned action is. This log becomes part of the institutional record and informs future revisions to the backup strategy.</li>
+<li><strong>R-D6-13-05:</strong> Recovered data must be verified before being treated as trustworthy. Verification methods include: checksum comparison against known-good values (if available), manual inspection of content, validation against format specifications, and cross-referencing against metadata in the file catalogue.</li>
+<li><strong>R-D6-13-06:</strong> The decision to engage professional recovery services outside the air gap requires GOV-001 Tier 1 approval and is prohibited for S3 or S4 classified data without explicit assessment that the recovery benefit exceeds the security risk.</li>
+<li><strong>R-D6-13-07:</strong> After any Level 2 or higher disaster, a post-incident review must be conducted within 30 days. The review must identify: what failed, why it failed, what the backup strategy assumed that proved incorrect, and what changes are required to prevent recurrence.</li>
+</ul>
+<h2 id="6-failure-modes-4">6. Failure Modes</h2>
+<ul>
+<li><strong>Panic-driven recovery.</strong> The operator, in a state of panic, begins running recovery commands without assessment. Actions taken in haste cause additional data loss -- overwriting good data with corrupt data, running destructive filesystem repairs on the only remaining copy, or accidentally formatting the wrong drive. Mitigation: R-D6-13-01 mandates assessment before action. The first rule -- do not make it worse -- must be internalized through training before the crisis occurs, not learned during it.</li>
+<li><strong>Triage violation.</strong> Under emotional pressure, the operator recovers personally meaningful data (photographs, personal writings) before institutionally critical data (governance records, system configurations). The institution's operational capacity is compromised while sentimental data is preserved. Mitigation: R-D6-13-03 mandates triage priority. The classification system (D6-012) pre-determines what is most important, removing the decision from the emotionally compromised operator in the moment of crisis.</li>
+<li><strong>Recovery of corrupted data without verification.</strong> The operator restores data from a damaged backup and returns it to service without verifying its integrity. The corrupted data causes downstream failures -- configurations that do not work, documents with missing sections, databases with inconsistent records. The corruption is not discovered until it has propagated further. Mitigation: R-D6-13-05 mandates verification of all recovered data.</li>
+<li><strong>Excessive recovery effort.</strong> The operator spends weeks attempting to recover Tier 3 reference data while Tier 2 operational systems remain impaired. Recovery effort is disproportionate to the value of the data. Mitigation: The recovery decision framework (Section 4.6) provides explicit criteria for when to continue and when to accept loss. The triage framework (Section 4.2) ensures recovery effort is allocated proportionally.</li>
+<li><strong>Post-disaster complacency.</strong> After successful recovery, the operator resumes normal operations without addressing the root cause of the backup failure. The same scenario, or a similar one, occurs again with the same result. Mitigation: R-D6-13-07 mandates a post-incident review. The review must produce concrete changes to the backup strategy. If the review finds that no changes are needed, the review itself must explain why the existing strategy failed and why it will not fail again.</li>
+<li><strong>Working on original media.</strong> The operator performs recovery operations directly on the damaged media, and a recovery tool causes further damage that makes subsequent recovery attempts impossible. Mitigation: R-D6-13-02 mandates working on copies. The original damaged media is preserved untouched as the last-resort source.</li>
+</ul>
+<h2 id="7-recovery-procedures-4">7. Recovery Procedures</h2>
+<p>This article is itself a recovery procedure. The specific recovery steps are detailed throughout Section 4. This section provides the high-level workflow that ties them together.</p>
+<ol>
+<li><strong>Disaster detected.</strong> Something has gone wrong. Data is missing, corrupted, or inaccessible. The operator becomes aware of the problem through monitoring alerts, failed access attempts, integrity check failures, or physical observation of damaged hardware.</li>
+<li><strong>Invoke Section 4.1: Disaster Assessment.</strong> Stop. Do not act on damaged media. Follow the five-step assessment procedure. Determine what survives, what is at risk, and what is lost. Classify the disaster level (1 through 4). Write the recovery plan.</li>
+<li><strong>For Level 1 disasters:</strong> Restore from intact backups per D6-006. This article's advanced procedures are not needed. Proceed to step 8 (post-incident review).</li>
+<li><strong>For Level 2-4 disasters:</strong> Execute the recovery plan in triage priority order (Section 4.2). For each piece of data requiring recovery:</li>
+<p>   a. Identify the best available source (least damaged copy).    b. Create a bit-for-bit image of the damaged source (R-D6-13-02).    c. Apply the appropriate recovery technique from Section 4.3 or Section 4.5.    d. Verify recovered data per R-D6-13-05.    e. Log all actions per R-D6-13-04.</p>
+<li><strong>For data that cannot be recovered from media:</strong> Attempt reconstruction per Section 4.4. Check for partial files, metadata, derivatives, institutional knowledge, and external sources.</li>
+<li><strong>For data that cannot be recovered or reconstructed:</strong> Apply the recovery decision framework (Section 4.6). When all avenues are exhausted, accept the loss. Document what was lost, the recovery attempt, and the impact.</li>
+<li><strong>Restore institutional operations.</strong> Once critical data is recovered, rebuild the backup strategy. Create new backup copies of all recovered data. Verify the new copies. Resume normal backup schedules only after the backup infrastructure is fully restored and verified.</li>
+<li><strong>Post-incident review (mandatory for Level 2+).</strong> Within 30 days, conduct the review per R-D6-13-07. Identify root causes. Identify backup strategy failures. Propose and implement changes. Update this article and its dependencies if the review reveals gaps in procedures.</li>
+</ol>
+<h2 id="8-evolution-path-4">8. Evolution Path</h2>
+<ul>
+<li><strong>Years 0-5:</strong> This article is hopefully never needed. The primary activity is ensuring that the backup strategy (D6-006) and media monitoring (D6-011) are functioning well enough that this article remains theoretical. During this period, the operator should conduct at least one disaster recovery drill -- a simulated Level 2 event where the primary data is treated as lost and recovery is attempted from backups alone. The drill validates both the backup procedures and this article's recovery procedures.</li>
+<li><strong>Years 5-15:</strong> The probability of a real recovery event increases as hardware ages and media degrades. The operator should have conducted multiple drills. Any recovery event -- even a Level 1 restore -- should trigger a review of this article to confirm its procedures are still current. Recovery tools mentioned here (ddrescue, testdisk, photorec) must be maintained in the institution's software inventory.</li>
+<li><strong>Years 15-30:</strong> Recovery tools may have changed. The filesystems in use may have changed (per D6-009 evolution path). This article must be updated to reflect the current technical reality. The triage framework and decision framework should remain stable, but the specific commands and techniques will evolve.</li>
+<li><strong>Years 30-50+:</strong> The institution has hopefully survived at least one significant data recovery event and the lessons learned have been incorporated. Future operators benefit from the Commentary Section entries recording what actually happened, what worked, and what did not. The institutional memory of real recovery events is more valuable than any theoretical procedure.</li>
+<li><strong>Signpost for revision:</strong> If the institution conducts a disaster recovery drill and the procedures in this article do not work as documented, revision is mandatory. If new recovery tools or techniques become available that supersede the ones documented here, this article must be updated. If the institution's backup strategy changes significantly (new media types, new filesystem, new backup software), the recovery procedures must be validated against the new strategy.</li>
+</ul>
+<h2 id="9-commentary-section-4">9. Commentary Section</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong> Writing this article was the most unsettling part of building this documentation system. Every other article assumes that the institution's systems are working -- that backups exist, that media is healthy, that procedures have been followed. This article assumes all of that has failed. It forces me to confront what I would do if I woke up tomorrow and my data was damaged beyond what my backup strategy can handle.</p>
+<p>The honest answer is: I would panic. Every operator would panic. That is why the first rule -- do not make it worse -- is stated so bluntly. The procedures exist so that when panic arrives, there is something to follow. You do not have to think clearly in a crisis if you have already thought clearly before the crisis and written down what to do.</p>
+<p>The triage framework was the hardest section to write. It requires accepting that some data might be lost forever. The tier system from D6-001 makes this intellectually manageable -- Tier 4 first, Tier 3 next, Tier 2 reluctantly, Tier 1 only as a last resort. But the emotional reality of watching data disappear -- data you created, data you curated, data that represents years of work -- is not addressed by any framework. All I can offer is this: if the classification was done correctly and the triage was followed, then what was saved is what was most worth saving. That has to be enough.</p>
+<p>I want to emphasize the disaster recovery drill. It is tempting to skip it. The systems are working. The backups are verified. Why simulate a disaster? Because the drill is not testing the backups. It is testing you. It tests whether you can follow these procedures under pressure, whether the procedures actually work with your specific hardware and software, and whether the documentation is clear enough to follow when your hands are shaking. Schedule the first drill within the first year. Do not defer it.</p>
+<p>One final thought: the post-incident review is not optional and is not a formality. Every backup strategy contains assumptions about what can go wrong. A disaster that defeats the backup strategy has proven at least one of those assumptions wrong. The post-incident review identifies which assumption failed. If you do not update the strategy based on that finding, you will lose data again to the same category of failure. The universe does not grade on a curve. It will exploit the same weakness twice.</p>
+<h2 id="10-references-4">10. References</h2>
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 3: Transparency)</li>
+<li>CON-001 -- The Founding Mandate (institutional persistence, data sovereignty)</li>
+<li>GOV-001 -- Authority Model (Tier 1 decisions for professional recovery services, institutional continuity provisions)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (air-gap implications for external recovery services, incident response)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo during crisis, documentation-first principle)</li>
+<li>D6-001 -- Data Philosophy (data tier system, triage framework, R-D6-02 redundancy requirement)</li>
+<li>D6-006 -- Backup Doctrine (normal restore procedures, backup schedule, verification)</li>
+<li>D6-007 -- Data Integrity & Verification (checksum verification, corruption detection)</li>
+<li>D6-008 -- Metadata Standards & Cataloguing (file catalogue as recovery aid, metadata reconstruction)</li>
+<li>D6-009 -- File System Architecture for Longevity (ZFS recovery procedures, pool import, scrub after recovery)</li>
+<li>D6-010 -- Digital Preservation: Formats That Survive (format-specific recovery considerations)</li>
+<li>D6-011 -- Physical Backup Media (media failure characteristics, degradation indicators)</li>
+<li>D6-012 -- Data Classification and Handling Procedures (classification-based triage, sensitivity constraints on recovery)</li>
+<li>D6-014 -- Data Ingest Procedures (quarantine for externally recovered data)</li>
+<li>D6-015 -- Print & Physical Backup Doctrine (non-digital recovery sources)</li>
+<li>D10-003 -- Incident Response Procedures (incident declaration, escalation)</li>
+<li>GNU ddrescue documentation (archived locally)</li>
+<li>TestDisk and PhotoRec documentation, CGSecurity (archived locally)</li>
+<li>OpenZFS troubleshooting and recovery documentation (archived locally)</li>
+</ul>
+</main>
+</div>
+<footer class="site-footer">
+<div class="footer-inner">
+<p>holm.chat Documentation Institution &mdash; Air-Gapped, Off-Grid, Self-Built</p>
+<p>Stage 1: Documentation Framework &mdash; Version 1.0.0 &mdash; 2026-02-16</p>
+</div>
+</footer>
+</body>
+</html>

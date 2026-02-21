@@ -1,0 +1,74 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: animus-dashboard
+  namespace: animus
+  labels:
+    app.kubernetes.io/name: animus-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: animus-dashboard
+  labels:
+    app.kubernetes.io/name: animus-dashboard
+rules:
+  # Node access
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes/status"]
+    verbs: ["get"]
+
+  # Pod access
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods/eviction"]
+    verbs: ["create"]
+
+  # Namespace access
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list"]
+
+  # Service access (for Loki)
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list"]
+
+  # Metrics access
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list"]
+
+  # Events access
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch"]
+
+  # Node drain/cordon operations
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: animus-dashboard
+  labels:
+    app.kubernetes.io/name: animus-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: animus-dashboard
+subjects:
+  - kind: ServiceAccount
+    name: animus-dashboard
+    namespace: animus

@@ -1,0 +1,147 @@
+# Worker Deployment
+# Long-running workers that continuously pull videos from Redis queue.
+#
+# Architecture:
+# - Workers download videos to ephemeral storage (/tmp/downloads)
+# - On completion, workers upload to the collector service
+# - Collector has the iSCSI mount and stores files permanently
+# - This allows many workers to run in parallel without iSCSI connection limits
+#
+# Resource Strategy:
+# - Fixed replica count (adjust based on cluster capacity)
+# - Each worker: 512Mi-2Gi RAM, 250m-2 CPU
+# - Ephemeral storage for downloads (no PVC needed)
+# - Graceful shutdown allows current download to complete
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ytarchive-worker
+  namespace: ytarchive
+  labels:
+    app.kubernetes.io/name: worker
+    app.kubernetes.io/component: downloader
+    app.kubernetes.io/part-of: ytarchive
+spec:
+  # Fixed replica count - adjust based on cluster capacity
+  # Cluster has 13 nodes, can scale to 10-20 workers easily
+  replicas: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: worker
+      app.kubernetes.io/component: downloader
+      app.kubernetes.io/part-of: ytarchive
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: worker
+        app.kubernetes.io/component: downloader
+        app.kubernetes.io/part-of: ytarchive
+    spec:
+      # Allow 10 minutes for graceful shutdown - workers finish current video + upload
+      terminationGracePeriodSeconds: 600
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: ytarchive-worker
+              topologyKey: kubernetes.io/hostname
+      imagePullSecrets:
+        - name: ghcr-secret
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+          - name: single-request-reopen
+      containers:
+        - name: worker
+          image: ghcr.io/timholm/ytarchive/worker@sha256:cafb67403bb6fe7a840a2c19cda480219ed7fc015e3cc3223164746cf1bbde21
+          imagePullPolicy: Always
+          ports:
+            - name: health
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: REDIS_URL
+            # Use ephemeral storage for downloads
+            - name: STORAGE_PATH
+              value: /tmp/downloads
+            - name: VIDEO_FORMAT
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: VIDEO_FORMAT
+                  optional: true
+            # Channel ID to process - set via ConfigMap or deployment overlay
+            - name: CHANNEL_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: ytarchive-config
+                  key: DEFAULT_CHANNEL_ID
+                  optional: true
+            # Worker ID is auto-generated from pod name for uniqueness
+            - name: WORKER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CONTROLLER_URL
+              value: http://ytarchive-controller.ytarchive.svc.cluster.local
+            # Collector URL for uploading completed videos
+            - name: COLLECTOR_URL
+              value: http://collector.ytarchive.svc.cluster.local:8081
+            - name: YOUTUBE_COOKIES_FILE
+              value: /etc/youtube-cookies/cookies.txt
+            # Limit video height to 1080p to avoid 403 errors on premium formats
+            - name: MAX_VIDEO_HEIGHT
+              value: "1080"
+            # Prefer combined streams (format 22/18) for better compatibility
+            - name: PREFER_COMBINED_STREAM
+              value: "true"
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "2"
+            requests:
+              memory: 512Mi
+              cpu: 250m
+          # Liveness probe - restart if worker health endpoint fails
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # Readiness probe - worker is ready when /readyz returns 200
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            # Ephemeral storage for downloads
+            - name: downloads
+              mountPath: /tmp/downloads
+            - name: youtube-cookies
+              mountPath: /etc/youtube-cookies
+              readOnly: true
+      volumes:
+        # EmptyDir for ephemeral download storage
+        - name: downloads
+          emptyDir:
+            sizeLimit: 20Gi
+        - name: youtube-cookies
+          secret:
+            secretName: youtube-cookies
+            optional: true

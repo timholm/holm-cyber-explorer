@@ -1,0 +1,256 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      deprecated.daemonset.template.generation: "2"
+    creationTimestamp: "2026-01-25T00:58:10Z"
+    generation: 2
+    labels:
+      app: node.csi.trident.qnap.io
+      k8s_version: v1.34.3
+      kubectl.kubernetes.io/default-container: trident-main
+      trident_version: v1.06.0
+    name: trident-node-linux
+    namespace: trident
+    ownerReferences:
+    - apiVersion: trident.qnap.io/v1
+      controller: true
+      kind: TridentOrchestrator
+      name: trident
+      uid: 8a0bec38-8bff-4828-ae27-2ef74058714d
+    resourceVersion: "985590"
+    uid: 5bf48cc3-01d9-4393-b308-e72ad7524b3b
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: node.csi.trident.qnap.io
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-24T17:50:22-08:00"
+          openshift.io/required-scc: trident-node-linux
+        labels:
+          app: node.csi.trident.qnap.io
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                  - arm64
+                  - amd64
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                  - linux
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - node.csi.trident.qnap.io
+              topologyKey: kubernetes.io/hostname
+        containers:
+        - args:
+          - --no_persistence
+          - --k8s_pod
+          - --rest=false
+          - --csi_node_name=$(KUBE_NODE_NAME)
+          - --csi_endpoint=$(CSI_ENDPOINT)
+          - --csi_role=node
+          - --log_format=text
+          - --log_level=debug
+          - --log_workflows=
+          - --log_layers=
+          - --disable_audit_log=true
+          - --http_request_timeout=90s
+          - --https_rest
+          - --https_port=17546
+          - --enable_force_detach=false
+          - --iscsi_self_healing_interval=5m0s
+          - --iscsi_self_healing_wait_time=7m0s
+          - -debug
+          command:
+          - /trident_orchestrator
+          env:
+          - name: KUBE_NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: KUBELET_DIR
+            value: /var/lib/kubelet
+          - name: CSI_ENDPOINT
+            value: unix://plugin/csi.sock
+          - name: PATH
+            value: /qnap:/bin
+          image: qnapsystem/qnap-csi:v1.6.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /liveness
+              port: 17546
+              scheme: HTTPS
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: trident-main
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /readiness
+              port: 17546
+              scheme: HTTPS
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+              - SYS_ADMIN
+              drop:
+              - all
+            privileged: true
+          startupProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /liveness
+              port: 17546
+              scheme: HTTPS
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /plugin
+            name: plugin-dir
+          - mountPath: /var/lib/kubelet/plugins
+            mountPropagation: Bidirectional
+            name: plugins-mount-dir
+          - mountPath: /var/lib/kubelet/pods
+            mountPropagation: Bidirectional
+            name: pods-mount-dir
+          - mountPath: /dev
+            name: dev-dir
+          - mountPath: /sys
+            name: sys-dir
+          - mountPath: /host
+            mountPropagation: Bidirectional
+            name: host-dir
+          - mountPath: /var/lib/trident/tracking
+            mountPropagation: Bidirectional
+            name: trident-tracking-dir
+          - mountPath: /certs
+            name: certs
+            readOnly: true
+        - args:
+          - --v=8
+          - --csi-address=$(ADDRESS)
+          - --kubelet-registration-path=$(REGISTRATION_PATH)
+          env:
+          - name: ADDRESS
+            value: /plugin/csi.sock
+          - name: REGISTRATION_PATH
+            value: /var/lib/kubelet/plugins/csi.trident.qnap.io/csi.sock
+          - name: KUBE_NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.0
+          imagePullPolicy: IfNotPresent
+          name: driver-registrar
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /plugin
+            name: plugin-dir
+          - mountPath: /registration
+            name: registration-dir
+        dnsPolicy: ClusterFirstWithHostNet
+        hostIPC: true
+        hostNetwork: true
+        hostPID: true
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: trident-node-linux
+        serviceAccountName: trident-node-linux
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoExecute
+          operator: Exists
+        - effect: NoSchedule
+          operator: Exists
+        volumes:
+        - hostPath:
+            path: /var/lib/kubelet/plugins/csi.trident.qnap.io/
+            type: DirectoryOrCreate
+          name: plugin-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins_registry/
+            type: Directory
+          name: registration-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins
+            type: DirectoryOrCreate
+          name: plugins-mount-dir
+        - hostPath:
+            path: /var/lib/kubelet/pods
+            type: DirectoryOrCreate
+          name: pods-mount-dir
+        - hostPath:
+            path: /dev
+            type: Directory
+          name: dev-dir
+        - hostPath:
+            path: /sys
+            type: Directory
+          name: sys-dir
+        - hostPath:
+            path: /
+            type: Directory
+          name: host-dir
+        - hostPath:
+            path: /var/lib/trident/tracking
+            type: DirectoryOrCreate
+          name: trident-tracking-dir
+        - name: certs
+          projected:
+            defaultMode: 420
+            sources:
+            - secret:
+                name: trident-csi
+            - secret:
+                name: trident-encryption-keys
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 13
+    desiredNumberScheduled: 13
+    numberAvailable: 13
+    numberMisscheduled: 0
+    numberReady: 13
+    observedGeneration: 2
+    updatedNumberScheduled: 13
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,186 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      gethomepage.dev/description: Identity & Access Management
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/group: Infrastructure
+      gethomepage.dev/href: https://holm.chat/auth
+      gethomepage.dev/icon: keycloak.svg
+      gethomepage.dev/name: Keycloak
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"keycloak","namespace":"keycloak"},"spec":{"ports":[{"port":80,"targetPort":8080}],"selector":{"app":"keycloak"}}}
+    creationTimestamp: "2026-01-19T23:38:33Z"
+    name: keycloak
+    namespace: keycloak
+    resourceVersion: "10246"
+    uid: 2b89803a-9958-44b7-9a71-f241521e9ad6
+  spec:
+    clusterIP: 10.43.176.216
+    clusterIPs:
+    - 10.43.176.216
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: keycloak
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"keycloak-db","namespace":"keycloak"},"spec":{"ports":[{"port":5432}],"selector":{"app":"keycloak-db"}}}
+    creationTimestamp: "2026-01-19T23:38:32Z"
+    name: keycloak-db
+    namespace: keycloak
+    resourceVersion: "10247"
+    uid: 8d39a5a0-88b1-46e4-8684-538c625edcc6
+  spec:
+    clusterIP: 10.43.195.65
+    clusterIPs:
+    - 10.43.195.65
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 5432
+      protocol: TCP
+      targetPort: 5432
+    selector:
+      app: keycloak-db
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: keycloak:/Service:keycloak/keycloak-keycloakx-headless
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"keycloak:/Service:keycloak/keycloak-keycloakx-headless"},"labels":{"app.kubernetes.io/component":"headless","app.kubernetes.io/instance":"keycloak","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"keycloakx","app.kubernetes.io/version":"26.0","helm.sh/chart":"keycloakx-7.1.7"},"name":"keycloak-keycloakx-headless","namespace":"keycloak"},"spec":{"clusterIP":"None","ports":[{"name":"http","port":80,"protocol":"TCP","targetPort":"http"}],"selector":{"app.kubernetes.io/instance":"keycloak","app.kubernetes.io/name":"keycloakx"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-01-22T01:45:25Z"
+    labels:
+      app.kubernetes.io/component: headless
+      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: keycloakx
+      app.kubernetes.io/version: "26.0"
+      helm.sh/chart: keycloakx-7.1.7
+    name: keycloak-keycloakx-headless
+    namespace: keycloak
+    resourceVersion: "10248"
+    uid: 5bbf52ae-c127-438f-94ae-c4c5c8b46673
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/name: keycloakx
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: keycloak:/Service:keycloak/keycloak-keycloakx-http
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"keycloak:/Service:keycloak/keycloak-keycloakx-http"},"labels":{"app.kubernetes.io/component":"http","app.kubernetes.io/instance":"keycloak","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"keycloakx","app.kubernetes.io/version":"26.0","helm.sh/chart":"keycloakx-7.1.7"},"name":"keycloak-keycloakx-http","namespace":"keycloak"},"spec":{"ports":[{"name":"http-internal","port":9000,"protocol":"TCP","targetPort":"http-internal"},{"name":"http","port":80,"protocol":"TCP","targetPort":"http"},{"name":"https","port":8443,"protocol":"TCP","targetPort":"https"}],"selector":{"app.kubernetes.io/instance":"keycloak","app.kubernetes.io/name":"keycloakx"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-01-22T01:45:25Z"
+    labels:
+      app.kubernetes.io/component: http
+      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: keycloakx
+      app.kubernetes.io/version: "26.0"
+      helm.sh/chart: keycloakx-7.1.7
+    name: keycloak-keycloakx-http
+    namespace: keycloak
+    resourceVersion: "10249"
+    uid: 9e8d8485-231b-4c66-b5ee-eb93d77d8f7b
+  spec:
+    clusterIP: 10.43.158.252
+    clusterIPs:
+    - 10.43.158.252
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-internal
+      port: 9000
+      protocol: TCP
+      targetPort: http-internal
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 8443
+      protocol: TCP
+      targetPort: https
+    selector:
+      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/name: keycloakx
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"keycloak-nodeport","namespace":"keycloak"},"spec":{"ports":[{"nodePort":30080,"port":80,"targetPort":8080}],"selector":{"app":"keycloak"},"type":"NodePort"}}
+    creationTimestamp: "2026-01-20T00:02:29Z"
+    name: keycloak-nodeport
+    namespace: keycloak
+    resourceVersion: "10250"
+    uid: dfd37058-afe3-4dda-90dc-cedb4131537a
+  spec:
+    clusterIP: 10.43.33.63
+    clusterIPs:
+    - 10.43.33.63
+    externalTrafficPolicy: Cluster
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - nodePort: 30080
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: keycloak
+    sessionAffinity: None
+    type: NodePort
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

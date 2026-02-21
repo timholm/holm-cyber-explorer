@@ -1,0 +1,69 @@
+name: Cluster Health Check
+
+on:
+  # Disabled: Pi cluster is on private network, unreachable from GitHub Actions
+  # schedule:
+  #   - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:
+
+env:
+  PI_HOST: 192.168.8.197
+
+jobs:
+  check-connectivity:
+    name: Check Connectivity
+    runs-on: ubuntu-latest
+    outputs:
+      reachable: ${{ steps.check.outputs.reachable }}
+    steps:
+      - name: Check if cluster is reachable
+        id: check
+        run: |
+          if curl -s --connect-timeout 5 "http://$PI_HOST:30000/health" > /dev/null 2>&1; then
+            echo "reachable=true" >> $GITHUB_OUTPUT
+            echo "✅ Cluster is reachable"
+          else
+            echo "reachable=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Cluster is not reachable (private network)"
+          fi
+
+  health:
+    name: Health Check
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check services via HTTP
+        run: |
+          echo "## HolmOS Health Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          SERVICES="holmos-shell:30000 nova:30004 auth-gateway:30100 registry-ui:31750"
+
+          for svc in $SERVICES; do
+            NAME=$(echo $svc | cut -d: -f1)
+            PORT=$(echo $svc | cut -d: -f2)
+
+            if curl -s --connect-timeout 5 "http://$PI_HOST:$PORT/health" > /dev/null 2>&1; then
+              echo "✅ $NAME: healthy" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ $NAME: unreachable" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+  summary:
+    name: Summary
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## ⚠️ Cluster Unreachable" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The Pi cluster at $PI_HOST is on a private network and cannot be reached from GitHub Actions." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**To check health locally:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "ssh rpi1@$PI_HOST 'kubectl get pods -n holm'" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

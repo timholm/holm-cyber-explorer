@@ -1,0 +1,344 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: nfs-disk1
+      meta.helm.sh/release-namespace: nfs-provisioner
+    creationTimestamp: "2026-01-26T00:35:06Z"
+    generation: 1
+    labels:
+      app: nfs-subdir-external-provisioner
+      app.kubernetes.io/managed-by: Helm
+      chart: nfs-subdir-external-provisioner-4.0.18
+      heritage: Helm
+      release: nfs-disk1
+    name: nfs-disk1-nfs-subdir-external-provisioner
+    namespace: nfs-provisioner
+    resourceVersion: "826766"
+    uid: 1ebbf394-9930-4560-9467-5bf994c909ae
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: nfs-subdir-external-provisioner
+        release: nfs-disk1
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: nfs-subdir-external-provisioner
+          release: nfs-disk1
+      spec:
+        containers:
+        - env:
+          - name: PROVISIONER_NAME
+            value: k8s-sigs.io/nfs-disk1
+          - name: NFS_SERVER
+            value: 192.168.8.152
+          - name: NFS_PATH
+            value: /mnt/disk1/nfs-pv
+          image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          imagePullPolicy: IfNotPresent
+          name: nfs-subdir-external-provisioner
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /persistentvolumes
+            name: nfs-subdir-external-provisioner-root
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: nfs-disk1-nfs-subdir-external-provisioner
+        serviceAccountName: nfs-disk1-nfs-subdir-external-provisioner
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: nfs-subdir-external-provisioner-root
+          nfs:
+            path: /mnt/disk1/nfs-pv
+            server: 192.168.8.152
+  status:
+    conditions:
+    - lastTransitionTime: "2026-01-26T00:35:06Z"
+      lastUpdateTime: "2026-01-26T00:35:11Z"
+      message: ReplicaSet "nfs-disk1-nfs-subdir-external-provisioner-c8cd4899" has
+        successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T01:12:48Z"
+      lastUpdateTime: "2026-01-27T01:12:48Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    observedGeneration: 1
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: nfs-disk2
+      meta.helm.sh/release-namespace: nfs-provisioner
+    creationTimestamp: "2026-01-26T00:35:14Z"
+    generation: 1
+    labels:
+      app: nfs-subdir-external-provisioner
+      app.kubernetes.io/managed-by: Helm
+      chart: nfs-subdir-external-provisioner-4.0.18
+      heritage: Helm
+      release: nfs-disk2
+    name: nfs-disk2-nfs-subdir-external-provisioner
+    namespace: nfs-provisioner
+    resourceVersion: "926927"
+    uid: 2e82e4cf-696d-46a5-980e-2f64f613d487
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: nfs-subdir-external-provisioner
+        release: nfs-disk2
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: nfs-subdir-external-provisioner
+          release: nfs-disk2
+      spec:
+        containers:
+        - env:
+          - name: PROVISIONER_NAME
+            value: k8s-sigs.io/nfs-disk2
+          - name: NFS_SERVER
+            value: 192.168.8.152
+          - name: NFS_PATH
+            value: /mnt/disk2/nfs-pv
+          image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          imagePullPolicy: IfNotPresent
+          name: nfs-subdir-external-provisioner
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /persistentvolumes
+            name: nfs-subdir-external-provisioner-root
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: nfs-disk2-nfs-subdir-external-provisioner
+        serviceAccountName: nfs-disk2-nfs-subdir-external-provisioner
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: nfs-subdir-external-provisioner-root
+          nfs:
+            path: /mnt/disk2/nfs-pv
+            server: 192.168.8.152
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-26T00:35:14Z"
+      lastUpdateTime: "2026-01-26T00:35:16Z"
+      message: ReplicaSet "nfs-disk2-nfs-subdir-external-provisioner-6569df866f" has
+        successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-28T04:07:06Z"
+      lastUpdateTime: "2026-01-28T04:07:06Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: nfs-disk3
+      meta.helm.sh/release-namespace: nfs-provisioner
+    creationTimestamp: "2026-01-26T00:35:16Z"
+    generation: 1
+    labels:
+      app: nfs-subdir-external-provisioner
+      app.kubernetes.io/managed-by: Helm
+      chart: nfs-subdir-external-provisioner-4.0.18
+      heritage: Helm
+      release: nfs-disk3
+    name: nfs-disk3-nfs-subdir-external-provisioner
+    namespace: nfs-provisioner
+    resourceVersion: "826868"
+    uid: dce5eca6-19da-4e99-b338-7d2b5f5efa21
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: nfs-subdir-external-provisioner
+        release: nfs-disk3
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: nfs-subdir-external-provisioner
+          release: nfs-disk3
+      spec:
+        containers:
+        - env:
+          - name: PROVISIONER_NAME
+            value: k8s-sigs.io/nfs-disk3
+          - name: NFS_SERVER
+            value: 192.168.8.152
+          - name: NFS_PATH
+            value: /mnt/disk3/nfs-pv
+          image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          imagePullPolicy: IfNotPresent
+          name: nfs-subdir-external-provisioner
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /persistentvolumes
+            name: nfs-subdir-external-provisioner-root
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: nfs-disk3-nfs-subdir-external-provisioner
+        serviceAccountName: nfs-disk3-nfs-subdir-external-provisioner
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: nfs-subdir-external-provisioner-root
+          nfs:
+            path: /mnt/disk3/nfs-pv
+            server: 192.168.8.152
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-26T00:35:16Z"
+      lastUpdateTime: "2026-01-26T00:35:18Z"
+      message: ReplicaSet "nfs-disk3-nfs-subdir-external-provisioner-74ff46d6dc" has
+        successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-28T01:43:12Z"
+      lastUpdateTime: "2026-01-28T01:43:12Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: nfs-disk4
+      meta.helm.sh/release-namespace: nfs-provisioner
+    creationTimestamp: "2026-01-26T00:35:18Z"
+    generation: 1
+    labels:
+      app: nfs-subdir-external-provisioner
+      app.kubernetes.io/managed-by: Helm
+      chart: nfs-subdir-external-provisioner-4.0.18
+      heritage: Helm
+      release: nfs-disk4
+    name: nfs-disk4-nfs-subdir-external-provisioner
+    namespace: nfs-provisioner
+    resourceVersion: "985176"
+    uid: 335b7ef2-9cd3-4122-8ed8-f26a50af9217
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: nfs-subdir-external-provisioner
+        release: nfs-disk4
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: nfs-subdir-external-provisioner
+          release: nfs-disk4
+      spec:
+        containers:
+        - env:
+          - name: PROVISIONER_NAME
+            value: k8s-sigs.io/nfs-disk4
+          - name: NFS_SERVER
+            value: 192.168.8.152
+          - name: NFS_PATH
+            value: /mnt/disk4/nfs-pv
+          image: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          imagePullPolicy: IfNotPresent
+          name: nfs-subdir-external-provisioner
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /persistentvolumes
+            name: nfs-subdir-external-provisioner-root
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: nfs-disk4-nfs-subdir-external-provisioner
+        serviceAccountName: nfs-disk4-nfs-subdir-external-provisioner
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: nfs-subdir-external-provisioner-root
+          nfs:
+            path: /mnt/disk4/nfs-pv
+            server: 192.168.8.152
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-26T00:35:18Z"
+      lastUpdateTime: "2026-01-26T00:35:20Z"
+      message: ReplicaSet "nfs-disk4-nfs-subdir-external-provisioner-5cfc698f57" has
+        successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-28T05:33:00Z"
+      lastUpdateTime: "2026-01-28T05:33:00Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

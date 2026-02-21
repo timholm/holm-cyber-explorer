@@ -1,0 +1,1622 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    custom_parsers.conf: |
+      [PARSER]
+          Name docker_no_time
+          Format json
+          Time_Keep Off
+          Time_Key time
+          Time_Format %Y-%m-%dT%H:%M:%S.%L
+    fluent-bit.conf: |
+      [SERVICE]
+          Daemon Off
+          Flush 1
+          Log_Level info
+          Parsers_File /fluent-bit/etc/parsers.conf
+          Parsers_File /fluent-bit/etc/conf/custom_parsers.conf
+          HTTP_Server On
+          HTTP_Listen 0.0.0.0
+          HTTP_Port 2020
+          Health_Check On
+
+      [INPUT]
+          Name tail
+          Path /var/log/containers/*.log
+          multiline.parser cri
+          Tag kube.*
+          Mem_Buf_Limit 5MB
+          Skip_Long_Lines On
+
+      [FILTER]
+          Name kubernetes
+          Match kube.*
+          Merge_Log On
+          Keep_Log Off
+          K8S-Logging.Parser On
+          K8S-Logging.Exclude On
+
+      [OUTPUT]
+          Name loki
+          Match kube.*
+          Host loki.monitoring.svc.cluster.local
+          Port 3100
+          Labels job=fluent-bit, namespace=$kubernetes['namespace_name'], pod=$kubernetes['pod_name'], container=$kubernetes['container_name'], node=$kubernetes['host'], stream=$stream
+          Auto_Kubernetes_Labels Off
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: fluent-bit:/ConfigMap:monitoring/fluent-bit
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"custom_parsers.conf":"[PARSER]\n    Name docker_no_time\n    Format json\n    Time_Keep Off\n    Time_Key time\n    Time_Format %Y-%m-%dT%H:%M:%S.%L\n","fluent-bit.conf":"[SERVICE]\n    Daemon Off\n    Flush 1\n    Log_Level info\n    Parsers_File /fluent-bit/etc/parsers.conf\n    Parsers_File /fluent-bit/etc/conf/custom_parsers.conf\n    HTTP_Server On\n    HTTP_Listen 0.0.0.0\n    HTTP_Port 2020\n    Health_Check On\n\n[INPUT]\n    Name tail\n    Path /var/log/containers/*.log\n    multiline.parser cri\n    Tag kube.*\n    Mem_Buf_Limit 5MB\n    Skip_Long_Lines On\n\n[FILTER]\n    Name kubernetes\n    Match kube.*\n    Merge_Log On\n    Keep_Log Off\n    K8S-Logging.Parser On\n    K8S-Logging.Exclude On\n\n[OUTPUT]\n    Name loki\n    Match kube.*\n    Host loki.monitoring.svc.cluster.local\n    Port 3100\n    Labels job=fluent-bit, namespace=$kubernetes['namespace_name'], pod=$kubernetes['pod_name'], container=$kubernetes['container_name'], node=$kubernetes['host'], stream=$stream\n    Auto_Kubernetes_Labels Off\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"fluent-bit:/ConfigMap:monitoring/fluent-bit"},"labels":{"app.kubernetes.io/instance":"fluent-bit","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"fluent-bit","app.kubernetes.io/version":"4.1.1","helm.sh/chart":"fluent-bit-0.54.1"},"name":"fluent-bit","namespace":"monitoring"}}
+    creationTimestamp: "2026-01-20T00:00:13Z"
+    labels:
+      app.kubernetes.io/instance: fluent-bit
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: fluent-bit
+      app.kubernetes.io/version: 4.1.1
+      helm.sh/chart: fluent-bit-0.54.1
+    name: fluent-bit
+    namespace: monitoring
+    resourceVersion: "799"
+    uid: 82ebecd3-8b63-4bcc-8b47-aecdbd6a84bf
+- apiVersion: v1
+  data:
+    datasources.yaml: |
+      apiVersion: 1
+      datasources:
+      - access: proxy
+        isDefault: true
+        name: Prometheus
+        type: prometheus
+        url: http://prometheus-server.monitoring:80
+      - access: proxy
+        name: Loki
+        type: loki
+        url: http://loki.monitoring:3100
+    grafana.ini: |
+      [analytics]
+      check_for_updates = true
+      [auth.basic]
+      enabled = true
+      [log]
+      mode = console
+      [paths]
+      data = /var/lib/grafana/
+      logs = /var/log/grafana
+      plugins = /var/lib/grafana/plugins
+      provisioning = /etc/grafana/provisioning
+      [server]
+      domain = ''
+      protocol = http
+      root_url = https://holm.chat/grafana
+      serve_from_sub_path = true
+      [unified_storage]
+      index_path = /var/lib/grafana-search/bleve
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: grafana:/ConfigMap:monitoring/grafana
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"datasources.yaml":"apiVersion: 1\ndatasources:\n- access: proxy\n  isDefault: true\n  name: Prometheus\n  type: prometheus\n  url: http://prometheus-server.monitoring:80\n- access: proxy\n  name: Loki\n  type: loki\n  url: http://loki.monitoring:3100\n","grafana.ini":"[analytics]\ncheck_for_updates = true\n[auth.basic]\nenabled = true\n[log]\nmode = console\n[paths]\ndata = /var/lib/grafana/\nlogs = /var/log/grafana\nplugins = /var/lib/grafana/plugins\nprovisioning = /etc/grafana/provisioning\n[server]\ndomain = ''\nprotocol = http\nroot_url = https://holm.chat/grafana\nserve_from_sub_path = true\n[unified_storage]\nindex_path = /var/lib/grafana-search/bleve\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"grafana:/ConfigMap:monitoring/grafana"},"labels":{"app.kubernetes.io/instance":"grafana","app.kubernetes.io/name":"grafana","app.kubernetes.io/version":"12.3.1","helm.sh/chart":"grafana-10.5.13"},"name":"grafana","namespace":"monitoring"}}
+    creationTimestamp: "2026-01-19T04:54:55Z"
+    labels:
+      app.kubernetes.io/instance: grafana
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 12.3.1
+      helm.sh/chart: grafana-10.5.13
+    name: grafana
+    namespace: monitoring
+    resourceVersion: "345099"
+    uid: a877c448-7e75-4a42-a08a-efdc6eb35495
+- apiVersion: v1
+  data:
+    provider.yaml: |-
+      apiVersion: 1
+      providers:
+        - name: 'sidecarProvider'
+          orgId: 1
+          folder: ''
+          folderUid: ''
+          type: file
+          disableDeletion: false
+          allowUiUpdates: false
+          updateIntervalSeconds: 30
+          options:
+            foldersFromFilesStructure: false
+            path: /tmp/dashboards
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: grafana:/ConfigMap:monitoring/grafana-config-dashboards
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"provider.yaml":"apiVersion: 1\nproviders:\n  - name: 'sidecarProvider'\n    orgId: 1\n    folder: ''\n    folderUid: ''\n    type: file\n    disableDeletion: false\n    allowUiUpdates: false\n    updateIntervalSeconds: 30\n    options:\n      foldersFromFilesStructure: false\n      path: /tmp/dashboards"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"grafana:/ConfigMap:monitoring/grafana-config-dashboards"},"labels":{"app.kubernetes.io/instance":"grafana","app.kubernetes.io/name":"grafana","app.kubernetes.io/version":"12.3.1","helm.sh/chart":"grafana-10.5.13"},"name":"grafana-config-dashboards","namespace":"monitoring"}}
+    creationTimestamp: "2026-01-25T15:51:46Z"
+    labels:
+      app.kubernetes.io/instance: grafana
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 12.3.1
+      helm.sh/chart: grafana-10.5.13
+    name: grafana-config-dashboards
+    namespace: monitoring
+    resourceVersion: "345098"
+    uid: 2610e805-2528-4dbc-a732-968c06410396
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-19T04:54:51Z"
+    name: kube-root-ca.crt
+    namespace: monitoring
+    resourceVersion: "802"
+    uid: 6fdf31e2-d769-4e0b-9dee-7cfef694e108
+- apiVersion: v1
+  data:
+    config.yaml: |2
+
+      auth_enabled: false
+      bloom_build:
+        builder:
+          planner_address: ""
+        enabled: false
+      bloom_gateway:
+        client:
+          addresses: ""
+        enabled: false
+      common:
+        compactor_grpc_address: 'loki.monitoring.svc.cluster.local:9095'
+        path_prefix: /var/loki
+        replication_factor: 1
+        storage:
+          filesystem:
+            chunks_directory: /var/loki/chunks
+            rules_directory: /var/loki/rules
+      frontend:
+        scheduler_address: ""
+        tail_proxy_url: ""
+      frontend_worker:
+        scheduler_address: ""
+      index_gateway:
+        mode: simple
+      limits_config:
+        max_cache_freshness_per_query: 10m
+        max_entries_limit_per_query: 10000
+        max_query_series: 5000
+        query_timeout: 5m
+        reject_old_samples: true
+        reject_old_samples_max_age: 168h
+        retention_period: 168h
+        split_queries_by_interval: 15m
+        volume_enabled: true
+      memberlist:
+        join_members:
+        - loki-memberlist.monitoring.svc.cluster.local
+      pattern_ingester:
+        enabled: false
+      querier:
+        max_concurrent: 4
+      query_range:
+        align_queries_with_step: true
+        parallelise_shardable_queries: false
+      ruler:
+        storage:
+          type: local
+        wal:
+          dir: /var/loki/ruler-wal
+      runtime_config:
+        file: /etc/loki/runtime-config/runtime-config.yaml
+      schema_config:
+        configs:
+        - from: "2024-01-01"
+          index:
+            period: 24h
+            prefix: index_
+          object_store: filesystem
+          schema: v13
+          store: tsdb
+      server:
+        grpc_listen_port: 9095
+        http_listen_port: 3100
+        http_server_read_timeout: 5m
+        http_server_write_timeout: 5m
+      storage_config:
+        bloom_shipper:
+          working_directory: /var/loki/data/bloomshipper
+        boltdb_shipper:
+          index_gateway_client:
+            server_address: ""
+        hedging:
+          at: 250ms
+          max_per_second: 20
+          up_to: 3
+        tsdb_shipper:
+          index_gateway_client:
+            server_address: ""
+        use_thanos_objstore: false
+      tracing:
+        enabled: false
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: loki:/ConfigMap:monitoring/loki
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.yaml":"\nauth_enabled: false\nbloom_build:\n  builder:\n    planner_address: \"\"\n  enabled: false\nbloom_gateway:\n  client:\n    addresses: \"\"\n  enabled: false\ncommon:\n  compactor_grpc_address: 'loki.monitoring.svc.cluster.local:9095'\n  path_prefix: /var/loki\n  replication_factor: 1\n  storage:\n    filesystem:\n      chunks_directory: /var/loki/chunks\n      rules_directory: /var/loki/rules\nfrontend:\n  scheduler_address: \"\"\n  tail_proxy_url: \"\"\nfrontend_worker:\n  scheduler_address: \"\"\nindex_gateway:\n  mode: simple\nlimits_config:\n  max_cache_freshness_per_query: 10m\n  max_entries_limit_per_query: 10000\n  max_query_series: 5000\n  query_timeout: 5m\n  reject_old_samples: true\n  reject_old_samples_max_age: 168h\n  retention_period: 168h\n  split_queries_by_interval: 15m\n  volume_enabled: true\nmemberlist:\n  join_members:\n  - loki-memberlist.monitoring.svc.cluster.local\npattern_ingester:\n  enabled: false\nquerier:\n  max_concurrent: 4\nquery_range:\n  align_queries_with_step: true\n  parallelise_shardable_queries: false\nruler:\n  storage:\n    type: local\n  wal:\n    dir: /var/loki/ruler-wal\nruntime_config:\n  file: /etc/loki/runtime-config/runtime-config.yaml\nschema_config:\n  configs:\n  - from: \"2024-01-01\"\n    index:\n      period: 24h\n      prefix: index_\n    object_store: filesystem\n    schema: v13\n    store: tsdb\nserver:\n  grpc_listen_port: 9095\n  http_listen_port: 3100\n  http_server_read_timeout: 5m\n  http_server_write_timeout: 5m\nstorage_config:\n  bloom_shipper:\n    working_directory: /var/loki/data/bloomshipper\n  boltdb_shipper:\n    index_gateway_client:\n      server_address: \"\"\n  hedging:\n    at: 250ms\n    max_per_second: 20\n    up_to: 3\n  tsdb_shipper:\n    index_gateway_client:\n      server_address: \"\"\n  use_thanos_objstore: false\ntracing:\n  enabled: false\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"loki:/ConfigMap:monitoring/loki"},"labels":{"app.kubernetes.io/instance":"loki","app.kubernetes.io/name":"loki","app.kubernetes.io/version":"3.6.3","helm.sh/chart":"loki-6.51.0"},"name":"loki","namespace":"monitoring"}}
+    creationTimestamp: "2026-01-19T23:59:00Z"
+    labels:
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/version: 3.6.3
+      helm.sh/chart: loki-6.51.0
+    name: loki
+    namespace: monitoring
+    resourceVersion: "803"
+    uid: fd15e298-b3a8-40a0-80f8-79cd9ae31ef5
+- apiVersion: v1
+  data:
+    runtime-config.yaml: |
+      {}
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: loki:/ConfigMap:monitoring/loki-runtime
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"runtime-config.yaml":"{}\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"loki:/ConfigMap:monitoring/loki-runtime"},"labels":{"app.kubernetes.io/instance":"loki","app.kubernetes.io/name":"loki","app.kubernetes.io/version":"3.6.3","helm.sh/chart":"loki-6.51.0"},"name":"loki-runtime","namespace":"monitoring"}}
+    creationTimestamp: "2026-01-19T23:59:00Z"
+    labels:
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/version: 3.6.3
+      helm.sh/chart: loki-6.51.0
+    name: loki-runtime
+    namespace: monitoring
+    resourceVersion: "804"
+    uid: a26440b5-737a-4ab5-b3b3-53e427983dbb
+- apiVersion: v1
+  data:
+    alertmanager.yml: |
+      global: {}
+      receivers:
+      - name: default-receiver
+      route:
+        group_interval: 5m
+        group_wait: 10s
+        receiver: default-receiver
+        repeat_interval: 3h
+      templates:
+      - /etc/alertmanager/*.tmpl
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: prometheus:/ConfigMap:monitoring/prometheus-alertmanager
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"alertmanager.yml":"global: {}\nreceivers:\n- name: default-receiver\nroute:\n  group_interval: 5m\n  group_wait: 10s\n  receiver: default-receiver\n  repeat_interval: 3h\ntemplates:\n- /etc/alertmanager/*.tmpl\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"prometheus:/ConfigMap:monitoring/prometheus-alertmanager"},"labels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"alertmanager","app.kubernetes.io/version":"v0.30.1","helm.sh/chart":"alertmanager-1.31.1"},"name":"prometheus-alertmanager","namespace":"monitoring"}}
+    creationTimestamp: "2026-01-19T05:06:29Z"
+    labels:
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: alertmanager
+      app.kubernetes.io/version: v0.30.1
+      helm.sh/chart: alertmanager-1.31.1
+    name: prometheus-alertmanager
+    namespace: monitoring
+    resourceVersion: "805"
+    uid: c0304a25-39fb-4b85-be53-c5e3670f85f0
+- apiVersion: v1
+  data:
+    alerting_rules.yml: |
+      {}
+    alerts: |
+      {}
+    allow-snippet-annotations: "false"
+    prometheus.yml: |
+      global:
+        evaluation_interval: 1m
+        scrape_interval: 1m
+        scrape_timeout: 10s
+      scrape_configs:
+      - job_name: kubernetes-api-servers
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - action: keep
+          regex: default;kubernetes;https
+          source_labels:
+          - __meta_kubernetes_namespace
+          - __meta_kubernetes_service_name
+          - __meta_kubernetes_endpoint_port_name
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      - job_name: kubernetes-nodes
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - replacement: kubernetes.default.svc:443
+          target_label: __address__
+        - regex: (.+)
+          replacement: /api/v1/nodes/$1/proxy/metrics
+          source_labels:
+          - __meta_kubernetes_node_name
+          target_label: __metrics_path__
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      - job_name: kubernetes-nodes-cadvisor
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - replacement: kubernetes.default.svc:443
+          target_label: __address__
+        - regex: (.+)
+          replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+          source_labels:
+          - __meta_kubernetes_node_name
+          target_label: __metrics_path__
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      - job_name: kubernetes-pods
+        honor_labels: true
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        - action: drop
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (\d+);(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})
+          replacement: '[$2]:$1'
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+          - __meta_kubernetes_pod_ip
+          target_label: __address__
+        - action: replace
+          regex: (\d+);((([0-9]+?)(\.|$)){4})
+          replacement: $2:$1
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+          - __meta_kubernetes_pod_ip
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_name
+          target_label: pod
+        - action: drop
+          regex: Pending|Succeeded|Failed|Completed
+          source_labels:
+          - __meta_kubernetes_pod_phase
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_node_name
+          target_label: node
+      - job_name: kubernetes-pods-slow
+        honor_labels: true
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (\d+);(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})
+          replacement: '[$2]:$1'
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+          - __meta_kubernetes_pod_ip
+          target_label: __address__
+        - action: replace
+          regex: (\d+);((([0-9]+?)(\.|$)){4})
+          replacement: $2:$1
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+          - __meta_kubernetes_pod_ip
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_name
+          target_label: pod
+        - action: drop
+          regex: Pending|Succeeded|Failed|Completed
+          source_labels:
+          - __meta_kubernetes_pod_phase
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_node_name
+          target_label: node
+        scrape_interval: 5m
+        scrape_timeout: 30s
+      - job_name: kubernetes-service-endpoints
+        honor_labels: true
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scrape
+        - action: drop
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (.+?)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+          - __address__
+          - __meta_kubernetes_service_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_service_name
+          target_label: service
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_node_name
+          target_label: node
+      - job_name: kubernetes-service-endpoints-slow
+        honor_labels: true
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (.+?)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+          - __address__
+          - __meta_kubernetes_service_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_service_name
+          target_label: service
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_node_name
+          target_label: node
+        scrape_interval: 5m
+        scrape_timeout: 30s
+      - job_name: kubernetes-services
+        honor_labels: true
+        kubernetes_sd_configs:
+        - role: service
+        metrics_path: /probe
+        params:
+          module:
+          - http_2xx
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_probe
+        - source_labels:
+          - __address__
+          target_label: __param_target
+        - replacement: blackbox
+          target_label: __address__
+        - source_labels:
+          - __param_target
+          target_label: instance
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - source_labels:
+          - __meta_kubernetes_service_name
+          target_label: service
+      - job_name: prometheus
+        static_configs:
+        - targets:
+          - localhost:9090
+      - job_name: prometheus-pushgateway
+        honor_labels: true
+        kubernetes_sd_configs:
+        - role: service
+        relabel_configs:
+        - action: keep
+          regex: pushgateway
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_probe
+      - job_name: trident-qnap
+        static_configs:
+        - targets:
+          - trident-csi.trident.svc.cluster.local:9220
+
+      rule_files:
+      - /etc/config/recording_rules.yml
+      - /etc/config/alerting_rules.yml
+      - /etc/config/rules
+      - /etc/config/alerts
+      alerting:
+        alertmanagers:
+        - kubernetes_sd_configs:
+            - role: pod
+          tls_config:
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace]
+            regex: monitoring
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+            regex: prometheus
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+            regex: alertmanager
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_container_port_number]
+            regex: "9093"
+            action: keep
+    recording_rules.yml: |
+      {}
+    rules: |
+      {}
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: prometheus:/ConfigMap:monitoring/prometheus-server
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"alerting_rules.yml":"{}\n","alerts":"{}\n","allow-snippet-annotations":"false","prometheus.yml":"global:\n  evaluation_interval: 1m\n  scrape_interval: 1m\n  scrape_timeout: 10s\nscrape_configs:\n- job_name: kubernetes-api-servers\n  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n  kubernetes_sd_configs:\n  - role: endpoints\n  relabel_configs:\n  - action: keep\n    regex: default;kubernetes;https\n    source_labels:\n    - __meta_kubernetes_namespace\n    - __meta_kubernetes_service_name\n    - __meta_kubernetes_endpoint_port_name\n  scheme: https\n  tls_config:\n    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n- job_name: kubernetes-nodes\n  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n  kubernetes_sd_configs:\n  - role: node\n  relabel_configs:\n  - action: labelmap\n    regex: __meta_kubernetes_node_label_(.+)\n  - replacement: kubernetes.default.svc:443\n    target_label: __address__\n  - regex: (.+)\n    replacement: /api/v1/nodes/$1/proxy/metrics\n    source_labels:\n    - __meta_kubernetes_node_name\n    target_label: __metrics_path__\n  scheme: https\n  tls_config:\n    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n- job_name: kubernetes-nodes-cadvisor\n  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n  kubernetes_sd_configs:\n  - role: node\n  relabel_configs:\n  - action: labelmap\n    regex: __meta_kubernetes_node_label_(.+)\n  - replacement: kubernetes.default.svc:443\n    target_label: __address__\n  - regex: (.+)\n    replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor\n    source_labels:\n    - __meta_kubernetes_node_name\n    target_label: __metrics_path__\n  scheme: https\n  tls_config:\n    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n- job_name: kubernetes-pods\n  honor_labels: true\n  kubernetes_sd_configs:\n  - role: pod\n  relabel_configs:\n  - action: keep\n    regex: true\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_scrape\n  - action: drop\n    regex: true\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow\n  - action: replace\n    regex: (https?)\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_scheme\n    target_label: __scheme__\n  - action: replace\n    regex: (.+)\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_path\n    target_label: __metrics_path__\n  - action: replace\n    regex: (\\d+);(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})\n    replacement: '[$2]:$1'\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_port\n    - __meta_kubernetes_pod_ip\n    target_label: __address__\n  - action: replace\n    regex: (\\d+);((([0-9]+?)(\\.|$)){4})\n    replacement: $2:$1\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_port\n    - __meta_kubernetes_pod_ip\n    target_label: __address__\n  - action: labelmap\n    regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)\n    replacement: __param_$1\n  - action: labelmap\n    regex: __meta_kubernetes_pod_label_(.+)\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_namespace\n    target_label: namespace\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_pod_name\n    target_label: pod\n  - action: drop\n    regex: Pending|Succeeded|Failed|Completed\n    source_labels:\n    - __meta_kubernetes_pod_phase\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_pod_node_name\n    target_label: node\n- job_name: kubernetes-pods-slow\n  honor_labels: true\n  kubernetes_sd_configs:\n  - role: pod\n  relabel_configs:\n  - action: keep\n    regex: true\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow\n  - action: replace\n    regex: (https?)\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_scheme\n    target_label: __scheme__\n  - action: replace\n    regex: (.+)\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_path\n    target_label: __metrics_path__\n  - action: replace\n    regex: (\\d+);(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})\n    replacement: '[$2]:$1'\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_port\n    - __meta_kubernetes_pod_ip\n    target_label: __address__\n  - action: replace\n    regex: (\\d+);((([0-9]+?)(\\.|$)){4})\n    replacement: $2:$1\n    source_labels:\n    - __meta_kubernetes_pod_annotation_prometheus_io_port\n    - __meta_kubernetes_pod_ip\n    target_label: __address__\n  - action: labelmap\n    regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)\n    replacement: __param_$1\n  - action: labelmap\n    regex: __meta_kubernetes_pod_label_(.+)\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_namespace\n    target_label: namespace\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_pod_name\n    target_label: pod\n  - action: drop\n    regex: Pending|Succeeded|Failed|Completed\n    source_labels:\n    - __meta_kubernetes_pod_phase\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_pod_node_name\n    target_label: node\n  scrape_interval: 5m\n  scrape_timeout: 30s\n- job_name: kubernetes-service-endpoints\n  honor_labels: true\n  kubernetes_sd_configs:\n  - role: endpoints\n  relabel_configs:\n  - action: keep\n    regex: true\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_scrape\n  - action: drop\n    regex: true\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow\n  - action: replace\n    regex: (https?)\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_scheme\n    target_label: __scheme__\n  - action: replace\n    regex: (.+)\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_path\n    target_label: __metrics_path__\n  - action: replace\n    regex: (.+?)(?::\\d+)?;(\\d+)\n    replacement: $1:$2\n    source_labels:\n    - __address__\n    - __meta_kubernetes_service_annotation_prometheus_io_port\n    target_label: __address__\n  - action: labelmap\n    regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)\n    replacement: __param_$1\n  - action: labelmap\n    regex: __meta_kubernetes_service_label_(.+)\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_namespace\n    target_label: namespace\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_service_name\n    target_label: service\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_pod_node_name\n    target_label: node\n- job_name: kubernetes-service-endpoints-slow\n  honor_labels: true\n  kubernetes_sd_configs:\n  - role: endpoints\n  relabel_configs:\n  - action: keep\n    regex: true\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow\n  - action: replace\n    regex: (https?)\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_scheme\n    target_label: __scheme__\n  - action: replace\n    regex: (.+)\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_path\n    target_label: __metrics_path__\n  - action: replace\n    regex: (.+?)(?::\\d+)?;(\\d+)\n    replacement: $1:$2\n    source_labels:\n    - __address__\n    - __meta_kubernetes_service_annotation_prometheus_io_port\n    target_label: __address__\n  - action: labelmap\n    regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)\n    replacement: __param_$1\n  - action: labelmap\n    regex: __meta_kubernetes_service_label_(.+)\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_namespace\n    target_label: namespace\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_service_name\n    target_label: service\n  - action: replace\n    source_labels:\n    - __meta_kubernetes_pod_node_name\n    target_label: node\n  scrape_interval: 5m\n  scrape_timeout: 30s\n- job_name: kubernetes-services\n  honor_labels: true\n  kubernetes_sd_configs:\n  - role: service\n  metrics_path: /probe\n  params:\n    module:\n    - http_2xx\n  relabel_configs:\n  - action: keep\n    regex: true\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_probe\n  - source_labels:\n    - __address__\n    target_label: __param_target\n  - replacement: blackbox\n    target_label: __address__\n  - source_labels:\n    - __param_target\n    target_label: instance\n  - action: labelmap\n    regex: __meta_kubernetes_service_label_(.+)\n  - source_labels:\n    - __meta_kubernetes_namespace\n    target_label: namespace\n  - source_labels:\n    - __meta_kubernetes_service_name\n    target_label: service\n- job_name: prometheus\n  static_configs:\n  - targets:\n    - localhost:9090\n- job_name: prometheus-pushgateway\n  honor_labels: true\n  kubernetes_sd_configs:\n  - role: service\n  relabel_configs:\n  - action: keep\n    regex: pushgateway\n    source_labels:\n    - __meta_kubernetes_service_annotation_prometheus_io_probe\n- job_name: trident-qnap\n  static_configs:\n  - targets:\n    - trident-csi.trident.svc.cluster.local:9220\n\nrule_files:\n- /etc/config/recording_rules.yml\n- /etc/config/alerting_rules.yml\n- /etc/config/rules\n- /etc/config/alerts\nalerting:\n  alertmanagers:\n  - kubernetes_sd_configs:\n      - role: pod\n    tls_config:\n      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n    relabel_configs:\n    - source_labels: [__meta_kubernetes_namespace]\n      regex: monitoring\n      action: keep\n    - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]\n      regex: prometheus\n      action: keep\n    - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]\n      regex: alertmanager\n      action: keep\n    - source_labels: [__meta_kubernetes_pod_container_port_number]\n      regex: \"9093\"\n      action: keep\n","recording_rules.yml":"{}\n","rules":"{}\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"prometheus:/ConfigMap:monitoring/prometheus-server"},"labels":{"app.kubernetes.io/component":"server","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"prometheus","app.kubernetes.io/part-of":"prometheus","app.kubernetes.io/version":"v3.9.1","helm.sh/chart":"prometheus-28.6.0"},"name":"prometheus-server","namespace":"monitoring"}}
+    creationTimestamp: "2026-01-19T05:06:29Z"
+    labels:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: prometheus
+      app.kubernetes.io/version: v3.9.1
+      helm.sh/chart: prometheus-28.6.0
+    name: prometheus-server
+    namespace: monitoring
+    resourceVersion: "874927"
+    uid: 41b2129c-5db4-4944-b4eb-9a0cb30066c6
+- apiVersion: v1
+  data:
+    trident-continental.json: "{\n  \"annotations\": {\n    \"list\": [\n      {\n
+      \       \"builtIn\": 1,\n        \"datasource\": { \"type\": \"grafana\", \"uid\":
+      \"-- Grafana --\" },\n        \"enable\": true,\n        \"hide\": true,\n        \"iconColor\":
+      \"#ff0000\",\n        \"name\": \"Annotations & Alerts\",\n        \"type\":
+      \"dashboard\"\n      }\n    ]\n  },\n  \"description\": \"The Continental -
+      QNAP Trident iSCSI Operations Center\",\n  \"editable\": true,\n  \"fiscalYearStartMonth\":
+      0,\n  \"graphTooltip\": 1,\n  \"links\": [],\n  \"panels\": [\n    {\n      \"collapsed\":
+      false,\n      \"gridPos\": { \"h\": 1, \"w\": 24, \"x\": 0, \"y\": 0 },\n      \"id\":
+      100,\n      \"panels\": [],\n      \"title\": \"⚔️ THE CONTINENTAL - Command
+      Center\",\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"mappings\":
+      [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":
+      [\n              { \"color\": \"#ff0055\", \"value\": null },\n              {
+      \"color\": \"#00fff2\", \"value\": 10 }\n            ]\n          },\n          \"unit\":
+      \"none\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\":
+      { \"h\": 4, \"w\": 4, \"x\": 0, \"y\": 1 },\n      \"id\": 1,\n      \"options\":
+      {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\",\n        \"justifyMode\":
+      \"center\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\":
+      { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"textMode\":
+      \"auto\"\n      },\n      \"pluginVersion\": \"10.0.0\",\n      \"targets\":
+      [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\":
+      \"${datasource}\" },\n          \"expr\": \"trident_node_count\",\n          \"refId\":
+      \"A\"\n        }\n      ],\n      \"title\": \"\U0001F5E1️ ACTIVE AGENTS\",\n
+      \     \"type\": \"stat\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\",
+      \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"mappings\":
+      [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":
+      [\n              { \"color\": \"#ff0055\", \"value\": null },\n              {
+      \"color\": \"#bf00ff\", \"value\": 20 }\n            ]\n          },\n          \"unit\":
+      \"none\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\":
+      { \"h\": 4, \"w\": 4, \"x\": 4, \"y\": 1 },\n      \"id\": 2,\n      \"options\":
+      {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\",\n        \"justifyMode\":
+      \"center\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\":
+      { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"textMode\":
+      \"auto\"\n      },\n      \"pluginVersion\": \"10.0.0\",\n      \"targets\":
+      [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\":
+      \"${datasource}\" },\n          \"expr\": \"trident_volume_count\",\n          \"refId\":
+      \"A\"\n        }\n      ],\n      \"title\": \"\U0001F4DC ACTIVE CONTRACTS\",\n
+      \     \"type\": \"stat\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\",
+      \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"mappings\":
+      [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":
+      [\n              { \"color\": \"#00fff2\", \"value\": null }\n            ]\n
+      \         },\n          \"unit\": \"decbytes\"\n        },\n        \"overrides\":
+      []\n      },\n      \"gridPos\": { \"h\": 4, \"w\": 4, \"x\": 8, \"y\": 1 },\n
+      \     \"id\": 3,\n      \"options\": {\n        \"colorMode\": \"value\",\n
+      \       \"graphMode\": \"none\",\n        \"justifyMode\": \"center\",\n        \"orientation\":
+      \"auto\",\n        \"reduceOptions\": { \"calcs\": [\"lastNotNull\"], \"fields\":
+      \"\", \"values\": false },\n        \"textMode\": \"auto\"\n      },\n      \"pluginVersion\":
+      \"10.0.0\",\n      \"targets\": [\n        {\n          \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\": \"trident_volume_total_bytes\",\n
+      \         \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"\U0001F4B0
+      TOTAL BOUNTY\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\":
+      {\n        \"defaults\": {\n          \"color\": { \"mode\": \"thresholds\"
+      },\n          \"mappings\": [],\n          \"thresholds\": {\n            \"mode\":
+      \"absolute\",\n            \"steps\": [\n              { \"color\": \"#00ff00\",
+      \"value\": null },\n              { \"color\": \"#ff0055\", \"value\": 0 }\n
+      \           ]\n          },\n          \"unit\": \"none\"\n        },\n        \"overrides\":
+      []\n      },\n      \"gridPos\": { \"h\": 4, \"w\": 4, \"x\": 12, \"y\": 1 },\n
+      \     \"id\": 4,\n      \"options\": {\n        \"colorMode\": \"value\",\n
+      \       \"graphMode\": \"none\",\n        \"justifyMode\": \"center\",\n        \"orientation\":
+      \"auto\",\n        \"reduceOptions\": { \"calcs\": [\"lastNotNull\"], \"fields\":
+      \"\", \"values\": false },\n        \"textMode\": \"auto\"\n      },\n      \"pluginVersion\":
+      \"10.0.0\",\n      \"targets\": [\n        {\n          \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\": \"trident_backend_count{backend_state=\\\"online\\\"}\",\n
+      \         \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"\U0001F3DB️
+      HIGH TABLE STATUS\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\":
+      {\n        \"defaults\": {\n          \"color\": { \"mode\": \"thresholds\"
+      },\n          \"mappings\": [],\n          \"thresholds\": {\n            \"mode\":
+      \"absolute\",\n            \"steps\": [\n              { \"color\": \"#bf00ff\",
+      \"value\": null }\n            ]\n          },\n          \"unit\": \"none\"\n
+      \       },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\":
+      4, \"w\": 4, \"x\": 16, \"y\": 1 },\n      \"id\": 5,\n      \"options\": {\n
+      \       \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\":
+      \"center\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\":
+      { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"textMode\":
+      \"auto\"\n      },\n      \"pluginVersion\": \"10.0.0\",\n      \"targets\":
+      [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\":
+      \"${datasource}\" },\n          \"expr\": \"sum(increase(trident_operation_duration_milliseconds_count{operation=\\\"volume_publish\\\"}[24h]))\",\n
+      \         \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"⚡ EXECUTIONS
+      (24h)\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"mappings\":
+      [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":
+      [\n              { \"color\": \"#00fff2\", \"value\": null }\n            ]\n
+      \         },\n          \"unit\": \"none\"\n        },\n        \"overrides\":
+      []\n      },\n      \"gridPos\": { \"h\": 4, \"w\": 4, \"x\": 20, \"y\": 1 },\n
+      \     \"id\": 6,\n      \"options\": {\n        \"colorMode\": \"value\",\n
+      \       \"graphMode\": \"none\",\n        \"justifyMode\": \"center\",\n        \"orientation\":
+      \"auto\",\n        \"reduceOptions\": { \"calcs\": [\"lastNotNull\"], \"fields\":
+      \"\", \"values\": false },\n        \"textMode\": \"auto\"\n      },\n      \"pluginVersion\":
+      \"10.0.0\",\n      \"targets\": [\n        {\n          \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\": \"trident_storageclass_count\",\n
+      \         \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"\U0001F3AD
+      WEAPON CLASSES\",\n      \"type\": \"stat\"\n    },\n    {\n      \"collapsed\":
+      false,\n      \"gridPos\": { \"h\": 1, \"w\": 24, \"x\": 0, \"y\": 5 },\n      \"id\":
+      101,\n      \"panels\": [],\n      \"title\": \"\U0001F3AF AGENT NETWORK - Node
+      Status\",\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\":
+      {\n            \"hideFrom\": { \"legend\": false, \"tooltip\": false, \"viz\":
+      false }\n          },\n          \"mappings\": []\n        },\n        \"overrides\":
+      [\n          {\n            \"matcher\": { \"id\": \"byName\", \"options\":
+      \"online\" },\n            \"properties\": [{ \"id\": \"color\", \"value\":
+      { \"fixedColor\": \"#00fff2\", \"mode\": \"fixed\" } }]\n          }\n        ]\n
+      \     },\n      \"gridPos\": { \"h\": 8, \"w\": 8, \"x\": 0, \"y\": 6 },\n      \"id\":
+      10,\n      \"options\": {\n        \"displayLabels\": [\"name\", \"value\"],\n
+      \       \"legend\": { \"displayMode\": \"list\", \"placement\": \"bottom\",
+      \"showLegend\": true },\n        \"pieType\": \"donut\",\n        \"reduceOptions\":
+      { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"tooltip\":
+      { \"mode\": \"single\", \"sort\": \"none\" }\n      },\n      \"targets\": [\n
+      \       {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n          \"expr\": \"count(kube_pod_info{namespace=\\\"trident\\\", pod=~\\\"trident-node.*\\\"})
+      by (node)\",\n          \"legendFormat\": \"{{node}}\",\n          \"refId\":
+      \"A\"\n        }\n      ],\n      \"title\": \"\U0001F5E1️ AGENT DISTRIBUTION\",\n
+      \     \"type\": \"piechart\"\n    },\n    {\n      \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"custom\":
+      {\n            \"align\": \"auto\",\n            \"cellOptions\": { \"type\":
+      \"color-text\" },\n            \"inspect\": false\n          },\n          \"mappings\":
+      [\n            { \"options\": { \"1\": { \"color\": \"#00fff2\", \"index\":
+      0, \"text\": \"ACTIVE\" } }, \"type\": \"value\" },\n            { \"options\":
+      { \"0\": { \"color\": \"#ff0055\", \"index\": 1, \"text\": \"INACTIVE\" } },
+      \"type\": \"value\" }\n          ],\n          \"thresholds\": {\n            \"mode\":
+      \"absolute\",\n            \"steps\": [\n              { \"color\": \"#ff0055\",
+      \"value\": null },\n              { \"color\": \"#00fff2\", \"value\": 1 }\n
+      \           ]\n          }\n        },\n        \"overrides\": [\n          {\n
+      \           \"matcher\": { \"id\": \"byName\", \"options\": \"Agent\" },\n            \"properties\":
+      [{ \"id\": \"custom.width\", \"value\": 150 }]\n          }\n        ]\n      },\n
+      \     \"gridPos\": { \"h\": 8, \"w\": 8, \"x\": 8, \"y\": 6 },\n      \"id\":
+      11,\n      \"options\": {\n        \"cellHeight\": \"sm\",\n        \"footer\":
+      { \"countRows\": false, \"fields\": \"\", \"reducer\": [\"sum\"], \"show\":
+      false },\n        \"showHeader\": true\n      },\n      \"pluginVersion\": \"10.0.0\",\n
+      \     \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\",
+      \"uid\": \"${datasource}\" },\n          \"expr\": \"sum by (node) (kube_pod_status_ready{namespace=\\\"trident\\\",
+      pod=~\\\"trident-node.*\\\", condition=\\\"true\\\"})\",\n          \"format\":
+      \"table\",\n          \"instant\": true,\n          \"refId\": \"A\"\n        }\n
+      \     ],\n      \"title\": \"\U0001F4CB AGENT ROSTER\",\n      \"transformations\":
+      [\n        { \"id\": \"organize\", \"options\": { \"excludeByName\": { \"Time\":
+      true }, \"renameByName\": { \"Value\": \"Status\", \"node\": \"Agent\" } } }\n
+      \     ],\n      \"type\": \"table\"\n    },\n    {\n      \"datasource\": {
+      \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\":
+      {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\"
+      },\n          \"custom\": {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\":
+      false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\":
+      \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\":
+      0,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 20,\n
+      \           \"gradientMode\": \"opacity\",\n            \"hideFrom\": { \"legend\":
+      false, \"tooltip\": false, \"viz\": false },\n            \"insertNulls\": false,\n
+      \           \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n
+      \           \"pointSize\": 5,\n            \"scaleDistribution\": { \"type\":
+      \"linear\" },\n            \"showPoints\": \"auto\",\n            \"spanNulls\":
+      false,\n            \"stacking\": { \"group\": \"A\", \"mode\": \"none\" },\n
+      \           \"thresholdsStyle\": { \"mode\": \"off\" }\n          },\n          \"mappings\":
+      [],\n          \"thresholds\": { \"mode\": \"absolute\", \"steps\": [{ \"color\":
+      \"green\", \"value\": null }] }\n        },\n        \"overrides\": []\n      },\n
+      \     \"gridPos\": { \"h\": 8, \"w\": 8, \"x\": 16, \"y\": 6 },\n      \"id\":
+      12,\n      \"options\": {\n        \"legend\": { \"calcs\": [], \"displayMode\":
+      \"list\", \"placement\": \"bottom\", \"showLegend\": true },\n        \"tooltip\":
+      { \"mode\": \"single\", \"sort\": \"none\" }\n      },\n      \"targets\": [\n
+      \       {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n          \"expr\": \"sum(rate(trident_rest_ops_total[5m])) by (route)\",\n
+      \         \"legendFormat\": \"{{route}}\",\n          \"refId\": \"A\"\n        }\n
+      \     ],\n      \"title\": \"\U0001F4E1 COMMS ACTIVITY\",\n      \"type\": \"timeseries\"\n
+      \   },\n    {\n      \"collapsed\": false,\n      \"gridPos\": { \"h\": 1, \"w\":
+      24, \"x\": 0, \"y\": 14 },\n      \"id\": 102,\n      \"panels\": [],\n      \"title\":
+      \"\U0001F4DC CONTRACT REGISTRY - Volume Operations\",\n      \"type\": \"row\"\n
+      \   },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\":
+      { \"mode\": \"palette-classic\" },\n          \"custom\": {\n            \"axisBorderShow\":
+      false,\n            \"axisCenteredZero\": false,\n            \"axisColorMode\":
+      \"text\",\n            \"axisLabel\": \"\",\n            \"axisPlacement\":
+      \"auto\",\n            \"barAlignment\": 0,\n            \"drawStyle\": \"bars\",\n
+      \           \"fillOpacity\": 80,\n            \"gradientMode\": \"hue\",\n            \"hideFrom\":
+      { \"legend\": false, \"tooltip\": false, \"viz\": false },\n            \"insertNulls\":
+      false,\n            \"lineInterpolation\": \"linear\",\n            \"lineWidth\":
+      1,\n            \"pointSize\": 5,\n            \"scaleDistribution\": { \"type\":
+      \"linear\" },\n            \"showPoints\": \"never\",\n            \"spanNulls\":
+      false,\n            \"stacking\": { \"group\": \"A\", \"mode\": \"normal\" },\n
+      \           \"thresholdsStyle\": { \"mode\": \"off\" }\n          },\n          \"mappings\":
+      [],\n          \"thresholds\": { \"mode\": \"absolute\", \"steps\": [{ \"color\":
+      \"green\", \"value\": null }] },\n          \"unit\": \"short\"\n        },\n
+      \       \"overrides\": [\n          {\n            \"matcher\": { \"id\": \"byRegexp\",
+      \"options\": \".*success.*\" },\n            \"properties\": [{ \"id\": \"color\",
+      \"value\": { \"fixedColor\": \"#00fff2\", \"mode\": \"fixed\" } }]\n          },\n
+      \         {\n            \"matcher\": { \"id\": \"byRegexp\", \"options\": \".*false.*\"
+      },\n            \"properties\": [{ \"id\": \"color\", \"value\": { \"fixedColor\":
+      \"#ff0055\", \"mode\": \"fixed\" } }]\n          }\n        ]\n      },\n      \"gridPos\":
+      { \"h\": 8, \"w\": 12, \"x\": 0, \"y\": 15 },\n      \"id\": 20,\n      \"options\":
+      {\n        \"legend\": { \"calcs\": [\"sum\"], \"displayMode\": \"table\", \"placement\":
+      \"right\", \"showLegend\": true },\n        \"tooltip\": { \"mode\": \"multi\",
+      \"sort\": \"desc\" }\n      },\n      \"targets\": [\n        {\n          \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\":
+      \"increase(trident_operation_duration_milliseconds_count{operation=~\\\"volume.*\\\"}[1h])\",\n
+      \         \"legendFormat\": \"{{operation}} ({{success}})\",\n          \"refId\":
+      \"A\"\n        }\n      ],\n      \"title\": \"⚔️ KILL COUNT - Volume Operations\",\n
+      \     \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"mappings\":
+      [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":
+      [\n              { \"color\": \"#00fff2\", \"value\": null },\n              {
+      \"color\": \"#ffff00\", \"value\": 1000 },\n              { \"color\": \"#ff0055\",
+      \"value\": 5000 }\n            ]\n          },\n          \"unit\": \"ms\"\n
+      \       },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\":
+      8, \"w\": 12, \"x\": 12, \"y\": 15 },\n      \"id\": 21,\n      \"options\":
+      {\n        \"displayMode\": \"lcd\",\n        \"maxVizHeight\": 300,\n        \"minVizHeight\":
+      16,\n        \"minVizWidth\": 8,\n        \"namePlacement\": \"auto\",\n        \"orientation\":
+      \"horizontal\",\n        \"reduceOptions\": { \"calcs\": [\"mean\"], \"fields\":
+      \"\", \"values\": false },\n        \"showUnfilled\": true,\n        \"sizing\":
+      \"auto\",\n        \"valueMode\": \"color\"\n      },\n      \"pluginVersion\":
+      \"10.0.0\",\n      \"targets\": [\n        {\n          \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\": \"trident_operation_duration_milliseconds_sum{operation=~\\\"volume.*\\\"}
+      / trident_operation_duration_milliseconds_count{operation=~\\\"volume.*\\\"}\",\n
+      \         \"legendFormat\": \"{{operation}}\",\n          \"refId\": \"A\"\n
+      \       }\n      ],\n      \"title\": \"⏱️ EXECUTION TIME - Avg Latency\",\n
+      \     \"type\": \"bargauge\"\n    },\n    {\n      \"collapsed\": false,\n      \"gridPos\":
+      { \"h\": 1, \"w\": 24, \"x\": 0, \"y\": 23 },\n      \"id\": 103,\n      \"panels\":
+      [],\n      \"title\": \"\U0001F4B0 ARSENAL - Storage Capacity\",\n      \"type\":
+      \"row\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\":
+      \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\":
+      { \"mode\": \"thresholds\" },\n          \"mappings\": [],\n          \"max\":
+      10000000000000,\n          \"min\": 0,\n          \"thresholds\": {\n            \"mode\":
+      \"percentage\",\n            \"steps\": [\n              { \"color\": \"#00fff2\",
+      \"value\": null },\n              { \"color\": \"#bf00ff\", \"value\": 50 },\n
+      \             { \"color\": \"#ff0055\", \"value\": 80 }\n            ]\n          },\n
+      \         \"unit\": \"decbytes\"\n        },\n        \"overrides\": []\n      },\n
+      \     \"gridPos\": { \"h\": 6, \"w\": 8, \"x\": 0, \"y\": 24 },\n      \"id\":
+      30,\n      \"options\": {\n        \"minVizHeight\": 75,\n        \"minVizWidth\":
+      75,\n        \"orientation\": \"auto\",\n        \"reduceOptions\": { \"calcs\":
+      [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"showThresholdLabels\":
+      false,\n        \"showThresholdMarkers\": true,\n        \"sizing\": \"auto\"\n
+      \     },\n      \"pluginVersion\": \"10.0.0\",\n      \"targets\": [\n        {\n
+      \         \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n          \"expr\": \"trident_volume_allocated_bytes\",\n          \"refId\":
+      \"A\"\n        }\n      ],\n      \"title\": \"\U0001F3AF ALLOCATED BOUNTY\",\n
+      \     \"type\": \"gauge\"\n    },\n    {\n      \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\":
+      {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\":
+      false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\":
+      \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\":
+      0,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 30,\n
+      \           \"gradientMode\": \"opacity\",\n            \"hideFrom\": { \"legend\":
+      false, \"tooltip\": false, \"viz\": false },\n            \"insertNulls\": false,\n
+      \           \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n
+      \           \"pointSize\": 5,\n            \"scaleDistribution\": { \"type\":
+      \"linear\" },\n            \"showPoints\": \"never\",\n            \"spanNulls\":
+      false,\n            \"stacking\": { \"group\": \"A\", \"mode\": \"none\" },\n
+      \           \"thresholdsStyle\": { \"mode\": \"off\" }\n          },\n          \"mappings\":
+      [],\n          \"thresholds\": { \"mode\": \"absolute\", \"steps\": [{ \"color\":
+      \"green\", \"value\": null }] },\n          \"unit\": \"decbytes\"\n        },\n
+      \       \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 6, \"w\": 16,
+      \"x\": 8, \"y\": 24 },\n      \"id\": 31,\n      \"options\": {\n        \"legend\":
+      { \"calcs\": [\"lastNotNull\"], \"displayMode\": \"table\", \"placement\": \"right\",
+      \"showLegend\": true },\n        \"tooltip\": { \"mode\": \"single\", \"sort\":
+      \"none\" }\n      },\n      \"targets\": [\n        {\n          \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\":
+      \"trident_volume_total_bytes\",\n          \"legendFormat\": \"Total Arsenal\",\n
+      \         \"refId\": \"A\"\n        },\n        {\n          \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\":
+      \"trident_volume_allocated_bytes\",\n          \"legendFormat\": \"Deployed\",\n
+      \         \"refId\": \"B\"\n        }\n      ],\n      \"title\": \"\U0001F4C8
+      ARSENAL GROWTH\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"collapsed\":
+      false,\n      \"gridPos\": { \"h\": 1, \"w\": 24, \"x\": 0, \"y\": 30 },\n      \"id\":
+      104,\n      \"panels\": [],\n      \"title\": \"\U0001F3DB️ THE HIGH TABLE -
+      Backend Status\",\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\":
+      {\n        \"defaults\": {\n          \"color\": { \"mode\": \"thresholds\"
+      },\n          \"custom\": {\n            \"align\": \"auto\",\n            \"cellOptions\":
+      { \"type\": \"color-background\" },\n            \"inspect\": false\n          },\n
+      \         \"mappings\": [],\n          \"thresholds\": {\n            \"mode\":
+      \"absolute\",\n            \"steps\": [\n              { \"color\": \"#1a1a2e\",
+      \"value\": null }\n            ]\n          }\n        },\n        \"overrides\":
+      [\n          {\n            \"matcher\": { \"id\": \"byName\", \"options\":
+      \"Status\" },\n            \"properties\": [\n              {\n                \"id\":
+      \"mappings\",\n                \"value\": [\n                  { \"options\":
+      { \"1\": { \"color\": \"#00fff2\", \"index\": 0, \"text\": \"\U0001F7E2 SANCTIONED\"
+      } }, \"type\": \"value\" }\n                ]\n              },\n              {
+      \"id\": \"custom.cellOptions\", \"value\": { \"type\": \"color-text\" } }\n
+      \           ]\n          },\n          {\n            \"matcher\": { \"id\":
+      \"byName\", \"options\": \"Backend\" },\n            \"properties\": [{ \"id\":
+      \"custom.width\", \"value\": 200 }]\n          }\n        ]\n      },\n      \"gridPos\":
+      { \"h\": 6, \"w\": 12, \"x\": 0, \"y\": 31 },\n      \"id\": 40,\n      \"options\":
+      {\n        \"cellHeight\": \"md\",\n        \"footer\": { \"countRows\": false,
+      \"fields\": \"\", \"reducer\": [\"sum\"], \"show\": false },\n        \"showHeader\":
+      true\n      },\n      \"pluginVersion\": \"10.0.0\",\n      \"targets\": [\n
+      \       {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n          \"expr\": \"trident_backend_info\",\n          \"format\": \"table\",\n
+      \         \"instant\": true,\n          \"refId\": \"A\"\n        }\n      ],\n
+      \     \"title\": \"\U0001F4CB HIGH TABLE MEMBERS\",\n      \"transformations\":
+      [\n        {\n          \"id\": \"organize\",\n          \"options\": {\n            \"excludeByName\":
+      { \"Time\": true, \"backend_uuid\": true },\n            \"renameByName\": {
+      \"Value\": \"Status\", \"backend_name\": \"Backend\", \"backend_type\": \"Type\"
+      }\n          }\n        }\n      ],\n      \"type\": \"table\"\n    },\n    {\n
+      \     \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\":
+      { \"mode\": \"thresholds\" },\n          \"mappings\": [],\n          \"thresholds\":
+      {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {
+      \"color\": \"#ff0055\", \"value\": null },\n              { \"color\": \"#00fff2\",
+      \"value\": 1 }\n            ]\n          },\n          \"unit\": \"short\"\n
+      \       },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\":
+      6, \"w\": 6, \"x\": 12, \"y\": 31 },\n      \"id\": 41,\n      \"options\":
+      {\n        \"colorMode\": \"background\",\n        \"graphMode\": \"none\",\n
+      \       \"justifyMode\": \"center\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\":
+      { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"textMode\":
+      \"auto\"\n      },\n      \"pluginVersion\": \"10.0.0\",\n      \"targets\":
+      [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\":
+      \"${datasource}\" },\n          \"expr\": \"trident_backend_count{backend_state=\\\"online\\\"}\",\n
+      \         \"legendFormat\": \"Online\",\n          \"refId\": \"A\"\n        }\n
+      \     ],\n      \"title\": \"✅ SANCTIONED\",\n      \"type\": \"stat\"\n    },\n
+      \   {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\":
+      { \"mode\": \"thresholds\" },\n          \"mappings\": [],\n          \"thresholds\":
+      {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {
+      \"color\": \"#00fff2\", \"value\": null },\n              { \"color\": \"#ff0055\",
+      \"value\": 1 }\n            ]\n          },\n          \"unit\": \"short\"\n
+      \       },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\":
+      6, \"w\": 6, \"x\": 18, \"y\": 31 },\n      \"id\": 42,\n      \"options\":
+      {\n        \"colorMode\": \"background\",\n        \"graphMode\": \"none\",\n
+      \       \"justifyMode\": \"center\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\":
+      { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"textMode\":
+      \"auto\"\n      },\n      \"pluginVersion\": \"10.0.0\",\n      \"targets\":
+      [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\":
+      \"${datasource}\" },\n          \"expr\": \"trident_backend_count{backend_state=\\\"offline\\\"}
+      or vector(0)\",\n          \"legendFormat\": \"Offline\",\n          \"refId\":
+      \"A\"\n        }\n      ],\n      \"title\": \"❌ EXCOMMUNICADO\",\n      \"type\":
+      \"stat\"\n    },\n    {\n      \"collapsed\": false,\n      \"gridPos\": { \"h\":
+      1, \"w\": 24, \"x\": 0, \"y\": 37 },\n      \"id\": 105,\n      \"panels\":
+      [],\n      \"title\": \"\U0001F525 MISSION LOG - System Health\",\n      \"type\":
+      \"row\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\":
+      \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\":
+      { \"mode\": \"palette-classic\" },\n          \"custom\": {\n            \"axisBorderShow\":
+      false,\n            \"axisCenteredZero\": false,\n            \"axisColorMode\":
+      \"text\",\n            \"axisLabel\": \"\",\n            \"axisPlacement\":
+      \"auto\",\n            \"barAlignment\": 0,\n            \"drawStyle\": \"line\",\n
+      \           \"fillOpacity\": 10,\n            \"gradientMode\": \"none\",\n
+      \           \"hideFrom\": { \"legend\": false, \"tooltip\": false, \"viz\":
+      false },\n            \"insertNulls\": false,\n            \"lineInterpolation\":
+      \"smooth\",\n            \"lineWidth\": 2,\n            \"pointSize\": 5,\n
+      \           \"scaleDistribution\": { \"type\": \"linear\" },\n            \"showPoints\":
+      \"never\",\n            \"spanNulls\": false,\n            \"stacking\": { \"group\":
+      \"A\", \"mode\": \"none\" },\n            \"thresholdsStyle\": { \"mode\": \"off\"
+      }\n          },\n          \"mappings\": [],\n          \"thresholds\": { \"mode\":
+      \"absolute\", \"steps\": [{ \"color\": \"green\", \"value\": null }] },\n          \"unit\":
+      \"decbytes\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\":
+      { \"h\": 6, \"w\": 8, \"x\": 0, \"y\": 38 },\n      \"id\": 50,\n      \"options\":
+      {\n        \"legend\": { \"calcs\": [\"lastNotNull\"], \"displayMode\": \"list\",
+      \"placement\": \"bottom\", \"showLegend\": true },\n        \"tooltip\": { \"mode\":
+      \"single\", \"sort\": \"none\" }\n      },\n      \"targets\": [\n        {\n
+      \         \"datasource\": { \"type\": \"prometheus\", \"uid\": \"${datasource}\"
+      },\n          \"expr\": \"process_resident_memory_bytes{job=\\\"trident\\\"}\",\n
+      \         \"legendFormat\": \"Controller Memory\",\n          \"refId\": \"A\"\n
+      \       }\n      ],\n      \"title\": \"\U0001F9E0 CONTROLLER MEMORY\",\n      \"type\":
+      \"timeseries\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\",
+      \"uid\": \"${datasource}\" },\n      \"fieldConfig\": {\n        \"defaults\":
+      {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\":
+      {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\":
+      false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\":
+      \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\":
+      0,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 10,\n
+      \           \"gradientMode\": \"none\",\n            \"hideFrom\": { \"legend\":
+      false, \"tooltip\": false, \"viz\": false },\n            \"insertNulls\": false,\n
+      \           \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n
+      \           \"pointSize\": 5,\n            \"scaleDistribution\": { \"type\":
+      \"linear\" },\n            \"showPoints\": \"never\",\n            \"spanNulls\":
+      false,\n            \"stacking\": { \"group\": \"A\", \"mode\": \"none\" },\n
+      \           \"thresholdsStyle\": { \"mode\": \"off\" }\n          },\n          \"mappings\":
+      [],\n          \"thresholds\": { \"mode\": \"absolute\", \"steps\": [{ \"color\":
+      \"green\", \"value\": null }] },\n          \"unit\": \"short\"\n        },\n
+      \       \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 6, \"w\": 8,
+      \"x\": 8, \"y\": 38 },\n      \"id\": 51,\n      \"options\": {\n        \"legend\":
+      { \"calcs\": [\"lastNotNull\"], \"displayMode\": \"list\", \"placement\": \"bottom\",
+      \"showLegend\": true },\n        \"tooltip\": { \"mode\": \"single\", \"sort\":
+      \"none\" }\n      },\n      \"targets\": [\n        {\n          \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\":
+      \"go_goroutines{job=\\\"trident\\\"}\",\n          \"legendFormat\": \"Goroutines\",\n
+      \         \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"⚡ ACTIVE
+      THREADS\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\":
+      { \"type\": \"prometheus\", \"uid\": \"${datasource}\" },\n      \"fieldConfig\":
+      {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\"
+      },\n          \"custom\": {\n            \"axisBorderShow\": false,\n            \"axisCenteredZero\":
+      false,\n            \"axisColorMode\": \"text\",\n            \"axisLabel\":
+      \"\",\n            \"axisPlacement\": \"auto\",\n            \"barAlignment\":
+      0,\n            \"drawStyle\": \"line\",\n            \"fillOpacity\": 10,\n
+      \           \"gradientMode\": \"none\",\n            \"hideFrom\": { \"legend\":
+      false, \"tooltip\": false, \"viz\": false },\n            \"insertNulls\": false,\n
+      \           \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n
+      \           \"pointSize\": 5,\n            \"scaleDistribution\": { \"type\":
+      \"linear\" },\n            \"showPoints\": \"never\",\n            \"spanNulls\":
+      false,\n            \"stacking\": { \"group\": \"A\", \"mode\": \"none\" },\n
+      \           \"thresholdsStyle\": { \"mode\": \"off\" }\n          },\n          \"mappings\":
+      [],\n          \"thresholds\": { \"mode\": \"absolute\", \"steps\": [{ \"color\":
+      \"green\", \"value\": null }] },\n          \"unit\": \"s\"\n        },\n        \"overrides\":
+      []\n      },\n      \"gridPos\": { \"h\": 6, \"w\": 8, \"x\": 16, \"y\": 38
+      },\n      \"id\": 52,\n      \"options\": {\n        \"legend\": { \"calcs\":
+      [\"lastNotNull\"], \"displayMode\": \"list\", \"placement\": \"bottom\", \"showLegend\":
+      true },\n        \"tooltip\": { \"mode\": \"single\", \"sort\": \"none\" }\n
+      \     },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\":
+      \"prometheus\", \"uid\": \"${datasource}\" },\n          \"expr\": \"rate(process_cpu_seconds_total{job=\\\"trident\\\"}[5m])\",\n
+      \         \"legendFormat\": \"CPU Usage\",\n          \"refId\": \"A\"\n        }\n
+      \     ],\n      \"title\": \"\U0001F525 CPU BURN RATE\",\n      \"type\": \"timeseries\"\n
+      \   }\n  ],\n  \"refresh\": \"30s\",\n  \"schemaVersion\": 38,\n  \"tags\":
+      [\"trident\", \"iscsi\", \"qnap\", \"storage\", \"continental\"],\n  \"templating\":
+      {\n    \"list\": [\n      {\n        \"current\": { \"selected\": false, \"text\":
+      \"prometheus\", \"value\": \"prometheus\" },\n        \"hide\": 0,\n        \"includeAll\":
+      false,\n        \"label\": \"Data Source\",\n        \"multi\": false,\n        \"name\":
+      \"datasource\",\n        \"options\": [],\n        \"query\": \"prometheus\",\n
+      \       \"refresh\": 1,\n        \"regex\": \"\",\n        \"skipUrlSync\":
+      false,\n        \"type\": \"datasource\"\n      }\n    ]\n  },\n  \"time\":
+      { \"from\": \"now-6h\", \"to\": \"now\" },\n  \"timepicker\": {},\n  \"timezone\":
+      \"\",\n  \"title\": \"⚔️ THE CONTINENTAL - Trident Operations\",\n  \"uid\":
+      \"trident-continental\",\n  \"version\": 1,\n  \"weekStart\": \"\"\n}\n"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: "{\"apiVersion\":\"v1\",\"data\":{\"trident-continental.json\":\"{\\n
+        \ \\\"annotations\\\": {\\n    \\\"list\\\": [\\n      {\\n        \\\"builtIn\\\":
+        1,\\n        \\\"datasource\\\": { \\\"type\\\": \\\"grafana\\\", \\\"uid\\\":
+        \\\"-- Grafana --\\\" },\\n        \\\"enable\\\": true,\\n        \\\"hide\\\":
+        true,\\n        \\\"iconColor\\\": \\\"#ff0000\\\",\\n        \\\"name\\\":
+        \\\"Annotations \\u0026 Alerts\\\",\\n        \\\"type\\\": \\\"dashboard\\\"\\n
+        \     }\\n    ]\\n  },\\n  \\\"description\\\": \\\"The Continental - QNAP
+        Trident iSCSI Operations Center\\\",\\n  \\\"editable\\\": true,\\n  \\\"fiscalYearStartMonth\\\":
+        0,\\n  \\\"graphTooltip\\\": 1,\\n  \\\"links\\\": [],\\n  \\\"panels\\\":
+        [\\n    {\\n      \\\"collapsed\\\": false,\\n      \\\"gridPos\\\": { \\\"h\\\":
+        1, \\\"w\\\": 24, \\\"x\\\": 0, \\\"y\\\": 0 },\\n      \\\"id\\\": 100,\\n
+        \     \\\"panels\\\": [],\\n      \\\"title\\\": \\\"⚔️ THE CONTINENTAL -
+        Command Center\\\",\\n      \\\"type\\\": \\\"row\\\"\\n    },\\n    {\\n
+        \     \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\":
+        \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#ff0055\\\",
+        \\\"value\\\": null },\\n              { \\\"color\\\": \\\"#00fff2\\\", \\\"value\\\":
+        10 }\\n            ]\\n          },\\n          \\\"unit\\\": \\\"none\\\"\\n
+        \       },\\n        \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 4, \\\"w\\\": 4, \\\"x\\\": 0, \\\"y\\\": 1 },\\n      \\\"id\\\":
+        1,\\n      \\\"options\\\": {\\n        \\\"colorMode\\\": \\\"value\\\",\\n
+        \       \\\"graphMode\\\": \\\"none\\\",\\n        \\\"justifyMode\\\": \\\"center\\\",\\n
+        \       \\\"orientation\\\": \\\"auto\\\",\\n        \\\"reduceOptions\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"fields\\\": \\\"\\\", \\\"values\\\":
+        false },\\n        \\\"textMode\\\": \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_node_count\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F5E1️ ACTIVE
+        AGENTS\\\",\\n      \\\"type\\\": \\\"stat\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\": [],\\n
+        \         \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#ff0055\\\",
+        \\\"value\\\": null },\\n              { \\\"color\\\": \\\"#bf00ff\\\", \\\"value\\\":
+        20 }\\n            ]\\n          },\\n          \\\"unit\\\": \\\"none\\\"\\n
+        \       },\\n        \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 4, \\\"w\\\": 4, \\\"x\\\": 4, \\\"y\\\": 1 },\\n      \\\"id\\\":
+        2,\\n      \\\"options\\\": {\\n        \\\"colorMode\\\": \\\"value\\\",\\n
+        \       \\\"graphMode\\\": \\\"none\\\",\\n        \\\"justifyMode\\\": \\\"center\\\",\\n
+        \       \\\"orientation\\\": \\\"auto\\\",\\n        \\\"reduceOptions\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"fields\\\": \\\"\\\", \\\"values\\\":
+        false },\\n        \\\"textMode\\\": \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_volume_count\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F4DC ACTIVE
+        CONTRACTS\\\",\\n      \\\"type\\\": \\\"stat\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\": [],\\n
+        \         \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#00fff2\\\",
+        \\\"value\\\": null }\\n            ]\\n          },\\n          \\\"unit\\\":
+        \\\"decbytes\\\"\\n        },\\n        \\\"overrides\\\": []\\n      },\\n
+        \     \\\"gridPos\\\": { \\\"h\\\": 4, \\\"w\\\": 4, \\\"x\\\": 8, \\\"y\\\":
+        1 },\\n      \\\"id\\\": 3,\\n      \\\"options\\\": {\\n        \\\"colorMode\\\":
+        \\\"value\\\",\\n        \\\"graphMode\\\": \\\"none\\\",\\n        \\\"justifyMode\\\":
+        \\\"center\\\",\\n        \\\"orientation\\\": \\\"auto\\\",\\n        \\\"reduceOptions\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"fields\\\": \\\"\\\", \\\"values\\\":
+        false },\\n        \\\"textMode\\\": \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_volume_total_bytes\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F4B0 TOTAL
+        BOUNTY\\\",\\n      \\\"type\\\": \\\"stat\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\": [],\\n
+        \         \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#00ff00\\\",
+        \\\"value\\\": null },\\n              { \\\"color\\\": \\\"#ff0055\\\", \\\"value\\\":
+        0 }\\n            ]\\n          },\\n          \\\"unit\\\": \\\"none\\\"\\n
+        \       },\\n        \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 4, \\\"w\\\": 4, \\\"x\\\": 12, \\\"y\\\": 1 },\\n      \\\"id\\\":
+        4,\\n      \\\"options\\\": {\\n        \\\"colorMode\\\": \\\"value\\\",\\n
+        \       \\\"graphMode\\\": \\\"none\\\",\\n        \\\"justifyMode\\\": \\\"center\\\",\\n
+        \       \\\"orientation\\\": \\\"auto\\\",\\n        \\\"reduceOptions\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"fields\\\": \\\"\\\", \\\"values\\\":
+        false },\\n        \\\"textMode\\\": \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_backend_count{backend_state=\\\\\\\"online\\\\\\\"}\\\",\\n
+        \         \\\"refId\\\": \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\":
+        \\\"\U0001F3DB️ HIGH TABLE STATUS\\\",\\n      \\\"type\\\": \\\"stat\\\"\\n
+        \   },\\n    {\\n      \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\",
+        \\\"uid\\\": \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#bf00ff\\\",
+        \\\"value\\\": null }\\n            ]\\n          },\\n          \\\"unit\\\":
+        \\\"none\\\"\\n        },\\n        \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 4, \\\"w\\\": 4, \\\"x\\\": 16, \\\"y\\\": 1 },\\n      \\\"id\\\":
+        5,\\n      \\\"options\\\": {\\n        \\\"colorMode\\\": \\\"value\\\",\\n
+        \       \\\"graphMode\\\": \\\"area\\\",\\n        \\\"justifyMode\\\": \\\"center\\\",\\n
+        \       \\\"orientation\\\": \\\"auto\\\",\\n        \\\"reduceOptions\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"fields\\\": \\\"\\\", \\\"values\\\":
+        false },\\n        \\\"textMode\\\": \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"sum(increase(trident_operation_duration_milliseconds_count{operation=\\\\\\\"volume_publish\\\\\\\"}[24h]))\\\",\\n
+        \         \\\"refId\\\": \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\":
+        \\\"⚡ EXECUTIONS (24h)\\\",\\n      \\\"type\\\": \\\"stat\\\"\\n    },\\n
+        \   {\\n      \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\":
+        \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#00fff2\\\",
+        \\\"value\\\": null }\\n            ]\\n          },\\n          \\\"unit\\\":
+        \\\"none\\\"\\n        },\\n        \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 4, \\\"w\\\": 4, \\\"x\\\": 20, \\\"y\\\": 1 },\\n      \\\"id\\\":
+        6,\\n      \\\"options\\\": {\\n        \\\"colorMode\\\": \\\"value\\\",\\n
+        \       \\\"graphMode\\\": \\\"none\\\",\\n        \\\"justifyMode\\\": \\\"center\\\",\\n
+        \       \\\"orientation\\\": \\\"auto\\\",\\n        \\\"reduceOptions\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"fields\\\": \\\"\\\", \\\"values\\\":
+        false },\\n        \\\"textMode\\\": \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_storageclass_count\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F3AD WEAPON
+        CLASSES\\\",\\n      \\\"type\\\": \\\"stat\\\"\\n    },\\n    {\\n      \\\"collapsed\\\":
+        false,\\n      \\\"gridPos\\\": { \\\"h\\\": 1, \\\"w\\\": 24, \\\"x\\\":
+        0, \\\"y\\\": 5 },\\n      \\\"id\\\": 101,\\n      \\\"panels\\\": [],\\n
+        \     \\\"title\\\": \\\"\U0001F3AF AGENT NETWORK - Node Status\\\",\\n      \\\"type\\\":
+        \\\"row\\\"\\n    },\\n    {\\n      \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\",
+        \\\"uid\\\": \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"palette-classic\\\" },\\n
+        \         \\\"custom\\\": {\\n            \\\"hideFrom\\\": { \\\"legend\\\":
+        false, \\\"tooltip\\\": false, \\\"viz\\\": false }\\n          },\\n          \\\"mappings\\\":
+        []\\n        },\\n        \\\"overrides\\\": [\\n          {\\n            \\\"matcher\\\":
+        { \\\"id\\\": \\\"byName\\\", \\\"options\\\": \\\"online\\\" },\\n            \\\"properties\\\":
+        [{ \\\"id\\\": \\\"color\\\", \\\"value\\\": { \\\"fixedColor\\\": \\\"#00fff2\\\",
+        \\\"mode\\\": \\\"fixed\\\" } }]\\n          }\\n        ]\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 8, \\\"w\\\": 8, \\\"x\\\": 0, \\\"y\\\": 6 },\\n      \\\"id\\\":
+        10,\\n      \\\"options\\\": {\\n        \\\"displayLabels\\\": [\\\"name\\\",
+        \\\"value\\\"],\\n        \\\"legend\\\": { \\\"displayMode\\\": \\\"list\\\",
+        \\\"placement\\\": \\\"bottom\\\", \\\"showLegend\\\": true },\\n        \\\"pieType\\\":
+        \\\"donut\\\",\\n        \\\"reduceOptions\\\": { \\\"calcs\\\": [\\\"lastNotNull\\\"],
+        \\\"fields\\\": \\\"\\\", \\\"values\\\": false },\\n        \\\"tooltip\\\":
+        { \\\"mode\\\": \\\"single\\\", \\\"sort\\\": \\\"none\\\" }\\n      },\\n
+        \     \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\": { \\\"type\\\":
+        \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n          \\\"expr\\\":
+        \\\"count(kube_pod_info{namespace=\\\\\\\"trident\\\\\\\", pod=~\\\\\\\"trident-node.*\\\\\\\"})
+        by (node)\\\",\\n          \\\"legendFormat\\\": \\\"{{node}}\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F5E1️ AGENT
+        DISTRIBUTION\\\",\\n      \\\"type\\\": \\\"piechart\\\"\\n    },\\n    {\\n
+        \     \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\":
+        \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"custom\\\":
+        {\\n            \\\"align\\\": \\\"auto\\\",\\n            \\\"cellOptions\\\":
+        { \\\"type\\\": \\\"color-text\\\" },\\n            \\\"inspect\\\": false\\n
+        \         },\\n          \\\"mappings\\\": [\\n            { \\\"options\\\":
+        { \\\"1\\\": { \\\"color\\\": \\\"#00fff2\\\", \\\"index\\\": 0, \\\"text\\\":
+        \\\"ACTIVE\\\" } }, \\\"type\\\": \\\"value\\\" },\\n            { \\\"options\\\":
+        { \\\"0\\\": { \\\"color\\\": \\\"#ff0055\\\", \\\"index\\\": 1, \\\"text\\\":
+        \\\"INACTIVE\\\" } }, \\\"type\\\": \\\"value\\\" }\\n          ],\\n          \\\"thresholds\\\":
+        {\\n            \\\"mode\\\": \\\"absolute\\\",\\n            \\\"steps\\\":
+        [\\n              { \\\"color\\\": \\\"#ff0055\\\", \\\"value\\\": null },\\n
+        \             { \\\"color\\\": \\\"#00fff2\\\", \\\"value\\\": 1 }\\n            ]\\n
+        \         }\\n        },\\n        \\\"overrides\\\": [\\n          {\\n            \\\"matcher\\\":
+        { \\\"id\\\": \\\"byName\\\", \\\"options\\\": \\\"Agent\\\" },\\n            \\\"properties\\\":
+        [{ \\\"id\\\": \\\"custom.width\\\", \\\"value\\\": 150 }]\\n          }\\n
+        \       ]\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\": 8, \\\"w\\\": 8,
+        \\\"x\\\": 8, \\\"y\\\": 6 },\\n      \\\"id\\\": 11,\\n      \\\"options\\\":
+        {\\n        \\\"cellHeight\\\": \\\"sm\\\",\\n        \\\"footer\\\": { \\\"countRows\\\":
+        false, \\\"fields\\\": \\\"\\\", \\\"reducer\\\": [\\\"sum\\\"], \\\"show\\\":
+        false },\\n        \\\"showHeader\\\": true\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"sum by (node) (kube_pod_status_ready{namespace=\\\\\\\"trident\\\\\\\",
+        pod=~\\\\\\\"trident-node.*\\\\\\\", condition=\\\\\\\"true\\\\\\\"})\\\",\\n
+        \         \\\"format\\\": \\\"table\\\",\\n          \\\"instant\\\": true,\\n
+        \         \\\"refId\\\": \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\":
+        \\\"\U0001F4CB AGENT ROSTER\\\",\\n      \\\"transformations\\\": [\\n        {
+        \\\"id\\\": \\\"organize\\\", \\\"options\\\": { \\\"excludeByName\\\": {
+        \\\"Time\\\": true }, \\\"renameByName\\\": { \\\"Value\\\": \\\"Status\\\",
+        \\\"node\\\": \\\"Agent\\\" } } }\\n      ],\\n      \\\"type\\\": \\\"table\\\"\\n
+        \   },\\n    {\\n      \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\",
+        \\\"uid\\\": \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"palette-classic\\\" },\\n
+        \         \\\"custom\\\": {\\n            \\\"axisBorderShow\\\": false,\\n
+        \           \\\"axisCenteredZero\\\": false,\\n            \\\"axisColorMode\\\":
+        \\\"text\\\",\\n            \\\"axisLabel\\\": \\\"\\\",\\n            \\\"axisPlacement\\\":
+        \\\"auto\\\",\\n            \\\"barAlignment\\\": 0,\\n            \\\"drawStyle\\\":
+        \\\"line\\\",\\n            \\\"fillOpacity\\\": 20,\\n            \\\"gradientMode\\\":
+        \\\"opacity\\\",\\n            \\\"hideFrom\\\": { \\\"legend\\\": false,
+        \\\"tooltip\\\": false, \\\"viz\\\": false },\\n            \\\"insertNulls\\\":
+        false,\\n            \\\"lineInterpolation\\\": \\\"smooth\\\",\\n            \\\"lineWidth\\\":
+        2,\\n            \\\"pointSize\\\": 5,\\n            \\\"scaleDistribution\\\":
+        { \\\"type\\\": \\\"linear\\\" },\\n            \\\"showPoints\\\": \\\"auto\\\",\\n
+        \           \\\"spanNulls\\\": false,\\n            \\\"stacking\\\": { \\\"group\\\":
+        \\\"A\\\", \\\"mode\\\": \\\"none\\\" },\\n            \\\"thresholdsStyle\\\":
+        { \\\"mode\\\": \\\"off\\\" }\\n          },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": { \\\"mode\\\": \\\"absolute\\\", \\\"steps\\\":
+        [{ \\\"color\\\": \\\"green\\\", \\\"value\\\": null }] }\\n        },\\n
+        \       \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\":
+        8, \\\"w\\\": 8, \\\"x\\\": 16, \\\"y\\\": 6 },\\n      \\\"id\\\": 12,\\n
+        \     \\\"options\\\": {\\n        \\\"legend\\\": { \\\"calcs\\\": [], \\\"displayMode\\\":
+        \\\"list\\\", \\\"placement\\\": \\\"bottom\\\", \\\"showLegend\\\": true
+        },\\n        \\\"tooltip\\\": { \\\"mode\\\": \\\"single\\\", \\\"sort\\\":
+        \\\"none\\\" }\\n      },\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"sum(rate(trident_rest_ops_total[5m])) by (route)\\\",\\n
+        \         \\\"legendFormat\\\": \\\"{{route}}\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F4E1 COMMS
+        ACTIVITY\\\",\\n      \\\"type\\\": \\\"timeseries\\\"\\n    },\\n    {\\n
+        \     \\\"collapsed\\\": false,\\n      \\\"gridPos\\\": { \\\"h\\\": 1, \\\"w\\\":
+        24, \\\"x\\\": 0, \\\"y\\\": 14 },\\n      \\\"id\\\": 102,\\n      \\\"panels\\\":
+        [],\\n      \\\"title\\\": \\\"\U0001F4DC CONTRACT REGISTRY - Volume Operations\\\",\\n
+        \     \\\"type\\\": \\\"row\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"palette-classic\\\" },\\n          \\\"custom\\\": {\\n
+        \           \\\"axisBorderShow\\\": false,\\n            \\\"axisCenteredZero\\\":
+        false,\\n            \\\"axisColorMode\\\": \\\"text\\\",\\n            \\\"axisLabel\\\":
+        \\\"\\\",\\n            \\\"axisPlacement\\\": \\\"auto\\\",\\n            \\\"barAlignment\\\":
+        0,\\n            \\\"drawStyle\\\": \\\"bars\\\",\\n            \\\"fillOpacity\\\":
+        80,\\n            \\\"gradientMode\\\": \\\"hue\\\",\\n            \\\"hideFrom\\\":
+        { \\\"legend\\\": false, \\\"tooltip\\\": false, \\\"viz\\\": false },\\n
+        \           \\\"insertNulls\\\": false,\\n            \\\"lineInterpolation\\\":
+        \\\"linear\\\",\\n            \\\"lineWidth\\\": 1,\\n            \\\"pointSize\\\":
+        5,\\n            \\\"scaleDistribution\\\": { \\\"type\\\": \\\"linear\\\"
+        },\\n            \\\"showPoints\\\": \\\"never\\\",\\n            \\\"spanNulls\\\":
+        false,\\n            \\\"stacking\\\": { \\\"group\\\": \\\"A\\\", \\\"mode\\\":
+        \\\"normal\\\" },\\n            \\\"thresholdsStyle\\\": { \\\"mode\\\": \\\"off\\\"
+        }\\n          },\\n          \\\"mappings\\\": [],\\n          \\\"thresholds\\\":
+        { \\\"mode\\\": \\\"absolute\\\", \\\"steps\\\": [{ \\\"color\\\": \\\"green\\\",
+        \\\"value\\\": null }] },\\n          \\\"unit\\\": \\\"short\\\"\\n        },\\n
+        \       \\\"overrides\\\": [\\n          {\\n            \\\"matcher\\\":
+        { \\\"id\\\": \\\"byRegexp\\\", \\\"options\\\": \\\".*success.*\\\" },\\n
+        \           \\\"properties\\\": [{ \\\"id\\\": \\\"color\\\", \\\"value\\\":
+        { \\\"fixedColor\\\": \\\"#00fff2\\\", \\\"mode\\\": \\\"fixed\\\" } }]\\n
+        \         },\\n          {\\n            \\\"matcher\\\": { \\\"id\\\": \\\"byRegexp\\\",
+        \\\"options\\\": \\\".*false.*\\\" },\\n            \\\"properties\\\": [{
+        \\\"id\\\": \\\"color\\\", \\\"value\\\": { \\\"fixedColor\\\": \\\"#ff0055\\\",
+        \\\"mode\\\": \\\"fixed\\\" } }]\\n          }\\n        ]\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 8, \\\"w\\\": 12, \\\"x\\\": 0, \\\"y\\\": 15 },\\n      \\\"id\\\":
+        20,\\n      \\\"options\\\": {\\n        \\\"legend\\\": { \\\"calcs\\\":
+        [\\\"sum\\\"], \\\"displayMode\\\": \\\"table\\\", \\\"placement\\\": \\\"right\\\",
+        \\\"showLegend\\\": true },\\n        \\\"tooltip\\\": { \\\"mode\\\": \\\"multi\\\",
+        \\\"sort\\\": \\\"desc\\\" }\\n      },\\n      \\\"targets\\\": [\\n        {\\n
+        \         \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\":
+        \\\"${datasource}\\\" },\\n          \\\"expr\\\": \\\"increase(trident_operation_duration_milliseconds_count{operation=~\\\\\\\"volume.*\\\\\\\"}[1h])\\\",\\n
+        \         \\\"legendFormat\\\": \\\"{{operation}} ({{success}})\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"⚔️ KILL COUNT
+        - Volume Operations\\\",\\n      \\\"type\\\": \\\"timeseries\\\"\\n    },\\n
+        \   {\\n      \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\":
+        \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#00fff2\\\",
+        \\\"value\\\": null },\\n              { \\\"color\\\": \\\"#ffff00\\\", \\\"value\\\":
+        1000 },\\n              { \\\"color\\\": \\\"#ff0055\\\", \\\"value\\\": 5000
+        }\\n            ]\\n          },\\n          \\\"unit\\\": \\\"ms\\\"\\n        },\\n
+        \       \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\":
+        8, \\\"w\\\": 12, \\\"x\\\": 12, \\\"y\\\": 15 },\\n      \\\"id\\\": 21,\\n
+        \     \\\"options\\\": {\\n        \\\"displayMode\\\": \\\"lcd\\\",\\n        \\\"maxVizHeight\\\":
+        300,\\n        \\\"minVizHeight\\\": 16,\\n        \\\"minVizWidth\\\": 8,\\n
+        \       \\\"namePlacement\\\": \\\"auto\\\",\\n        \\\"orientation\\\":
+        \\\"horizontal\\\",\\n        \\\"reduceOptions\\\": { \\\"calcs\\\": [\\\"mean\\\"],
+        \\\"fields\\\": \\\"\\\", \\\"values\\\": false },\\n        \\\"showUnfilled\\\":
+        true,\\n        \\\"sizing\\\": \\\"auto\\\",\\n        \\\"valueMode\\\":
+        \\\"color\\\"\\n      },\\n      \\\"pluginVersion\\\": \\\"10.0.0\\\",\\n
+        \     \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\": { \\\"type\\\":
+        \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n          \\\"expr\\\":
+        \\\"trident_operation_duration_milliseconds_sum{operation=~\\\\\\\"volume.*\\\\\\\"}
+        / trident_operation_duration_milliseconds_count{operation=~\\\\\\\"volume.*\\\\\\\"}\\\",\\n
+        \         \\\"legendFormat\\\": \\\"{{operation}}\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"⏱️ EXECUTION TIME
+        - Avg Latency\\\",\\n      \\\"type\\\": \\\"bargauge\\\"\\n    },\\n    {\\n
+        \     \\\"collapsed\\\": false,\\n      \\\"gridPos\\\": { \\\"h\\\": 1, \\\"w\\\":
+        24, \\\"x\\\": 0, \\\"y\\\": 23 },\\n      \\\"id\\\": 103,\\n      \\\"panels\\\":
+        [],\\n      \\\"title\\\": \\\"\U0001F4B0 ARSENAL - Storage Capacity\\\",\\n
+        \     \\\"type\\\": \\\"row\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\": [],\\n
+        \         \\\"max\\\": 10000000000000,\\n          \\\"min\\\": 0,\\n          \\\"thresholds\\\":
+        {\\n            \\\"mode\\\": \\\"percentage\\\",\\n            \\\"steps\\\":
+        [\\n              { \\\"color\\\": \\\"#00fff2\\\", \\\"value\\\": null },\\n
+        \             { \\\"color\\\": \\\"#bf00ff\\\", \\\"value\\\": 50 },\\n              {
+        \\\"color\\\": \\\"#ff0055\\\", \\\"value\\\": 80 }\\n            ]\\n          },\\n
+        \         \\\"unit\\\": \\\"decbytes\\\"\\n        },\\n        \\\"overrides\\\":
+        []\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\": 6, \\\"w\\\": 8, \\\"x\\\":
+        0, \\\"y\\\": 24 },\\n      \\\"id\\\": 30,\\n      \\\"options\\\": {\\n
+        \       \\\"minVizHeight\\\": 75,\\n        \\\"minVizWidth\\\": 75,\\n        \\\"orientation\\\":
+        \\\"auto\\\",\\n        \\\"reduceOptions\\\": { \\\"calcs\\\": [\\\"lastNotNull\\\"],
+        \\\"fields\\\": \\\"\\\", \\\"values\\\": false },\\n        \\\"showThresholdLabels\\\":
+        false,\\n        \\\"showThresholdMarkers\\\": true,\\n        \\\"sizing\\\":
+        \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\": \\\"10.0.0\\\",\\n
+        \     \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\": { \\\"type\\\":
+        \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n          \\\"expr\\\":
+        \\\"trident_volume_allocated_bytes\\\",\\n          \\\"refId\\\": \\\"A\\\"\\n
+        \       }\\n      ],\\n      \\\"title\\\": \\\"\U0001F3AF ALLOCATED BOUNTY\\\",\\n
+        \     \\\"type\\\": \\\"gauge\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"palette-classic\\\" },\\n          \\\"custom\\\": {\\n
+        \           \\\"axisBorderShow\\\": false,\\n            \\\"axisCenteredZero\\\":
+        false,\\n            \\\"axisColorMode\\\": \\\"text\\\",\\n            \\\"axisLabel\\\":
+        \\\"\\\",\\n            \\\"axisPlacement\\\": \\\"auto\\\",\\n            \\\"barAlignment\\\":
+        0,\\n            \\\"drawStyle\\\": \\\"line\\\",\\n            \\\"fillOpacity\\\":
+        30,\\n            \\\"gradientMode\\\": \\\"opacity\\\",\\n            \\\"hideFrom\\\":
+        { \\\"legend\\\": false, \\\"tooltip\\\": false, \\\"viz\\\": false },\\n
+        \           \\\"insertNulls\\\": false,\\n            \\\"lineInterpolation\\\":
+        \\\"smooth\\\",\\n            \\\"lineWidth\\\": 2,\\n            \\\"pointSize\\\":
+        5,\\n            \\\"scaleDistribution\\\": { \\\"type\\\": \\\"linear\\\"
+        },\\n            \\\"showPoints\\\": \\\"never\\\",\\n            \\\"spanNulls\\\":
+        false,\\n            \\\"stacking\\\": { \\\"group\\\": \\\"A\\\", \\\"mode\\\":
+        \\\"none\\\" },\\n            \\\"thresholdsStyle\\\": { \\\"mode\\\": \\\"off\\\"
+        }\\n          },\\n          \\\"mappings\\\": [],\\n          \\\"thresholds\\\":
+        { \\\"mode\\\": \\\"absolute\\\", \\\"steps\\\": [{ \\\"color\\\": \\\"green\\\",
+        \\\"value\\\": null }] },\\n          \\\"unit\\\": \\\"decbytes\\\"\\n        },\\n
+        \       \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\":
+        6, \\\"w\\\": 16, \\\"x\\\": 8, \\\"y\\\": 24 },\\n      \\\"id\\\": 31,\\n
+        \     \\\"options\\\": {\\n        \\\"legend\\\": { \\\"calcs\\\": [\\\"lastNotNull\\\"],
+        \\\"displayMode\\\": \\\"table\\\", \\\"placement\\\": \\\"right\\\", \\\"showLegend\\\":
+        true },\\n        \\\"tooltip\\\": { \\\"mode\\\": \\\"single\\\", \\\"sort\\\":
+        \\\"none\\\" }\\n      },\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_volume_total_bytes\\\",\\n          \\\"legendFormat\\\":
+        \\\"Total Arsenal\\\",\\n          \\\"refId\\\": \\\"A\\\"\\n        },\\n
+        \       {\\n          \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\",
+        \\\"uid\\\": \\\"${datasource}\\\" },\\n          \\\"expr\\\": \\\"trident_volume_allocated_bytes\\\",\\n
+        \         \\\"legendFormat\\\": \\\"Deployed\\\",\\n          \\\"refId\\\":
+        \\\"B\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F4C8 ARSENAL
+        GROWTH\\\",\\n      \\\"type\\\": \\\"timeseries\\\"\\n    },\\n    {\\n      \\\"collapsed\\\":
+        false,\\n      \\\"gridPos\\\": { \\\"h\\\": 1, \\\"w\\\": 24, \\\"x\\\":
+        0, \\\"y\\\": 30 },\\n      \\\"id\\\": 104,\\n      \\\"panels\\\": [],\\n
+        \     \\\"title\\\": \\\"\U0001F3DB️ THE HIGH TABLE - Backend Status\\\",\\n
+        \     \\\"type\\\": \\\"row\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"custom\\\": {\\n            \\\"align\\\":
+        \\\"auto\\\",\\n            \\\"cellOptions\\\": { \\\"type\\\": \\\"color-background\\\"
+        },\\n            \\\"inspect\\\": false\\n          },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#1a1a2e\\\",
+        \\\"value\\\": null }\\n            ]\\n          }\\n        },\\n        \\\"overrides\\\":
+        [\\n          {\\n            \\\"matcher\\\": { \\\"id\\\": \\\"byName\\\",
+        \\\"options\\\": \\\"Status\\\" },\\n            \\\"properties\\\": [\\n
+        \             {\\n                \\\"id\\\": \\\"mappings\\\",\\n                \\\"value\\\":
+        [\\n                  { \\\"options\\\": { \\\"1\\\": { \\\"color\\\": \\\"#00fff2\\\",
+        \\\"index\\\": 0, \\\"text\\\": \\\"\U0001F7E2 SANCTIONED\\\" } }, \\\"type\\\":
+        \\\"value\\\" }\\n                ]\\n              },\\n              { \\\"id\\\":
+        \\\"custom.cellOptions\\\", \\\"value\\\": { \\\"type\\\": \\\"color-text\\\"
+        } }\\n            ]\\n          },\\n          {\\n            \\\"matcher\\\":
+        { \\\"id\\\": \\\"byName\\\", \\\"options\\\": \\\"Backend\\\" },\\n            \\\"properties\\\":
+        [{ \\\"id\\\": \\\"custom.width\\\", \\\"value\\\": 200 }]\\n          }\\n
+        \       ]\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\": 6, \\\"w\\\": 12,
+        \\\"x\\\": 0, \\\"y\\\": 31 },\\n      \\\"id\\\": 40,\\n      \\\"options\\\":
+        {\\n        \\\"cellHeight\\\": \\\"md\\\",\\n        \\\"footer\\\": { \\\"countRows\\\":
+        false, \\\"fields\\\": \\\"\\\", \\\"reducer\\\": [\\\"sum\\\"], \\\"show\\\":
+        false },\\n        \\\"showHeader\\\": true\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_backend_info\\\",\\n          \\\"format\\\":
+        \\\"table\\\",\\n          \\\"instant\\\": true,\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F4CB HIGH
+        TABLE MEMBERS\\\",\\n      \\\"transformations\\\": [\\n        {\\n          \\\"id\\\":
+        \\\"organize\\\",\\n          \\\"options\\\": {\\n            \\\"excludeByName\\\":
+        { \\\"Time\\\": true, \\\"backend_uuid\\\": true },\\n            \\\"renameByName\\\":
+        { \\\"Value\\\": \\\"Status\\\", \\\"backend_name\\\": \\\"Backend\\\", \\\"backend_type\\\":
+        \\\"Type\\\" }\\n          }\\n        }\\n      ],\\n      \\\"type\\\":
+        \\\"table\\\"\\n    },\\n    {\\n      \\\"datasource\\\": { \\\"type\\\":
+        \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\":
+        {\\n        \\\"defaults\\\": {\\n          \\\"color\\\": { \\\"mode\\\":
+        \\\"thresholds\\\" },\\n          \\\"mappings\\\": [],\\n          \\\"thresholds\\\":
+        {\\n            \\\"mode\\\": \\\"absolute\\\",\\n            \\\"steps\\\":
+        [\\n              { \\\"color\\\": \\\"#ff0055\\\", \\\"value\\\": null },\\n
+        \             { \\\"color\\\": \\\"#00fff2\\\", \\\"value\\\": 1 }\\n            ]\\n
+        \         },\\n          \\\"unit\\\": \\\"short\\\"\\n        },\\n        \\\"overrides\\\":
+        []\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\": 6, \\\"w\\\": 6, \\\"x\\\":
+        12, \\\"y\\\": 31 },\\n      \\\"id\\\": 41,\\n      \\\"options\\\": {\\n
+        \       \\\"colorMode\\\": \\\"background\\\",\\n        \\\"graphMode\\\":
+        \\\"none\\\",\\n        \\\"justifyMode\\\": \\\"center\\\",\\n        \\\"orientation\\\":
+        \\\"auto\\\",\\n        \\\"reduceOptions\\\": { \\\"calcs\\\": [\\\"lastNotNull\\\"],
+        \\\"fields\\\": \\\"\\\", \\\"values\\\": false },\\n        \\\"textMode\\\":
+        \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\": \\\"10.0.0\\\",\\n
+        \     \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\": { \\\"type\\\":
+        \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n          \\\"expr\\\":
+        \\\"trident_backend_count{backend_state=\\\\\\\"online\\\\\\\"}\\\",\\n          \\\"legendFormat\\\":
+        \\\"Online\\\",\\n          \\\"refId\\\": \\\"A\\\"\\n        }\\n      ],\\n
+        \     \\\"title\\\": \\\"✅ SANCTIONED\\\",\\n      \\\"type\\\": \\\"stat\\\"\\n
+        \   },\\n    {\\n      \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\",
+        \\\"uid\\\": \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"thresholds\\\" },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": {\\n            \\\"mode\\\": \\\"absolute\\\",\\n
+        \           \\\"steps\\\": [\\n              { \\\"color\\\": \\\"#00fff2\\\",
+        \\\"value\\\": null },\\n              { \\\"color\\\": \\\"#ff0055\\\", \\\"value\\\":
+        1 }\\n            ]\\n          },\\n          \\\"unit\\\": \\\"short\\\"\\n
+        \       },\\n        \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 6, \\\"w\\\": 6, \\\"x\\\": 18, \\\"y\\\": 31 },\\n      \\\"id\\\":
+        42,\\n      \\\"options\\\": {\\n        \\\"colorMode\\\": \\\"background\\\",\\n
+        \       \\\"graphMode\\\": \\\"none\\\",\\n        \\\"justifyMode\\\": \\\"center\\\",\\n
+        \       \\\"orientation\\\": \\\"auto\\\",\\n        \\\"reduceOptions\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"fields\\\": \\\"\\\", \\\"values\\\":
+        false },\\n        \\\"textMode\\\": \\\"auto\\\"\\n      },\\n      \\\"pluginVersion\\\":
+        \\\"10.0.0\\\",\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"trident_backend_count{backend_state=\\\\\\\"offline\\\\\\\"}
+        or vector(0)\\\",\\n          \\\"legendFormat\\\": \\\"Offline\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"❌ EXCOMMUNICADO\\\",\\n
+        \     \\\"type\\\": \\\"stat\\\"\\n    },\\n    {\\n      \\\"collapsed\\\":
+        false,\\n      \\\"gridPos\\\": { \\\"h\\\": 1, \\\"w\\\": 24, \\\"x\\\":
+        0, \\\"y\\\": 37 },\\n      \\\"id\\\": 105,\\n      \\\"panels\\\": [],\\n
+        \     \\\"title\\\": \\\"\U0001F525 MISSION LOG - System Health\\\",\\n      \\\"type\\\":
+        \\\"row\\\"\\n    },\\n    {\\n      \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\",
+        \\\"uid\\\": \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\": {\\n        \\\"defaults\\\":
+        {\\n          \\\"color\\\": { \\\"mode\\\": \\\"palette-classic\\\" },\\n
+        \         \\\"custom\\\": {\\n            \\\"axisBorderShow\\\": false,\\n
+        \           \\\"axisCenteredZero\\\": false,\\n            \\\"axisColorMode\\\":
+        \\\"text\\\",\\n            \\\"axisLabel\\\": \\\"\\\",\\n            \\\"axisPlacement\\\":
+        \\\"auto\\\",\\n            \\\"barAlignment\\\": 0,\\n            \\\"drawStyle\\\":
+        \\\"line\\\",\\n            \\\"fillOpacity\\\": 10,\\n            \\\"gradientMode\\\":
+        \\\"none\\\",\\n            \\\"hideFrom\\\": { \\\"legend\\\": false, \\\"tooltip\\\":
+        false, \\\"viz\\\": false },\\n            \\\"insertNulls\\\": false,\\n
+        \           \\\"lineInterpolation\\\": \\\"smooth\\\",\\n            \\\"lineWidth\\\":
+        2,\\n            \\\"pointSize\\\": 5,\\n            \\\"scaleDistribution\\\":
+        { \\\"type\\\": \\\"linear\\\" },\\n            \\\"showPoints\\\": \\\"never\\\",\\n
+        \           \\\"spanNulls\\\": false,\\n            \\\"stacking\\\": { \\\"group\\\":
+        \\\"A\\\", \\\"mode\\\": \\\"none\\\" },\\n            \\\"thresholdsStyle\\\":
+        { \\\"mode\\\": \\\"off\\\" }\\n          },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": { \\\"mode\\\": \\\"absolute\\\", \\\"steps\\\":
+        [{ \\\"color\\\": \\\"green\\\", \\\"value\\\": null }] },\\n          \\\"unit\\\":
+        \\\"decbytes\\\"\\n        },\\n        \\\"overrides\\\": []\\n      },\\n
+        \     \\\"gridPos\\\": { \\\"h\\\": 6, \\\"w\\\": 8, \\\"x\\\": 0, \\\"y\\\":
+        38 },\\n      \\\"id\\\": 50,\\n      \\\"options\\\": {\\n        \\\"legend\\\":
+        { \\\"calcs\\\": [\\\"lastNotNull\\\"], \\\"displayMode\\\": \\\"list\\\",
+        \\\"placement\\\": \\\"bottom\\\", \\\"showLegend\\\": true },\\n        \\\"tooltip\\\":
+        { \\\"mode\\\": \\\"single\\\", \\\"sort\\\": \\\"none\\\" }\\n      },\\n
+        \     \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\": { \\\"type\\\":
+        \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n          \\\"expr\\\":
+        \\\"process_resident_memory_bytes{job=\\\\\\\"trident\\\\\\\"}\\\",\\n          \\\"legendFormat\\\":
+        \\\"Controller Memory\\\",\\n          \\\"refId\\\": \\\"A\\\"\\n        }\\n
+        \     ],\\n      \\\"title\\\": \\\"\U0001F9E0 CONTROLLER MEMORY\\\",\\n      \\\"type\\\":
+        \\\"timeseries\\\"\\n    },\\n    {\\n      \\\"datasource\\\": { \\\"type\\\":
+        \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n      \\\"fieldConfig\\\":
+        {\\n        \\\"defaults\\\": {\\n          \\\"color\\\": { \\\"mode\\\":
+        \\\"palette-classic\\\" },\\n          \\\"custom\\\": {\\n            \\\"axisBorderShow\\\":
+        false,\\n            \\\"axisCenteredZero\\\": false,\\n            \\\"axisColorMode\\\":
+        \\\"text\\\",\\n            \\\"axisLabel\\\": \\\"\\\",\\n            \\\"axisPlacement\\\":
+        \\\"auto\\\",\\n            \\\"barAlignment\\\": 0,\\n            \\\"drawStyle\\\":
+        \\\"line\\\",\\n            \\\"fillOpacity\\\": 10,\\n            \\\"gradientMode\\\":
+        \\\"none\\\",\\n            \\\"hideFrom\\\": { \\\"legend\\\": false, \\\"tooltip\\\":
+        false, \\\"viz\\\": false },\\n            \\\"insertNulls\\\": false,\\n
+        \           \\\"lineInterpolation\\\": \\\"smooth\\\",\\n            \\\"lineWidth\\\":
+        2,\\n            \\\"pointSize\\\": 5,\\n            \\\"scaleDistribution\\\":
+        { \\\"type\\\": \\\"linear\\\" },\\n            \\\"showPoints\\\": \\\"never\\\",\\n
+        \           \\\"spanNulls\\\": false,\\n            \\\"stacking\\\": { \\\"group\\\":
+        \\\"A\\\", \\\"mode\\\": \\\"none\\\" },\\n            \\\"thresholdsStyle\\\":
+        { \\\"mode\\\": \\\"off\\\" }\\n          },\\n          \\\"mappings\\\":
+        [],\\n          \\\"thresholds\\\": { \\\"mode\\\": \\\"absolute\\\", \\\"steps\\\":
+        [{ \\\"color\\\": \\\"green\\\", \\\"value\\\": null }] },\\n          \\\"unit\\\":
+        \\\"short\\\"\\n        },\\n        \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\":
+        { \\\"h\\\": 6, \\\"w\\\": 8, \\\"x\\\": 8, \\\"y\\\": 38 },\\n      \\\"id\\\":
+        51,\\n      \\\"options\\\": {\\n        \\\"legend\\\": { \\\"calcs\\\":
+        [\\\"lastNotNull\\\"], \\\"displayMode\\\": \\\"list\\\", \\\"placement\\\":
+        \\\"bottom\\\", \\\"showLegend\\\": true },\\n        \\\"tooltip\\\": { \\\"mode\\\":
+        \\\"single\\\", \\\"sort\\\": \\\"none\\\" }\\n      },\\n      \\\"targets\\\":
+        [\\n        {\\n          \\\"datasource\\\": { \\\"type\\\": \\\"prometheus\\\",
+        \\\"uid\\\": \\\"${datasource}\\\" },\\n          \\\"expr\\\": \\\"go_goroutines{job=\\\\\\\"trident\\\\\\\"}\\\",\\n
+        \         \\\"legendFormat\\\": \\\"Goroutines\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"⚡ ACTIVE THREADS\\\",\\n
+        \     \\\"type\\\": \\\"timeseries\\\"\\n    },\\n    {\\n      \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \     \\\"fieldConfig\\\": {\\n        \\\"defaults\\\": {\\n          \\\"color\\\":
+        { \\\"mode\\\": \\\"palette-classic\\\" },\\n          \\\"custom\\\": {\\n
+        \           \\\"axisBorderShow\\\": false,\\n            \\\"axisCenteredZero\\\":
+        false,\\n            \\\"axisColorMode\\\": \\\"text\\\",\\n            \\\"axisLabel\\\":
+        \\\"\\\",\\n            \\\"axisPlacement\\\": \\\"auto\\\",\\n            \\\"barAlignment\\\":
+        0,\\n            \\\"drawStyle\\\": \\\"line\\\",\\n            \\\"fillOpacity\\\":
+        10,\\n            \\\"gradientMode\\\": \\\"none\\\",\\n            \\\"hideFrom\\\":
+        { \\\"legend\\\": false, \\\"tooltip\\\": false, \\\"viz\\\": false },\\n
+        \           \\\"insertNulls\\\": false,\\n            \\\"lineInterpolation\\\":
+        \\\"smooth\\\",\\n            \\\"lineWidth\\\": 2,\\n            \\\"pointSize\\\":
+        5,\\n            \\\"scaleDistribution\\\": { \\\"type\\\": \\\"linear\\\"
+        },\\n            \\\"showPoints\\\": \\\"never\\\",\\n            \\\"spanNulls\\\":
+        false,\\n            \\\"stacking\\\": { \\\"group\\\": \\\"A\\\", \\\"mode\\\":
+        \\\"none\\\" },\\n            \\\"thresholdsStyle\\\": { \\\"mode\\\": \\\"off\\\"
+        }\\n          },\\n          \\\"mappings\\\": [],\\n          \\\"thresholds\\\":
+        { \\\"mode\\\": \\\"absolute\\\", \\\"steps\\\": [{ \\\"color\\\": \\\"green\\\",
+        \\\"value\\\": null }] },\\n          \\\"unit\\\": \\\"s\\\"\\n        },\\n
+        \       \\\"overrides\\\": []\\n      },\\n      \\\"gridPos\\\": { \\\"h\\\":
+        6, \\\"w\\\": 8, \\\"x\\\": 16, \\\"y\\\": 38 },\\n      \\\"id\\\": 52,\\n
+        \     \\\"options\\\": {\\n        \\\"legend\\\": { \\\"calcs\\\": [\\\"lastNotNull\\\"],
+        \\\"displayMode\\\": \\\"list\\\", \\\"placement\\\": \\\"bottom\\\", \\\"showLegend\\\":
+        true },\\n        \\\"tooltip\\\": { \\\"mode\\\": \\\"single\\\", \\\"sort\\\":
+        \\\"none\\\" }\\n      },\\n      \\\"targets\\\": [\\n        {\\n          \\\"datasource\\\":
+        { \\\"type\\\": \\\"prometheus\\\", \\\"uid\\\": \\\"${datasource}\\\" },\\n
+        \         \\\"expr\\\": \\\"rate(process_cpu_seconds_total{job=\\\\\\\"trident\\\\\\\"}[5m])\\\",\\n
+        \         \\\"legendFormat\\\": \\\"CPU Usage\\\",\\n          \\\"refId\\\":
+        \\\"A\\\"\\n        }\\n      ],\\n      \\\"title\\\": \\\"\U0001F525 CPU
+        BURN RATE\\\",\\n      \\\"type\\\": \\\"timeseries\\\"\\n    }\\n  ],\\n
+        \ \\\"refresh\\\": \\\"30s\\\",\\n  \\\"schemaVersion\\\": 38,\\n  \\\"tags\\\":
+        [\\\"trident\\\", \\\"iscsi\\\", \\\"qnap\\\", \\\"storage\\\", \\\"continental\\\"],\\n
+        \ \\\"templating\\\": {\\n    \\\"list\\\": [\\n      {\\n        \\\"current\\\":
+        { \\\"selected\\\": false, \\\"text\\\": \\\"prometheus\\\", \\\"value\\\":
+        \\\"prometheus\\\" },\\n        \\\"hide\\\": 0,\\n        \\\"includeAll\\\":
+        false,\\n        \\\"label\\\": \\\"Data Source\\\",\\n        \\\"multi\\\":
+        false,\\n        \\\"name\\\": \\\"datasource\\\",\\n        \\\"options\\\":
+        [],\\n        \\\"query\\\": \\\"prometheus\\\",\\n        \\\"refresh\\\":
+        1,\\n        \\\"regex\\\": \\\"\\\",\\n        \\\"skipUrlSync\\\": false,\\n
+        \       \\\"type\\\": \\\"datasource\\\"\\n      }\\n    ]\\n  },\\n  \\\"time\\\":
+        { \\\"from\\\": \\\"now-6h\\\", \\\"to\\\": \\\"now\\\" },\\n  \\\"timepicker\\\":
+        {},\\n  \\\"timezone\\\": \\\"\\\",\\n  \\\"title\\\": \\\"⚔️ THE CONTINENTAL
+        - Trident Operations\\\",\\n  \\\"uid\\\": \\\"trident-continental\\\",\\n
+        \ \\\"version\\\": 1,\\n  \\\"weekStart\\\": \\\"\\\"\\n}\\n\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":null,\"name\":\"trident-continental-dashboard\",\"namespace\":\"monitoring\"}}\n"
+    creationTimestamp: "2026-01-25T15:48:26Z"
+    labels:
+      grafana_dashboard: "1"
+    name: trident-continental-dashboard
+    namespace: monitoring
+    resourceVersion: "807"
+    uid: 5055fefb-517e-429d-8a81-3ead54e9988f
+kind: List
+metadata:
+  resourceVersion: ""

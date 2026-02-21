@@ -1,0 +1,148 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    controller-config.yaml: |
+      eventBus:
+        nats:
+          versions:
+          - version: latest
+            natsStreamingImage: nats-streaming:latest
+            metricsExporterImage: natsio/prometheus-nats-exporter:latest
+          - version: 0.22.1
+            natsStreamingImage: nats-streaming:0.22.1
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.8.0
+        jetstream:
+          # Default JetStream settings, could be overridden by EventBus JetStream specs
+          settings: |
+            # https://docs.nats.io/running-a-nats-service/configuration#jetstream
+            # Only configure "max_memory_store" or "max_file_store", do not set "store_dir" as it has been hardcoded.
+            max_memory_store: -1
+            max_file_store: -1
+          # The default properties of the streams to be created in this JetStream service
+          streamConfig: |
+            maxMsgs: 1e+06
+            maxAge: 72h
+            maxBytes: 1GB
+            replicas: 3
+            duplicates: 300s
+          versions:
+          - version: latest
+            natsImage: nats:2.10.10
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.14.0
+            configReloaderImage: natsio/nats-server-config-reloader:0.14.0
+            startCommand: /nats-server
+          - version: 2.8.1
+            natsImage: nats:2.8.1
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.9.1
+            configReloaderImage: natsio/nats-server-config-reloader:0.7.0
+            startCommand: /nats-server
+          - version: 2.8.1-alpine
+            natsImage: nats:2.8.1-alpine
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.9.1
+            configReloaderImage: natsio/nats-server-config-reloader:0.7.0
+            startCommand: nats-server
+          - version: 2.8.2
+            natsImage: nats:2.8.2
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.9.1
+            configReloaderImage: natsio/nats-server-config-reloader:0.7.0
+            startCommand: /nats-server
+          - version: 2.8.2-alpine
+            natsImage: nats:2.8.2-alpine
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.9.1
+            configReloaderImage: natsio/nats-server-config-reloader:0.7.0
+            startCommand: nats-server
+          - version: 2.9.1
+            natsImage: nats:2.9.1
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.9.1
+            configReloaderImage: natsio/nats-server-config-reloader:0.7.0
+            startCommand: /nats-server
+          - version: 2.9.12
+            natsImage: nats:2.9.12
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.9.1
+            configReloaderImage: natsio/nats-server-config-reloader:0.7.0
+            startCommand: /nats-server
+          - version: 2.9.16
+            natsImage: nats:2.9.16
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.9.1
+            configReloaderImage: natsio/nats-server-config-reloader:0.7.0
+            startCommand: /nats-server
+          - version: 2.10.10
+            natsImage: nats:2.10.10
+            metricsExporterImage: natsio/prometheus-nats-exporter:0.14.0
+            configReloaderImage: natsio/nats-server-config-reloader:0.14.0
+            startCommand: /nats-server
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: argo-events:/ConfigMap:argo-events/argo-events-controller-manager
+    creationTimestamp: "2026-01-20T20:55:46Z"
+    labels:
+      app.kubernetes.io/instance: argo-events
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argo-events-controller-manager
+      app.kubernetes.io/part-of: argo-events
+      helm.sh/chart: argo-events-2.4.8
+    name: argo-events-controller-manager
+    namespace: argo-events
+    resourceVersion: "687"
+    uid: 6da2f003-1aab-4671-92b0-2c5274a0d035
+- apiVersion: v1
+  data:
+    stan-config: "http: 8222\ninclude ./auth.conf\ncluster {\n  port: 6222\n  routes:
+      [nats://eventbus-default-stan-0.eventbus-default-stan-svc.argo-events.svc:6222,nats://eventbus-default-stan-1.eventbus-default-stan-svc.argo-events.svc:6222,nats://eventbus-default-stan-2.eventbus-default-stan-svc.argo-events.svc:6222]\n
+      \ cluster_advertise: $CLUSTER_ADVERTISE\n  connect_retries: 10\n}\nmax_payload:
+      1MB\nstreaming {\n  id: eventbus-default\n  store: file\n  dir: /data/stan/store\n
+      \ cluster {\n\tnode_id: $POD_NAME\n\tpeers: [\"eventbus-default-stan-0\",\"eventbus-default-stan-1\",\"eventbus-default-stan-2\"]\n\tlog_path:
+      /data/stan/logs\n\traft_heartbeat_timeout: \"2s\"\n\traft_election_timeout:
+      \"2s\"\n\traft_lease_timeout: \"1s\"\n\traft_commit_timeout: \"100ms\"\n  }\n
+      \ store_limits {\n    max_age: 72h\n\tmax_msgs: 1000000\n\tmax_bytes: 1GB\n\tmax_subs:
+      1000\n  }\n}"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      resource-spec-hash: "883577670"
+    creationTimestamp: "2026-01-22T02:14:10Z"
+    labels:
+      controller: eventbus-controller
+      eventbus-name: default
+      owner-name: default
+    name: eventbus-default-stan-configmap
+    namespace: argo-events
+    ownerReferences:
+    - apiVersion: argoproj.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: EventBus
+      name: default
+      uid: 27b873f3-1a79-4fba-bbb4-4268601345c2
+    resourceVersion: "688"
+    uid: d9cbce76-8290-4fbf-94d4-a81837e82534
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-20T20:55:45Z"
+    name: kube-root-ca.crt
+    namespace: argo-events
+    resourceVersion: "689"
+    uid: e58e9918-eccb-40a2-a9b5-d5e347ef4af9
+kind: List
+metadata:
+  resourceVersion: ""

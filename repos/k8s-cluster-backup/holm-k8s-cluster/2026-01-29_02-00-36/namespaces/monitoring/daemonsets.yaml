@@ -1,0 +1,290 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: prometheus:apps/DaemonSet:monitoring/prometheus-prometheus-node-exporter
+      deprecated.daemonset.template.generation: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"prometheus:apps/DaemonSet:monitoring/prometheus-prometheus-node-exporter"},"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"prometheus-node-exporter","app.kubernetes.io/part-of":"prometheus-node-exporter","app.kubernetes.io/version":"1.10.2","helm.sh/chart":"prometheus-node-exporter-4.51.0"},"name":"prometheus-prometheus-node-exporter","namespace":"monitoring"},"spec":{"revisionHistoryLimit":10,"selector":{"matchLabels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"prometheus-node-exporter"}},"template":{"metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict":"true"},"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"prometheus-node-exporter","app.kubernetes.io/part-of":"prometheus-node-exporter","app.kubernetes.io/version":"1.10.2","helm.sh/chart":"prometheus-node-exporter-4.51.0"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"eks.amazonaws.com/compute-type","operator":"NotIn","values":["fargate"]},{"key":"type","operator":"NotIn","values":["virtual-kubelet"]}]}]}}},"automountServiceAccountToken":false,"containers":[{"args":["--path.procfs=/host/proc","--path.sysfs=/host/sys","--path.rootfs=/host/root","--path.udev.data=/host/root/run/udev/data","--web.listen-address=[$(HOST_IP)]:9100"],"env":[{"name":"HOST_IP","value":"0.0.0.0"}],"image":"quay.io/prometheus/node-exporter:v1.10.2","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"httpHeaders":null,"path":"/","port":"metrics","scheme":"HTTP"},"initialDelaySeconds":0,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"name":"node-exporter","ports":[{"containerPort":9100,"name":"metrics","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"httpHeaders":null,"path":"/","port":"metrics","scheme":"HTTP"},"initialDelaySeconds":0,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"securityContext":{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/host/proc","name":"proc","readOnly":true},{"mountPath":"/host/sys","name":"sys","readOnly":true},{"mountPath":"/host/root","mountPropagation":"HostToContainer","name":"root","readOnly":true}]}],"hostIPC":false,"hostNetwork":true,"hostPID":true,"nodeSelector":{"kubernetes.io/os":"linux"},"securityContext":{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534},"serviceAccountName":"prometheus-prometheus-node-exporter","tolerations":[{"effect":"NoSchedule","operator":"Exists"}],"volumes":[{"hostPath":{"path":"/proc"},"name":"proc"},{"hostPath":{"path":"/sys"},"name":"sys"},{"hostPath":{"path":"/"},"name":"root"}]}},"updateStrategy":{"rollingUpdate":{"maxUnavailable":1},"type":"RollingUpdate"}}}
+    creationTimestamp: "2026-01-19T05:06:36Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: metrics
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: prometheus-node-exporter
+      app.kubernetes.io/part-of: prometheus-node-exporter
+      app.kubernetes.io/version: 1.10.2
+      helm.sh/chart: prometheus-node-exporter-4.51.0
+    name: prometheus-prometheus-node-exporter
+    namespace: monitoring
+    resourceVersion: "1189268"
+    uid: 63add66b-babc-4fbb-ad3f-98b32c7e5627
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/name: prometheus-node-exporter
+    template:
+      metadata:
+        annotations:
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        labels:
+          app.kubernetes.io/component: metrics
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: prometheus-node-exporter
+          app.kubernetes.io/part-of: prometheus-node-exporter
+          app.kubernetes.io/version: 1.10.2
+          helm.sh/chart: prometheus-node-exporter-4.51.0
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: eks.amazonaws.com/compute-type
+                  operator: NotIn
+                  values:
+                  - fargate
+                - key: type
+                  operator: NotIn
+                  values:
+                  - virtual-kubelet
+        automountServiceAccountToken: false
+        containers:
+        - args:
+          - --path.procfs=/host/proc
+          - --path.sysfs=/host/sys
+          - --path.rootfs=/host/root
+          - --path.udev.data=/host/root/run/udev/data
+          - --web.listen-address=[$(HOST_IP)]:9100
+          env:
+          - name: HOST_IP
+            value: 0.0.0.0
+          image: quay.io/prometheus/node-exporter:v1.10.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: metrics
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: node-exporter
+          ports:
+          - containerPort: 9100
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: metrics
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /host/proc
+            name: proc
+            readOnly: true
+          - mountPath: /host/sys
+            name: sys
+            readOnly: true
+          - mountPath: /host/root
+            mountPropagation: HostToContainer
+            name: root
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        hostNetwork: true
+        hostPID: true
+        nodeSelector:
+          kubernetes.io/os: linux
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 65534
+          runAsGroup: 65534
+          runAsNonRoot: true
+          runAsUser: 65534
+        serviceAccount: prometheus-prometheus-node-exporter
+        serviceAccountName: prometheus-prometheus-node-exporter
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        volumes:
+        - hostPath:
+            path: /proc
+            type: ""
+          name: proc
+        - hostPath:
+            path: /sys
+            type: ""
+          name: sys
+        - hostPath:
+            path: /
+            type: ""
+          name: root
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 13
+    desiredNumberScheduled: 13
+    numberAvailable: 13
+    numberMisscheduled: 0
+    numberReady: 13
+    observedGeneration: 1
+    updatedNumberScheduled: 13
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: promtail:apps/DaemonSet:monitoring/promtail
+      deprecated.daemonset.template.generation: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"promtail:apps/DaemonSet:monitoring/promtail"},"labels":{"app.kubernetes.io/instance":"promtail","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"promtail","app.kubernetes.io/version":"3.5.1","helm.sh/chart":"promtail-6.17.1"},"name":"promtail","namespace":"monitoring"},"spec":{"selector":{"matchLabels":{"app.kubernetes.io/instance":"promtail","app.kubernetes.io/name":"promtail"}},"template":{"metadata":{"annotations":{"checksum/config":"af876186ac392460ab5674ae472c8a2c012d501b54dcf2ae5ee231c0666492ac"},"labels":{"app.kubernetes.io/instance":"promtail","app.kubernetes.io/name":"promtail"}},"spec":{"automountServiceAccountToken":true,"containers":[{"args":["-config.file=/etc/promtail/promtail.yaml","-config.expand-env=true"],"env":[{"name":"HOSTNAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}}],"image":"docker.io/grafana/promtail:3.5.1","imagePullPolicy":"IfNotPresent","name":"promtail","ports":[{"containerPort":3101,"name":"http-metrics","protocol":"TCP"}],"readinessProbe":{"failureThreshold":5,"httpGet":{"path":"/ready","port":"http-metrics"},"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"resources":{"limits":{"memory":"256Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/etc/promtail","name":"config"},{"mountPath":"/run/promtail","name":"run"},{"mountPath":"/var/lib/docker/containers","name":"containers","readOnly":true},{"mountPath":"/var/log/pods","name":"pods","readOnly":true}]}],"enableServiceLinks":true,"securityContext":{"runAsGroup":0,"runAsUser":0},"serviceAccountName":"promtail","tolerations":[{"effect":"NoSchedule","key":"node-role.kubernetes.io/master","operator":"Exists"},{"effect":"NoSchedule","key":"node-role.kubernetes.io/control-plane","operator":"Exists"}],"volumes":[{"name":"config","secret":{"secretName":"promtail"}},{"hostPath":{"path":"/run/promtail"},"name":"run"},{"hostPath":{"path":"/var/lib/docker/containers"},"name":"containers"},{"hostPath":{"path":"/var/log/pods"},"name":"pods"}]}},"updateStrategy":{}}}
+    creationTimestamp: "2026-01-19T23:59:01Z"
+    generation: 3
+    labels:
+      app.kubernetes.io/instance: promtail
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: promtail
+      app.kubernetes.io/version: 3.5.1
+      helm.sh/chart: promtail-6.17.1
+    name: promtail
+    namespace: monitoring
+    resourceVersion: "1324322"
+    uid: a47960ba-900b-441c-9af7-43b6ba7fdd3b
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: promtail
+        app.kubernetes.io/name: promtail
+    template:
+      metadata:
+        annotations:
+          checksum/config: af876186ac392460ab5674ae472c8a2c012d501b54dcf2ae5ee231c0666492ac
+        labels:
+          app.kubernetes.io/instance: promtail
+          app.kubernetes.io/name: promtail
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - args:
+          - -config.file=/etc/promtail/promtail.yaml
+          - -config.expand-env=true
+          env:
+          - name: HOSTNAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          image: docker.io/grafana/promtail:3.5.1
+          imagePullPolicy: IfNotPresent
+          name: promtail
+          ports:
+          - containerPort: 3101
+            name: http-metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /ready
+              port: http-metrics
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/promtail
+            name: config
+          - mountPath: /run/promtail
+            name: run
+          - mountPath: /var/lib/docker/containers
+            name: containers
+            readOnly: true
+          - mountPath: /var/log/pods
+            name: pods
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: true
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsGroup: 0
+          runAsUser: 0
+        serviceAccount: promtail
+        serviceAccountName: promtail
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        volumes:
+        - name: config
+          secret:
+            defaultMode: 420
+            secretName: promtail
+        - hostPath:
+            path: /run/promtail
+            type: ""
+          name: run
+        - hostPath:
+            path: /var/lib/docker/containers
+            type: ""
+          name: containers
+        - hostPath:
+            path: /var/log/pods
+            type: ""
+          name: pods
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 13
+    desiredNumberScheduled: 13
+    numberAvailable: 13
+    numberMisscheduled: 0
+    numberReady: 13
+    observedGeneration: 3
+    updatedNumberScheduled: 13
+kind: List
+metadata:
+  resourceVersion: ""

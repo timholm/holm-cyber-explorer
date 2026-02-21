@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ytarchive-controller
+  namespace: ytarchive
+  labels:
+    app.kubernetes.io/name: controller
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ytarchive
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ytarchive-controller
+  namespace: ytarchive
+  labels:
+    app.kubernetes.io/name: controller
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ytarchive
+rules:
+  # Permission to manage worker jobs
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "list", "delete", "watch"]
+  # Permission to read pod status (for monitoring workers)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # Permission to read pod logs (for debugging workers)
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ytarchive-controller
+  namespace: ytarchive
+  labels:
+    app.kubernetes.io/name: controller
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: ytarchive
+subjects:
+  - kind: ServiceAccount
+    name: ytarchive-controller
+    namespace: ytarchive
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ytarchive-controller

@@ -1,0 +1,236 @@
+name: Deploy to Pi Cluster
+
+on:
+  push:
+    branches: [main]
+    paths: ['services/**']
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to deploy (or "all")'
+        required: true
+        default: 'all'
+
+env:
+  REGISTRY: 192.168.8.197:31500
+
+jobs:
+  detect:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      services: ${{ steps.set-matrix.outputs.services }}
+      has_services: ${{ steps.set-matrix.outputs.has_services }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect services to build
+        id: set-matrix
+        run: |
+          if [ "${{ github.event.inputs.service }}" = "all" ]; then
+            SERVICES=$(find services -name "Dockerfile" -exec dirname {} \; | xargs -I {} basename {} | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          elif [ -n "${{ github.event.inputs.service }}" ]; then
+            SERVICES="[\"${{ github.event.inputs.service }}\"]"
+          else
+            SERVICES=$(git diff --name-only HEAD~1 HEAD -- services/ 2>/dev/null | cut -d'/' -f2 | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          fi
+
+          if [ -z "$SERVICES" ] || [ "$SERVICES" = "[]" ] || [ "$SERVICES" = '[""]' ]; then
+            echo "has_services=false" >> $GITHUB_OUTPUT
+            echo "services=[]" >> $GITHUB_OUTPUT
+            echo "matrix={\"include\":[]}" >> $GITHUB_OUTPUT
+          else
+            echo "has_services=true" >> $GITHUB_OUTPUT
+            MATRIX='{"include":[]}'
+            for svc in $(echo "$SERVICES" | jq -r '.[]'); do
+              if [ -f "services/$svc/Dockerfile" ]; then
+                SLANG="unknown"
+                [ -f "services/$svc/go.mod" ] && SLANG="go"
+                [ -f "services/$svc/requirements.txt" ] && SLANG="python"
+                [ -f "services/$svc/package.json" ] && SLANG="node"
+                MATRIX=$(echo "$MATRIX" | jq -c --arg s "$svc" --arg l "$SLANG" '.include += [{"service": $s, "lang": $l}]')
+              fi
+            done
+            echo "services=$(echo "$SERVICES" | jq -c .)" >> $GITHUB_OUTPUT
+            echo "matrix=$(echo "$MATRIX" | jq -c .)" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    name: Build ${{ matrix.service }}
+    needs: detect
+    if: needs.detect.outputs.has_services == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+      fail-fast: false
+      max-parallel: 4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.service }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.service }}-
+
+      - name: Build ${{ matrix.service }}
+        run: |
+          cd services/${{ matrix.service }}
+          docker buildx build \
+            --platform linux/arm64 \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+            --tag ${{ env.REGISTRY }}/${{ matrix.service }}:${{ github.sha }} \
+            --tag ${{ env.REGISTRY }}/${{ matrix.service }}:latest \
+            --output type=docker,dest=/tmp/${{ matrix.service }}.tar \
+            .
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-${{ matrix.service }}
+          path: /tmp/${{ matrix.service }}.tar
+          retention-days: 1
+
+  deploy:
+    name: Deploy ${{ matrix.service }}
+    needs: [detect, build]
+    if: needs.detect.outputs.has_services == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+      fail-fast: false
+      max-parallel: 2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image-${{ matrix.service }}
+          path: /tmp
+
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "UserKnownHostsFile /dev/null" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Deploy to Pi Cluster
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          SERVICE="${{ matrix.service }}"
+          IMAGE_TAG="${{ github.sha }}"
+
+          echo "📦 Transferring image to Mac mini..."
+          scp -P $SSH_PORT /tmp/${SERVICE}.tar $SSH_USER@$SSH_HOST:/tmp/${SERVICE}.tar
+
+          echo "🚀 Deploying ${SERVICE}..."
+          ssh -p $SSH_PORT $SSH_USER@$SSH_HOST << DEPLOY_SCRIPT
+          set -e
+
+          SERVICE="${SERVICE}"
+          IMAGE_TAG="${IMAGE_TAG}"
+          REGISTRY="${{ env.REGISTRY }}"
+          RPI_HOST="192.168.8.197"
+          RPI_USER="rpi1"
+          RPI_PASS="19209746"
+
+          echo "Transferring image to Pi cluster..."
+          sshpass -p "\$RPI_PASS" scp -o StrictHostKeyChecking=no /tmp/\${SERVICE}.tar \$RPI_USER@\$RPI_HOST:/tmp/\${SERVICE}.tar
+
+          echo "Loading and deploying on cluster..."
+          sshpass -p "\$RPI_PASS" ssh -o StrictHostKeyChecking=no \$RPI_USER@\$RPI_HOST << 'CLUSTER_SCRIPT'
+          set -e
+          SERVICE="${SERVICE}"
+          IMAGE_TAG="${IMAGE_TAG}"
+          REGISTRY="${{ env.REGISTRY }}"
+
+          echo "Loading image into containerd..."
+          sudo ctr -n k8s.io images import /tmp/\${SERVICE}.tar
+
+          echo "Pushing to local registry..."
+          sudo ctr -n k8s.io images push --plain-http \${REGISTRY}/\${SERVICE}:\${IMAGE_TAG} || true
+          sudo ctr -n k8s.io images push --plain-http \${REGISTRY}/\${SERVICE}:latest || true
+
+          echo "Updating deployment..."
+          if kubectl get deployment \${SERVICE} -n holm >/dev/null 2>&1; then
+            kubectl set image deployment/\${SERVICE} \${SERVICE}=\${REGISTRY}/\${SERVICE}:\${IMAGE_TAG} -n holm
+            kubectl rollout status deployment/\${SERVICE} -n holm --timeout=120s
+          else
+            echo "No deployment found for \${SERVICE}, skipping rollout"
+          fi
+
+          echo "Cleaning up..."
+          rm -f /tmp/\${SERVICE}.tar
+          echo "✅ Cluster deployment complete!"
+          CLUSTER_SCRIPT
+
+          rm -f /tmp/\${SERVICE}.tar
+          echo "✅ Deployment complete!"
+          DEPLOY_SCRIPT
+
+  summary:
+    name: Deployment Summary
+    needs: [detect, build, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🚀 HolmOS Deployment Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Services:** ${{ needs.detect.outputs.services }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Job Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Detect | ${{ needs.detect.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy | ${{ needs.deploy.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.deploy.result }}" = "success" ]; then
+            echo "### ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Services have been deployed to the Pi cluster." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ Deployment Status" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Check the deploy job logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Cluster Access" >> $GITHUB_STEP_SUMMARY
+          echo "- HolmOS Dashboard: http://192.168.8.197:30088" >> $GITHUB_STEP_SUMMARY
+          echo "- Steve Bot API: http://192.168.8.197:30099" >> $GITHUB_STEP_SUMMARY

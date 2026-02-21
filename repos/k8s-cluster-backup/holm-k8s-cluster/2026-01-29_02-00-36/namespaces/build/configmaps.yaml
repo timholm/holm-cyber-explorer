@@ -1,0 +1,478 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM node:20-alpine
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm install --omit=dev
+      COPY . .
+      EXPOSE 3000
+      CMD ["node", "server.js"]
+    package.json: |
+      {
+        "name": "claude-web-ui",
+        "version": "5.0.0",
+        "main": "server.js",
+        "scripts": {
+          "start": "node server.js"
+        },
+        "dependencies": {
+          "express": "^4.18.2"
+        }
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"Dockerfile":"FROM node:20-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install --omit=dev\nCOPY . .\nEXPOSE 3000\nCMD [\"node\", \"server.js\"]\n","package.json":"{\n  \"name\": \"claude-web-ui\",\n  \"version\": \"5.0.0\",\n  \"main\": \"server.js\",\n  \"scripts\": {\n    \"start\": \"node server.js\"\n  },\n  \"dependencies\": {\n    \"express\": \"^4.18.2\"\n  }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"claude-webui-build","namespace":"build"}}
+    creationTimestamp: "2026-01-20T04:09:36Z"
+    name: claude-webui-build
+    namespace: build
+    resourceVersion: "708"
+    uid: 98fd2b06-9bf5-4e75-97d1-4d28f5ce5201
+- apiVersion: v1
+  data:
+    index.html: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Claude Code UI</title>
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}
+          header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+          header h1{font-size:1.1rem;color:#e94560}
+          .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}
+          .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}
+          .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}
+          .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}
+          .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}
+          .settings-panel.show{display:block}
+          .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}
+          .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}
+          #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}
+          #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}
+          #terminal.live-mode{border-left:3px solid #4ade80}
+          #session-picker{display:none;background:#16213e;border-bottom:1px solid #0f3460;padding:.5rem;max-height:200px;overflow-y:auto}
+          #session-picker.show{display:block}
+          #session-picker h3{font-size:.9rem;color:#e94560;margin-bottom:.5rem}
+          .session-btn{display:block;width:100%;text-align:left;padding:.5rem .8rem;margin:.3rem 0;background:#0f3460;border:none;border-radius:4px;color:#eee;cursor:pointer;font-size:.8rem}
+          .session-btn:hover{background:#1a4a7a}
+          .session-btn .time{color:#888;font-size:.7rem;margin-left:.5rem}
+          .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}
+          #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}
+          #input:focus{outline:none;border-color:#e94560}
+          #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}
+          #send:disabled{background:#666}
+        </style>
+      </head>
+      <body>
+        <header>
+          <h1>Claude Code UI</h1>
+          <button class="btn" onclick="toggleSettings()">Settings</button>
+          <button class="btn" onclick="testConnection()">Test</button>
+          <button class="btn primary" onclick="startSession()">Start</button>
+          <button class="btn" onclick="resumeSession()" style="background:#9333ea">Resume</button>
+          <button class="btn" onclick="refreshOutput()">Refresh</button>
+          <button class="btn" onclick="resetSession()">Reset</button>
+          <span class="status" id="status">Ready</span>
+        </header>
+        <div class="settings-panel" id="settingsPanel">
+          <label>SSH Host:</label>
+          <input type="text" id="sshHost" placeholder="192.168.8.116">
+          <label>Username:</label>
+          <input type="text" id="sshUser" placeholder="tim">
+          <label>Password:</label>
+          <input type="password" id="sshPass" placeholder="password">
+          <label>Claude Path:</label>
+          <input type="text" id="claudePath" placeholder="/Users/tim/.local/bin/claude">
+          <button class="btn primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+        <div id="session-picker">
+          <h3>Select a session to resume:</h3>
+          <div id="session-list"></div>
+        </div>
+        <div id="terminal" tabindex="0">Welcome to Claude Code UI!
+
+      1. Click "Settings" to configure SSH connection
+      2. Click "Test" to verify connection
+      3. Click "Start" to launch NEW Claude session
+      4. Click "Resume" to continue a previous session
+      5. Type messages below OR click terminal and type directly!</div>
+        <div class="input-area">
+          <textarea id="input" placeholder="Type your message to Claude..." rows="1"></textarea>
+          <button id="send" onclick="sendMessage()">Send</button>
+          <button id="stop" onclick="stopClaude()" style="background:#dc2626">Stop</button>
+        </div>
+        <script>
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('input');
+          const status = document.getElementById('status');
+          let refreshInterval = null;
+          function setStatus(t, c) { status.textContent = t; status.className = 'status ' + (c || ''); }
+          function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('show'); loadSettings(); }
+          async function loadSettings() {
+            try { const r = await fetch('api/settings'); const d = await r.json();
+              document.getElementById('sshHost').value = d.host || '';
+              document.getElementById('sshUser').value = d.user || '';
+              document.getElementById('claudePath').value = d.claudePath || '';
+            } catch (e) {}
+          }
+          async function saveSettings() {
+            const host = document.getElementById('sshHost').value;
+            const user = document.getElementById('sshUser').value;
+            const pass = document.getElementById('sshPass').value;
+            const claudePath = document.getElementById('claudePath').value;
+            try {
+              await fetch('api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ host, user, pass, claudePath }) });
+              setStatus('Saved', 'ok');
+              document.getElementById('settingsPanel').classList.remove('show');
+            } catch (e) { setStatus('Error', 'error'); }
+          }
+          async function testConnection() {
+            setStatus('Testing...', 'loading');
+            try {
+              const r = await fetch('api/test'); const d = await r.json();
+              terminal.textContent = '=== SSH Test via cmd.holm.chat ===\n' + d.output;
+              setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');
+            } catch (e) { setStatus('Error', 'error'); terminal.textContent = 'Error: ' + e.message; }
+          }
+          async function startSession() {
+            setStatus('Starting...', 'loading');
+            try {
+              const r = await fetch('api/start', { method: 'POST' }); const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              setStatus('Running', 'ok');
+              setTimeout(refreshOutput, 3000);
+              startLivePolling();
+            } catch (e) { setStatus('Error', 'error'); terminal.textContent = 'Error: ' + e.message; }
+          }
+          let inResumeMode = false;
+          async function resumeSession() {
+            setStatus('Resuming...', 'loading');
+            try {
+              const r = await fetch('api/resume', { method: 'POST' }); const d = await r.json();
+              if (d.error) throw new Error(d.error);
+              inResumeMode = true;
+              setStatus('Loading sessions...', 'loading');
+              setTimeout(async () => { await refreshOutput(); parseAndShowSessions(); }, 3000);
+              startLivePolling();
+            } catch (e) { setStatus('Error', 'error'); terminal.textContent = 'Error: ' + e.message; }
+          }
+          function parseAndShowSessions() {
+            const lines = terminal.textContent.split('\n'); const sessions = [];
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i]; const nextLine = lines[i + 1] || '';
+              if (nextLine.match(/\d+\s+(minutes?|hours?|days?)\s+ago\s+·\s+\d+\s+messages?/i)) {
+                let desc = line.trim().replace(/^[↓>]\s*/, '').trim();
+                if (desc && desc.length > 2) {
+                  const timeMatch = nextLine.match(/(\d+\s+(?:minutes?|hours?|days?)\s+ago)/i);
+                  const msgMatch = nextLine.match(/(\d+)\s+messages?/i);
+                  sessions.push({ description: desc.substring(0, 60), time: timeMatch ? timeMatch[1] : '', messages: msgMatch ? msgMatch[1] : '0', index: sessions.length });
+                }
+              }
+            }
+            if (sessions.length > 0) { showSessionPicker(sessions); setStatus('Select a session', 'ok'); }
+            else { setStatus('No sessions found', 'error'); }
+          }
+          function showSessionPicker(sessions) {
+            const picker = document.getElementById('session-picker');
+            const list = document.getElementById('session-list');
+            list.innerHTML = '';
+            sessions.forEach((s, idx) => {
+              const btn = document.createElement('button');
+              btn.className = 'session-btn';
+              btn.innerHTML = s.description + ' <span class="time">' + s.time + ' · ' + s.messages + ' msgs</span>';
+              btn.onclick = () => selectSession(idx);
+              list.appendChild(btn);
+            });
+            picker.classList.add('show');
+          }
+          async function selectSession(index) {
+            setStatus('Selecting...', 'loading');
+            document.getElementById('session-picker').classList.remove('show');
+            for (let i = 0; i < 20; i++) { await sendKeys('ArrowUp'); await sleep(50); }
+            for (let i = 0; i < index; i++) { await sendKeys('ArrowDown'); await sleep(100); }
+            await sleep(300); await sendKeys('Enter');
+            inResumeMode = false; setStatus('Session loaded!', 'ok');
+            setTimeout(refreshOutput, 2000);
+          }
+          function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+          function startLivePolling() { if (refreshInterval) clearInterval(refreshInterval); refreshInterval = setInterval(refreshOutput, 1000); }
+          async function refreshOutput() {
+            try { const r = await fetch('api/output'); const d = await r.json();
+              if (d.output) { terminal.textContent = d.output; terminal.scrollTop = terminal.scrollHeight; }
+            } catch (e) {}
+          }
+          async function sendMessage() {
+            const msg = input.value.trim(); if (!msg) return;
+            input.value = ''; document.getElementById('send').disabled = true;
+            setStatus('Sending...', 'loading');
+            try {
+              const r = await fetch('api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });
+              const d = await r.json(); if (d.error) throw new Error(d.error);
+              setStatus('Processing...', 'loading'); startLivePolling();
+            } catch (e) { setStatus('Error', 'error'); }
+            document.getElementById('send').disabled = false;
+          }
+          async function resetSession() {
+            if (!confirm('Reset session?')) return;
+            if (refreshInterval) clearInterval(refreshInterval);
+            try { await fetch('api/reset', { method: 'POST' }); terminal.textContent = 'Session reset. Click Start to begin.'; setStatus('Ready', ''); } catch (e) {}
+          }
+          input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+          let liveMode = false;
+          terminal.addEventListener('focus', () => { liveMode = true; terminal.classList.add('live-mode'); setStatus('Live Mode', 'ok'); });
+          terminal.addEventListener('blur', () => { liveMode = false; terminal.classList.remove('live-mode'); setStatus('Ready', ''); });
+          terminal.addEventListener('keydown', async (e) => {
+            if (!liveMode) return;
+            if (!['F5', 'F12'].includes(e.key)) e.preventDefault();
+            if (e.ctrlKey && e.key === 'c') { await sendKeys('C-c'); return; }
+            if (e.ctrlKey && e.key === 'd') { await sendKeys('C-d'); return; }
+            if (e.ctrlKey && e.key === 'z') { await sendKeys('C-z'); return; }
+            if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+            await sendKeys(e.key);
+          });
+          async function sendKeys(keys) {
+            try { await fetch('api/keys', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ keys }) }); } catch (e) {}
+          }
+          async function stopClaude() { setStatus('Stopping...', 'loading'); await sendKeys('C-c'); setTimeout(() => { refreshOutput(); setStatus('Stopped', 'ok'); }, 500); }
+          document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { refreshOutput(); startLivePolling(); } });
+          window.addEventListener('focus', () => { refreshOutput(); startLivePolling(); });
+          loadSettings();
+        </script>
+      </body>
+      </html>
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"index.html":"\u003c!DOCTYPE html\u003e\n\u003chtml lang=\"en\"\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"UTF-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width,initial-scale=1\"\u003e\n  \u003ctitle\u003eClaude Code UI\u003c/title\u003e\n  \u003cstyle\u003e\n    *{box-sizing:border-box;margin:0;padding:0}\n    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;height:100vh;display:flex;flex-direction:column}\n    header{background:#16213e;padding:.8rem 1rem;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}\n    header h1{font-size:1.1rem;color:#e94560}\n    .status{margin-left:auto;font-size:.75rem;padding:.3rem .6rem;border-radius:4px;background:#0f3460}\n    .status.ok{color:#4ade80}.status.loading{color:#fbbf24}.status.error{color:#f87171}\n    .btn{padding:.4rem .8rem;background:#0f3460;color:#fff;border:none;border-radius:4px;font-size:.8rem;cursor:pointer}\n    .btn:hover{background:#1a4a7a}.btn.primary{background:#e94560}.btn.primary:hover{background:#d63850}\n    .settings-panel{background:#0d0d1a;padding:1rem;border-bottom:1px solid #0f3460;display:none}\n    .settings-panel.show{display:block}\n    .settings-panel label{display:block;font-size:.8rem;color:#888;margin-bottom:.3rem}\n    .settings-panel input{width:100%;padding:.5rem;margin-bottom:.8rem;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#eee}\n    #terminal{flex:1;overflow-y:auto;padding:1rem;background:#0d0d1a;font-family:Monaco,Menlo,monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;cursor:text;outline:none}\n    #terminal:focus{box-shadow:inset 0 0 0 2px #e94560}\n    #terminal.live-mode{border-left:3px solid #4ade80}\n    #session-picker{display:none;background:#16213e;border-bottom:1px solid #0f3460;padding:.5rem;max-height:200px;overflow-y:auto}\n    #session-picker.show{display:block}\n    #session-picker h3{font-size:.9rem;color:#e94560;margin-bottom:.5rem}\n    .session-btn{display:block;width:100%;text-align:left;padding:.5rem .8rem;margin:.3rem 0;background:#0f3460;border:none;border-radius:4px;color:#eee;cursor:pointer;font-size:.8rem}\n    .session-btn:hover{background:#1a4a7a}\n    .session-btn .time{color:#888;font-size:.7rem;margin-left:.5rem}\n    .input-area{padding:1rem;background:#16213e;border-top:1px solid #0f3460;display:flex;gap:.5rem}\n    #input{flex:1;padding:.75rem;border:1px solid #0f3460;border-radius:8px;background:#1a1a2e;color:#eee;font-size:1rem;resize:none;min-height:50px}\n    #input:focus{outline:none;border-color:#e94560}\n    #send{padding:.75rem 1.5rem;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer}\n    #send:disabled{background:#666}\n  \u003c/style\u003e\n\u003c/head\u003e\n\u003cbody\u003e\n  \u003cheader\u003e\n    \u003ch1\u003eClaude Code UI\u003c/h1\u003e\n    \u003cbutton class=\"btn\" onclick=\"toggleSettings()\"\u003eSettings\u003c/button\u003e\n    \u003cbutton class=\"btn\" onclick=\"testConnection()\"\u003eTest\u003c/button\u003e\n    \u003cbutton class=\"btn primary\" onclick=\"startSession()\"\u003eStart\u003c/button\u003e\n    \u003cbutton class=\"btn\" onclick=\"resumeSession()\" style=\"background:#9333ea\"\u003eResume\u003c/button\u003e\n    \u003cbutton class=\"btn\" onclick=\"refreshOutput()\"\u003eRefresh\u003c/button\u003e\n    \u003cbutton class=\"btn\" onclick=\"resetSession()\"\u003eReset\u003c/button\u003e\n    \u003cspan class=\"status\" id=\"status\"\u003eReady\u003c/span\u003e\n  \u003c/header\u003e\n  \u003cdiv class=\"settings-panel\" id=\"settingsPanel\"\u003e\n    \u003clabel\u003eSSH Host:\u003c/label\u003e\n    \u003cinput type=\"text\" id=\"sshHost\" placeholder=\"192.168.8.116\"\u003e\n    \u003clabel\u003eUsername:\u003c/label\u003e\n    \u003cinput type=\"text\" id=\"sshUser\" placeholder=\"tim\"\u003e\n    \u003clabel\u003ePassword:\u003c/label\u003e\n    \u003cinput type=\"password\" id=\"sshPass\" placeholder=\"password\"\u003e\n    \u003clabel\u003eClaude Path:\u003c/label\u003e\n    \u003cinput type=\"text\" id=\"claudePath\" placeholder=\"/Users/tim/.local/bin/claude\"\u003e\n    \u003cbutton class=\"btn primary\" onclick=\"saveSettings()\"\u003eSave Settings\u003c/button\u003e\n  \u003c/div\u003e\n  \u003cdiv id=\"session-picker\"\u003e\n    \u003ch3\u003eSelect a session to resume:\u003c/h3\u003e\n    \u003cdiv id=\"session-list\"\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv id=\"terminal\" tabindex=\"0\"\u003eWelcome to Claude Code UI!\n\n1. Click \"Settings\" to configure SSH connection\n2. Click \"Test\" to verify connection\n3. Click \"Start\" to launch NEW Claude session\n4. Click \"Resume\" to continue a previous session\n5. Type messages below OR click terminal and type directly!\u003c/div\u003e\n  \u003cdiv class=\"input-area\"\u003e\n    \u003ctextarea id=\"input\" placeholder=\"Type your message to Claude...\" rows=\"1\"\u003e\u003c/textarea\u003e\n    \u003cbutton id=\"send\" onclick=\"sendMessage()\"\u003eSend\u003c/button\u003e\n    \u003cbutton id=\"stop\" onclick=\"stopClaude()\" style=\"background:#dc2626\"\u003eStop\u003c/button\u003e\n  \u003c/div\u003e\n  \u003cscript\u003e\n    const terminal = document.getElementById('terminal');\n    const input = document.getElementById('input');\n    const status = document.getElementById('status');\n    let refreshInterval = null;\n    function setStatus(t, c) { status.textContent = t; status.className = 'status ' + (c || ''); }\n    function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('show'); loadSettings(); }\n    async function loadSettings() {\n      try { const r = await fetch('api/settings'); const d = await r.json();\n        document.getElementById('sshHost').value = d.host || '';\n        document.getElementById('sshUser').value = d.user || '';\n        document.getElementById('claudePath').value = d.claudePath || '';\n      } catch (e) {}\n    }\n    async function saveSettings() {\n      const host = document.getElementById('sshHost').value;\n      const user = document.getElementById('sshUser').value;\n      const pass = document.getElementById('sshPass').value;\n      const claudePath = document.getElementById('claudePath').value;\n      try {\n        await fetch('api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ host, user, pass, claudePath }) });\n        setStatus('Saved', 'ok');\n        document.getElementById('settingsPanel').classList.remove('show');\n      } catch (e) { setStatus('Error', 'error'); }\n    }\n    async function testConnection() {\n      setStatus('Testing...', 'loading');\n      try {\n        const r = await fetch('api/test'); const d = await r.json();\n        terminal.textContent = '=== SSH Test via cmd.holm.chat ===\\n' + d.output;\n        setStatus(d.status === 'ok' ? 'Connected' : 'Error', d.status === 'ok' ? 'ok' : 'error');\n      } catch (e) { setStatus('Error', 'error'); terminal.textContent = 'Error: ' + e.message; }\n    }\n    async function startSession() {\n      setStatus('Starting...', 'loading');\n      try {\n        const r = await fetch('api/start', { method: 'POST' }); const d = await r.json();\n        if (d.error) throw new Error(d.error);\n        setStatus('Running', 'ok');\n        setTimeout(refreshOutput, 3000);\n        startLivePolling();\n      } catch (e) { setStatus('Error', 'error'); terminal.textContent = 'Error: ' + e.message; }\n    }\n    let inResumeMode = false;\n    async function resumeSession() {\n      setStatus('Resuming...', 'loading');\n      try {\n        const r = await fetch('api/resume', { method: 'POST' }); const d = await r.json();\n        if (d.error) throw new Error(d.error);\n        inResumeMode = true;\n        setStatus('Loading sessions...', 'loading');\n        setTimeout(async () =\u003e { await refreshOutput(); parseAndShowSessions(); }, 3000);\n        startLivePolling();\n      } catch (e) { setStatus('Error', 'error'); terminal.textContent = 'Error: ' + e.message; }\n    }\n    function parseAndShowSessions() {\n      const lines = terminal.textContent.split('\\n'); const sessions = [];\n      for (let i = 0; i \u003c lines.length; i++) {\n        const line = lines[i]; const nextLine = lines[i + 1] || '';\n        if (nextLine.match(/\\d+\\s+(minutes?|hours?|days?)\\s+ago\\s+·\\s+\\d+\\s+messages?/i)) {\n          let desc = line.trim().replace(/^[↓\u003e]\\s*/, '').trim();\n          if (desc \u0026\u0026 desc.length \u003e 2) {\n            const timeMatch = nextLine.match(/(\\d+\\s+(?:minutes?|hours?|days?)\\s+ago)/i);\n            const msgMatch = nextLine.match(/(\\d+)\\s+messages?/i);\n            sessions.push({ description: desc.substring(0, 60), time: timeMatch ? timeMatch[1] : '', messages: msgMatch ? msgMatch[1] : '0', index: sessions.length });\n          }\n        }\n      }\n      if (sessions.length \u003e 0) { showSessionPicker(sessions); setStatus('Select a session', 'ok'); }\n      else { setStatus('No sessions found', 'error'); }\n    }\n    function showSessionPicker(sessions) {\n      const picker = document.getElementById('session-picker');\n      const list = document.getElementById('session-list');\n      list.innerHTML = '';\n      sessions.forEach((s, idx) =\u003e {\n        const btn = document.createElement('button');\n        btn.className = 'session-btn';\n        btn.innerHTML = s.description + ' \u003cspan class=\"time\"\u003e' + s.time + ' · ' + s.messages + ' msgs\u003c/span\u003e';\n        btn.onclick = () =\u003e selectSession(idx);\n        list.appendChild(btn);\n      });\n      picker.classList.add('show');\n    }\n    async function selectSession(index) {\n      setStatus('Selecting...', 'loading');\n      document.getElementById('session-picker').classList.remove('show');\n      for (let i = 0; i \u003c 20; i++) { await sendKeys('ArrowUp'); await sleep(50); }\n      for (let i = 0; i \u003c index; i++) { await sendKeys('ArrowDown'); await sleep(100); }\n      await sleep(300); await sendKeys('Enter');\n      inResumeMode = false; setStatus('Session loaded!', 'ok');\n      setTimeout(refreshOutput, 2000);\n    }\n    function sleep(ms) { return new Promise(resolve =\u003e setTimeout(resolve, ms)); }\n    function startLivePolling() { if (refreshInterval) clearInterval(refreshInterval); refreshInterval = setInterval(refreshOutput, 1000); }\n    async function refreshOutput() {\n      try { const r = await fetch('api/output'); const d = await r.json();\n        if (d.output) { terminal.textContent = d.output; terminal.scrollTop = terminal.scrollHeight; }\n      } catch (e) {}\n    }\n    async function sendMessage() {\n      const msg = input.value.trim(); if (!msg) return;\n      input.value = ''; document.getElementById('send').disabled = true;\n      setStatus('Sending...', 'loading');\n      try {\n        const r = await fetch('api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });\n        const d = await r.json(); if (d.error) throw new Error(d.error);\n        setStatus('Processing...', 'loading'); startLivePolling();\n      } catch (e) { setStatus('Error', 'error'); }\n      document.getElementById('send').disabled = false;\n    }\n    async function resetSession() {\n      if (!confirm('Reset session?')) return;\n      if (refreshInterval) clearInterval(refreshInterval);\n      try { await fetch('api/reset', { method: 'POST' }); terminal.textContent = 'Session reset. Click Start to begin.'; setStatus('Ready', ''); } catch (e) {}\n    }\n    input.addEventListener('keydown', e =\u003e { if (e.key === 'Enter' \u0026\u0026 !e.shiftKey) { e.preventDefault(); sendMessage(); } });\n    let liveMode = false;\n    terminal.addEventListener('focus', () =\u003e { liveMode = true; terminal.classList.add('live-mode'); setStatus('Live Mode', 'ok'); });\n    terminal.addEventListener('blur', () =\u003e { liveMode = false; terminal.classList.remove('live-mode'); setStatus('Ready', ''); });\n    terminal.addEventListener('keydown', async (e) =\u003e {\n      if (!liveMode) return;\n      if (!['F5', 'F12'].includes(e.key)) e.preventDefault();\n      if (e.ctrlKey \u0026\u0026 e.key === 'c') { await sendKeys('C-c'); return; }\n      if (e.ctrlKey \u0026\u0026 e.key === 'd') { await sendKeys('C-d'); return; }\n      if (e.ctrlKey \u0026\u0026 e.key === 'z') { await sendKeys('C-z'); return; }\n      if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;\n      await sendKeys(e.key);\n    });\n    async function sendKeys(keys) {\n      try { await fetch('api/keys', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ keys }) }); } catch (e) {}\n    }\n    async function stopClaude() { setStatus('Stopping...', 'loading'); await sendKeys('C-c'); setTimeout(() =\u003e { refreshOutput(); setStatus('Stopped', 'ok'); }, 500); }\n    document.addEventListener('visibilitychange', () =\u003e { if (document.visibilityState === 'visible') { refreshOutput(); startLivePolling(); } });\n    window.addEventListener('focus', () =\u003e { refreshOutput(); startLivePolling(); });\n    loadSettings();\n  \u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"claude-webui-html","namespace":"build"}}
+    creationTimestamp: "2026-01-20T04:09:37Z"
+    name: claude-webui-html
+    namespace: build
+    resourceVersion: "709"
+    uid: 8a94561f-f1ad-4994-abd6-8802a1612d8e
+- apiVersion: v1
+  data:
+    server.js: |
+      const express = require('express');
+      const path = require('path');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      const CMD_API_URL = process.env.CMD_API_URL || 'https://cmd.holm.chat';
+
+      let sshConfig = {
+        host: process.env.SSH_HOST || '192.168.8.116',
+        user: process.env.SSH_USER || 'tim',
+        pass: process.env.SSH_PASS || '',
+        claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'
+      };
+
+      const TMUX_SESSION = 'claude-session';
+      const PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      async function runSSH(cmd, timeout = 30000) {
+        const fullCmd = PATH_PREFIX + cmd;
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
+          const response = await fetch(`${CMD_API_URL}/ssh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              host: sshConfig.host,
+              username: sshConfig.user,
+              password: sshConfig.pass,
+              command: fullCmd,
+              port: 22
+            }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          const data = await response.json();
+          if (data.error) {
+            console.error('[SSH Error]', data.error);
+            return data.error;
+          }
+          let output = data.stdout || '';
+          if (data.stderr) output += '\n' + data.stderr;
+          return output.trim() || '(no output)';
+        } catch (e) {
+          console.error('[SSH Fetch Error]', e.message);
+          return `Error: ${e.message}`;
+        }
+      }
+
+      app.post('/api/settings', (req, res) => {
+        const { host, user, pass, claudePath } = req.body;
+        if (host) sshConfig.host = host;
+        if (user) sshConfig.user = user;
+        if (pass) sshConfig.pass = pass;
+        if (claudePath) sshConfig.claudePath = claudePath;
+        res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });
+      });
+
+      app.get('/api/settings', (req, res) => {
+        res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });
+      });
+
+      app.get('/api/test', async (req, res) => {
+        try {
+          const result = await runSSH(`echo "SSH OK via cmd.holm.chat" && ${sshConfig.claudePath} --version`);
+          const isOk = result.includes('SSH OK') || result.includes('claude');
+          res.json({ status: isOk ? 'ok' : 'error', output: result });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/start', async (req, res) => {
+        try {
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;
+          const check = await runSSH(`tmux has-session -t ${TMUX_SESSION} 2>/dev/null && echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter && echo CREATED)`);
+          res.json({ status: 'ok', result: check.trim() });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/resume', async (req, res) => {
+        try {
+          await runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;
+          await runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 && sleep 1 && tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);
+          res.json({ status: 'ok', result: 'RESUME_STARTED' });
+        } catch (e) {
+          res.json({ status: 'error', error: e.message });
+        }
+      });
+
+      app.post('/api/chat', async (req, res) => {
+        try {
+          const { message } = req.body;
+          if (!message) return res.status(400).json({ error: 'Message required' });
+          const escaped = message.replace(/'/g, "'\\''").replace(/\\/g, '\\\\');
+          await runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter && sleep 0.3 && tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'sent' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/api/output', async (req, res) => {
+        try {
+          const output = await runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);
+          res.json({ output });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/enter', async (req, res) => {
+        try {
+          await runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/keys', async (req, res) => {
+        try {
+          const { keys } = req.body;
+          if (!keys) return res.status(400).json({ error: 'Keys required' });
+          const keyMap = {
+            'Backspace': 'BSpace', 'Delete': 'DC', 'Escape': 'Escape', 'Tab': 'Tab',
+            'ArrowUp': 'Up', 'ArrowDown': 'Down', 'ArrowLeft': 'Left', 'ArrowRight': 'Right',
+            'Home': 'Home', 'End': 'End', 'PageUp': 'PPage', 'PageDown': 'NPage'
+          };
+          const tmuxKey = keyMap[keys] || keys;
+          if (keyMap[keys]) {
+            await runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);
+          } else if (keys === 'Enter') {
+            await runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);
+          } else {
+            const escaped = keys.replace(/'/g, "'\\''");
+            await runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);
+          }
+          res.json({ status: 'ok' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.post('/api/reset', async (req, res) => {
+        try {
+          await runSSH(`tmux kill-session -t ${TMUX_SESSION} 2>/dev/null || true`);
+          res.json({ status: 'Session reset' });
+        } catch (e) {
+          res.json({ error: e.message });
+        }
+      });
+
+      app.get('/health', (req, res) => res.json({ status: 'ok', cmdApi: CMD_API_URL }));
+
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Claude Web UI v5 on port ${PORT}`);
+        console.log(`Using cmd API: ${CMD_API_URL}`);
+      });
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"server.js":"const express = require('express');\nconst path = require('path');\nconst app = express();\nconst PORT = process.env.PORT || 3000;\n\nconst CMD_API_URL = process.env.CMD_API_URL || 'https://cmd.holm.chat';\n\nlet sshConfig = {\n  host: process.env.SSH_HOST || '192.168.8.116',\n  user: process.env.SSH_USER || 'tim',\n  pass: process.env.SSH_PASS || '',\n  claudePath: process.env.CLAUDE_PATH || '/Users/tim/.local/bin/claude'\n};\n\nconst TMUX_SESSION = 'claude-session';\nconst PATH_PREFIX = 'export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH \u0026\u0026 ';\n\napp.use(express.json());\napp.use(express.static('public'));\n\nasync function runSSH(cmd, timeout = 30000) {\n  const fullCmd = PATH_PREFIX + cmd;\n  try {\n    const controller = new AbortController();\n    const timeoutId = setTimeout(() =\u003e controller.abort(), timeout);\n    const response = await fetch(`${CMD_API_URL}/ssh`, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({\n        host: sshConfig.host,\n        username: sshConfig.user,\n        password: sshConfig.pass,\n        command: fullCmd,\n        port: 22\n      }),\n      signal: controller.signal\n    });\n    clearTimeout(timeoutId);\n    const data = await response.json();\n    if (data.error) {\n      console.error('[SSH Error]', data.error);\n      return data.error;\n    }\n    let output = data.stdout || '';\n    if (data.stderr) output += '\\n' + data.stderr;\n    return output.trim() || '(no output)';\n  } catch (e) {\n    console.error('[SSH Fetch Error]', e.message);\n    return `Error: ${e.message}`;\n  }\n}\n\napp.post('/api/settings', (req, res) =\u003e {\n  const { host, user, pass, claudePath } = req.body;\n  if (host) sshConfig.host = host;\n  if (user) sshConfig.user = user;\n  if (pass) sshConfig.pass = pass;\n  if (claudePath) sshConfig.claudePath = claudePath;\n  res.json({ status: 'ok', config: { host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath } });\n});\n\napp.get('/api/settings', (req, res) =\u003e {\n  res.json({ host: sshConfig.host, user: sshConfig.user, claudePath: sshConfig.claudePath });\n});\n\napp.get('/api/test', async (req, res) =\u003e {\n  try {\n    const result = await runSSH(`echo \"SSH OK via cmd.holm.chat\" \u0026\u0026 ${sshConfig.claudePath} --version`);\n    const isOk = result.includes('SSH OK') || result.includes('claude');\n    res.json({ status: isOk ? 'ok' : 'error', output: result });\n  } catch (e) {\n    res.json({ status: 'error', error: e.message });\n  }\n});\n\napp.post('/api/start', async (req, res) =\u003e {\n  try {\n    const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions`;\n    const check = await runSSH(`tmux has-session -t ${TMUX_SESSION} 2\u003e/dev/null \u0026\u0026 echo EXISTS || (tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 \u0026\u0026 sleep 1 \u0026\u0026 tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter \u0026\u0026 echo CREATED)`);\n    res.json({ status: 'ok', result: check.trim() });\n  } catch (e) {\n    res.json({ status: 'error', error: e.message });\n  }\n});\n\napp.post('/api/resume', async (req, res) =\u003e {\n  try {\n    await runSSH(`tmux kill-session -t ${TMUX_SESSION} 2\u003e/dev/null || true`);\n    const claudeCmd = `${sshConfig.claudePath} --dangerously-skip-permissions --resume`;\n    await runSSH(`tmux new-session -d -s ${TMUX_SESSION} -x 200 -y 50 \u0026\u0026 sleep 1 \u0026\u0026 tmux send-keys -t ${TMUX_SESSION} '${claudeCmd}' Enter`);\n    res.json({ status: 'ok', result: 'RESUME_STARTED' });\n  } catch (e) {\n    res.json({ status: 'error', error: e.message });\n  }\n});\n\napp.post('/api/chat', async (req, res) =\u003e {\n  try {\n    const { message } = req.body;\n    if (!message) return res.status(400).json({ error: 'Message required' });\n    const escaped = message.replace(/'/g, \"'\\\\''\").replace(/\\\\/g, '\\\\\\\\');\n    await runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}' Enter \u0026\u0026 sleep 0.3 \u0026\u0026 tmux send-keys -t ${TMUX_SESSION} Enter`);\n    res.json({ status: 'sent' });\n  } catch (e) {\n    res.json({ error: e.message });\n  }\n});\n\napp.get('/api/output', async (req, res) =\u003e {\n  try {\n    const output = await runSSH(`tmux capture-pane -t ${TMUX_SESSION} -p -S -200`);\n    res.json({ output });\n  } catch (e) {\n    res.json({ error: e.message });\n  }\n});\n\napp.post('/api/enter', async (req, res) =\u003e {\n  try {\n    await runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);\n    res.json({ status: 'ok' });\n  } catch (e) {\n    res.json({ error: e.message });\n  }\n});\n\napp.post('/api/keys', async (req, res) =\u003e {\n  try {\n    const { keys } = req.body;\n    if (!keys) return res.status(400).json({ error: 'Keys required' });\n    const keyMap = {\n      'Backspace': 'BSpace', 'Delete': 'DC', 'Escape': 'Escape', 'Tab': 'Tab',\n      'ArrowUp': 'Up', 'ArrowDown': 'Down', 'ArrowLeft': 'Left', 'ArrowRight': 'Right',\n      'Home': 'Home', 'End': 'End', 'PageUp': 'PPage', 'PageDown': 'NPage'\n    };\n    const tmuxKey = keyMap[keys] || keys;\n    if (keyMap[keys]) {\n      await runSSH(`tmux send-keys -t ${TMUX_SESSION} ${tmuxKey}`);\n    } else if (keys === 'Enter') {\n      await runSSH(`tmux send-keys -t ${TMUX_SESSION} Enter`);\n    } else {\n      const escaped = keys.replace(/'/g, \"'\\\\''\");\n      await runSSH(`tmux send-keys -t ${TMUX_SESSION} '${escaped}'`);\n    }\n    res.json({ status: 'ok' });\n  } catch (e) {\n    res.json({ error: e.message });\n  }\n});\n\napp.post('/api/reset', async (req, res) =\u003e {\n  try {\n    await runSSH(`tmux kill-session -t ${TMUX_SESSION} 2\u003e/dev/null || true`);\n    res.json({ status: 'Session reset' });\n  } catch (e) {\n    res.json({ error: e.message });\n  }\n});\n\napp.get('/health', (req, res) =\u003e res.json({ status: 'ok', cmdApi: CMD_API_URL }));\n\napp.listen(PORT, '0.0.0.0', () =\u003e {\n  console.log(`Claude Web UI v5 on port ${PORT}`);\n  console.log(`Using cmd API: ${CMD_API_URL}`);\n});\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"claude-webui-server","namespace":"build"}}
+    creationTimestamp: "2026-01-20T04:09:36Z"
+    name: claude-webui-server
+    namespace: build
+    resourceVersion: "710"
+    uid: 5c2fb2bf-dd4a-4056-80b0-65ef2cc1a384
+- apiVersion: v1
+  binaryData:
+    source.tar.gz: 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
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","binaryData":{"source.tar.gz":"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"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"holm-homepage-source","namespace":"build"}}
+    creationTimestamp: "2026-01-20T01:14:45Z"
+    name: holm-homepage-source
+    namespace: build
+    resourceVersion: "711"
+    uid: bbf1cf63-dd17-4124-ab3d-9facdb14cf4f
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-20T01:14:45Z"
+    name: kube-root-ca.crt
+    namespace: build
+    resourceVersion: "712"
+    uid: d0f77e91-7c2b-439a-bb19-d3535953659a
+kind: List
+metadata:
+  resourceVersion: ""

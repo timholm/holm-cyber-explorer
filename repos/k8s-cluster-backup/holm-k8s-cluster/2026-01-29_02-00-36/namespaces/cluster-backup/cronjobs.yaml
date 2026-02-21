@@ -1,0 +1,140 @@
+apiVersion: v1
+items:
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"labels":{"app":"k8s-backup"},"name":"k8s-manifest-backup","namespace":"cluster-backup"},"spec":{"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":3,"jobTemplate":{"spec":{"template":{"metadata":{"labels":{"app":"k8s-backup"}},"spec":{"containers":[{"args":["set -e\n\n# Configuration\nBACKUP_DIR=\"/backup\"\nDATE=$(date +%Y-%m-%d_%H-%M-%S)\nCLUSTER_NAME=\"${CLUSTER_NAME:-k8s-cluster}\"\n\necho \"=== Starting Kubernetes Cluster Backup ===\"\necho \"Date: $DATE\"\necho \"Cluster: $CLUSTER_NAME\"\n\n# Install kubectl\ncurl -LO \"https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl\"\nchmod +x kubectl\nmv kubectl /usr/local/bin/\n\n# Setup Git\ncd $BACKUP_DIR\ngit config --global user.email \"$GIT_EMAIL\"\ngit config --global user.name \"$GIT_USERNAME\"\ngit config --global --add safe.directory $BACKUP_DIR\n\n# Configure git credentials\nREPO_URL=$(echo \"$GITHUB_REPO\" | sed \"s|https://|https://${GITHUB_TOKEN}@|\")\n\n# Clone or pull\nif [ ! -d \".git\" ]; then\n  echo \"Cloning repository...\"\n  git clone \"$REPO_URL\" . 2\u003e/dev/null || {\n    echo \"Empty repo, initializing...\"\n    git init\n    git remote add origin \"$REPO_URL\"\n    git checkout -b main\n  }\nfi\n\n# Create backup dir\nmkdir -p \"$CLUSTER_NAME/$DATE\"\nEXPORT_DIR=\"$CLUSTER_NAME/$DATE\"\n\n# Get namespaces\necho \"=== Fetching namespaces ===\"\nnamespaces=$(kubectl get namespaces -o jsonpath='{.items[*].metadata.name}')\n\n# Export cluster resources\necho \"=== Exporting cluster resources ===\"\nmkdir -p \"$EXPORT_DIR/cluster\"\nkubectl get namespaces -o yaml \u003e \"$EXPORT_DIR/cluster/namespaces.yaml\"\nkubectl get storageclasses -o yaml \u003e \"$EXPORT_DIR/cluster/storageclasses.yaml\" 2\u003e/dev/null || true\nkubectl get pv -o yaml \u003e \"$EXPORT_DIR/cluster/persistentvolumes.yaml\" 2\u003e/dev/null || true\nkubectl get clusterroles -o yaml \u003e \"$EXPORT_DIR/cluster/clusterroles.yaml\" 2\u003e/dev/null || true\n\n# Export namespaced resources\necho \"=== Exporting namespaced resources ===\"\nfor ns in $namespaces; do\n  case \"$ns\" in\n    kube-system|kube-public|kube-node-lease) continue ;;\n  esac\n  \n  echo \"Processing: $ns\"\n  NS_DIR=\"$EXPORT_DIR/namespaces/$ns\"\n  mkdir -p \"$NS_DIR\"\n  \n  kubectl get deployments -n \"$ns\" -o yaml \u003e \"$NS_DIR/deployments.yaml\" 2\u003e/dev/null || true\n  kubectl get services -n \"$ns\" -o yaml \u003e \"$NS_DIR/services.yaml\" 2\u003e/dev/null || true\n  kubectl get configmaps -n \"$ns\" -o yaml \u003e \"$NS_DIR/configmaps.yaml\" 2\u003e/dev/null || true\n  kubectl get statefulsets -n \"$ns\" -o yaml \u003e \"$NS_DIR/statefulsets.yaml\" 2\u003e/dev/null || true\n  kubectl get daemonsets -n \"$ns\" -o yaml \u003e \"$NS_DIR/daemonsets.yaml\" 2\u003e/dev/null || true\n  kubectl get pvc -n \"$ns\" -o yaml \u003e \"$NS_DIR/pvcs.yaml\" 2\u003e/dev/null || true\n  kubectl get ingresses -n \"$ns\" -o yaml \u003e \"$NS_DIR/ingresses.yaml\" 2\u003e/dev/null || true\n  kubectl get cronjobs -n \"$ns\" -o yaml \u003e \"$NS_DIR/cronjobs.yaml\" 2\u003e/dev/null || true\ndone\n\n# Create summary\necho \"# Kubernetes Backup - $CLUSTER_NAME - $DATE\" \u003e \"$EXPORT_DIR/README.md\"\necho \"\" \u003e\u003e \"$EXPORT_DIR/README.md\"\necho \"## Namespaces\" \u003e\u003e \"$EXPORT_DIR/README.md\"\necho \"$namespaces\" | tr ' ' '\\n' | sed 's/^/- /' \u003e\u003e \"$EXPORT_DIR/README.md\"\n\n# Commit and push\necho \"=== Pushing to GitHub ===\"\ngit add -A\ngit commit -m \"Backup: $CLUSTER_NAME - $DATE\" || echo \"No changes\"\ngit push -u origin main || git push origin master || echo \"Push failed\"\n\necho \"=== Backup completed ===\"\n"],"command":["/bin/bash","-c"],"env":[{"name":"CLUSTER_NAME","value":"holm-k8s-cluster"},{"name":"GITHUB_TOKEN","valueFrom":{"secretKeyRef":{"key":"github-token","name":"github-credentials"}}},{"name":"GIT_EMAIL","valueFrom":{"secretKeyRef":{"key":"git-email","name":"github-credentials"}}},{"name":"GIT_USERNAME","valueFrom":{"secretKeyRef":{"key":"git-username","name":"github-credentials"}}},{"name":"GITHUB_REPO","valueFrom":{"secretKeyRef":{"key":"github-repo","name":"github-credentials"}}}],"image":"bitnami/git:latest","name":"backup","resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/backup","name":"backup-storage"}]}],"restartPolicy":"OnFailure","serviceAccountName":"cluster-backup-sa","volumes":[{"emptyDir":{},"name":"backup-storage"}]}},"ttlSecondsAfterFinished":86400}},"schedule":"0 2 * * *","successfulJobsHistoryLimit":3}}
+    creationTimestamp: "2026-01-28T05:38:28Z"
+    generation: 3
+    labels:
+      app: k8s-backup
+    name: k8s-manifest-backup
+    namespace: cluster-backup
+    resourceVersion: "1872687"
+    uid: 5131966d-ad6f-41c3-9ef3-015043a325ab
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 3
+    jobTemplate:
+      metadata: {}
+      spec:
+        template:
+          metadata:
+            labels:
+              app: k8s-backup
+          spec:
+            containers:
+            - args:
+              - "set -e\n\n# Configuration\nBACKUP_DIR=\"/backup\"\nDATE=$(date +%Y-%m-%d_%H-%M-%S)\nCLUSTER_NAME=\"${CLUSTER_NAME:-k8s-cluster}\"\n\necho
+                \"=== Starting Kubernetes Cluster Backup ===\"\necho \"Date: $DATE\"\necho
+                \"Cluster: $CLUSTER_NAME\"\n\n# Install kubectl\ncurl -LO \"https://dl.k8s.io/release/$(curl
+                -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl\"\nchmod
+                +x kubectl\nmv kubectl /usr/local/bin/\n\n# Setup Git\ncd $BACKUP_DIR\ngit
+                config --global user.email \"$GIT_EMAIL\"\ngit config --global user.name
+                \"$GIT_USERNAME\"\ngit config --global --add safe.directory $BACKUP_DIR\n\n#
+                Configure git credentials\nREPO_URL=$(echo \"$GITHUB_REPO\" | sed
+                \"s|https://|https://${GITHUB_TOKEN}@|\")\n\n# Clone or pull\nif [
+                ! -d \".git\" ]; then\n  echo \"Cloning repository...\"\n  git clone
+                \"$REPO_URL\" . 2>/dev/null || {\n    echo \"Empty repo, initializing...\"\n
+                \   git init\n    git remote add origin \"$REPO_URL\"\n    git checkout
+                -b main\n  }\nfi\n\n# Create backup dir\nmkdir -p \"$CLUSTER_NAME/$DATE\"\nEXPORT_DIR=\"$CLUSTER_NAME/$DATE\"\n\n#
+                Get namespaces\necho \"=== Fetching namespaces ===\"\nnamespaces=$(kubectl
+                get namespaces -o jsonpath='{.items[*].metadata.name}')\n\n# Export
+                cluster resources\necho \"=== Exporting cluster resources ===\"\nmkdir
+                -p \"$EXPORT_DIR/cluster\"\nkubectl get namespaces -o yaml > \"$EXPORT_DIR/cluster/namespaces.yaml\"\nkubectl
+                get storageclasses -o yaml > \"$EXPORT_DIR/cluster/storageclasses.yaml\"
+                2>/dev/null || true\nkubectl get pv -o yaml > \"$EXPORT_DIR/cluster/persistentvolumes.yaml\"
+                2>/dev/null || true\nkubectl get clusterroles -o yaml > \"$EXPORT_DIR/cluster/clusterroles.yaml\"
+                2>/dev/null || true\n\n# Export namespaced resources\necho \"=== Exporting
+                namespaced resources ===\"\nfor ns in $namespaces; do\n  case \"$ns\"
+                in\n    kube-system|kube-public|kube-node-lease) continue ;;\n  esac\n
+                \ \n  echo \"Processing: $ns\"\n  NS_DIR=\"$EXPORT_DIR/namespaces/$ns\"\n
+                \ mkdir -p \"$NS_DIR\"\n  \n  kubectl get deployments -n \"$ns\" -o
+                yaml > \"$NS_DIR/deployments.yaml\" 2>/dev/null || true\n  kubectl
+                get services -n \"$ns\" -o yaml > \"$NS_DIR/services.yaml\" 2>/dev/null
+                || true\n  kubectl get configmaps -n \"$ns\" -o yaml > \"$NS_DIR/configmaps.yaml\"
+                2>/dev/null || true\n  kubectl get statefulsets -n \"$ns\" -o yaml
+                > \"$NS_DIR/statefulsets.yaml\" 2>/dev/null || true\n  kubectl get
+                daemonsets -n \"$ns\" -o yaml > \"$NS_DIR/daemonsets.yaml\" 2>/dev/null
+                || true\n  kubectl get pvc -n \"$ns\" -o yaml > \"$NS_DIR/pvcs.yaml\"
+                2>/dev/null || true\n  kubectl get ingresses -n \"$ns\" -o yaml >
+                \"$NS_DIR/ingresses.yaml\" 2>/dev/null || true\n  kubectl get cronjobs
+                -n \"$ns\" -o yaml > \"$NS_DIR/cronjobs.yaml\" 2>/dev/null || true\ndone\n\n#
+                Create summary\necho \"# Kubernetes Backup - $CLUSTER_NAME - $DATE\"
+                > \"$EXPORT_DIR/README.md\"\necho \"\" >> \"$EXPORT_DIR/README.md\"\necho
+                \"## Namespaces\" >> \"$EXPORT_DIR/README.md\"\necho \"$namespaces\"
+                | tr ' ' '\\n' | sed 's/^/- /' >> \"$EXPORT_DIR/README.md\"\n\n# Commit
+                and push\necho \"=== Pushing to GitHub ===\"\ngit add -A\ngit commit
+                -m \"Backup: $CLUSTER_NAME - $DATE\" || echo \"No changes\"\ngit push
+                -u origin main || git push origin master || echo \"Push failed\"\n\necho
+                \"=== Backup completed ===\"\n"
+              command:
+              - /bin/bash
+              - -c
+              env:
+              - name: CLUSTER_NAME
+                value: holm-k8s-cluster
+              - name: GITHUB_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    key: github-token
+                    name: github-credentials
+              - name: GIT_EMAIL
+                valueFrom:
+                  secretKeyRef:
+                    key: git-email
+                    name: github-credentials
+              - name: GIT_USERNAME
+                valueFrom:
+                  secretKeyRef:
+                    key: git-username
+                    name: github-credentials
+              - name: GITHUB_REPO
+                valueFrom:
+                  secretKeyRef:
+                    key: github-repo
+                    name: github-credentials
+              image: bitnami/git:latest
+              imagePullPolicy: Always
+              name: backup
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+              - mountPath: /backup
+                name: backup-storage
+            dnsPolicy: ClusterFirst
+            restartPolicy: OnFailure
+            schedulerName: default-scheduler
+            securityContext: {}
+            serviceAccount: cluster-backup-sa
+            serviceAccountName: cluster-backup-sa
+            terminationGracePeriodSeconds: 30
+            volumes:
+            - emptyDir: {}
+              name: backup-storage
+        ttlSecondsAfterFinished: 86400
+    schedule: 0 2 * * *
+    successfulJobsHistoryLimit: 3
+    suspend: false
+  status:
+    active:
+    - apiVersion: batch/v1
+      kind: Job
+      name: k8s-manifest-backup-29494200
+      namespace: cluster-backup
+      resourceVersion: "1872684"
+      uid: 61ffd29e-be2c-448c-951b-13b89ab97566
+    lastScheduleTime: "2026-01-29T02:00:00Z"
+    lastSuccessfulTime: "2026-01-28T05:43:18Z"
+kind: List
+metadata:
+  resourceVersion: ""

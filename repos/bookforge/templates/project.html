@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title if project else 'Project' }}{% endblock %}
+
+{% block content %}
+<div x-data="projectView()">
+    <!-- Project Header -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex-1">
+                <div class="flex items-center space-x-3">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white" x-text="project.title">Project Title</h1>
+                    <span class="px-3 py-1 text-xs font-medium rounded-full"
+                          :class="{
+                              'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': project.status === 'completed',
+                              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': project.status === 'generating',
+                              'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': project.status === 'draft'
+                          }"
+                          x-text="project.status"></span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mt-2" x-text="project.description"></p>
+                <div class="flex items-center space-x-6 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span x-text="project.chapters.length + ' Chapters'"></span>
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span x-text="project.totalDuration"></span>
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span x-text="'Updated ' + project.updated"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 mt-6 lg:mt-0">
+                <button @click="generateAll()" 
+                        class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors"
+                        :disabled="project.status === 'generating'">
+                    <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': project.status === 'generating' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span x-text="project.status === 'generating' ? 'Generating...' : 'Generate All'"></span>
+                </button>
+                <button class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Overall Progress -->
+        <div x-show="project.status === 'generating'" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+                <span>Overall Progress</span>
+                <span x-text="project.progress + '%'"></span>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                <div class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-500 relative overflow-hidden" :style="'width: ' + project.progress + '%'">
+                    <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter List -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Chapters</h2>
+            <button class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium">
+                + Add Chapter
+            </button>
+        </div>
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <template x-for="(chapter, index) in project.chapters" :key="chapter.id">
+                <a :href="'/chapter/' + chapter.id" class="block p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div class="flex items-center">
+                        <!-- Chapter Number -->
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mr-4"
+                             :class="{
+                                 'bg-green-100 dark:bg-green-900/30': chapter.status === 'completed',
+                                 'bg-yellow-100 dark:bg-yellow-900/30': chapter.status === 'generating',
+                                 'bg-gray-100 dark:bg-gray-700': chapter.status === 'pending'
+                             }">
+                            <span class="font-semibold"
+                                  :class="{
+                                      'text-green-600 dark:text-green-400': chapter.status === 'completed',
+                                      'text-yellow-600 dark:text-yellow-400': chapter.status === 'generating',
+                                      'text-gray-500 dark:text-gray-400': chapter.status === 'pending'
+                                  }"
+                                  x-text="index + 1"></span>
+                        </div>
+
+                        <!-- Chapter Info -->
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-base font-medium text-gray-900 dark:text-white" x-text="chapter.title"></h3>
+                            <div class="flex items-center space-x-4 mt-1">
+                                <span class="text-sm text-gray-500 dark:text-gray-400" x-text="chapter.wordCount + ' words'"></span>
+                                <span x-show="chapter.audioDuration" class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728"></path>
+                                    </svg>
+                                    <span x-text="chapter.audioDuration"></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Status Indicator -->
+                        <div class="flex items-center space-x-4">
+                            <!-- Generating Spinner -->
+                            <div x-show="chapter.status === 'generating'" class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-yellow-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="text-sm text-yellow-600 dark:text-yellow-400" x-text="chapter.progress + '%'"></span>
+                            </div>
+
+                            <!-- Status Badge -->
+                            <span class="px-2 py-1 text-xs font-medium rounded-full"
+                                  :class="{
+                                      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': chapter.status === 'completed',
+                                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': chapter.status === 'generating',
+                                      'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400': chapter.status === 'pending'
+                                  }"
+                                  x-text="chapter.status"></span>
+
+                            <!-- Arrow -->
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Chapter Progress Bar -->
+                    <div x-show="chapter.status === 'generating'" class="mt-4 ml-14">
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                            <div class="bg-yellow-500 h-1.5 rounded-full transition-all duration-300" :style="'width: ' + chapter.progress + '%'"></div>
+                        </div>
+                    </div>
+                </a>
+            </template>
+        </div>
+    </div>
+</div>
+
+<script>
+function projectView() {
+    return {
+        project: {
+            id: 1,
+            title: 'The AI Revolution',
+            description: 'A comprehensive guide to artificial intelligence and its impact on society, exploring the technology, ethics, and future implications of AI systems.',
+            status: 'generating',
+            progress: 65,
+            totalDuration: '4h 32m',
+            updated: '15 mins ago',
+            chapters: [
+                { id: 1, title: 'Introduction to Artificial Intelligence', wordCount: 3500, status: 'completed', audioDuration: '12:34', progress: 100 },
+                { id: 2, title: 'The History of Machine Learning', wordCount: 4200, status: 'completed', audioDuration: '15:21', progress: 100 },
+                { id: 3, title: 'Neural Networks Explained', wordCount: 5100, status: 'completed', audioDuration: '18:45', progress: 100 },
+                { id: 4, title: 'Natural Language Processing', wordCount: 4800, status: 'completed', audioDuration: '17:12', progress: 100 },
+                { id: 5, title: 'Computer Vision and Image Recognition', wordCount: 4500, status: 'generating', audioDuration: null, progress: 72 },
+                { id: 6, title: 'The Ethics of AI', wordCount: 0, status: 'pending', audioDuration: null, progress: 0 },
+                { id: 7, title: 'AI in Healthcare', wordCount: 0, status: 'pending', audioDuration: null, progress: 0 },
+                { id: 8, title: 'The Future of Work', wordCount: 0, status: 'pending', audioDuration: null, progress: 0 }
+            ]
+        },
+        generateAll() {
+            if (this.project.status !== 'generating') {
+                this.project.status = 'generating';
+                // Simulate progress
+                this.simulateProgress();
+            }
+        },
+        simulateProgress() {
+            const interval = setInterval(() => {
+                if (this.project.progress < 100) {
+                    this.project.progress += 1;
+                } else {
+                    this.project.status = 'completed';
+                    clearInterval(interval);
+                }
+            }, 500);
+        }
+    }
+}
+</script>
+{% endblock %}

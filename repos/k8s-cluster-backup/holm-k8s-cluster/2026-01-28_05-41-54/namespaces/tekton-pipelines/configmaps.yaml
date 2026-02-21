@@ -1,0 +1,846 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    default-kind: task
+    default-service-account: default
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: bundleresolver-config
+    namespace: tekton-pipelines
+    resourceVersion: "817"
+    uid: bf6be939-e358-4053-8344-086e9da49d20
+- apiVersion: v1
+  data:
+    allowed-namespaces: ""
+    blocked-namespaces: ""
+    default-kind: task
+    default-namespace: ""
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: cluster-resolver-config
+    namespace: tekton-pipelines
+    resourceVersion: "818"
+    uid: a3471a69-0c80-4812-9162-3f6205bcfed1
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # default-timeout-minutes contains the default number of
+      # minutes to use for TaskRun and PipelineRun, if none is specified.
+      default-timeout-minutes: "60"  # 60 minutes
+
+      # default-service-account contains the default service account name
+      # to use for TaskRun and PipelineRun, if none is specified.
+      default-service-account: "default"
+
+      # default-managed-by-label-value contains the default value given to the
+      # "app.kubernetes.io/managed-by" label applied to all Pods created for
+      # TaskRuns. If a user's requested TaskRun specifies another value for this
+      # label, the user's request supercedes.
+      default-managed-by-label-value: "tekton-pipelines"
+
+      # default-pod-template contains the default pod template to use for
+      # TaskRun and PipelineRun. If a pod template is specified on the
+      # PipelineRun, the default-pod-template is merged with that one.
+      # default-pod-template:
+
+      # default-affinity-assistant-pod-template contains the default pod template
+      # to use for affinity assistant pods. If a pod template is specified on the
+      # PipelineRun, the default-affinity-assistant-pod-template is merged with
+      # that one.
+      # default-affinity-assistant-pod-template:
+
+      # default-cloud-events-sink contains the default CloudEvents sink to be
+      # used for TaskRun and PipelineRun, when no sink is specified.
+      # Note that right now it is still not possible to set a PipelineRun or
+      # TaskRun specific sink, so the default is the only option available.
+      # If no sink is specified, no CloudEvent is generated
+      # default-cloud-events-sink:
+
+      # default-task-run-workspace-binding contains the default workspace
+      # configuration provided for any Workspaces that a Task declares
+      # but that a TaskRun does not explicitly provide.
+      # default-task-run-workspace-binding: |
+      #   emptyDir: {}
+
+      # default-max-matrix-combinations-count contains the default maximum number
+      # of combinations from a Matrix, if none is specified.
+      default-max-matrix-combinations-count: "256"
+
+      # default-forbidden-env contains comma seperated environment variables that cannot be
+      # overridden by podTemplate.
+      default-forbidden-env:
+
+      # default-resolver-type contains the default resolver type to be used in the cluster,
+      # no default-resolver-type is specified by default
+      default-resolver-type:
+
+      # default-imagepullbackoff-timeout contains the default duration to wait
+      # before requeuing the TaskRun to retry, specifying 0 here is equivalent to fail fast
+      # possible values could be 1m, 5m, 10s, 1h, etc
+      # default-imagepullbackoff-timeout: "5m"
+
+      # default-maximum-resolution-timeout specifies the default duration used by the
+      # resolution controller before timing out when exceeded.
+      # Possible values include "1m", "5m", "10s", "1h", etc.
+      # Example: default-maximum-resolution-timeout: "1m"
+
+      # default-container-resource-requirements allow users to update default resource requirements
+      # to a init-containers and containers of a pods create by the controller
+      # Onet: All the resource requirements are applied to init-containers and containers
+      # only if the existing resource requirements are empty.
+      # default-container-resource-requirements: |
+      #   place-scripts: # updates resource requirements of a 'place-scripts' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   prepare: # updates resource requirements of a 'prepare' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "256Mi"
+      #       cpu: "500m"
+      #
+      #   working-dir-initializer: # updates resource requirements of a 'working-dir-initializer' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "512Mi"
+      #       cpu: "500m"
+      #
+      #   prefix-scripts: # updates resource requirements of containers which starts with 'scripts-'
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   prefix-sidecar-scripts: # updates resource requirements of containers which starts with 'sidecar-scripts-'
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   default: # updates resource requirements of init-containers and containers which has empty resource resource requirements
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "256Mi"
+      #       cpu: "500m"
+
+      # default-sidecar-log-polling-interval specifies the polling interval for the Tekton sidecar log results container.
+      # This controls how frequently the sidecar checks for step completion files written by steps in a TaskRun.
+      # Lower values (e.g., "10ms") make the sidecar more responsive but may increase CPU usage; higher values (e.g., "1s")
+      # reduce resource usage but may delay result collection.
+      # This value is used by the sidecar-tekton-log-results container and can be tuned for performance or test scenarios.
+      # Example values: "100ms", "500ms", "1s"
+      default-sidecar-log-polling-interval: "100ms"
+
+      # default-step-ref-concurrency-limit specifies the concurrency limit for resolving step references.
+      # This setting controls the maximum number of concurrent goroutines used to resolve
+      # step references (`step.ref` fields) simultaneously. This limit acts as a throttle
+      # to prevent overwhelming remote servers (e.g., git providers, OCI registries) or
+      # the Kubernetes API server, especially when a TaskRun contains many steps that
+      # reference StepActions.
+      default-step-ref-concurrency-limit: "5"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-defaults
+    namespace: tekton-pipelines
+    resourceVersion: "819"
+    uid: 4561581c-f806-4078-9edb-f44830ca3723
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # formats contains a comma seperated list of event formats to be used
+      # the only format supported today is "tektonv1". An empty string is not
+      # a valid configuration. To disable events, do not specify the sink.
+      formats: "tektonv1"
+
+      # sink contains the event sink to be used for TaskRun, PipelineRun and
+      # CustomRun. If no sink is specified, no CloudEvent is generated.
+      # This setting supercedes the "default-cloud-events-sink" from the
+      # "config-defaults" config map
+      sink: "https://events.sink/cdevents"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-events
+    namespace: tekton-pipelines
+    resourceVersion: "820"
+    uid: f0cf9795-a6df-4bca-8cd7-dfa30fdcaac5
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-leader-election-controller
+    namespace: tekton-pipelines
+    resourceVersion: "821"
+    uid: b2f97de0-4989-4c4b-b031-c2b9c2e9f891
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-leader-election-events
+    namespace: tekton-pipelines
+    resourceVersion: "822"
+    uid: 05f41031-e0f1-4b14-af70-0317cf388530
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-leader-election-resolvers
+    namespace: tekton-pipelines
+    resourceVersion: "823"
+    uid: 9601c4b3-cd48-479f-b34b-35a3677f9577
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-leader-election-webhook
+    namespace: tekton-pipelines
+    resourceVersion: "824"
+    uid: a1009c16-2c73-4e43-ba79-8419c0888040
+- apiVersion: v1
+  data:
+    loglevel.controller: info
+    loglevel.webhook: info
+    zap-logger-config: |
+      {
+        "level": "info",
+        "development": false,
+        "sampling": {
+          "initial": 100,
+          "thereafter": 100
+        },
+        "outputPaths": ["stdout"],
+        "errorOutputPaths": ["stderr"],
+        "encoding": "json",
+        "encoderConfig": {
+          "timeKey": "timestamp",
+          "levelKey": "severity",
+          "nameKey": "logger",
+          "callerKey": "caller",
+          "messageKey": "message",
+          "stacktraceKey": "stacktrace",
+          "lineEnding": "",
+          "levelEncoder": "",
+          "timeEncoder": "iso8601",
+          "durationEncoder": "",
+          "callerEncoder": ""
+        }
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-logging
+    namespace: tekton-pipelines
+    resourceVersion: "825"
+    uid: af8dc1f1-243d-4dda-8e1e-5fef38324ed3
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # metrics.backend-destination field specifies the system metrics destination.
+      # It supports either prometheus (the default) or stackdriver.
+      # Note: Using stackdriver will incur additional charges
+      metrics.backend-destination: prometheus
+
+      # metrics.request-metrics-backend-destination specifies the request metrics
+      # destination. If non-empty, it enables queue proxy to send request metrics.
+      # Currently supported values: prometheus, stackdriver.
+      metrics.request-metrics-backend-destination: prometheus
+
+      # metrics.stackdriver-project-id field specifies the stackdriver project ID. This
+      # field is optional. When running on GCE, application default credentials will be
+      # used if this field is not provided.
+      metrics.stackdriver-project-id: "<your stackdriver project id>"
+
+      # metrics.allow-stackdriver-custom-metrics indicates whether it is allowed to send metrics to
+      # Stackdriver using "global" resource type and custom metric type if the
+      # metrics are not supported by "knative_revision" resource type. Setting this
+      # flag to "true" could cause extra Stackdriver charge.
+      # If metrics.backend-destination is not Stackdriver, this is ignored.
+      metrics.allow-stackdriver-custom-metrics: "false"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-observability
+    namespace: tekton-pipelines
+    resourceVersion: "826"
+    uid: 1776bf7b-dbf9-4d23-8b21-fb3b3d104b52
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-registry-cert
+    namespace: tekton-pipelines
+    resourceVersion: "827"
+    uid: f3e3dcb0-ef57-4266-8a9e-5f44889058ce
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      #
+      # spire-trust-domain specifies the SPIRE trust domain to use.
+      # spire-trust-domain: "example.org"
+      #
+      # spire-socket-path specifies the SPIRE agent socket for SPIFFE workload API.
+      # spire-socket-path: "unix:///spiffe-workload-api/spire-agent.sock"
+      #
+      # spire-server-addr specifies the SPIRE server address for workload/node registration.
+      # spire-server-addr: "spire-server.spire.svc.cluster.local:8081"
+      #
+      # spire-node-alias-prefix specifies the SPIRE node alias prefix to use.
+      # spire-node-alias-prefix: "/tekton-node/"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-spire
+    namespace: tekton-pipelines
+    resourceVersion: "828"
+    uid: 70dc1b06-1f74-46d6-8447-f7b5974b7c1d
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      #
+      # Enable sending traces to defined endpoint by setting this to true
+      enabled: "true"
+      #
+      # API endpoint to send the traces to
+      # (optional): The default value is given below
+      endpoint: "http://jaeger-collector.jaeger.svc.cluster.local:14268/api/traces"
+      # (optional) Name of the k8s secret which contains basic auth credentials
+      credentialsSecret: "jaeger-creds"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-tracing
+    namespace: tekton-pipelines
+    resourceVersion: "829"
+    uid: b9303210-2e83-4948-bafa-6e873a9f3eab
+- apiVersion: v1
+  data:
+    cap: 60s
+    duration: 10s
+    factor: "2.0"
+    jitter: "0.0"
+    steps: "5"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: config-wait-exponential-backoff
+    namespace: tekton-pipelines
+    resourceVersion: "830"
+    uid: 08fc528a-05c6-4eb0-9523-aab9a38abba1
+- apiVersion: v1
+  data:
+    version: v0.63.1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"version":"v0.63.1"},"kind":"ConfigMap","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-dashboard"},"name":"dashboard-info","namespace":"tekton-pipelines"}}
+    creationTimestamp: "2026-01-18T15:16:14Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-dashboard
+    name: dashboard-info
+    namespace: tekton-pipelines
+    resourceVersion: "831"
+    uid: 53bfa514-57e6-40bd-8573-dfe6972227c9
+- apiVersion: v1
+  data:
+    await-sidecar-readiness: "true"
+    coschedule: workspaces
+    disable-creds-init: "false"
+    disable-inline-spec: ""
+    enable-api-fields: beta
+    enable-artifacts: "false"
+    enable-cel-in-whenexpression: "false"
+    enable-concise-resolver-syntax: "false"
+    enable-kubernetes-sidecar: "false"
+    enable-param-enum: "false"
+    enable-provenance-in-status: "true"
+    enable-step-actions: "true"
+    enable-tekton-oci-bundles: "false"
+    enable-wait-exponential-backoff: "false"
+    enforce-nonfalsifiability: none
+    keep-pod-on-cancel: "false"
+    require-git-ssh-secret-known-hosts: "false"
+    results-from: termination-message
+    running-in-environment-with-injected-sidecars: "true"
+    send-cloudevents-for-runs: "false"
+    set-security-context: "false"
+    set-security-context-read-only-root-filesystem: "false"
+    trusted-resources-verification-no-match-policy: ignore
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: feature-flags
+    namespace: tekton-pipelines
+    resourceVersion: "832"
+    uid: 3552fc77-3c11-4136-a064-6820d3f8e5ee
+- apiVersion: v1
+  data:
+    api-token-secret-key: ""
+    api-token-secret-name: ""
+    api-token-secret-namespace: default
+    default-org: ""
+    default-revision: main
+    default-url: https://github.com/tektoncd/catalog.git
+    fetch-timeout: 1m
+    scm-type: github
+    server-url: ""
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: git-resolver-config
+    namespace: tekton-pipelines
+    resourceVersion: "833"
+    uid: 73bb4c08-6f19-4444-833a-05c5d6e7876a
+- apiVersion: v1
+  data:
+    fetch-timeout: 1m
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: http-resolver-config
+    namespace: tekton-pipelines
+    resourceVersion: "834"
+    uid: 93ff71bc-cad3-4707-a6e3-57c43c290132
+- apiVersion: v1
+  data:
+    default-artifact-hub-pipeline-catalog: tekton-catalog-pipelines
+    default-artifact-hub-task-catalog: tekton-catalog-tasks
+    default-kind: task
+    default-tekton-hub-catalog: Tekton
+    default-type: artifact
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: hubresolver-config
+    namespace: tekton-pipelines
+    resourceVersion: "835"
+    uid: 8979aa48-e1a2-4536-9a49-a228db0e2656
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-18T09:23:11Z"
+    name: kube-root-ca.crt
+    namespace: tekton-pipelines
+    resourceVersion: "836"
+    uid: 97de0a65-a369-41a5-99c1-cb769592ebf6
+- apiVersion: v1
+  data:
+    version: v1.6.0
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: pipelines-info
+    namespace: tekton-pipelines
+    resourceVersion: "837"
+    uid: c1225f04-ee76-4f1c-b267-b68c93993281
+- apiVersion: v1
+  data:
+    max-size: "1000"
+    ttl: 5m
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: resolver-cache-config
+    namespace: tekton-pipelines
+    resourceVersion: "838"
+    uid: 0eac7393-f9d4-4d5c-ad39-b2020eec380f
+- apiVersion: v1
+  data:
+    enable-bundles-resolver: "true"
+    enable-cluster-resolver: "true"
+    enable-git-resolver: "true"
+    enable-hub-resolver: "true"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: tekton
+      meta.helm.sh/release-namespace: tekton-pipelines
+    creationTimestamp: "2026-01-18T09:23:13Z"
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: tekton-pipelines
+    name: resolvers-feature-flags
+    namespace: tekton-pipelines
+    resourceVersion: "839"
+    uid: dec9838b-43b7-446e-8e18-d5471f7a1202
+kind: List
+metadata:
+  resourceVersion: ""

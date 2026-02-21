@@ -1,0 +1,347 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --animus-black: #0a0a0f;
+  --animus-navy: #12121a;
+  --animus-gold: #c9a227;
+  --animus-cyan: #00d4ff;
+  --animus-green: #00ff88;
+  --animus-red: #ff3366;
+  --text-primary: #ffffff;
+  --text-secondary: #8888aa;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--animus-black);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Scan line overlay effect */
+.scan-lines {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0px,
+    rgba(0, 0, 0, 0.1) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  opacity: 0.3;
+}
+
+.scan-lines::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(201, 162, 39, 0.1),
+    transparent
+  );
+  animation: scan-line 8s linear infinite;
+}
+
+/* Glitch text effect */
+.glitch-text {
+  position: relative;
+}
+
+.glitch-text:hover {
+  animation: glitch 0.3s ease-in-out;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.glitch-text:hover::before {
+  animation: glitch-1 0.3s ease-in-out;
+  color: var(--animus-cyan);
+  z-index: -1;
+  opacity: 0.8;
+}
+
+.glitch-text:hover::after {
+  animation: glitch-2 0.3s ease-in-out;
+  color: var(--animus-red);
+  z-index: -2;
+  opacity: 0.8;
+}
+
+@keyframes glitch-1 {
+  0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+  20% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 0); }
+  40% { clip-path: inset(40% 0 40% 0); transform: translate(3px, 0); }
+  60% { clip-path: inset(60% 0 20% 0); transform: translate(-3px, 0); }
+  80% { clip-path: inset(80% 0 10% 0); transform: translate(3px, 0); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+  20% { clip-path: inset(80% 0 10% 0); transform: translate(3px, 0); }
+  40% { clip-path: inset(60% 0 20% 0); transform: translate(-3px, 0); }
+  60% { clip-path: inset(40% 0 40% 0); transform: translate(3px, 0); }
+  80% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 0); }
+}
+
+/* Hexagonal pattern background */
+.hex-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%23c9a227' stroke-opacity='0.05'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+/* Card glow effects */
+.card-glow {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--animus-gold), transparent 50%, var(--animus-cyan));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-glow:hover::before {
+  opacity: 1;
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 30px rgba(201, 162, 39, 0.2);
+}
+
+/* Status indicators */
+.status-synchronized {
+  color: var(--animus-green);
+  text-shadow: 0 0 10px var(--animus-green);
+}
+
+.status-warning {
+  color: var(--animus-gold);
+  text-shadow: 0 0 10px var(--animus-gold);
+}
+
+.status-desynchronized {
+  color: var(--animus-red);
+  text-shadow: 0 0 10px var(--animus-red);
+}
+
+/* Progress bar styling */
+.progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--animus-gold), var(--animus-cyan));
+  transition: width 0.5s ease;
+}
+
+/* Terminal/Log styling */
+.log-stream {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  border-radius: 8px;
+}
+
+.log-line {
+  padding: 2px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.log-line:hover {
+  background: rgba(201, 162, 39, 0.1);
+}
+
+.log-timestamp {
+  color: var(--animus-cyan);
+}
+
+.log-source {
+  color: var(--animus-gold);
+}
+
+.log-level-info {
+  color: var(--animus-cyan);
+}
+
+.log-level-warn {
+  color: var(--animus-gold);
+}
+
+.log-level-error {
+  color: var(--animus-red);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--animus-navy);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--animus-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--animus-cyan);
+}
+
+/* Button styles */
+.btn-animus {
+  background: linear-gradient(135deg, rgba(201, 162, 39, 0.2), rgba(0, 212, 255, 0.1));
+  border: 1px solid var(--animus-gold);
+  color: var(--animus-gold);
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-animus::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-animus:hover::before {
+  left: 100%;
+}
+
+.btn-animus:hover {
+  background: linear-gradient(135deg, rgba(201, 162, 39, 0.4), rgba(0, 212, 255, 0.2));
+  box-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
+}
+
+.btn-animus:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Input styles */
+.input-animus {
+  background: rgba(18, 18, 26, 0.8);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.input-animus:focus {
+  outline: none;
+  border-color: var(--animus-cyan);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+.input-animus::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Tab navigation */
+.nav-tab {
+  padding: 12px 24px;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-tab:hover {
+  color: var(--animus-gold);
+}
+
+.nav-tab.active {
+  color: var(--animus-cyan);
+  border-bottom-color: var(--animus-cyan);
+}
+
+/* DNA Helix Loading Animation */
+.dna-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.dna-loader span {
+  width: 4px;
+  height: 20px;
+  background: var(--animus-gold);
+  border-radius: 2px;
+  animation: dna-wave 1s ease-in-out infinite;
+}
+
+.dna-loader span:nth-child(1) { animation-delay: 0s; }
+.dna-loader span:nth-child(2) { animation-delay: 0.1s; }
+.dna-loader span:nth-child(3) { animation-delay: 0.2s; }
+.dna-loader span:nth-child(4) { animation-delay: 0.3s; }
+.dna-loader span:nth-child(5) { animation-delay: 0.4s; }
+.dna-loader span:nth-child(6) { animation-delay: 0.5s; }
+.dna-loader span:nth-child(7) { animation-delay: 0.6s; }
+
+@keyframes dna-wave {
+  0%, 100% { transform: scaleY(1); opacity: 0.5; }
+  50% { transform: scaleY(2); opacity: 1; }
+}

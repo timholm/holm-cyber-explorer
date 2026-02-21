@@ -1,0 +1,100 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    backup.sh: "#!/bin/sh\nset -e\n\n# Configuration\nBACKUP_DIR=\"/backup\"\nDATE=$(date
+      +%Y-%m-%d_%H-%M-%S)\nCLUSTER_NAME=\"${CLUSTER_NAME:-k8s-cluster}\"\n\necho \"===
+      Starting Kubernetes Cluster Backup ===\"\necho \"Date: $DATE\"\necho \"Cluster:
+      $CLUSTER_NAME\"\n\n# Setup Git\ncd $BACKUP_DIR\ngit config --global user.email
+      \"$GIT_EMAIL\"\ngit config --global user.name \"$GIT_USERNAME\"\ngit config
+      --global --add safe.directory $BACKUP_DIR\n\n# Configure git credentials using
+      URL with token\nREPO_URL=$(echo \"$GITHUB_REPO\" | sed \"s|https://|https://${GITHUB_TOKEN}@|\")\n\n#
+      Clone or pull the repository\nif [ ! -d \".git\" ]; then\n  echo \"Cloning repository...\"\n
+      \ git clone \"$REPO_URL\" . || {\n    echo \"Empty repo, initializing...\"\n
+      \   git init\n    git remote add origin \"$REPO_URL\"\n    git checkout -b main\n
+      \ }\nelse\n  echo \"Pulling latest changes...\"\n  git pull origin main || git
+      pull origin master || true\nfi\n\n# Create backup directory structure\nmkdir
+      -p \"$CLUSTER_NAME/$DATE\"\nEXPORT_DIR=\"$CLUSTER_NAME/$DATE\"\n\n# Function
+      to export resources\nexport_resources() {\n  local namespace=$1\n  local resource_type=$2\n
+      \ local output_dir=$3\n  \n  mkdir -p \"$output_dir\"\n  \n  echo \"  Exporting
+      $resource_type from namespace: $namespace\"\n  \n  resources=$(kubectl get \"$resource_type\"
+      -n \"$namespace\" -o name 2>/dev/null || true)\n  \n  for resource in $resources;
+      do\n    resource_name=$(echo \"$resource\" | cut -d'/' -f2)\n    echo \"    -
+      $resource_name\"\n    \n    kubectl get \"$resource\" -n \"$namespace\" -o yaml
+      2>/dev/null | \\\n      grep -v \"resourceVersion:\" | \\\n      grep -v \"uid:\"
+      | \\\n      grep -v \"creationTimestamp:\" | \\\n      grep -v \"selfLink:\"
+      | \\\n      grep -v \"managedFields:\" | \\\n      grep -v \"generation:\" >
+      \"$output_dir/${resource_name}.yaml\" || true\n  done\n}\n\n# Get all namespaces\necho
+      \"\"\necho \"=== Fetching namespaces ===\"\nnamespaces=$(kubectl get namespaces
+      -o jsonpath='{.items[*].metadata.name}')\n\n# Export cluster-wide resources\necho
+      \"\"\necho \"=== Exporting cluster-wide resources ===\"\n\n# Namespaces\necho
+      \"Exporting namespaces...\"\nmkdir -p \"$EXPORT_DIR/cluster/namespaces\"\nfor
+      ns in $namespaces; do\n  kubectl get namespace \"$ns\" -o yaml | \\\n    grep
+      -v \"resourceVersion:\" | \\\n    grep -v \"uid:\" | \\\n    grep -v \"creationTimestamp:\"
+      | \\\n    grep -v \"selfLink:\" > \"$EXPORT_DIR/cluster/namespaces/${ns}.yaml\"
+      2>/dev/null || true\ndone\n\n# ClusterRoles (non-system only)\necho \"Exporting
+      ClusterRoles...\"\nmkdir -p \"$EXPORT_DIR/cluster/clusterroles\"\nclusterroles=$(kubectl
+      get clusterroles -o name 2>/dev/null | grep -v \"system:\" || true)\nfor cr
+      in $clusterroles; do\n  cr_name=$(echo \"$cr\" | cut -d'/' -f2)\n  kubectl get
+      \"$cr\" -o yaml | grep -v \"resourceVersion:\" | grep -v \"uid:\" > \"$EXPORT_DIR/cluster/clusterroles/${cr_name}.yaml\"
+      2>/dev/null || true\ndone\n\n# StorageClasses\necho \"Exporting StorageClasses...\"\nmkdir
+      -p \"$EXPORT_DIR/cluster/storageclasses\"\nkubectl get storageclasses -o yaml
+      > \"$EXPORT_DIR/cluster/storageclasses/all.yaml\" 2>/dev/null || true\n\n# Export
+      namespaced resources\necho \"\"\necho \"=== Exporting namespaced resources ===\"\n\nfor
+      ns in $namespaces; do\n  # Skip system namespaces\n  case \"$ns\" in\n    kube-system|kube-public|kube-node-lease)
+      \n      echo \"Skipping system namespace: $ns\"\n      continue\n      ;;\n
+      \ esac\n  \n  echo \"\"\n  echo \"Processing namespace: $ns\"\n  NS_DIR=\"$EXPORT_DIR/namespaces/$ns\"\n
+      \ \n  export_resources \"$ns\" \"deployments\" \"$NS_DIR/deployments\"\n  export_resources
+      \"$ns\" \"statefulsets\" \"$NS_DIR/statefulsets\"\n  export_resources \"$ns\"
+      \"daemonsets\" \"$NS_DIR/daemonsets\"\n  export_resources \"$ns\" \"services\"
+      \"$NS_DIR/services\"\n  export_resources \"$ns\" \"configmaps\" \"$NS_DIR/configmaps\"\n
+      \ export_resources \"$ns\" \"persistentvolumeclaims\" \"$NS_DIR/pvcs\"\n  export_resources
+      \"$ns\" \"ingresses\" \"$NS_DIR/ingresses\"\n  export_resources \"$ns\" \"cronjobs\"
+      \"$NS_DIR/cronjobs\"\ndone\n\n# Create summary\necho \"\"\necho \"=== Creating
+      backup summary ===\"\necho \"# Kubernetes Backup - $CLUSTER_NAME - $DATE\" >
+      \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\necho \"\" >> \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\necho
+      \"## Namespaces\" >> \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\necho \"$namespaces\"
+      | tr ' ' '\\n' | sed 's/^/- /' >> \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\n\n# Update
+      latest symlink\nrm -f \"$CLUSTER_NAME/latest\"\nln -sf \"$DATE\" \"$CLUSTER_NAME/latest\"\n\n#
+      Commit and push\necho \"\"\necho \"=== Pushing to GitHub ===\"\ngit add -A\ngit
+      commit -m \"Backup: $CLUSTER_NAME - $DATE\" || echo \"No changes to commit\"\ngit
+      push -u origin main || git push -u origin master || echo \"Push failed\"\n\necho
+      \"\"\necho \"=== Backup completed successfully ===\"\n"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"backup.sh":"#!/bin/sh\nset -e\n\n# Configuration\nBACKUP_DIR=\"/backup\"\nDATE=$(date +%Y-%m-%d_%H-%M-%S)\nCLUSTER_NAME=\"${CLUSTER_NAME:-k8s-cluster}\"\n\necho \"=== Starting Kubernetes Cluster Backup ===\"\necho \"Date: $DATE\"\necho \"Cluster: $CLUSTER_NAME\"\n\n# Setup Git\ncd $BACKUP_DIR\ngit config --global user.email \"$GIT_EMAIL\"\ngit config --global user.name \"$GIT_USERNAME\"\ngit config --global --add safe.directory $BACKUP_DIR\n\n# Configure git credentials using URL with token\nREPO_URL=$(echo \"$GITHUB_REPO\" | sed \"s|https://|https://${GITHUB_TOKEN}@|\")\n\n# Clone or pull the repository\nif [ ! -d \".git\" ]; then\n  echo \"Cloning repository...\"\n  git clone \"$REPO_URL\" . || {\n    echo \"Empty repo, initializing...\"\n    git init\n    git remote add origin \"$REPO_URL\"\n    git checkout -b main\n  }\nelse\n  echo \"Pulling latest changes...\"\n  git pull origin main || git pull origin master || true\nfi\n\n# Create backup directory structure\nmkdir -p \"$CLUSTER_NAME/$DATE\"\nEXPORT_DIR=\"$CLUSTER_NAME/$DATE\"\n\n# Function to export resources\nexport_resources() {\n  local namespace=$1\n  local resource_type=$2\n  local output_dir=$3\n  \n  mkdir -p \"$output_dir\"\n  \n  echo \"  Exporting $resource_type from namespace: $namespace\"\n  \n  resources=$(kubectl get \"$resource_type\" -n \"$namespace\" -o name 2\u003e/dev/null || true)\n  \n  for resource in $resources; do\n    resource_name=$(echo \"$resource\" | cut -d'/' -f2)\n    echo \"    - $resource_name\"\n    \n    kubectl get \"$resource\" -n \"$namespace\" -o yaml 2\u003e/dev/null | \\\n      grep -v \"resourceVersion:\" | \\\n      grep -v \"uid:\" | \\\n      grep -v \"creationTimestamp:\" | \\\n      grep -v \"selfLink:\" | \\\n      grep -v \"managedFields:\" | \\\n      grep -v \"generation:\" \u003e \"$output_dir/${resource_name}.yaml\" || true\n  done\n}\n\n# Get all namespaces\necho \"\"\necho \"=== Fetching namespaces ===\"\nnamespaces=$(kubectl get namespaces -o jsonpath='{.items[*].metadata.name}')\n\n# Export cluster-wide resources\necho \"\"\necho \"=== Exporting cluster-wide resources ===\"\n\n# Namespaces\necho \"Exporting namespaces...\"\nmkdir -p \"$EXPORT_DIR/cluster/namespaces\"\nfor ns in $namespaces; do\n  kubectl get namespace \"$ns\" -o yaml | \\\n    grep -v \"resourceVersion:\" | \\\n    grep -v \"uid:\" | \\\n    grep -v \"creationTimestamp:\" | \\\n    grep -v \"selfLink:\" \u003e \"$EXPORT_DIR/cluster/namespaces/${ns}.yaml\" 2\u003e/dev/null || true\ndone\n\n# ClusterRoles (non-system only)\necho \"Exporting ClusterRoles...\"\nmkdir -p \"$EXPORT_DIR/cluster/clusterroles\"\nclusterroles=$(kubectl get clusterroles -o name 2\u003e/dev/null | grep -v \"system:\" || true)\nfor cr in $clusterroles; do\n  cr_name=$(echo \"$cr\" | cut -d'/' -f2)\n  kubectl get \"$cr\" -o yaml | grep -v \"resourceVersion:\" | grep -v \"uid:\" \u003e \"$EXPORT_DIR/cluster/clusterroles/${cr_name}.yaml\" 2\u003e/dev/null || true\ndone\n\n# StorageClasses\necho \"Exporting StorageClasses...\"\nmkdir -p \"$EXPORT_DIR/cluster/storageclasses\"\nkubectl get storageclasses -o yaml \u003e \"$EXPORT_DIR/cluster/storageclasses/all.yaml\" 2\u003e/dev/null || true\n\n# Export namespaced resources\necho \"\"\necho \"=== Exporting namespaced resources ===\"\n\nfor ns in $namespaces; do\n  # Skip system namespaces\n  case \"$ns\" in\n    kube-system|kube-public|kube-node-lease) \n      echo \"Skipping system namespace: $ns\"\n      continue\n      ;;\n  esac\n  \n  echo \"\"\n  echo \"Processing namespace: $ns\"\n  NS_DIR=\"$EXPORT_DIR/namespaces/$ns\"\n  \n  export_resources \"$ns\" \"deployments\" \"$NS_DIR/deployments\"\n  export_resources \"$ns\" \"statefulsets\" \"$NS_DIR/statefulsets\"\n  export_resources \"$ns\" \"daemonsets\" \"$NS_DIR/daemonsets\"\n  export_resources \"$ns\" \"services\" \"$NS_DIR/services\"\n  export_resources \"$ns\" \"configmaps\" \"$NS_DIR/configmaps\"\n  export_resources \"$ns\" \"persistentvolumeclaims\" \"$NS_DIR/pvcs\"\n  export_resources \"$ns\" \"ingresses\" \"$NS_DIR/ingresses\"\n  export_resources \"$ns\" \"cronjobs\" \"$NS_DIR/cronjobs\"\ndone\n\n# Create summary\necho \"\"\necho \"=== Creating backup summary ===\"\necho \"# Kubernetes Backup - $CLUSTER_NAME - $DATE\" \u003e \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\necho \"\" \u003e\u003e \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\necho \"## Namespaces\" \u003e\u003e \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\necho \"$namespaces\" | tr ' ' '\\n' | sed 's/^/- /' \u003e\u003e \"$EXPORT_DIR/BACKUP_SUMMARY.md\"\n\n# Update latest symlink\nrm -f \"$CLUSTER_NAME/latest\"\nln -sf \"$DATE\" \"$CLUSTER_NAME/latest\"\n\n# Commit and push\necho \"\"\necho \"=== Pushing to GitHub ===\"\ngit add -A\ngit commit -m \"Backup: $CLUSTER_NAME - $DATE\" || echo \"No changes to commit\"\ngit push -u origin main || git push -u origin master || echo \"Push failed\"\n\necho \"\"\necho \"=== Backup completed successfully ===\"\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"backup-script","namespace":"cluster-backup"}}
+    creationTimestamp: "2026-01-28T05:38:28Z"
+    name: backup-script
+    namespace: cluster-backup
+    resourceVersion: "990215"
+    uid: bdba3866-e375-4646-bac7-aa02a0986731
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-28T05:38:23Z"
+    name: kube-root-ca.crt
+    namespace: cluster-backup
+    resourceVersion: "989384"
+    uid: 4c559ba8-59b5-4c3f-92d6-63e9bc1d5495
+kind: List
+metadata:
+  resourceVersion: ""

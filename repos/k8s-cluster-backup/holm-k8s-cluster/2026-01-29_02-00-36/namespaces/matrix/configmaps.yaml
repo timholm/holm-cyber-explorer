@@ -1,0 +1,321 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    config.json: |
+      {
+        "default_server_config": {
+          "m.homeserver": {
+            "base_url": "https://matrix.holm.chat",
+            "server_name": "holm.chat"
+          },
+          "m.identity_server": {
+            "base_url": "https://vector.im"
+          }
+        },
+        "disable_custom_urls": false,
+        "disable_guests": true,
+        "disable_login_language_selector": false,
+        "disable_3pid_login": false,
+        "brand": "Element",
+        "default_country_code": "US",
+        "show_labs_settings": true,
+        "features": {
+          "feature_video_rooms": true,
+          "feature_element_call_video_rooms": true,
+          "feature_group_calls": true
+        },
+        "default_federate": true,
+        "default_theme": "dark",
+        "room_directory": {
+          "servers": ["holm.chat", "matrix.org"]
+        },
+        "element_call": {
+          "url": "https://call.element.io",
+          "participant_limit": 8,
+          "brand": "Element Call"
+        },
+        "setting_defaults": {
+          "breadcrumbs": true,
+          "showCallButtonsInComposer": true
+        }
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.json":"{\n  \"default_server_config\": {\n    \"m.homeserver\": {\n      \"base_url\": \"https://matrix.holm.chat\",\n      \"server_name\": \"holm.chat\"\n    },\n    \"m.identity_server\": {\n      \"base_url\": \"https://vector.im\"\n    }\n  },\n  \"disable_custom_urls\": false,\n  \"disable_guests\": true,\n  \"disable_login_language_selector\": false,\n  \"disable_3pid_login\": false,\n  \"brand\": \"Element\",\n  \"default_country_code\": \"US\",\n  \"show_labs_settings\": true,\n  \"features\": {\n    \"feature_video_rooms\": true,\n    \"feature_element_call_video_rooms\": true,\n    \"feature_group_calls\": true\n  },\n  \"default_federate\": true,\n  \"default_theme\": \"dark\",\n  \"room_directory\": {\n    \"servers\": [\"holm.chat\", \"matrix.org\"]\n  },\n  \"element_call\": {\n    \"url\": \"https://call.element.io\",\n    \"participant_limit\": 8,\n    \"brand\": \"Element Call\"\n  },\n  \"setting_defaults\": {\n    \"breadcrumbs\": true,\n    \"showCallButtonsInComposer\": true\n  }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"element-web-config","namespace":"matrix"}}
+    creationTimestamp: "2026-01-25T00:46:52Z"
+    name: element-web-config
+    namespace: matrix
+    resourceVersion: "793"
+    uid: 1a9a6567-0a34-4686-82ba-06e31ed3984c
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-25T00:28:53Z"
+    name: kube-root-ca.crt
+    namespace: matrix
+    resourceVersion: "794"
+    uid: 7bd85c75-bcfc-4c73-a9f8-2a82c004bcc2
+- apiVersion: v1
+  data:
+    config.yaml: |
+      http:
+        public_base: https://auth.holm.chat/
+        issuer: https://auth.holm.chat/
+        listeners:
+          - name: web
+            resources:
+              - name: discovery
+              - name: human
+              - name: oauth
+              - name: compat
+              - name: graphql
+              - name: assets
+              - name: adminapi
+            binds:
+              - address: "[::]:8080"
+          - name: internal
+            resources:
+              - name: health
+            binds:
+              - address: "[::]:8081"
+
+      database:
+        uri: postgresql://synapse:synapse_matrix_2026@matrix-postgres:5432/mas
+
+      matrix:
+        homeserver: holm.chat
+        endpoint: "http://synapse:8008"
+        secret: "5c48f0bbe909331b3d849f132c133c817283bb658eaa23b77b272b1b8fad4451"
+
+      passwords:
+        enabled: true
+        schemes:
+          - version: 1
+            algorithm: bcrypt
+        minimum_complexity: 0
+
+      account:
+        password_registration_enabled: true
+        password_change_allowed: true
+        password_recovery_enabled: false
+
+      secrets:
+        encryption: "b3edc4917f6a77858f9e95d077dc9e78c279a2ecfcd805e43673ce47fea63784"
+        keys:
+          - kid: "key1"
+            key: |
+              -----BEGIN PRIVATE KEY-----
+              MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjFeq/sfCfVyFm
+              6A2IkWLHq6gnoGOwDBiFoooW80tXsKd1DWfjkUTwrCyeAyyMmh6IPvAbfLAh1T/Y
+              XNVnnltZOCjgzADIxBeVb67LUsWZuvOgMOVIV1XqDrMc6ofTFJpMROHNbqZwC7sy
+              PyGlhJhghBmT5TvGTXfOn+HxSMGxMB66+R67rqwTMglNIaydRXAGtE1QKss9AIGe
+              ZnEGPnmam9sZjWB9xrHoRxW2rM3lDfgrBtkGTanZkWjaNBWpg+nCPxa0eUM69COr
+              duDk4lQSVJbUV+UL96u4xbjaS50CNG+AyOPre5jxUISdQgDbili7u8gdt/CbGwYE
+              A3yyT21VAgMBAAECggEAI5dQZGZyc2vB++HPtkq4SoghSgicSNrS7TMkPM761dfV
+              K9vxnL3i1D1W/WMG8WZfHG/T2cPT8oZGCTN1VUg/elChxzFuSGJXHUNC29ekDSE6
+              Mu8I0slQlCSCHWDnpH6+D8AGoV0xEInW4Cfb8XHnCUU7CcZAzc2xRFQrLIuqzb6v
+              /syda5rgbt2ua+g+AZh9bDpQvy2K++b07hZu0Gj0xVyQ89I0rDcFpzMDVx3L1ram
+              iskrC1gED8kJBzOJiodMZqkZwYZqk2IYRKxXCbuhN6EB8vCOwByr5shgbSBNQrM8
+              M2BWgILPDCFE2+m8dQviWFJ28+3+uUffXsM+R19iPwKBgQDNCUr1PGQHk2/pZA81
+              GK2w35dcqt9O2RrP/a368xHQ8km9ECQN/44tzUZBA21ANmMe7bq9q/jPPII3La3Z
+              iLYTbZdiM/XoruVPvZR9+PqZEQqfccSIR9+oxpU84+7nP/y97GvlqnCaLvXcchcn
+              zTDr1/gCxaGzIpn+S9QonTgGSwKBgQDLn0BZFi76oi0MRhA0RkAvQlL8hZKdDowM
+              xMDt4CF1s9CYQwsTSMVdicbouhC4uqjtx5cEXtBnPYWZW8EL6oT0MiMMYjmXGle8
+              kPgFwY2gwrE0ydWstW1PDaQ0zhFG3ZXMnSs6LroLyCOHPX6E2GVNomj5MwTgGIcs
+              /d0QZTaW3wKBgQC62zMy13yZ4uXkn0m0q+7u+HXq/9ZO91CWKKx7vTWJZKWK5cDV
+              +QZL+32BFmxkTqx6rVC4Npej1ZMeUkTTsOGuRvvlhVEgYvOcfjtrqpJHGN7DfF0N
+              jeLo30F2ootAuHHPbDzQq0m/Wfi6lEdCAKAK72GYtR+uL2SD+fs5oD5EjQKBgHyh
+              V7BvbIfJlcsKY0arrQOAE+0uEIQC8GOsVe4DHle9nLJlbrT5+Jt9BftST4PR9C29
+              2Ug6hFJ8jHZGe81AWOpieaNNx7Qd0o+/J5/WTUqVgAMwepGAZoxZbCVJ77cxT0vy
+              8w9kpEkr0dsoH3VOQgsXmirVOGm1eZ9nLtSnLpd/AoGBAImwuWVNGPU4KRl63vja
+              PfbGpL3OdDunMnZFu/D03ILsmRQuMVcVa1VOCM1LqEBWzDW2CeECgsD2c9pqj0hb
+              F+Gf8LWc92USLBkb5qF5VY4ANwXPGVVFQ9FyYoHDukP40kpBoq1BR7k6E6ePse5i
+              Q1D//gA+MGySXpDEsyKzL8AN
+              -----END PRIVATE KEY-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.yaml":"http:\n  public_base: https://auth.holm.chat/\n  issuer: https://auth.holm.chat/\n  listeners:\n    - name: web\n      resources:\n        - name: discovery\n        - name: human\n        - name: oauth\n        - name: compat\n        - name: graphql\n        - name: assets\n        - name: adminapi\n      binds:\n        - address: \"[::]:8080\"\n    - name: internal\n      resources:\n        - name: health\n      binds:\n        - address: \"[::]:8081\"\n\ndatabase:\n  uri: postgresql://synapse:synapse_matrix_2026@matrix-postgres:5432/mas\n\nmatrix:\n  homeserver: holm.chat\n  endpoint: \"http://synapse:8008\"\n  secret: \"5c48f0bbe909331b3d849f132c133c817283bb658eaa23b77b272b1b8fad4451\"\n\npasswords:\n  enabled: true\n  schemes:\n    - version: 1\n      algorithm: bcrypt\n  minimum_complexity: 0\n\naccount:\n  password_registration_enabled: true\n  password_change_allowed: true\n  password_recovery_enabled: false\n\nsecrets:\n  encryption: \"b3edc4917f6a77858f9e95d077dc9e78c279a2ecfcd805e43673ce47fea63784\"\n  keys:\n    - kid: \"key1\"\n      key: |\n        -----BEGIN PRIVATE KEY-----\n        MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCjFeq/sfCfVyFm\n        6A2IkWLHq6gnoGOwDBiFoooW80tXsKd1DWfjkUTwrCyeAyyMmh6IPvAbfLAh1T/Y\n        XNVnnltZOCjgzADIxBeVb67LUsWZuvOgMOVIV1XqDrMc6ofTFJpMROHNbqZwC7sy\n        PyGlhJhghBmT5TvGTXfOn+HxSMGxMB66+R67rqwTMglNIaydRXAGtE1QKss9AIGe\n        ZnEGPnmam9sZjWB9xrHoRxW2rM3lDfgrBtkGTanZkWjaNBWpg+nCPxa0eUM69COr\n        duDk4lQSVJbUV+UL96u4xbjaS50CNG+AyOPre5jxUISdQgDbili7u8gdt/CbGwYE\n        A3yyT21VAgMBAAECggEAI5dQZGZyc2vB++HPtkq4SoghSgicSNrS7TMkPM761dfV\n        K9vxnL3i1D1W/WMG8WZfHG/T2cPT8oZGCTN1VUg/elChxzFuSGJXHUNC29ekDSE6\n        Mu8I0slQlCSCHWDnpH6+D8AGoV0xEInW4Cfb8XHnCUU7CcZAzc2xRFQrLIuqzb6v\n        /syda5rgbt2ua+g+AZh9bDpQvy2K++b07hZu0Gj0xVyQ89I0rDcFpzMDVx3L1ram\n        iskrC1gED8kJBzOJiodMZqkZwYZqk2IYRKxXCbuhN6EB8vCOwByr5shgbSBNQrM8\n        M2BWgILPDCFE2+m8dQviWFJ28+3+uUffXsM+R19iPwKBgQDNCUr1PGQHk2/pZA81\n        GK2w35dcqt9O2RrP/a368xHQ8km9ECQN/44tzUZBA21ANmMe7bq9q/jPPII3La3Z\n        iLYTbZdiM/XoruVPvZR9+PqZEQqfccSIR9+oxpU84+7nP/y97GvlqnCaLvXcchcn\n        zTDr1/gCxaGzIpn+S9QonTgGSwKBgQDLn0BZFi76oi0MRhA0RkAvQlL8hZKdDowM\n        xMDt4CF1s9CYQwsTSMVdicbouhC4uqjtx5cEXtBnPYWZW8EL6oT0MiMMYjmXGle8\n        kPgFwY2gwrE0ydWstW1PDaQ0zhFG3ZXMnSs6LroLyCOHPX6E2GVNomj5MwTgGIcs\n        /d0QZTaW3wKBgQC62zMy13yZ4uXkn0m0q+7u+HXq/9ZO91CWKKx7vTWJZKWK5cDV\n        +QZL+32BFmxkTqx6rVC4Npej1ZMeUkTTsOGuRvvlhVEgYvOcfjtrqpJHGN7DfF0N\n        jeLo30F2ootAuHHPbDzQq0m/Wfi6lEdCAKAK72GYtR+uL2SD+fs5oD5EjQKBgHyh\n        V7BvbIfJlcsKY0arrQOAE+0uEIQC8GOsVe4DHle9nLJlbrT5+Jt9BftST4PR9C29\n        2Ug6hFJ8jHZGe81AWOpieaNNx7Qd0o+/J5/WTUqVgAMwepGAZoxZbCVJ77cxT0vy\n        8w9kpEkr0dsoH3VOQgsXmirVOGm1eZ9nLtSnLpd/AoGBAImwuWVNGPU4KRl63vja\n        PfbGpL3OdDunMnZFu/D03ILsmRQuMVcVa1VOCM1LqEBWzDW2CeECgsD2c9pqj0hb\n        F+Gf8LWc92USLBkb5qF5VY4ANwXPGVVFQ9FyYoHDukP40kpBoq1BR7k6E6ePse5i\n        Q1D//gA+MGySXpDEsyKzL8AN\n        -----END PRIVATE KEY-----\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"mas-config","namespace":"matrix"}}
+    creationTimestamp: "2026-01-25T02:44:56Z"
+    name: mas-config
+    namespace: matrix
+    resourceVersion: "795"
+    uid: 09dd2371-595a-4761-a972-09e99cda2ef9
+- apiVersion: v1
+  data:
+    client: |
+      {
+        "m.homeserver": {"base_url": "https://matrix.holm.chat"},
+        "m.identity_server": {"base_url": "https://vector.im"},
+        "org.matrix.msc2965.authentication": {
+          "issuer": "https://auth.holm.chat/",
+          "account": "https://auth.holm.chat/account/"
+        },
+        "org.matrix.msc4143.rtc_foci": [
+          {
+            "type": "livekit",
+            "livekit_service_url": "https://livekit.holm.chat"
+          }
+        ]
+      }
+    server: |
+      {"m.server": "matrix.holm.chat:443"}
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"client":"{\n  \"m.homeserver\": {\"base_url\": \"https://matrix.holm.chat\"},\n  \"m.identity_server\": {\"base_url\": \"https://vector.im\"},\n  \"org.matrix.msc2965.authentication\": {\n    \"issuer\": \"https://auth.holm.chat/\",\n    \"account\": \"https://auth.holm.chat/account/\"\n  },\n  \"org.matrix.msc4143.rtc_foci\": [\n    {\n      \"type\": \"livekit\",\n      \"livekit_service_url\": \"https://livekit.holm.chat\"\n    }\n  ]\n}\n","server":"{\"m.server\": \"matrix.holm.chat:443\"}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"matrix-wellknown","namespace":"matrix"}}
+    creationTimestamp: "2026-01-25T00:42:58Z"
+    name: matrix-wellknown
+    namespace: matrix
+    resourceVersion: "796"
+    uid: a4c9a2b9-e3c2-4fc2-850b-3648657d782a
+- apiVersion: v1
+  data:
+    default.conf: "server {\n    listen 80;\n    server_name _;\n    \n    location
+      /.well-known/matrix/server {\n        default_type application/json;\n        add_header
+      Access-Control-Allow-Origin *;\n        alias /usr/share/nginx/html/.well-known/matrix/server;\n
+      \   }\n    \n    location /.well-known/matrix/client {\n        default_type
+      application/json;\n        add_header Access-Control-Allow-Origin *;\n        alias
+      /usr/share/nginx/html/.well-known/matrix/client;\n    }\n    \n    location
+      / {\n        return 404;\n    }\n}\n"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"default.conf":"server {\n    listen 80;\n    server_name _;\n    \n    location /.well-known/matrix/server {\n        default_type application/json;\n        add_header Access-Control-Allow-Origin *;\n        alias /usr/share/nginx/html/.well-known/matrix/server;\n    }\n    \n    location /.well-known/matrix/client {\n        default_type application/json;\n        add_header Access-Control-Allow-Origin *;\n        alias /usr/share/nginx/html/.well-known/matrix/client;\n    }\n    \n    location / {\n        return 404;\n    }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"matrix-wellknown-nginx","namespace":"matrix"}}
+    creationTimestamp: "2026-01-25T00:42:58Z"
+    name: matrix-wellknown-nginx
+    namespace: matrix
+    resourceVersion: "797"
+    uid: 67732e4a-210d-4826-911f-f841332e99a6
+- apiVersion: v1
+  data:
+    homeserver.yaml: |
+      server_name: "holm.chat"
+      public_baseurl: "https://matrix.holm.chat/"
+      pid_file: /data/homeserver.pid
+      web_client_location: "https://holm.chat/element/"
+      serve_server_wellknown: true
+
+      listeners:
+        - port: 8008
+          tls: false
+          type: http
+          x_forwarded: true
+          resources:
+            - names: [client, federation]
+              compress: false
+
+      database:
+        name: psycopg2
+        allow_unsafe_locale: true
+        args:
+          user: synapse
+          password: synapse_matrix_2026
+          database: synapse
+          host: matrix-postgres
+          port: 5432
+          cp_min: 5
+          cp_max: 10
+
+      log_config: "/data/holm.chat.log.config"
+
+      media_store_path: /data/media_store
+      uploads_path: /data/uploads
+      max_upload_size: 100M
+
+      registration_shared_secret: "vPvjXhwF65xrGXVHSwCJCY4ShtY5sJ9M"
+      enable_registration: false
+
+      report_stats: false
+
+      macaroon_secret_key: "xKQy8NmfV3JhZWP4R2TbYcLdEwUsAq7G"
+      form_secret: "mN5hJkL9pQrStUvWxYzAbCdEfGhIjKl0"
+
+      signing_key_path: "/data/holm.chat.signing.key"
+
+      trusted_key_servers:
+        - server_name: "matrix.org"
+
+      suppress_key_server_warning: true
+
+      allow_public_rooms_over_federation: true
+      allow_public_rooms_without_auth: false
+
+      url_preview_enabled: true
+      url_preview_ip_range_blacklist:
+        - '127.0.0.0/8'
+        - '10.0.0.0/8'
+        - '172.16.0.0/12'
+        - '192.168.0.0/16'
+        - '100.64.0.0/10'
+        - '169.254.0.0/16'
+        - '::1/128'
+        - 'fe80::/64'
+        - 'fc00::/7'
+
+      # Element Call / MatrixRTC - Self-hosted LiveKit
+      well_known_client_content:
+        "org.matrix.msc4143.rtc_foci":
+          - type: "livekit"
+            livekit_service_url: "https://livekit.holm.chat"
+
+      # Matrix Authentication Service (MAS)
+      matrix_authentication_service:
+        enabled: true
+        endpoint: "http://mas:8080/"
+        secret: "5c48f0bbe909331b3d849f132c133c817283bb658eaa23b77b272b1b8fad4451"
+
+      experimental_features:
+        msc3882_enabled: true
+        msc3886_enabled: true
+        msc3575_enabled: true
+        msc2716_enabled: true
+        msc3266_enabled: true
+        msc4143_enabled: true
+        msc4108_enabled: true
+
+      # TURN server - Metered Open Relay (free, works through firewalls)
+      turn_uris:
+        - "turn:staticauth.openrelay.metered.ca:80?transport=udp"
+        - "turn:staticauth.openrelay.metered.ca:80?transport=tcp"
+        - "turn:staticauth.openrelay.metered.ca:443?transport=udp"
+        - "turns:staticauth.openrelay.metered.ca:443?transport=tcp"
+      turn_shared_secret: "openrelayprojectsecret"
+      turn_user_lifetime: 86400000
+      turn_allow_guests: true
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"homeserver.yaml":"server_name: \"holm.chat\"\npublic_baseurl: \"https://matrix.holm.chat/\"\npid_file: /data/homeserver.pid\nweb_client_location: \"https://holm.chat/element/\"\nserve_server_wellknown: true\n\nlisteners:\n  - port: 8008\n    tls: false\n    type: http\n    x_forwarded: true\n    resources:\n      - names: [client, federation]\n        compress: false\n\ndatabase:\n  name: psycopg2\n  allow_unsafe_locale: true\n  args:\n    user: synapse\n    password: synapse_matrix_2026\n    database: synapse\n    host: matrix-postgres\n    port: 5432\n    cp_min: 5\n    cp_max: 10\n\nlog_config: \"/data/holm.chat.log.config\"\n\nmedia_store_path: /data/media_store\nuploads_path: /data/uploads\nmax_upload_size: 100M\n\nregistration_shared_secret: \"vPvjXhwF65xrGXVHSwCJCY4ShtY5sJ9M\"\nenable_registration: false\n\nreport_stats: false\n\nmacaroon_secret_key: \"xKQy8NmfV3JhZWP4R2TbYcLdEwUsAq7G\"\nform_secret: \"mN5hJkL9pQrStUvWxYzAbCdEfGhIjKl0\"\n\nsigning_key_path: \"/data/holm.chat.signing.key\"\n\ntrusted_key_servers:\n  - server_name: \"matrix.org\"\n\nsuppress_key_server_warning: true\n\nallow_public_rooms_over_federation: true\nallow_public_rooms_without_auth: false\n\nurl_preview_enabled: true\nurl_preview_ip_range_blacklist:\n  - '127.0.0.0/8'\n  - '10.0.0.0/8'\n  - '172.16.0.0/12'\n  - '192.168.0.0/16'\n  - '100.64.0.0/10'\n  - '169.254.0.0/16'\n  - '::1/128'\n  - 'fe80::/64'\n  - 'fc00::/7'\n\n# Element Call / MatrixRTC - Self-hosted LiveKit\nwell_known_client_content:\n  \"org.matrix.msc4143.rtc_foci\":\n    - type: \"livekit\"\n      livekit_service_url: \"https://livekit.holm.chat\"\n\n# Matrix Authentication Service (MAS)\nmatrix_authentication_service:\n  enabled: true\n  endpoint: \"http://mas:8080/\"\n  secret: \"5c48f0bbe909331b3d849f132c133c817283bb658eaa23b77b272b1b8fad4451\"\n\nexperimental_features:\n  msc3882_enabled: true\n  msc3886_enabled: true\n  msc3575_enabled: true\n  msc2716_enabled: true\n  msc3266_enabled: true\n  msc4143_enabled: true\n  msc4108_enabled: true\n\n# TURN server - Metered Open Relay (free, works through firewalls)\nturn_uris:\n  - \"turn:staticauth.openrelay.metered.ca:80?transport=udp\"\n  - \"turn:staticauth.openrelay.metered.ca:80?transport=tcp\"\n  - \"turn:staticauth.openrelay.metered.ca:443?transport=udp\"\n  - \"turns:staticauth.openrelay.metered.ca:443?transport=tcp\"\nturn_shared_secret: \"openrelayprojectsecret\"\nturn_user_lifetime: 86400000\nturn_allow_guests: true\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"synapse-config","namespace":"matrix"}}
+    creationTimestamp: "2026-01-25T00:40:38Z"
+    name: synapse-config
+    namespace: matrix
+    resourceVersion: "798"
+    uid: 50047b7d-1174-491c-a724-a41d68eeef5c
+kind: List
+metadata:
+  resourceVersion: ""

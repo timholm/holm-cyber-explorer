@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tiktok-archive-backend
+  namespace: tiktok-archive
+  labels:
+    app: tiktok-archive
+    component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tiktok-archive
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: tiktok-archive
+        component: backend
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: backend
+          image: ghcr.io/timholm/tiktok-archive-backend:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: "sqlite:////data/tiktok_archive.db"
+            - name: ARCHIVE_DIR
+              value: "/data/archive"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: tiktok-archive-data

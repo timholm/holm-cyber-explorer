@@ -1,0 +1,445 @@
+# Sync New Videos Workflow Template
+# This workflow fetches and downloads only new videos from a channel
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ytarchive-sync-new
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: workflow
+spec:
+  entrypoint: sync-new-videos
+  serviceAccountName: ytarchive-workflow
+
+  # Workflow-level retry strategy
+  retryStrategy:
+    limit: 3
+    retryPolicy: "Always"
+    backoff:
+      duration: "30s"
+      factor: 2
+      maxDuration: "10m"
+
+  # Volume configuration for iSCSI PVC
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+  - name: logs-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+
+  arguments:
+    parameters:
+    - name: channel-url
+      description: "YouTube channel URL to sync"
+    - name: channel-id
+      value: ""
+      description: "Internal channel ID (optional)"
+    - name: batch-size
+      value: "10"
+      description: "Number of videos per batch for downloading"
+    - name: max-workers
+      value: "5"
+      description: "Maximum number of parallel download workers"
+
+  templates:
+  # Main workflow entry point
+  - name: sync-new-videos
+    steps:
+    # Step 1: Fetch current video list from YouTube
+    - - name: fetch-current-videos
+        template: fetch-channel-videos
+        arguments:
+          parameters:
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+
+    # Step 2: Get existing videos from database
+    - - name: get-existing-videos
+        template: query-existing-videos
+        arguments:
+          parameters:
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+          - name: channel-id
+            value: "{{workflow.parameters.channel-id}}"
+
+    # Step 3: Compare and find new videos
+    - - name: find-new-videos
+        template: compare-video-lists
+        arguments:
+          parameters:
+          - name: current-videos
+            value: "{{steps.fetch-current-videos.outputs.parameters.video-list}}"
+          - name: existing-videos
+            value: "{{steps.get-existing-videos.outputs.parameters.video-list}}"
+
+    # Step 4: Check if there are new videos
+    - - name: check-new-count
+        template: check-new-video-count
+        arguments:
+          parameters:
+          - name: new-videos
+            value: "{{steps.find-new-videos.outputs.parameters.new-videos}}"
+
+    # Step 5: Create batches for new videos (only if there are new videos)
+    - - name: create-batches
+        template: batch-new-videos
+        when: "{{steps.check-new-count.outputs.parameters.has-new-videos}} == true"
+        arguments:
+          parameters:
+          - name: video-list
+            value: "{{steps.find-new-videos.outputs.parameters.new-videos}}"
+          - name: batch-size
+            value: "{{workflow.parameters.batch-size}}"
+          - name: max-workers
+            value: "{{workflow.parameters.max-workers}}"
+
+    # Step 6: Download new videos in parallel
+    - - name: download-new-videos
+        template: download-worker
+        when: "{{steps.check-new-count.outputs.parameters.has-new-videos}} == true"
+        withParam: "{{steps.create-batches.outputs.result}}"
+        arguments:
+          parameters:
+          - name: batch-data
+            value: "{{item}}"
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+
+    # Step 7: Update sync timestamp
+    - - name: update-sync-time
+        template: update-last-sync
+        arguments:
+          parameters:
+          - name: channel-url
+            value: "{{workflow.parameters.channel-url}}"
+          - name: new-video-count
+            value: "{{steps.find-new-videos.outputs.parameters.new-count}}"
+          - name: had-new-videos
+            value: "{{steps.check-new-count.outputs.parameters.has-new-videos}}"
+
+  # Template: Fetch current video list from YouTube
+  - name: fetch-channel-videos
+    inputs:
+      parameters:
+      - name: channel-url
+    outputs:
+      parameters:
+      - name: video-list
+        valueFrom:
+          path: /tmp/current-videos.json
+      - name: video-count
+        valueFrom:
+          path: /tmp/video-count.txt
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "30s"
+        factor: 2
+        maxDuration: "5m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=fetch"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--output=/tmp/current-videos.json"
+      - "--count-output=/tmp/video-count.txt"
+      - "--metadata-only=true"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "100m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
+  # Template: Query existing videos from database
+  - name: query-existing-videos
+    inputs:
+      parameters:
+      - name: channel-url
+      - name: channel-id
+    outputs:
+      parameters:
+      - name: video-list
+        valueFrom:
+          path: /tmp/existing-videos.json
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "10s"
+        factor: 2
+        maxDuration: "2m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=query"
+      - "--query-type=channel-videos"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--channel-id={{inputs.parameters.channel-id}}"
+      - "--output=/tmp/existing-videos.json"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "256Mi"
+          cpu: "250m"
+
+  # Template: Compare video lists to find new videos
+  - name: compare-video-lists
+    inputs:
+      parameters:
+      - name: current-videos
+      - name: existing-videos
+    outputs:
+      parameters:
+      - name: new-videos
+        valueFrom:
+          path: /tmp/new-videos.json
+      - name: new-count
+        valueFrom:
+          path: /tmp/new-count.txt
+    script:
+      image: python:3.11-alpine
+      command: [python]
+      source: |
+        import json
+
+        current_videos = json.loads('''{{inputs.parameters.current-videos}}''')
+        existing_videos = json.loads('''{{inputs.parameters.existing-videos}}''')
+
+        # Create set of existing video IDs for O(1) lookup
+        existing_ids = set()
+        for video in existing_videos:
+            if 'youtube_id' in video:
+                existing_ids.add(video['youtube_id'])
+            elif 'id' in video:
+                existing_ids.add(video['id'])
+
+        # Find new videos (not in existing set)
+        new_videos = []
+        for video in current_videos:
+            video_id = video.get('youtube_id') or video.get('id')
+            if video_id and video_id not in existing_ids:
+                new_videos.append(video)
+
+        # Write outputs
+        with open('/tmp/new-videos.json', 'w') as f:
+            json.dump(new_videos, f)
+
+        with open('/tmp/new-count.txt', 'w') as f:
+            f.write(str(len(new_videos)))
+
+        print(f"Found {len(new_videos)} new videos out of {len(current_videos)} total")
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "256Mi"
+          cpu: "200m"
+
+  # Template: Check if there are new videos
+  - name: check-new-video-count
+    inputs:
+      parameters:
+      - name: new-videos
+    outputs:
+      parameters:
+      - name: has-new-videos
+        valueFrom:
+          path: /tmp/has-new-videos.txt
+    script:
+      image: python:3.11-alpine
+      command: [python]
+      source: |
+        import json
+
+        new_videos = '''{{inputs.parameters.new-videos}}'''
+        try:
+            videos = json.loads(new_videos)
+            has_new = len(videos) > 0
+        except:
+            has_new = False
+
+        with open('/tmp/has-new-videos.txt', 'w') as f:
+            f.write('true' if has_new else 'false')
+
+        print(f"Has new videos: {has_new}")
+      resources:
+        requests:
+          memory: "32Mi"
+          cpu: "25m"
+        limits:
+          memory: "64Mi"
+          cpu: "50m"
+
+  # Template: Batch new videos for parallel download
+  - name: batch-new-videos
+    inputs:
+      parameters:
+      - name: video-list
+      - name: batch-size
+      - name: max-workers
+    script:
+      image: python:3.11-alpine
+      command: [python]
+      source: |
+        import json
+
+        video_list = json.loads('''{{inputs.parameters.video-list}}''')
+        batch_size = int({{inputs.parameters.batch-size}})
+        max_workers = int({{inputs.parameters.max-workers}})
+
+        # Split videos into batches
+        batches = []
+        for i in range(0, len(video_list), batch_size):
+            batch = video_list[i:i + batch_size]
+            batches.append({
+                "batch_id": len(batches),
+                "videos": batch,
+                "count": len(batch),
+                "sync_type": "new"
+            })
+
+        # Limit concurrent batches
+        result = batches[:max_workers] if len(batches) > max_workers else batches
+        print(json.dumps(result))
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+
+  # Template: Download worker for batch of videos
+  - name: download-worker
+    inputs:
+      parameters:
+      - name: batch-data
+      - name: channel-url
+    outputs:
+      parameters:
+      - name: result
+        valueFrom:
+          path: /tmp/download-result.json
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "1m"
+        factor: 2
+        maxDuration: "15m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/worker
+      command: ["/ko-app/worker"]
+      args:
+      - "--mode=download"
+      - "--batch-data={{inputs.parameters.batch-data}}"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--output-dir=/data/videos"
+      - "--result-file=/tmp/download-result.json"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: YTDLP_FORMAT
+        value: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "2Gi"
+          cpu: "1000m"
+
+  # Template: Update last sync timestamp
+  - name: update-last-sync
+    inputs:
+      parameters:
+      - name: channel-url
+      - name: new-video-count
+      - name: had-new-videos
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=status-update"
+      - "--channel-url={{inputs.parameters.channel-url}}"
+      - "--update-type=sync-timestamp"
+      - "--new-video-count={{inputs.parameters.new-video-count}}"
+      - "--had-new-videos={{inputs.parameters.had-new-videos}}"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"

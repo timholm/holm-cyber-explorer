@@ -1,0 +1,47 @@
+replicaCount: 1
+
+image:
+  repository: node
+  tag: "20-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+httpRoute:
+  enabled: true
+  hostname: "claude-action.holm.chat"
+  path: "/"
+  gateway:
+    name: "main-gateway"
+    namespace: "default"
+
+gitea:
+  url: "http://gitea.gitea.svc.cluster.local:3000"
+  token: "78957dcd51678a97186c7bcb12aab4196b57e3de"
+  secretName: "claude-code-gitea-actions-secret"
+
+cmdApi:
+  url: "http://cmd-api.default.svc.cluster.local:80"
+
+webhookSecret: ""
+
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "50m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  readiness:
+    path: /health
+    initialDelaySeconds: 3
+    periodSeconds: 5

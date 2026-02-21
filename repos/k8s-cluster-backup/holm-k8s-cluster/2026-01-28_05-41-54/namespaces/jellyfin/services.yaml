@@ -1,0 +1,81 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: jellyfin:/Service:jellyfin/jellyfin
+      gethomepage.dev/description: Media Server
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/group: Applications
+      gethomepage.dev/href: https://holm.chat/jellyfin
+      gethomepage.dev/icon: jellyfin.svg
+      gethomepage.dev/name: Jellyfin
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"jellyfin:/Service:jellyfin/jellyfin"},"labels":{"app.kubernetes.io/instance":"jellyfin","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"jellyfin","app.kubernetes.io/version":"10.11.5","helm.sh/chart":"jellyfin-2.7.0"},"name":"jellyfin","namespace":"jellyfin"},"spec":{"ports":[{"name":"http","port":8096,"protocol":"TCP","targetPort":"http"}],"selector":{"app.kubernetes.io/instance":"jellyfin","app.kubernetes.io/name":"jellyfin"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-01-19T03:55:37Z"
+    labels:
+      app.kubernetes.io/instance: jellyfin
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jellyfin
+      app.kubernetes.io/version: 10.11.5
+      helm.sh/chart: jellyfin-2.7.0
+    name: jellyfin
+    namespace: jellyfin
+    resourceVersion: "10241"
+    uid: d768be34-a3be-40e5-b747-7855b34daa29
+  spec:
+    clusterIP: 10.43.197.229
+    clusterIPs:
+    - 10.43.197.229
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8096
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/instance: jellyfin
+      app.kubernetes.io/name: jellyfin
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"jellyfin-external","namespace":"jellyfin"},"spec":{"ports":[{"nodePort":30096,"port":8096,"protocol":"TCP","targetPort":8096}],"selector":{"app.kubernetes.io/instance":"jellyfin","app.kubernetes.io/name":"jellyfin"},"type":"NodePort"}}
+    creationTimestamp: "2026-01-19T04:59:08Z"
+    name: jellyfin-external
+    namespace: jellyfin
+    resourceVersion: "10242"
+    uid: 20438ea9-3947-4e34-bad3-4c6a8684dec1
+  spec:
+    clusterIP: 10.43.166.206
+    clusterIPs:
+    - 10.43.166.206
+    externalTrafficPolicy: Cluster
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - nodePort: 30096
+      port: 8096
+      protocol: TCP
+      targetPort: 8096
+    selector:
+      app.kubernetes.io/instance: jellyfin
+      app.kubernetes.io/name: jellyfin
+    sessionAffinity: None
+    type: NodePort
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

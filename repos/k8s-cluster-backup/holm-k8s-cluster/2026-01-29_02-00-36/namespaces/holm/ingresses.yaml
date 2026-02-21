@@ -1,0 +1,104 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: holmos:networking.k8s.io/Ingress:holm/auth-gateway
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"holmos:networking.k8s.io/Ingress:holm/auth-gateway","nginx.ingress.kubernetes.io/rewrite-target":"/"},"name":"auth-gateway","namespace":"holm"},"spec":{"ingressClassName":"nginx","rules":[{"host":"auth.holm.local","http":{"paths":[{"backend":{"service":{"name":"auth-gateway","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}}]}}
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    creationTimestamp: "2026-01-27T03:31:51Z"
+    generation: 1
+    name: auth-gateway
+    namespace: holm
+    resourceVersion: "7612"
+    uid: 31a00581-5514-42a6-817a-8db3cc6e6f51
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: auth.holm.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: auth-gateway
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+  status:
+    loadBalancer: {}
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: holmos:networking.k8s.io/Ingress:holm/gateway
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"holmos:networking.k8s.io/Ingress:holm/gateway","nginx.ingress.kubernetes.io/proxy-body-size":"100m","nginx.ingress.kubernetes.io/proxy-read-timeout":"300","nginx.ingress.kubernetes.io/proxy-send-timeout":"300"},"name":"gateway","namespace":"holm"},"spec":{"ingressClassName":"nginx","rules":[{"host":"gateway.holm.local","http":{"paths":[{"backend":{"service":{"name":"gateway","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}},{"host":"api.holm.local","http":{"paths":[{"backend":{"service":{"name":"gateway","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}}]}}
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    creationTimestamp: "2026-01-27T03:31:51Z"
+    generation: 1
+    name: gateway
+    namespace: holm
+    resourceVersion: "7613"
+    uid: 4f528ec5-ed8a-4048-b7de-cd8804f6801a
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: gateway.holm.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: gateway
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    - host: api.holm.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: gateway
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+  status:
+    loadBalancer: {}
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: holmos:networking.k8s.io/Ingress:holm/notification-hub
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"holmos:networking.k8s.io/Ingress:holm/notification-hub","nginx.ingress.kubernetes.io/rewrite-target":"/"},"name":"notification-hub","namespace":"holm"},"spec":{"ingressClassName":"nginx","rules":[{"host":"notifications.holm.local","http":{"paths":[{"backend":{"service":{"name":"notification-hub","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}}]}}
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    creationTimestamp: "2026-01-27T03:31:51Z"
+    generation: 1
+    name: notification-hub
+    namespace: holm
+    resourceVersion: "7614"
+    uid: 6810a962-7b2a-49b3-8bec-24c59ca8865d
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: notifications.holm.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: notification-hub
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

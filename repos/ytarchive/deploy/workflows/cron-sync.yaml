@@ -1,0 +1,352 @@
+# Cron Sync Workflow - Automatic Hourly Sync
+# This CronWorkflow automatically syncs all channels every hour
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: ytarchive-hourly-sync
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: cron-workflow
+spec:
+  # Run every hour at minute 0
+  schedule: "0 * * * *"
+  # Timezone for schedule (optional, defaults to cluster timezone)
+  timezone: "UTC"
+  # If a workflow is still running when the next scheduled time comes,
+  # replace the running workflow with a new one
+  concurrencyPolicy: Replace
+  # Keep last 5 successful runs
+  successfulJobsHistoryLimit: 5
+  # Keep last 3 failed runs
+  failedJobsHistoryLimit: 3
+  # Start immediately if cron was suspended
+  startingDeadlineSeconds: 300
+  # Suspend the cron workflow (set to true to pause)
+  suspend: false
+
+  workflowSpec:
+    entrypoint: sync-all-channels
+    serviceAccountName: ytarchive-workflow
+
+    # Workflow-level configurations
+    activeDeadlineSeconds: 10800  # 3 hour timeout for entire workflow
+    ttlStrategy:
+      secondsAfterCompletion: 86400  # Clean up after 24 hours
+      secondsAfterSuccess: 86400
+      secondsAfterFailure: 172800    # Keep failed workflows for 48 hours
+
+    # Volume configuration for iSCSI PVC
+    volumes:
+    - name: data-volume
+      persistentVolumeClaim:
+        claimName: ytarchive-data
+    - name: logs-volume
+      persistentVolumeClaim:
+        claimName: ytarchive-data
+
+    arguments:
+      parameters:
+      - name: max-concurrent-channels
+        value: "3"
+        description: "Maximum number of channels to sync concurrently"
+      - name: batch-size
+        value: "10"
+        description: "Number of videos per batch"
+      - name: max-workers-per-channel
+        value: "5"
+        description: "Maximum workers per channel"
+
+    templates:
+    # Main entry point - syncs all channels
+    - name: sync-all-channels
+      steps:
+      # Step 1: Get list of all registered channels
+      - - name: get-all-channels
+          template: fetch-channel-list
+
+      # Step 2: Filter channels that need syncing
+      - - name: filter-channels
+          template: filter-sync-needed
+          arguments:
+            parameters:
+            - name: channel-list
+              value: "{{steps.get-all-channels.outputs.parameters.channels}}"
+
+      # Step 3: Check if any channels need syncing
+      - - name: check-channel-count
+          template: check-channels-to-sync
+          arguments:
+            parameters:
+            - name: channels-to-sync
+              value: "{{steps.filter-channels.outputs.parameters.filtered-channels}}"
+
+      # Step 4: Sync channels concurrently (limited concurrency)
+      - - name: sync-channel
+          template: trigger-channel-sync
+          when: "{{steps.check-channel-count.outputs.parameters.has-channels}} == true"
+          withParam: "{{steps.filter-channels.outputs.parameters.filtered-channels}}"
+          arguments:
+            parameters:
+            - name: channel-data
+              value: "{{item}}"
+
+      # Step 5: Generate sync summary report
+      - - name: generate-summary
+          template: sync-summary-report
+          arguments:
+            parameters:
+            - name: total-channels
+              value: "{{steps.get-all-channels.outputs.parameters.channel-count}}"
+            - name: synced-channels
+              value: "{{steps.filter-channels.outputs.parameters.filtered-count}}"
+            - name: had-channels
+              value: "{{steps.check-channel-count.outputs.parameters.has-channels}}"
+
+    # Template: Fetch list of all registered channels
+    - name: fetch-channel-list
+      outputs:
+        parameters:
+        - name: channels
+          valueFrom:
+            path: /tmp/channel-list.json
+        - name: channel-count
+          valueFrom:
+            path: /tmp/channel-count.txt
+      retryStrategy:
+        limit: 3
+        retryPolicy: "Always"
+        backoff:
+          duration: "10s"
+          factor: 2
+          maxDuration: "2m"
+      container:
+        image: ko://github.com/timholm/ytarchive/cmd/controller
+        command: ["/ko-app/controller"]
+        args:
+        - "--mode=query"
+        - "--query-type=all-channels"
+        - "--output=/tmp/channel-list.json"
+        - "--count-output=/tmp/channel-count.txt"
+        - "--log-dir=/data/logs"
+        env:
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: ytarchive-secrets
+              key: redis-url
+              optional: true
+        - name: LOG_LEVEL
+          value: "info"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /data
+        - name: logs-volume
+          mountPath: /data/logs
+          subPath: logs
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+
+    # Template: Filter channels that need syncing (not currently syncing, not recently synced)
+    - name: filter-sync-needed
+      inputs:
+        parameters:
+        - name: channel-list
+      outputs:
+        parameters:
+        - name: filtered-channels
+          valueFrom:
+            path: /tmp/filtered-channels.json
+        - name: filtered-count
+          valueFrom:
+            path: /tmp/filtered-count.txt
+      script:
+        image: python:3.11-alpine
+        command: [python]
+        source: |
+          import json
+          from datetime import datetime, timedelta
+
+          channel_list = json.loads('''{{inputs.parameters.channel-list}}''')
+
+          # Filter out channels that are:
+          # 1. Currently syncing
+          # 2. Were synced in the last 30 minutes (avoid overlap)
+          # 3. Have status 'error' (will be handled by retry workflow)
+          filtered = []
+          now = datetime.utcnow()
+          min_sync_interval = timedelta(minutes=30)
+
+          for channel in channel_list:
+              status = channel.get('status', 'unknown')
+
+              # Skip if currently syncing
+              if status == 'syncing':
+                  continue
+
+              # Check last sync time
+              last_sync = channel.get('last_sync_at')
+              if last_sync:
+                  try:
+                      last_sync_time = datetime.fromisoformat(last_sync.replace('Z', '+00:00').replace('+00:00', ''))
+                      if now - last_sync_time < min_sync_interval:
+                          continue
+                  except:
+                      pass  # If we can't parse, include it
+
+              filtered.append(channel)
+
+          # Write outputs
+          with open('/tmp/filtered-channels.json', 'w') as f:
+              json.dump(filtered, f)
+
+          with open('/tmp/filtered-count.txt', 'w') as f:
+              f.write(str(len(filtered)))
+
+          print(f"Filtered {len(filtered)} channels out of {len(channel_list)} for sync")
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+
+    # Template: Check if there are channels to sync
+    - name: check-channels-to-sync
+      inputs:
+        parameters:
+        - name: channels-to-sync
+      outputs:
+        parameters:
+        - name: has-channels
+          valueFrom:
+            path: /tmp/has-channels.txt
+      script:
+        image: python:3.11-alpine
+        command: [python]
+        source: |
+          import json
+
+          channels = '''{{inputs.parameters.channels-to-sync}}'''
+          try:
+              channel_list = json.loads(channels)
+              has_channels = len(channel_list) > 0
+          except:
+              has_channels = False
+
+          with open('/tmp/has-channels.txt', 'w') as f:
+              f.write('true' if has_channels else 'false')
+
+          print(f"Has channels to sync: {has_channels}")
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+
+    # Template: Trigger sync for a single channel (calls sync-new workflow)
+    - name: trigger-channel-sync
+      inputs:
+        parameters:
+        - name: channel-data
+      # Limit concurrent channel syncs
+      synchronization:
+        semaphore:
+          configMapKeyRef:
+            name: ytarchive-semaphore
+            key: channel-sync
+      retryStrategy:
+        limit: 2
+        retryPolicy: "Always"
+        backoff:
+          duration: "1m"
+          factor: 2
+          maxDuration: "5m"
+      resource:
+        action: create
+        manifest: |
+          apiVersion: argoproj.io/v1alpha1
+          kind: Workflow
+          metadata:
+            generateName: sync-channel-
+            namespace: ytarchive
+            labels:
+              app: ytarchive
+              workflow-type: sync-new
+              triggered-by: cron-sync
+          spec:
+            workflowTemplateRef:
+              name: ytarchive-sync-new
+            arguments:
+              parameters:
+              - name: channel-url
+                value: "{{inputs.parameters.channel-data.youtube_url}}"
+              - name: channel-id
+                value: "{{inputs.parameters.channel-data.id}}"
+              - name: batch-size
+                value: "{{workflow.parameters.batch-size}}"
+              - name: max-workers
+                value: "{{workflow.parameters.max-workers-per-channel}}"
+
+    # Template: Generate summary report
+    - name: sync-summary-report
+      inputs:
+        parameters:
+        - name: total-channels
+        - name: synced-channels
+        - name: had-channels
+      container:
+        image: ko://github.com/timholm/ytarchive/cmd/controller
+        command: ["/ko-app/controller"]
+        args:
+        - "--mode=report"
+        - "--report-type=cron-sync-summary"
+        - "--total-channels={{inputs.parameters.total-channels}}"
+        - "--synced-channels={{inputs.parameters.synced-channels}}"
+        - "--had-channels={{inputs.parameters.had-channels}}"
+        - "--output=/tmp/cron-report.json"
+        - "--log-dir=/data/logs"
+        - "--notify-webui=true"
+        env:
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: ytarchive-secrets
+              key: redis-url
+              optional: true
+        - name: WEBUI_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ytarchive-config
+              key: webui-url
+        - name: LOG_LEVEL
+          value: "info"
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /data/logs
+          subPath: logs
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+---
+# ConfigMap for semaphore (controls concurrency)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ytarchive-semaphore
+  namespace: ytarchive
+data:
+  # Maximum 3 channels can sync concurrently
+  channel-sync: "3"

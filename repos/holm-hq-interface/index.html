@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="description" content="HOLM INTELLIGENCE COMPLEX — Full Documentation Skyscraper">
+  <title>HOLM HQ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-text-size-adjust: 100%; }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- GRID OVERLAY ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---- HEADER ---- */
+    .hq-header {
+      text-align: center;
+      padding: 24px 16px 16px;
+      border-bottom: 2px solid #00ffcc;
+      position: sticky;
+      top: 0;
+      background: rgba(0, 0, 0, 0.97);
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .hq-header h1 {
+      font-size: 22px;
+      letter-spacing: 6px;
+      color: #00ffcc;
+      text-shadow: 0 0 20px #00ffcc, 0 0 40px #00ffcc;
+      margin-bottom: 4px;
+    }
+
+    .hq-subtitle {
+      font-size: 10px;
+      color: #00ccff;
+      letter-spacing: 3px;
+      text-shadow: 0 0 8px #00ccff;
+      margin-bottom: 10px;
+    }
+
+    .hq-stats {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 10px;
+      color: #00ffcc;
+      letter-spacing: 1px;
+    }
+
+    .stat-val { color: #fff; font-weight: bold; }
+
+    /* ---- SEARCH ---- */
+    .search-wrap {
+      max-width: 520px;
+      margin: 12px auto 0;
+      padding: 0 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 255, 204, 0.06);
+      border: 1px solid #00ffcc;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+    }
+
+    .search-input::placeholder { color: #00997a; }
+    .search-input:focus { box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
+
+    /* ---- SPIRE ---- */
+    .spire {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0 8px;
+    }
+
+    .spire-dot {
+      width: 10px;
+      height: 10px;
+      background: #ff3366;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #ff3366, 0 0 24px #ff3366;
+      animation: pulse 1.5s infinite;
+    }
+
+    .spire-line {
+      width: 2px;
+      height: 30px;
+      background: #00ffcc;
+      box-shadow: 0 0 6px #00ffcc;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ---- BUILDING ---- */
+    .building {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 12px 40px;
+    }
+
+    /* ---- ZONE LABELS ---- */
+    .zone-label {
+      text-align: center;
+      padding: 14px 0 6px;
+      font-size: 10px;
+      letter-spacing: 4px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* ---- FLOOR ---- */
+    .floor {
+      border: 2px solid var(--fc, #00ffcc);
+      margin-bottom: 4px;
+      background: rgba(0, 255, 204, 0.02);
+      transition: background 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .floor.open {
+      background: rgba(0, 255, 204, 0.05);
+      box-shadow: 0 0 12px var(--fc, #00ffcc);
+    }
+
+    .floor.hidden { display: none; }
+
+    .floor-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+
+    .floor-id {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--fc, #00ffcc);
+      text-shadow: 0 0 6px var(--fc, #00ffcc);
+      min-width: 36px;
+    }
+
+    .floor-name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: bold;
+      color: #fff;
+      padding: 0 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .floor-badge {
+      font-size: 10px;
+      color: #000;
+      background: var(--fc, #00ffcc);
+      padding: 2px 6px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-right: 8px;
+    }
+
+    .floor-arrow {
+      font-size: 14px;
+      color: var(--fc, #00ffcc);
+      transition: transform 0.2s;
+    }
+
+    .floor.open .floor-arrow { transform: rotate(90deg); }
+
+    /* ---- ROOMS ---- */
+    .rooms {
+      display: none;
+      padding: 0 10px 10px;
+      border-top: 1px solid var(--fc, #00ffcc);
+    }
+
+    .floor.open .rooms { display: block; }
+
+    .room {
+      margin-top: 8px;
+      border: 1px solid var(--fc, #00ffcc);
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .room-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .room-icon {
+      font-size: 16px;
+      margin-right: 10px;
+      color: var(--fc, #00ffcc);
+      text-shadow: 0 0 4px var(--fc, #00ffcc);
+    }
+
+    .room-name {
+      flex: 1;
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .room-count {
+      font-size: 10px;
+      color: var(--fc, #00ffcc);
+      letter-spacing: 1px;
+    }
+
+    .room-arrow {
+      font-size: 12px;
+      color: var(--fc, #00ffcc);
+      margin-left: 8px;
+      transition: transform 0.2s;
+    }
+
+    .room.open .room-arrow { transform: rotate(90deg); }
+
+    /* ---- DOC LIST ---- */
+    .docs {
+      display: none;
+      padding: 0 12px 10px;
+      border-top: 1px solid rgba(0, 255, 204, 0.15);
+    }
+
+    .room.open .docs { display: block; }
+
+    .doc-link {
+      display: block;
+      padding: 8px 10px;
+      margin-top: 4px;
+      background: rgba(0, 255, 204, 0.04);
+      border-left: 3px solid var(--fc, #00ffcc);
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .doc-link:active {
+      background: rgba(0, 255, 204, 0.15);
+    }
+
+    .doc-code {
+      color: var(--fc, #00ffcc);
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    .doc-title {
+      color: #fff;
+      margin-left: 6px;
+    }
+
+    /* ---- FOOTER ---- */
+    .hq-footer {
+      text-align: center;
+      padding: 20px 16px;
+      border-top: 1px solid #00ffcc;
+      font-size: 10px;
+      color: #00ffcc;
+      letter-spacing: 2px;
+      text-shadow: 0 0 6px #00ffcc;
+    }
+
+    /* ---- NO RESULTS ---- */
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: #ff3366;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hq-header">
+    <h1>HOLM HQ</h1>
+    <div class="hq-subtitle">HOLM INTELLIGENCE COMPLEX</div>
+    <div class="hq-stats">
+      <span>FLOORS <span class="stat-val" id="stat-floors">14</span></span>
+      <span>ROOMS <span class="stat-val" id="stat-rooms">0</span></span>
+      <span>DOCS <span class="stat-val" id="stat-docs">0</span></span>
+    </div>
+    <div class="search-wrap">
+      <input class="search-input" id="search" type="text" placeholder="SEARCH DOCS..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+  </header>
+
+  <div class="spire">
+    <div class="spire-dot"></div>
+    <div class="spire-line"></div>
+  </div>
+
+  <main class="building" id="building"></main>
+
+  <div class="no-results" id="no-results">NO MATCHING DOCUMENTS</div>
+
+  <footer class="hq-footer">
+    HOLM INTELLIGENCE COMPLEX &mdash; OFFLINE-FIRST &mdash; ALL SYSTEMS NOMINAL
+  </footer>
+
+  <script>
+    /* ================================================================
+       HOLM INTELLIGENCE COMPLEX — FULL DOCUMENTATION MAP
+       Base URL for all docs (change for offline/USB deployment)
+       ================================================================ */
+    var BASE = "https://holm.chat/";
+    var HIC_BASE = BASE + "hic/";
+
+    /* Helper: generate numbered doc array */
+    function docs(prefix, count, start, base) {
+      var arr = [];
+      var s = start || 1;
+      var b = base || BASE;
+      for (var i = s; i <= count; i++) {
+        var num = i < 10 ? "00" + i : (i < 100 ? "0" + i : "" + i);
+        arr.push({ code: prefix.toUpperCase() + "-" + num, url: b + prefix.toLowerCase() + "-" + num + ".html" });
+      }
+      return arr;
+    }
+
+    /* Helper: single doc */
+    function doc(code, file, base) {
+      return { code: code, url: (base || BASE) + file };
+    }
+
+    /* ================================================================
+       BUILDING DATA — 14 levels, ~40 rooms, 300+ docs
+       ================================================================ */
+    var BUILDING = {
+      zones: [
+        {
+          label: "ROOFTOP — SIMULATION & FORESIGHT",
+          color: "#ff3366",
+          floors: [
+            {
+              id: "F12", label: "Simulation & HIC Systems", color: "#ff3366",
+              rooms: [
+                { name: "HIC Control Room", icon: "\u2609", docs: docs("hic", 20, 1, HIC_BASE) },
+                { name: "Disaster Simulation", icon: "\u26A0", docs: docs("d12", 14) },
+                { name: "Evolution Lab", icon: "\u2B06", docs: docs("d13", 13) },
+                { name: "Institutional Memory", icon: "\u231B", docs: docs("d20", 13) }
+              ]
+            }
+          ]
+        },
+        {
+          label: "TOP FLOOR — STRATEGY & DOCTRINE",
+          color: "#ffff00",
+          floors: [
+            {
+              id: "F11", label: "Strategy & Doctrine", color: "#ffff00",
+              rooms: [
+                { name: "Constitution Vault", icon: "\u2660", docs: docs("con", 13) },
+                { name: "Governance Archive", icon: "\u2694", docs: docs("gov", 14) },
+                { name: "Meta Framework", icon: "\u2261",
+                  docs: [doc("META-FW", "meta-framework.html")].concat(docs("meta", 15))
+                },
+                { name: "Ethics Foundation", icon: "\u2696",
+                  docs: [doc("ETH-001", "eth-001.html"), doc("OPS-001", "ops-001.html")]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          label: "UPPER FLOORS — COMMAND",
+          color: "#ff9900",
+          floors: [
+            {
+              id: "F10", label: "Security Command", color: "#ff0066",
+              rooms: [
+                { name: "Security Operations", icon: "\u2666", docs: docs("sec", 14) },
+                { name: "Ethics & Quality Control", icon: "\u2714", docs: docs("d15", 5).concat(docs("d19", 15)) }
+              ]
+            },
+            {
+              id: "F09", label: "Governance & Admin", color: "#33cccc",
+              rooms: [
+                { name: "Administration Center", icon: "\u2302", docs: docs("d11", 13) },
+                { name: "Education & Training", icon: "\u270E", docs: docs("d9", 13) },
+                { name: "Daily Operations", icon: "\u2699", docs: docs("d10", 14, 2) }
+              ]
+            },
+            {
+              id: "F08", label: "Automation & Ops", color: "#ff3366",
+              rooms: [
+                { name: "Automation Bay", icon: "\u2699", docs: docs("d8", 13) },
+                { name: "Operations Docs", icon: "\u2588",
+                  docs: [
+                    doc("STAGE3-AUTO-OPS", "stage3-automation-ops.html"),
+                    doc("STAGE3-GOV-OPS", "stage3-governance-ops.html"),
+                    doc("STAGE3-EDU-OPS", "stage3-education-ops.html"),
+                    doc("STAGE3-ETHQ-OPS", "stage3-ethics-quality-ops.html"),
+                    doc("STAGE4-AUTO-ADV", "stage4-automation-advanced.html"),
+                    doc("STAGE4-SEC-ADV", "stage4-security-advanced.html")
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          label: "MIDDLE FLOORS — ANALYSIS",
+          color: "#00ccff",
+          floors: [
+            {
+              id: "F07", label: "Intelligence & Analysis", color: "#cc66ff",
+              rooms: [
+                { name: "Intel Center", icon: "\u25CE", docs: docs("d7", 13) },
+                { name: "Intel Operations", icon: "\u2316",
+                  docs: [
+                    doc("STAGE3-INTEL-OPS", "stage3-intel-ops.html")
+                  ]
+                }
+              ]
+            },
+            {
+              id: "F06", label: "Research & Theory", color: "#ff6600",
+              rooms: [
+                { name: "Research Lab", icon: "\u2697", docs: docs("d14", 13) },
+                { name: "Advanced Research", icon: "\u2605",
+                  docs: [
+                    doc("STAGE4-RESEARCH-ADV", "stage4-research-advanced.html"),
+                    doc("STAGE4-EVOMEM-ADV", "stage4-evolution-memory-advanced.html")
+                  ]
+                }
+              ]
+            },
+            {
+              id: "F05", label: "Infrastructure & Platform", color: "#66ff66",
+              rooms: [
+                { name: "Infrastructure Engineering", icon: "\u26A1", docs: docs("d4", 14) },
+                { name: "Platform & Core Systems", icon: "\u2588", docs: docs("d5", 6) },
+                { name: "Advanced Infrastructure", icon: "\u2692",
+                  docs: [
+                    doc("STAGE3-PLATFORM-OPS", "stage3-platform-ops.html"),
+                    doc("STAGE4-INFRA-ADV", "stage4-infrastructure-advanced.html")
+                  ]
+                }
+              ]
+            },
+            {
+              id: "F04", label: "Dashboards & Analysis", color: "#00ccff",
+              rooms: [
+                { name: "Cross-Domain Analysis", icon: "\u25A3",
+                  docs: [
+                    doc("X-DOMAIN-DEP", "cross-domain-dependency-matrix.html"),
+                    doc("X-DOMAIN-INT", "cross-domain-integration.html"),
+                    doc("X-DOMAIN-INT-2", "cross-domain-integration-2.html"),
+                    doc("X-DOMAIN-SYN", "cross-domain-synthesis-domains-6-10.html"),
+                    doc("MAINT-PLAN", "universal-maintenance-plan.html"),
+                    doc("REVIEW-PROC", "universal-review-process.html"),
+                    doc("WRITE-SCHED", "consolidated-writing-schedule.html")
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          label: "LOWER FLOORS — COLLECTION",
+          color: "#ffcc00",
+          floors: [
+            {
+              id: "F03", label: "Data & Archives", color: "#ffcc00",
+              rooms: [
+                { name: "Data Vault", icon: "\u2261", docs: docs("d6", 15) },
+                { name: "Archive Operations", icon: "\u2610",
+                  docs: [
+                    doc("STAGE3-DATA-OPS", "stage3-data-ops.html"),
+                    doc("STAGE4-DATA-ADV", "stage4-data-advanced.html")
+                  ]
+                }
+              ]
+            },
+            {
+              id: "F02", label: "Comms & Federation", color: "#ff00ff",
+              rooms: [
+                { name: "Interface & Navigation", icon: "\u2637", docs: docs("d16", 14) },
+                { name: "Federation & Scaling", icon: "\u2641", docs: docs("d17", 15) },
+                { name: "Import & Quarantine", icon: "\u2B07", docs: docs("d18", 14) },
+                { name: "Federation Operations", icon: "\u21C4",
+                  docs: [
+                    doc("STAGE3-FED-OPS", "stage3-federation-ops.html"),
+                    doc("STAGE3-IFACE-OPS", "stage3-interface-ops.html"),
+                    doc("STAGE3-OPS-B3", "stage3-ops-batch3.html"),
+                    doc("STAGE4-FED-ADV", "stage4-federation-import-advanced.html")
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          label: "GROUND FLOOR — LOBBY",
+          color: "#00ffcc",
+          floors: [
+            {
+              id: "F01", label: "Lobby & Directory", color: "#00ffcc",
+              rooms: [
+                { name: "Building Directory", icon: "\u2302",
+                  docs: [
+                    doc("INDEX", "index.html"),
+                    doc("DOMAIN-01", "domain-1.html"),
+                    doc("DOMAIN-02", "domain-2.html"),
+                    doc("DOMAIN-03", "domain-3.html"),
+                    doc("DOMAIN-04", "domain-4.html"),
+                    doc("DOMAIN-05", "domain-5.html"),
+                    doc("DOMAIN-06", "domain-6.html"),
+                    doc("DOMAIN-07", "domain-7.html"),
+                    doc("DOMAIN-08", "domain-8.html"),
+                    doc("DOMAIN-09", "domain-9.html"),
+                    doc("DOMAIN-10", "domain-10.html"),
+                    doc("DOMAIN-11", "domain-11.html"),
+                    doc("DOMAIN-12", "domain-12.html"),
+                    doc("DOMAIN-13", "domain-13.html"),
+                    doc("DOMAIN-14", "domain-14.html"),
+                    doc("DOMAIN-15", "domain-15.html")
+                  ]
+                },
+                { name: "Quick Deploy", icon: "\u26A1",
+                  docs: [
+                    doc("DEPLOY-QUICK", "deploy-quick.html"),
+                    doc("DEPLOY-README", "deploy/DEPLOY-README.html")
+                  ]
+                },
+                { name: "Appendices", icon: "\u2630",
+                  docs: [
+                    doc("APPENDIX-A", "appendix-a.html"),
+                    doc("APPENDIX-A-2", "appendix-a-2.html"),
+                    doc("APPENDIX-B", "appendix-b.html"),
+                    doc("APPENDIX-B-2", "appendix-b-2.html"),
+                    doc("APPENDIX-C", "appendix-c.html")
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          label: "BASEMENT — ARCHIVES",
+          color: "#667788",
+          floors: [
+            {
+              id: "B1", label: "Archives & Ops Doctrine", color: "#557799",
+              rooms: [
+                { name: "Ops Doctrine Vault", icon: "\u2261",
+                  docs: [
+                    doc("STAGE3-OPS-B1", "stage3-ops-batch1.html"),
+                    doc("STAGE3-OPS-B2", "stage3-ops-batch2.html")
+                  ]
+                }
+              ]
+            },
+            {
+              id: "B2", label: "Deep Archives", color: "#445566",
+              rooms: [
+                { name: "Cold Storage", icon: "\u2744",
+                  docs: [
+                    doc("STAGE1-META", "stage1-meta-framework.html"),
+                    doc("STAGE1-D1-5", "stage1-domains-1-5.html"),
+                    doc("STAGE1-D6-10", "stage1-domains-6-10.html"),
+                    doc("STAGE1-D11-15", "stage1-domains-11-15.html"),
+                    doc("STAGE1-D16-20", "stage1-domains-16-20.html"),
+                    doc("STAGE2-CHARTER", "stage2-core-charter.html"),
+                    doc("STAGE2-PHIL-B2", "stage2-philosophy-batch2.html"),
+                    doc("STAGE2-PHIL-B3", "stage2-philosophy-batch3.html"),
+                    doc("STAGE2-PHIL-B4", "stage2-philosophy-batch4.html"),
+                    doc("STAGE5-META-B1", "stage5-meta-batch1.html"),
+                    doc("STAGE5-META-B2", "stage5-meta-batch2.html"),
+                    doc("STAGE5-META-B3", "stage5-meta-batch3.html")
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    /* ================================================================
+       RENDER
+       ================================================================ */
+    var building = document.getElementById("building");
+    var totalRooms = 0;
+    var totalDocs = 0;
+    var allFloorEls = [];
+    var allDocEls = [];
+
+    BUILDING.zones.forEach(function(zone) {
+      /* Zone label */
+      var zoneEl = document.createElement("div");
+      zoneEl.className = "zone-label";
+      zoneEl.style.color = zone.color;
+      zoneEl.style.textShadow = "0 0 8px " + zone.color;
+      zoneEl.textContent = zone.label;
+      building.appendChild(zoneEl);
+
+      zone.floors.forEach(function(floor) {
+        var floorDocCount = 0;
+        floor.rooms.forEach(function(r) { floorDocCount += r.docs.length; });
+        totalRooms += floor.rooms.length;
+        totalDocs += floorDocCount;
+
+        var floorEl = document.createElement("div");
+        floorEl.className = "floor";
+        floorEl.style.setProperty("--fc", floor.color);
+        floorEl.setAttribute("data-floor", floor.id);
+
+        /* Floor header */
+        var fh = document.createElement("div");
+        fh.className = "floor-header";
+        fh.innerHTML =
+          '<span class="floor-id">' + floor.id + '</span>' +
+          '<span class="floor-name">' + floor.label + '</span>' +
+          '<span class="floor-badge">' + floorDocCount + '</span>' +
+          '<span class="floor-arrow">\u25B6</span>';
+        floorEl.appendChild(fh);
+
+        /* Rooms container */
+        var roomsEl = document.createElement("div");
+        roomsEl.className = "rooms";
+
+        floor.rooms.forEach(function(room) {
+          var roomEl = document.createElement("div");
+          roomEl.className = "room";
+
+          /* Room header */
+          var rh = document.createElement("div");
+          rh.className = "room-header";
+          rh.innerHTML =
+            '<span class="room-icon">' + room.icon + '</span>' +
+            '<span class="room-name">' + room.name + '</span>' +
+            '<span class="room-count">' + room.docs.length + '</span>' +
+            '<span class="room-arrow">\u25B6</span>';
+          roomEl.appendChild(rh);
+
+          /* Doc list */
+          var docsEl = document.createElement("div");
+          docsEl.className = "docs";
+
+          room.docs.forEach(function(d) {
+            var a = document.createElement("a");
+            a.className = "doc-link";
+            a.href = d.url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.setAttribute("data-code", d.code.toLowerCase());
+            a.innerHTML = '<span class="doc-code">' + d.code + '</span>';
+            docsEl.appendChild(a);
+            allDocEls.push({ el: a, code: d.code.toLowerCase(), floorEl: floorEl, roomEl: roomEl });
+          });
+
+          roomEl.appendChild(docsEl);
+
+          /* Room click handler */
+          rh.addEventListener("click", function(e) {
+            e.stopPropagation();
+            roomEl.classList.toggle("open");
+          });
+
+          roomsEl.appendChild(roomEl);
+        });
+
+        floorEl.appendChild(roomsEl);
+
+        /* Floor click handler */
+        fh.addEventListener("click", function() {
+          floorEl.classList.toggle("open");
+        });
+
+        building.appendChild(floorEl);
+        allFloorEls.push(floorEl);
+      });
+    });
+
+    /* Update stats */
+    document.getElementById("stat-rooms").textContent = totalRooms;
+    document.getElementById("stat-docs").textContent = totalDocs;
+
+    /* ================================================================
+       SEARCH
+       ================================================================ */
+    var searchInput = document.getElementById("search");
+    var noResults = document.getElementById("no-results");
+    var debounceTimer = null;
+
+    searchInput.addEventListener("input", function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(doSearch, 200);
+    });
+
+    function doSearch() {
+      var q = searchInput.value.trim().toLowerCase();
+
+      if (!q) {
+        /* Reset: show all floors, collapse everything */
+        allFloorEls.forEach(function(f) {
+          f.classList.remove("hidden", "open");
+          f.querySelectorAll(".room").forEach(function(r) { r.classList.remove("open"); });
+        });
+        document.querySelectorAll(".zone-label").forEach(function(z) { z.style.display = ""; });
+        noResults.style.display = "none";
+        return;
+      }
+
+      /* Find matching docs */
+      var matchedFloors = {};
+      var matchedRooms = {};
+      var found = 0;
+
+      allDocEls.forEach(function(item) {
+        if (item.code.indexOf(q) !== -1) {
+          matchedFloors[item.floorEl.getAttribute("data-floor")] = item.floorEl;
+          matchedRooms[item.roomEl.querySelector(".room-name").textContent] = item.roomEl;
+          item.el.style.display = "";
+          found++;
+        } else {
+          item.el.style.display = "none";
+        }
+      });
+
+      /* Show/hide floors */
+      allFloorEls.forEach(function(f) {
+        var fid = f.getAttribute("data-floor");
+        if (matchedFloors[fid]) {
+          f.classList.remove("hidden");
+          f.classList.add("open");
+        } else {
+          f.classList.add("hidden");
+          f.classList.remove("open");
+        }
+      });
+
+      /* Open matched rooms */
+      document.querySelectorAll(".room").forEach(function(r) {
+        var rn = r.querySelector(".room-name").textContent;
+        if (matchedRooms[rn]) {
+          r.classList.add("open");
+        } else {
+          r.classList.remove("open");
+        }
+      });
+
+      /* Hide zone labels during search */
+      document.querySelectorAll(".zone-label").forEach(function(z) { z.style.display = "none"; });
+
+      noResults.style.display = found === 0 ? "block" : "none";
+    }
+  </script>
+
+</body>
+</html>

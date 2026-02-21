@@ -1,0 +1,216 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: odoo:apps/Deployment:odoo/odoo
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"odoo:apps/Deployment:odoo/odoo"},"labels":{"app":"odoo"},"name":"odoo","namespace":"odoo"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"odoo"}},"template":{"metadata":{"labels":{"app":"odoo"}},"spec":{"containers":[{"env":[{"name":"HOST","value":"odoo-db"},{"name":"USER","valueFrom":{"secretKeyRef":{"key":"POSTGRES_USER","name":"odoo-db-secret"}}},{"name":"PASSWORD","valueFrom":{"secretKeyRef":{"key":"POSTGRES_PASSWORD","name":"odoo-db-secret"}}}],"image":"odoo:17","livenessProbe":{"httpGet":{"path":"/web/login","port":8069},"initialDelaySeconds":60,"periodSeconds":30},"name":"odoo","ports":[{"containerPort":8069,"name":"http"}],"readinessProbe":{"httpGet":{"path":"/web/login","port":8069},"initialDelaySeconds":30,"periodSeconds":10},"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/var/lib/odoo","name":"odoo-data"}]}],"volumes":[{"name":"odoo-data","persistentVolumeClaim":{"claimName":"odoo-data"}}]}}}}
+    creationTimestamp: "2026-01-24T23:36:05Z"
+    generation: 8
+    labels:
+      app: odoo
+    name: odoo
+    namespace: odoo
+    resourceVersion: "1032"
+    uid: c9f5a2d6-b96c-486f-ad11-8eabccdfc3ee
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: odoo
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: odoo
+      spec:
+        containers:
+        - env:
+          - name: HOST
+            value: odoo-db
+          - name: USER
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_USER
+                name: odoo-db-secret
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_PASSWORD
+                name: odoo-db-secret
+          image: odoo:17
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /web/login
+              port: 8069
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: odoo
+          ports:
+          - containerPort: 8069
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /web/login
+              port: 8069
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/odoo
+            name: odoo-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: odoo-data
+          persistentVolumeClaim:
+            claimName: odoo-data
+  status:
+    conditions:
+    - lastTransitionTime: "2026-01-24T23:36:05Z"
+      lastUpdateTime: "2026-01-25T01:46:10Z"
+      message: ReplicaSet "odoo-865969ff5" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-25T20:57:51Z"
+      lastUpdateTime: "2026-01-25T20:57:51Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    observedGeneration: 8
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: odoo:apps/Deployment:odoo/odoo-postgres
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"odoo:apps/Deployment:odoo/odoo-postgres"},"labels":{"app":"odoo-postgres"},"name":"odoo-postgres","namespace":"odoo"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"odoo-postgres"}},"template":{"metadata":{"labels":{"app":"odoo-postgres"}},"spec":{"containers":[{"env":[{"name":"POSTGRES_USER","valueFrom":{"secretKeyRef":{"key":"POSTGRES_USER","name":"odoo-db-secret"}}},{"name":"POSTGRES_PASSWORD","valueFrom":{"secretKeyRef":{"key":"POSTGRES_PASSWORD","name":"odoo-db-secret"}}},{"name":"POSTGRES_DB","valueFrom":{"secretKeyRef":{"key":"POSTGRES_DB","name":"odoo-db-secret"}}},{"name":"PGDATA","value":"/var/lib/postgresql/data/pgdata"}],"image":"postgres:15","name":"postgres","ports":[{"containerPort":5432,"name":"postgres"}],"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/var/lib/postgresql/data","name":"postgres-data"}]}],"volumes":[{"name":"postgres-data","persistentVolumeClaim":{"claimName":"odoo-postgres-data"}}]}}}}
+    creationTimestamp: "2026-01-24T23:36:04Z"
+    generation: 8
+    labels:
+      app: odoo-postgres
+    name: odoo-postgres
+    namespace: odoo
+    resourceVersion: "1033"
+    uid: 06ac7c0d-ece1-45de-94c3-7926ddf1817a
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: odoo-postgres
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: odoo-postgres
+      spec:
+        containers:
+        - env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_USER
+                name: odoo-db-secret
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_PASSWORD
+                name: odoo-db-secret
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_DB
+                name: odoo-db-secret
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+          image: postgres:15
+          imagePullPolicy: IfNotPresent
+          name: postgres
+          ports:
+          - containerPort: 5432
+            name: postgres
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: postgres-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: odoo-postgres-data
+  status:
+    conditions:
+    - lastTransitionTime: "2026-01-24T23:36:04Z"
+      lastUpdateTime: "2026-01-25T01:45:47Z"
+      message: ReplicaSet "odoo-postgres-7965d5f675" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-25T20:57:51Z"
+      lastUpdateTime: "2026-01-25T20:57:51Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    observedGeneration: 8
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

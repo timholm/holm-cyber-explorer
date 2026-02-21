@@ -1,0 +1,330 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: loki:apps/StatefulSet:monitoring/loki
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"loki:apps/StatefulSet:monitoring/loki"},"labels":{"app.kubernetes.io/component":"single-binary","app.kubernetes.io/instance":"loki","app.kubernetes.io/name":"loki","app.kubernetes.io/part-of":"memberlist","app.kubernetes.io/version":"3.6.3","helm.sh/chart":"loki-6.51.0"},"name":"loki","namespace":"monitoring"},"spec":{"persistentVolumeClaimRetentionPolicy":{"whenDeleted":"Delete","whenScaled":"Delete"},"podManagementPolicy":"Parallel","replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app.kubernetes.io/component":"single-binary","app.kubernetes.io/instance":"loki","app.kubernetes.io/name":"loki"}},"serviceName":"loki-headless","template":{"metadata":{"annotations":{"checksum/config":"41bc9e08752b2b2a17b737ff3e1bff115978003b3ca449daf2289cfbb1a911cc","kubectl.kubernetes.io/default-container":"loki","storage/size":"10Gi"},"labels":{"app.kubernetes.io/component":"single-binary","app.kubernetes.io/instance":"loki","app.kubernetes.io/name":"loki","app.kubernetes.io/part-of":"memberlist"}},"spec":{"affinity":{"podAntiAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":[{"labelSelector":{"matchLabels":{"app.kubernetes.io/component":"single-binary","app.kubernetes.io/instance":"loki","app.kubernetes.io/name":"loki"}},"topologyKey":"kubernetes.io/hostname"}]}},"automountServiceAccountToken":true,"containers":[{"args":["-config.file=/etc/loki/config/config.yaml","-target=all"],"image":"docker.io/grafana/loki:3.6.3","imagePullPolicy":"IfNotPresent","name":"loki","ports":[{"containerPort":3100,"name":"http-metrics","protocol":"TCP"},{"containerPort":9095,"name":"grpc","protocol":"TCP"},{"containerPort":7946,"name":"http-memberlist","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/ready","port":"http-metrics"},"initialDelaySeconds":15,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"resources":{"limits":{"memory":"1Gi"},"requests":{"cpu":"200m","memory":"512Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/tmp","name":"tmp"},{"mountPath":"/etc/loki/config","name":"config"},{"mountPath":"/etc/loki/runtime-config","name":"runtime-config"},{"mountPath":"/var/loki","name":"storage"},{"mountPath":"/rules","name":"sc-rules-volume"}]},{"env":[{"name":"METHOD","value":"WATCH"},{"name":"LABEL","value":"loki_rule"},{"name":"FOLDER","value":"/rules"},{"name":"RESOURCE","value":"both"},{"name":"WATCH_SERVER_TIMEOUT","value":"60"},{"name":"WATCH_CLIENT_TIMEOUT","value":"60"},{"name":"LOG_LEVEL","value":"INFO"}],"image":"docker.io/kiwigrid/k8s-sidecar:1.30.9","imagePullPolicy":"IfNotPresent","name":"loki-sc-rules","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/rules","name":"sc-rules-volume"}]}],"enableServiceLinks":true,"securityContext":{"fsGroup":10001,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001},"serviceAccountName":"loki","terminationGracePeriodSeconds":30,"volumes":[{"emptyDir":{},"name":"tmp"},{"configMap":{"items":[{"key":"config.yaml","path":"config.yaml"}],"name":"loki"},"name":"config"},{"configMap":{"name":"loki-runtime"},"name":"runtime-config"},{"emptyDir":{},"name":"sc-rules-volume"}]}},"updateStrategy":{"rollingUpdate":{"partition":0}},"volumeClaimTemplates":[{"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"name":"storage"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"10Gi"}},"storageClassName":"qnap-iscsi"}}]}}
+    creationTimestamp: "2026-01-25T01:39:27Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: single-binary
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/part-of: memberlist
+      app.kubernetes.io/version: 3.6.3
+      helm.sh/chart: loki-6.51.0
+    name: loki
+    namespace: monitoring
+    resourceVersion: "759091"
+    uid: ebb361fa-d8c7-4b50-a718-fa8cbc8beacc
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Delete
+      whenScaled: Delete
+    podManagementPolicy: Parallel
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: single-binary
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/name: loki
+    serviceName: loki-headless
+    template:
+      metadata:
+        annotations:
+          checksum/config: 41bc9e08752b2b2a17b737ff3e1bff115978003b3ca449daf2289cfbb1a911cc
+          kubectl.kubernetes.io/default-container: loki
+          storage/size: 10Gi
+        labels:
+          app.kubernetes.io/component: single-binary
+          app.kubernetes.io/instance: loki
+          app.kubernetes.io/name: loki
+          app.kubernetes.io/part-of: memberlist
+      spec:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: single-binary
+                  app.kubernetes.io/instance: loki
+                  app.kubernetes.io/name: loki
+              topologyKey: kubernetes.io/hostname
+        automountServiceAccountToken: true
+        containers:
+        - args:
+          - -config.file=/etc/loki/config/config.yaml
+          - -target=all
+          image: docker.io/grafana/loki:3.6.3
+          imagePullPolicy: IfNotPresent
+          name: loki
+          ports:
+          - containerPort: 3100
+            name: http-metrics
+            protocol: TCP
+          - containerPort: 9095
+            name: grpc
+            protocol: TCP
+          - containerPort: 7946
+            name: http-memberlist
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: http-metrics
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /etc/loki/config
+            name: config
+          - mountPath: /etc/loki/runtime-config
+            name: runtime-config
+          - mountPath: /var/loki
+            name: storage
+          - mountPath: /rules
+            name: sc-rules-volume
+        - env:
+          - name: METHOD
+            value: WATCH
+          - name: LABEL
+            value: loki_rule
+          - name: FOLDER
+            value: /rules
+          - name: RESOURCE
+            value: both
+          - name: WATCH_SERVER_TIMEOUT
+            value: "60"
+          - name: WATCH_CLIENT_TIMEOUT
+            value: "60"
+          - name: LOG_LEVEL
+            value: INFO
+          image: docker.io/kiwigrid/k8s-sidecar:1.30.9
+          imagePullPolicy: IfNotPresent
+          name: loki-sc-rules
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /rules
+            name: sc-rules-volume
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: true
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 10001
+          fsGroupChangePolicy: OnRootMismatch
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+        serviceAccount: loki
+        serviceAccountName: loki
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tmp
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: config.yaml
+              path: config.yaml
+            name: loki
+          name: config
+        - configMap:
+            defaultMode: 420
+            name: loki-runtime
+          name: runtime-config
+        - emptyDir: {}
+          name: sc-rules-volume
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: storage
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: qnap-iscsi
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 0
+    collisionCount: 0
+    currentReplicas: 1
+    currentRevision: loki-7bbcc7fc4f
+    observedGeneration: 1
+    replicas: 1
+    updateRevision: loki-7bbcc7fc4f
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: prometheus:apps/StatefulSet:monitoring/prometheus-alertmanager
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"prometheus:apps/StatefulSet:monitoring/prometheus-alertmanager"},"labels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"alertmanager","app.kubernetes.io/version":"v0.30.1","helm.sh/chart":"alertmanager-1.31.1"},"name":"prometheus-alertmanager","namespace":"monitoring"},"spec":{"minReadySeconds":0,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"alertmanager"}},"serviceName":"prometheus-alertmanager-headless","template":{"metadata":{"annotations":{"checksum/config":"1d74ea0c9572d129a5e986cd52f17207f277b52d703594e8b35ae64954ee5d52"},"labels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"alertmanager"}},"spec":{"automountServiceAccountToken":true,"containers":[{"args":["--storage.path=/alertmanager","--config.file=/etc/alertmanager/alertmanager.yml"],"env":[{"name":"POD_IP","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"status.podIP"}}}],"image":"quay.io/prometheus/alertmanager:v0.30.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/","port":"http"}},"name":"alertmanager","ports":[{"containerPort":9093,"name":"http","protocol":"TCP"}],"readinessProbe":{"httpGet":{"path":"/","port":"http"}},"resources":{},"securityContext":{"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534},"volumeMounts":[{"mountPath":"/etc/alertmanager","name":"config"},{"mountPath":"/alertmanager","name":"storage"}]}],"securityContext":{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534},"serviceAccountName":"prometheus-alertmanager","volumes":[{"configMap":{"name":"prometheus-alertmanager"},"name":"config"}]}},"volumeClaimTemplates":[{"metadata":{"name":"storage"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"2Gi"}}}}]}}
+    creationTimestamp: "2026-01-19T05:06:37Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: alertmanager
+      app.kubernetes.io/version: v0.30.1
+      helm.sh/chart: alertmanager-1.31.1
+    name: prometheus-alertmanager
+    namespace: monitoring
+    resourceVersion: "10320"
+    uid: 61dc640e-b328-4bc9-8fd3-e036c5227f8c
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/name: alertmanager
+    serviceName: prometheus-alertmanager-headless
+    template:
+      metadata:
+        annotations:
+          checksum/config: 1d74ea0c9572d129a5e986cd52f17207f277b52d703594e8b35ae64954ee5d52
+        labels:
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/name: alertmanager
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - args:
+          - --storage.path=/alertmanager
+          - --config.file=/etc/alertmanager/alertmanager.yml
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          image: quay.io/prometheus/alertmanager:v0.30.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: alertmanager
+          ports:
+          - containerPort: 9093
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/alertmanager
+            name: config
+          - mountPath: /alertmanager
+            name: storage
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 65534
+          runAsGroup: 65534
+          runAsNonRoot: true
+          runAsUser: 65534
+        serviceAccount: prometheus-alertmanager
+        serviceAccountName: prometheus-alertmanager
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: prometheus-alertmanager
+          name: config
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: storage
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 1
+    collisionCount: 0
+    currentReplicas: 1
+    currentRevision: prometheus-alertmanager-689b474cd4
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updateRevision: prometheus-alertmanager-689b474cd4
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

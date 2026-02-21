@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "claude-code-gitea-actions.fullname" . }}
+  labels:
+    {{- include "claude-code-gitea-actions.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "claude-code-gitea-actions.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config-server: {{ include (print $.Template.BasePath "/configmap-server.yaml") . | sha256sum }}
+        checksum/config-html: {{ include (print $.Template.BasePath "/configmap-html.yaml") . | sha256sum }}
+      labels:
+        {{- include "claude-code-gitea-actions.selectorLabels" . | nindent 8 }}
+    spec:
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+          protocol: TCP
+        env:
+        - name: PORT
+          value: "{{ .Values.service.targetPort }}"
+        - name: GITEA_URL
+          value: {{ .Values.gitea.url | quote }}
+        - name: GITEA_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.gitea.secretName }}
+              key: gitea-token
+        - name: CMD_API_URL
+          value: {{ .Values.cmdApi.url | quote }}
+        {{- if .Values.webhookSecret }}
+        - name: WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.gitea.secretName }}
+              key: webhook-secret
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.probes.liveness.path }}
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.probes.readiness.path }}
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+        volumeMounts:
+        - name: server-code
+          mountPath: /app/server.js
+          subPath: server.js
+        - name: html-code
+          mountPath: /app/public/index.html
+          subPath: index.html
+        {{- with .Values.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      volumes:
+      - name: server-code
+        configMap:
+          name: {{ include "claude-code-gitea-actions.fullname" . }}-server
+      - name: html-code
+        configMap:
+          name: {{ include "claude-code-gitea-actions.fullname" . }}-html

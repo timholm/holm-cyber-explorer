@@ -1,0 +1,57 @@
+name: Sync Cluster to GitHub
+
+on:
+  # Disabled: Pi cluster is on private network, unreachable from GitHub Actions
+  # schedule:
+  #   - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+env:
+  PI_HOST: 192.168.8.197
+
+jobs:
+  check-connectivity:
+    name: Check Connectivity
+    runs-on: ubuntu-latest
+    outputs:
+      reachable: ${{ steps.check.outputs.reachable }}
+    steps:
+      - name: Check if cluster is reachable
+        id: check
+        run: |
+          if curl -s --connect-timeout 5 "http://$PI_HOST:30000/health" > /dev/null 2>&1; then
+            echo "reachable=true" >> $GITHUB_OUTPUT
+          else
+            echo "reachable=false" >> $GITHUB_OUTPUT
+          fi
+
+  sync:
+    name: Sync Services
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync from cluster
+        run: |
+          echo "Syncing from cluster..."
+          # This would run if cluster was reachable
+
+  summary:
+    name: Summary
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## ⚠️ Sync Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The Pi cluster at $PI_HOST is on a private network." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**To sync manually:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "# On Pi cluster:" >> $GITHUB_STEP_SUMMARY
+          echo "cd ~/HolmOS && git pull && git add -A && git commit -m 'sync' && git push" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

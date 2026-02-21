@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ chapter.title if chapter else 'Chapter' }}{% endblock %}
+
+{% block content %}
+<div x-data="chapterView()">
+    <!-- Breadcrumb -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm">
+            <li><a href="/" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Dashboard</a></li>
+            <li><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></li>
+            <li><a :href="'/project/' + chapter.projectId" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400" x-text="chapter.projectTitle"></a></li>
+            <li><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></li>
+            <li class="text-gray-900 dark:text-white font-medium" x-text="'Chapter ' + chapter.number"></li>
+        </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Chapter Header -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-medium text-primary-600 dark:text-primary-400" x-text="'Chapter ' + chapter.number"></span>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full"
+                                  :class="{
+                                      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': chapter.status === 'completed',
+                                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': chapter.status === 'generating',
+                                      'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400': chapter.status === 'pending'
+                                  }"
+                                  x-text="chapter.status"></span>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-2" x-text="chapter.title"></h1>
+                        <div class="flex items-center space-x-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
+                            <span x-text="chapter.wordCount.toLocaleString() + ' words'"></span>
+                            <span>|</span>
+                            <span x-text="chapter.readingTime + ' min read'"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button @click="regenerate()" 
+                                class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                title="Regenerate">
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" :class="{ 'animate-spin': isRegenerating }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </button>
+                        <button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" title="Edit">
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio Player -->
+            <div x-show="chapter.hasAudio" class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Audio Narration</p>
+                            <p class="text-sm text-white/70" x-text="chapter.audioDuration"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button @click="toggleSpeed()" class="px-3 py-1 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors" x-text="playbackSpeed + 'x'"></button>
+                        <button class="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mb-4">
+                    <div class="relative w-full h-2 bg-white/20 rounded-full cursor-pointer" @click="seekAudio($event)">
+                        <div class="absolute h-2 bg-white rounded-full transition-all" :style="'width: ' + audioProgress + '%'"></div>
+                        <div class="absolute w-4 h-4 bg-white rounded-full shadow-lg -top-1 transform -translate-x-1/2 transition-all" :style="'left: ' + audioProgress + '%'"></div>
+                    </div>
+                    <div class="flex justify-between text-sm text-white/70 mt-2">
+                        <span x-text="currentTime">0:00</span>
+                        <span x-text="chapter.audioDuration">12:34</span>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center justify-center space-x-6">
+                    <button @click="skipBackward()" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"></path>
+                        </svg>
+                    </button>
+                    <button @click="togglePlay()" class="w-14 h-14 bg-white text-primary-600 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg">
+                        <svg x-show="!isPlaying" class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"></path>
+                        </svg>
+                        <svg x-show="isPlaying" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"></path>
+                        </svg>
+                    </button>
+                    <button @click="skipForward()" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generation Progress -->
+            <div x-show="chapter.status === 'generating'" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900 dark:text-white">Generating Chapter Content</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400" x-text="generationStatus"></p>
+                        <div class="mt-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full transition-all duration-500" :style="'width: ' + generationProgress + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter Content -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+                <article class="prose prose-lg dark:prose-invert max-w-none" x-html="chapter.content">
+                </article>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Chapter Navigation -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Chapter Navigation</h3>
+                <div class="space-y-2">
+                    <template x-for="nav in chapterNav" :key="nav.number">
+                        <a :href="'/chapter/' + nav.id" 
+                           class="flex items-center space-x-3 p-3 rounded-lg transition-colors"
+                           :class="nav.number === chapter.number ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400'">
+                            <span class="w-6 h-6 rounded flex items-center justify-center text-sm font-medium"
+                                  :class="{
+                                      'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': nav.status === 'completed',
+                                      'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400': nav.status === 'generating',
+                                      'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400': nav.status === 'pending'
+                                  }"
+                                  x-text="nav.number"></span>
+                            <span class="text-sm truncate" x-text="nav.title"></span>
+                        </a>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Chapter Stats -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Statistics</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 dark:text-gray-400">Words</span>
+                        <span class="font-medium text-gray-900 dark:text-white" x-text="chapter.wordCount.toLocaleString()"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 dark:text-gray-400">Characters</span>
+                        <span class="font-medium text-gray-900 dark:text-white" x-text="chapter.charCount.toLocaleString()"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 dark:text-gray-400">Paragraphs</span>
+                        <span class="font-medium text-gray-900 dark:text-white" x-text="chapter.paragraphs"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 dark:text-gray-400">Reading Time</span>
+                        <span class="font-medium text-gray-900 dark:text-white" x-text="chapter.readingTime + ' min'"></span>
+                    </div>
+                    <div x-show="chapter.hasAudio" class="flex justify-between">
+                        <span class="text-gray-500 dark:text-gray-400">Audio Length</span>
+                        <span class="font-medium text-gray-900 dark:text-white" x-text="chapter.audioDuration"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                <div class="space-y-2">
+                    <button class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span class="text-gray-700 dark:text-gray-300">Download Chapter</span>
+                    </button>
+                    <button class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                        </svg>
+                        <span class="text-gray-700 dark:text-gray-300">Share Chapter</span>
+                    </button>
+                    <button @click="regenerateAudio()" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                        <span class="text-gray-700 dark:text-gray-300">Regenerate Audio</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function chapterView() {
+    return {
+        isPlaying: false,
+        isRegenerating: false,
+        audioProgress: 0,
+        currentTime: '0:00',
+        playbackSpeed: 1,
+        generationProgress: 72,
+        generationStatus: 'Writing content... 72% complete',
+        chapter: {
+            id: 5,
+            projectId: 1,
+            projectTitle: 'The AI Revolution',
+            number: 5,
+            title: 'Computer Vision and Image Recognition',
+            status: 'completed',
+            wordCount: 4532,
+            charCount: 27456,
+            paragraphs: 24,
+            readingTime: 18,
+            hasAudio: true,
+            audioDuration: '18:45',
+            content: `
+                <p class="lead">Computer vision represents one of the most exciting frontiers in artificial intelligence, enabling machines to interpret and understand the visual world in ways that were once thought to be exclusively human capabilities.</p>
+                
+                <h2>The Evolution of Machine Vision</h2>
+                <p>The journey of computer vision began in the 1960s when researchers first attempted to teach computers to see. Early systems were primitive, capable only of detecting simple shapes and edges. Today, modern AI systems can recognize faces, read text, identify objects, and even generate realistic images from scratch.</p>
+                
+                <p>The breakthrough came with the development of convolutional neural networks (CNNs), which revolutionized how computers process visual information. Unlike traditional algorithms that required hand-crafted features, CNNs learn to identify relevant patterns directly from data.</p>
+                
+                <h2>How Machines Learn to See</h2>
+                <p>At its core, a digital image is nothing more than an array of numbers representing pixel intensities. What makes computer vision challenging is the vast gap between these raw numbers and the rich semantic meaning humans effortlessly extract from images.</p>
+                
+                <p>Deep learning bridges this gap through hierarchical feature learning. The first layers of a neural network might detect simple edges and textures, while deeper layers combine these to recognize complex objects like faces, cars, or animals.</p>
+                
+                <h2>Applications Transforming Industries</h2>
+                <p>Computer vision has found applications across virtually every industry. In healthcare, AI systems analyze medical images to detect diseases earlier and more accurately than human experts. Self-driving cars rely on computer vision to navigate safely through traffic. Manufacturing plants use visual inspection systems to identify defects with superhuman precision.</p>
+            `
+        },
+        chapterNav: [
+            { id: 1, number: 1, title: 'Introduction to AI', status: 'completed' },
+            { id: 2, number: 2, title: 'History of ML', status: 'completed' },
+            { id: 3, number: 3, title: 'Neural Networks', status: 'completed' },
+            { id: 4, number: 4, title: 'NLP', status: 'completed' },
+            { id: 5, number: 5, title: 'Computer Vision', status: 'completed' },
+            { id: 6, number: 6, title: 'Ethics of AI', status: 'pending' },
+            { id: 7, number: 7, title: 'AI in Healthcare', status: 'pending' },
+            { id: 8, number: 8, title: 'Future of Work', status: 'pending' }
+        ],
+        togglePlay() {
+            this.isPlaying = !this.isPlaying;
+            if (this.isPlaying) {
+                this.simulateAudioProgress();
+            }
+        },
+        simulateAudioProgress() {
+            const interval = setInterval(() => {
+                if (!this.isPlaying || this.audioProgress >= 100) {
+                    clearInterval(interval);
+                    if (this.audioProgress >= 100) {
+                        this.isPlaying = false;
+                        this.audioProgress = 0;
+                    }
+                    return;
+                }
+                this.audioProgress += 0.5;
+                const totalSeconds = Math.floor((this.audioProgress / 100) * 1125);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                this.currentTime = minutes + ':' + seconds.toString().padStart(2, '0');
+            }, 100);
+        },
+        toggleSpeed() {
+            const speeds = [1, 1.25, 1.5, 2, 0.75];
+            const currentIndex = speeds.indexOf(this.playbackSpeed);
+            this.playbackSpeed = speeds[(currentIndex + 1) % speeds.length];
+        },
+        skipBackward() {
+            this.audioProgress = Math.max(0, this.audioProgress - 5);
+        },
+        skipForward() {
+            this.audioProgress = Math.min(100, this.audioProgress + 5);
+        },
+        seekAudio(event) {
+            const rect = event.target.getBoundingClientRect();
+            const percent = ((event.clientX - rect.left) / rect.width) * 100;
+            this.audioProgress = Math.max(0, Math.min(100, percent));
+        },
+        regenerate() {
+            this.isRegenerating = true;
+            setTimeout(() => {
+                this.isRegenerating = false;
+            }, 3000);
+        },
+        regenerateAudio() {
+            alert('Regenerating audio narration...');
+        }
+    }
+}
+</script>
+{% endblock %}

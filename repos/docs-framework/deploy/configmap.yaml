@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docs-site-config
+  namespace: docs
+  labels:
+    app.kubernetes.io/name: docs-site
+    app.kubernetes.io/part-of: holm-chat
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name holm.chat;
+
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # Health check endpoint (returns 200 even with no content deployed yet)
+        location = /healthz {
+            access_log off;
+            default_type text/plain;
+            return 200 "ok\n";
+        }
+
+        # Serve static files with caching
+        location / {
+            try_files $uri $uri/ $uri.html /404.html =404;
+
+            # Browser caching for static assets
+            location ~* \.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$ {
+                expires 7d;
+                add_header Cache-Control "public, immutable";
+            }
+
+            # HTML files: short cache so updates propagate quickly
+            location ~* \.html$ {
+                expires 10m;
+                add_header Cache-Control "public, must-revalidate";
+            }
+        }
+
+        # Security headers
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+        # Gzip compression (saves bandwidth on Pi)
+        gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml;
+        gzip_min_length 256;
+        gzip_vary on;
+
+        # Custom error pages (optional — place 404.html in site content)
+        error_page 404 /404.html;
+        location = /404.html {
+            internal;
+        }
+
+        # Disable access log for favicon to reduce noise
+        location = /favicon.ico {
+            access_log off;
+            log_not_found off;
+        }
+    }

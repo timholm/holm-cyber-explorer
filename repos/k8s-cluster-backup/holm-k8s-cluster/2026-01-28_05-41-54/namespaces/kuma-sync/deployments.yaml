@@ -1,0 +1,136 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"kuma-sync"},"name":"kuma-sync","namespace":"kuma-sync"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"kuma-sync"}},"template":{"metadata":{"labels":{"app":"kuma-sync"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"NotIn","values":["openmediavault"]}]}]}}},"containers":[{"command":["python","-u","/app/main.py"],"env":[{"name":"PYTHONPATH","value":"/app-deps"}],"envFrom":[{"configMapRef":{"name":"kuma-sync-config"}},{"secretRef":{"name":"kuma-sync-credentials"}}],"image":"python:3.11-slim","name":"kuma-sync","resources":{"limits":{"memory":"256Mi"},"requests":{"cpu":"10m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/app","name":"app-script"},{"mountPath":"/app-deps","name":"app-deps"}]}],"dnsConfig":{"options":[{"name":"ndots","value":"2"},{"name":"timeout","value":"5"},{"name":"attempts","value":"3"}]},"initContainers":[{"command":["pip","install","--target=/app-deps","kubernetes\u003e=28.1.0","uptime-kuma-api\u003e=1.2.1"],"image":"python:3.11-slim","name":"install-deps","volumeMounts":[{"mountPath":"/app-deps","name":"app-deps"}]}],"serviceAccountName":"kuma-sync","tolerations":[{"effect":"NoSchedule","key":"node.cilium.io/agent-not-ready","operator":"Exists"}],"volumes":[{"configMap":{"name":"kuma-sync-script"},"name":"app-script"},{"emptyDir":{},"name":"app-deps"}]}}}}
+    creationTimestamp: "2026-01-25T01:03:32Z"
+    generation: 1
+    labels:
+      app: kuma-sync
+    name: kuma-sync
+    namespace: kuma-sync
+    resourceVersion: "1014"
+    uid: f97a3d98-afd8-49b9-87d4-737ea9cd7309
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: kuma-sync
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: kuma-sync
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                  - openmediavault
+        containers:
+        - command:
+          - python
+          - -u
+          - /app/main.py
+          env:
+          - name: PYTHONPATH
+            value: /app-deps
+          envFrom:
+          - configMapRef:
+              name: kuma-sync-config
+          - secretRef:
+              name: kuma-sync-credentials
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          name: kuma-sync
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app
+            name: app-script
+          - mountPath: /app-deps
+            name: app-deps
+        dnsConfig:
+          options:
+          - name: ndots
+            value: "2"
+          - name: timeout
+            value: "5"
+          - name: attempts
+            value: "3"
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - pip
+          - install
+          - --target=/app-deps
+          - kubernetes>=28.1.0
+          - uptime-kuma-api>=1.2.1
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          name: install-deps
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app-deps
+            name: app-deps
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: kuma-sync
+        serviceAccountName: kuma-sync
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node.cilium.io/agent-not-ready
+          operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: kuma-sync-script
+          name: app-script
+        - emptyDir: {}
+          name: app-deps
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T01:03:35Z"
+      lastUpdateTime: "2026-01-25T01:04:16Z"
+      message: ReplicaSet "kuma-sync-6f56cdddf5" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:39:45Z"
+      lastUpdateTime: "2026-01-27T02:39:45Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

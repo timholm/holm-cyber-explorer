@@ -1,0 +1,101 @@
+---
+# HTTPRoute for Gateway API (Cilium or other Gateway controller)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: animus-dashboard
+  namespace: animus
+  labels:
+    app.kubernetes.io/name: animus-dashboard
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: gateway
+  hostnames:
+    - "holm.chat"
+  rules:
+    # API routes
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /animus/api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api
+      backendRefs:
+        - name: animus-api
+          port: 8080
+
+    # WebSocket routes
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /animus/ws
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /ws
+      backendRefs:
+        - name: animus-api
+          port: 8080
+
+    # Frontend routes
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /animus
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: animus-frontend
+          port: 3000
+---
+# Alternative: Ingress for nginx-ingress or traefik
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: animus-dashboard
+  namespace: animus
+  labels:
+    app.kubernetes.io/name: animus-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/websocket-services: "animus-api"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: holm.chat
+      http:
+        paths:
+          - path: /animus/api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: animus-api
+                port:
+                  number: 8080
+          - path: /animus/ws(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: animus-api
+                port:
+                  number: 8080
+          - path: /animus(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: animus-frontend
+                port:
+                  number: 3000

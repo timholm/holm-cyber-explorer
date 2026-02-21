@@ -1,0 +1,116 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    policy.csv: |
+      # Default rule - all authenticated users get admin role
+      g, *, role:admin
+    policy.default: role:admin
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"policy.csv":"# Default rule - all authenticated users get admin role\ng, *, role:admin\n","policy.default":"role:admin"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"argo-workflows-sso-rbac","namespace":"argo"}}
+    creationTimestamp: "2026-01-20T04:04:39Z"
+    name: argo-workflows-sso-rbac
+    namespace: argo
+    resourceVersion: "693"
+    uid: 61a5c4b2-ac4b-4b9c-b15f-b30bd58a5dc0
+- apiVersion: v1
+  data:
+    config: |
+      sso:
+        issuer: https://holm.chat/auth/realms/k8s
+        clientId:
+          name: argo-workflows-sso-secret
+          key: client-id
+        clientSecret:
+          name: argo-workflows-sso-secret
+          key: client-secret
+        redirectUrl: "https://holm.chat/argo-workflows/oauth2/callback"
+        rbac:
+          enabled: true
+        scopes:
+          - openid
+          - profile
+          - email
+        sessionExpiry: 10h
+        insecureSkipVerify: true
+      nodeEvents:
+        enabled: true
+      workflowEvents:
+        enabled: true
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: argo-workflows:/ConfigMap:argo/argo-workflows-workflow-controller-configmap
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config":"sso:\n  issuer: https://holm.chat/auth/realms/k8s\n  clientId:\n    name: argo-workflows-sso-secret\n    key: client-id\n  clientSecret:\n    name: argo-workflows-sso-secret\n    key: client-secret\n  redirectUrl: \"https://holm.chat/argo-workflows/oauth2/callback\"\n  rbac:\n    enabled: true\n  scopes:\n    - openid\n    - profile\n    - email\n  sessionExpiry: 10h\n  insecureSkipVerify: true\nnodeEvents:\n  enabled: true\nworkflowEvents:\n  enabled: true\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"argo-workflows:/ConfigMap:argo/argo-workflows-workflow-controller-configmap"},"labels":{"app":"workflow-controller","app.kubernetes.io/component":"workflow-controller","app.kubernetes.io/instance":"argo-workflows","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"argo-workflows-cm","app.kubernetes.io/part-of":"argo-workflows","helm.sh/chart":"argo-workflows-0.47.1"},"name":"argo-workflows-workflow-controller-configmap","namespace":"argo"}}
+    creationTimestamp: "2026-01-20T03:58:58Z"
+    labels:
+      app: workflow-controller
+      app.kubernetes.io/component: workflow-controller
+      app.kubernetes.io/instance: argo-workflows
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argo-workflows-cm
+      app.kubernetes.io/part-of: argo-workflows
+      helm.sh/chart: argo-workflows-0.47.1
+    name: argo-workflows-workflow-controller-configmap
+    namespace: argo
+    resourceVersion: "694"
+    uid: 0ff8a71c-44bf-4b89-9c2b-fae3086bd13e
+- apiVersion: v1
+  data:
+    cooldown_seconds: "300"
+    excluded_namespaces: argo,argo-events,kube-system
+    max_concurrent: "1"
+    min_restart_count: "3"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"cooldown_seconds":"300","excluded_namespaces":"argo,argo-events,kube-system","max_concurrent":"1","min_restart_count":"3"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"auto-remediation-config","namespace":"argo"}}
+    creationTimestamp: "2026-01-22T03:01:01Z"
+    name: auto-remediation-config
+    namespace: argo
+    resourceVersion: "695"
+    uid: 7c4a7783-c0f6-46f1-82cd-dfe403b19dc8
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-19T01:15:47Z"
+    name: kube-root-ca.crt
+    namespace: argo
+    resourceVersion: "696"
+    uid: 7a78c266-cfbd-4237-9a22-1c04b96733fd
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{},"kind":"ConfigMap","metadata":{"annotations":{},"name":"workflow-cache","namespace":"argo"}}
+    creationTimestamp: "2026-01-22T03:01:01Z"
+    name: workflow-cache
+    namespace: argo
+    resourceVersion: "697"
+    uid: e210e3a2-0ed7-47f0-b392-b218bd786155
+kind: List
+metadata:
+  resourceVersion: ""

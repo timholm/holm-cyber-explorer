@@ -1,0 +1,69 @@
+name: Smoke Tests
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Pi Cluster"]
+    types: [completed]
+  workflow_dispatch:
+
+env:
+  PI_HOST: 192.168.8.197
+
+jobs:
+  check-connectivity:
+    name: Check Connectivity
+    runs-on: ubuntu-latest
+    outputs:
+      reachable: ${{ steps.check.outputs.reachable }}
+    steps:
+      - name: Check cluster
+        id: check
+        run: |
+          if curl -s --connect-timeout 5 "http://$PI_HOST:30000/health" > /dev/null 2>&1; then
+            echo "reachable=true" >> $GITHUB_OUTPUT
+          else
+            echo "reachable=false" >> $GITHUB_OUTPUT
+          fi
+
+  smoke-test:
+    name: Smoke Test
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test critical services
+        run: |
+          echo "## 🔥 Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          SERVICES="holmos-shell:30000 nova:30004 auth-gateway:30100 registry-ui:31750"
+          PASSED=0
+          FAILED=0
+
+          for svc in $SERVICES; do
+            NAME=$(echo $svc | cut -d: -f1)
+            PORT=$(echo $svc | cut -d: -f2)
+
+            if curl -sf --connect-timeout 5 "http://$PI_HOST:$PORT/health" > /dev/null 2>&1; then
+              echo "✅ $NAME: healthy" >> $GITHUB_STEP_SUMMARY
+              PASSED=$((PASSED + 1))
+            else
+              echo "❌ $NAME: unreachable" >> $GITHUB_STEP_SUMMARY
+              FAILED=$((FAILED + 1))
+            fi
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Results:** $PASSED passed, $FAILED failed" >> $GITHUB_STEP_SUMMARY
+
+  summary:
+    name: Summary
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## ⚠️ Smoke Tests Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Pi cluster at $PI_HOST is on a private network." >> $GITHUB_STEP_SUMMARY

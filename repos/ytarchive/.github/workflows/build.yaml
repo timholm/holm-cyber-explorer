@@ -1,0 +1,135 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'cmd/**'
+      - 'internal/**'
+      - 'deploy/**'
+      - 'web/**'
+      - 'go.mod'
+      - 'go.sum'
+      - '.ko.yaml'
+      - 'Dockerfile.ffmpeg-base'
+      - '.github/workflows/build.yaml'
+
+env:
+  KO_DOCKER_REPO: ghcr.io/timholm/ytarchive
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install Ko
+        uses: ko-build/setup-ko@v0.6
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontend
+        run: |
+          cd web
+          npm install
+          npm run build
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push ffmpeg base image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.ffmpeg-base
+          platforms: linux/arm64
+          push: true
+          tags: ghcr.io/timholm/ytarchive/ffmpeg-base:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push controller
+        id: build-controller
+        run: |
+          set -e
+          IMAGE=$(ko build ./cmd/controller --platform=linux/arm64 --push --sbom=none -B --tags=latest)
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+          echo "Controller image: ${IMAGE}"
+
+      - name: Build and push worker
+        id: build-worker
+        run: |
+          set -e
+          IMAGE=$(ko build ./cmd/worker --platform=linux/arm64 --push --sbom=none -B --tags=latest)
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+          echo "Worker image: ${IMAGE}"
+
+      - name: Build and push collector
+        id: build-collector
+        run: |
+          set -e
+          IMAGE=$(ko build ./cmd/collector --platform=linux/arm64 --push --sbom=none -B --tags=latest)
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+          echo "Collector image: ${IMAGE}"
+
+      - name: Update Kubernetes manifests
+        run: |
+          CONTROLLER_IMAGE="${{ steps.build-controller.outputs.image }}"
+          WORKER_IMAGE="${{ steps.build-worker.outputs.image }}"
+          COLLECTOR_IMAGE="${{ steps.build-collector.outputs.image }}"
+
+          echo "Controller: ${CONTROLLER_IMAGE}"
+          echo "Worker: ${WORKER_IMAGE}"
+          echo "Collector: ${COLLECTOR_IMAGE}"
+
+          # Update controller image in controller.yaml
+          sed -i "s|image: ghcr.io/timholm/ytarchive/controller[^[:space:]]*|image: ${CONTROLLER_IMAGE}|g" deploy/kubernetes/controller.yaml
+
+          # Update WORKER_IMAGE env var in controller.yaml
+          sed -i "s|value: ghcr.io/timholm/ytarchive/worker[^[:space:]]*|value: ${WORKER_IMAGE}|g" deploy/kubernetes/controller.yaml
+
+          # Update worker image in worker-job.yaml and worker-deployment.yaml
+          sed -i "s|image: ghcr.io/timholm/ytarchive/worker[^[:space:]]*|image: ${WORKER_IMAGE}|g" deploy/kubernetes/worker-job.yaml
+          sed -i "s|image: ghcr.io/timholm/ytarchive/worker[^[:space:]]*|image: ${WORKER_IMAGE}|g" deploy/kubernetes/worker-deployment.yaml
+
+          # Update collector image in collector.yaml
+          sed -i "s|image: ghcr.io/timholm/ytarchive/collector[^[:space:]]*|image: ${COLLECTOR_IMAGE}|g" deploy/kubernetes/collector.yaml
+
+          echo "Updated manifests:"
+          grep "image:" deploy/kubernetes/controller.yaml
+          grep "WORKER_IMAGE" -A1 deploy/kubernetes/controller.yaml
+          grep "image:" deploy/kubernetes/worker-deployment.yaml
+          grep "image:" deploy/kubernetes/collector.yaml
+
+      - name: Commit and push manifest updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add deploy/kubernetes/
+          git diff --staged --quiet || git commit -m "chore: update image digests [skip ci]"
+          git push

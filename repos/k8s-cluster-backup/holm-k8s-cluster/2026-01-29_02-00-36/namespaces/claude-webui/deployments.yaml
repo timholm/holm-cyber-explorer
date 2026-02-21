@@ -1,0 +1,116 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: claude-webui:apps/Deployment:claude-webui/claude-webui
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"claude-webui:apps/Deployment:claude-webui/claude-webui"},"labels":{"app.kubernetes.io/instance":"claude-webui","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"claude-webui","app.kubernetes.io/version":"1.0.0","helm.sh/chart":"claude-webui-1.0.0"},"name":"claude-webui","namespace":"claude-webui"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"claude-webui","app.kubernetes.io/instance":"claude-webui","app.kubernetes.io/name":"claude-webui"}},"template":{"metadata":{"annotations":{"checksum/config-html":"3bc165ad1a255fbc567ad7577bfe18d62822ec91fcaa0661f2cab0b1a9d85040","checksum/config-server":"ad988670b6dfc5220cbd41bfcfb38e30cf5b1683ad5b4ca501aa99edbfc298a9"},"labels":{"app":"claude-webui","app.kubernetes.io/instance":"claude-webui","app.kubernetes.io/name":"claude-webui"}},"spec":{"containers":[{"env":[{"name":"PORT","value":"3000"},{"name":"SSH_HOST","value":"192.168.8.116"},{"name":"SSH_USER","value":"tim"},{"name":"SSH_PASS","valueFrom":{"secretKeyRef":{"key":"ssh-password","name":"claude-webui-secret"}}},{"name":"CMD_API_URL","value":"http://10.43.170.9"}],"image":"192.168.8.197:30500/claude-webui:v14","imagePullPolicy":"IfNotPresent","name":"claude-webui","ports":[{"containerPort":3000,"protocol":"TCP"}],"volumeMounts":[{"mountPath":"/app/server.js","name":"server-code","subPath":"server.js"},{"mountPath":"/app/public/index.html","name":"html-code","subPath":"index.html"}]}],"nodeSelector":{"kubernetes.io/hostname":"rpi-1"},"volumes":[{"configMap":{"name":"claude-webui-server"},"name":"server-code"},{"configMap":{"name":"claude-webui-html"},"name":"html-code"}]}}}}
+    creationTimestamp: "2026-01-20T06:57:53Z"
+    generation: 3
+    labels:
+      app.kubernetes.io/instance: claude-webui
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: claude-webui
+      app.kubernetes.io/version: 1.0.0
+      helm.sh/chart: claude-webui-1.0.0
+    name: claude-webui
+    namespace: claude-webui
+    resourceVersion: "389943"
+    uid: 2ded35d5-fbf4-4d6f-a308-4bb3ad54725c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: claude-webui
+        app.kubernetes.io/instance: claude-webui
+        app.kubernetes.io/name: claude-webui
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/config-html: 3bc165ad1a255fbc567ad7577bfe18d62822ec91fcaa0661f2cab0b1a9d85040
+          checksum/config-server: ad988670b6dfc5220cbd41bfcfb38e30cf5b1683ad5b4ca501aa99edbfc298a9
+          kubectl.kubernetes.io/restartedAt: "2026-01-19T23:29:39-08:00"
+        labels:
+          app: claude-webui
+          app.kubernetes.io/instance: claude-webui
+          app.kubernetes.io/name: claude-webui
+      spec:
+        containers:
+        - env:
+          - name: PORT
+            value: "3000"
+          - name: SSH_HOST
+            value: 192.168.8.116
+          - name: SSH_USER
+            value: tim
+          - name: SSH_PASS
+            valueFrom:
+              secretKeyRef:
+                key: ssh-password
+                name: claude-webui-secret
+          - name: CMD_API_URL
+            value: http://10.43.170.9
+          image: 192.168.8.197:30500/claude-webui:v14
+          imagePullPolicy: IfNotPresent
+          name: claude-webui
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/server.js
+            name: server-code
+            subPath: server.js
+          - mountPath: /app/public/index.html
+            name: html-code
+            subPath: index.html
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: rpi-1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: claude-webui-server
+          name: server-code
+        - configMap:
+            defaultMode: 420
+            name: claude-webui-html
+          name: html-code
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-20T06:57:53Z"
+      lastUpdateTime: "2026-01-20T07:29:43Z"
+      message: ReplicaSet "claude-webui-675c9c7fdc" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T14:18:45Z"
+      lastUpdateTime: "2026-01-27T14:18:45Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

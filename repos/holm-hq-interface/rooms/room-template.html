@@ -1,0 +1,44 @@
+<!--
+  HOLM HQ — Room Template
+  Reference template for individual room content panels.
+  The actual room rendering is handled by main.js selectRoom().
+  Extend room data in map-data.json to customize room content.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HOLM HQ — Room</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <div style="padding: 40px; max-width: 600px;">
+    <h2 id="room-title" style="color: var(--neon-cyan); letter-spacing: 3px;">ROOM</h2>
+    <div id="room-content" style="margin-top: 20px; color: var(--text-dim);">
+      [ PLACEHOLDER — Room content will be loaded here ]
+    </div>
+  </div>
+  <script>
+    // Standalone room viewer
+    (async function() {
+      const resp = await fetch('../map-data.json');
+      const data = await resp.json();
+      const roomId = new URLSearchParams(location.search).get('id') || 'R0101';
+      for (const floor of data.floors) {
+        const room = floor.rooms.find(r => r.id === roomId);
+        if (room) {
+          document.getElementById('room-title').textContent = room.label;
+          document.getElementById('room-content').innerHTML = `
+            <p><strong>ID:</strong> ${room.id}</p>
+            <p><strong>Floor:</strong> ${floor.label}</p>
+            <p><strong>Type:</strong> ${room.icon}</p>
+            <p><strong>Position:</strong> ${room.x}, ${room.y}</p>
+            <p><strong>Size:</strong> ${room.w} x ${room.h}</p>
+          `;
+          break;
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

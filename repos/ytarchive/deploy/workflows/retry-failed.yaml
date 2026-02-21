@@ -1,0 +1,331 @@
+# Retry Failed Videos Workflow Template
+# This workflow retries downloading videos that previously failed
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ytarchive-retry-failed
+  namespace: ytarchive
+  labels:
+    app: ytarchive
+    component: workflow
+spec:
+  entrypoint: retry-failed-videos
+  serviceAccountName: ytarchive-workflow
+
+  # Workflow-level retry strategy
+  retryStrategy:
+    limit: 3
+    retryPolicy: "Always"
+    backoff:
+      duration: "30s"
+      factor: 2
+      maxDuration: "10m"
+
+  # Volume configuration for iSCSI PVC
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+  - name: logs-volume
+    persistentVolumeClaim:
+      claimName: ytarchive-data
+
+  arguments:
+    parameters:
+    - name: channel-id
+      value: ""
+      description: "Specific channel ID to retry (empty for all channels)"
+    - name: batch-size
+      value: "5"
+      description: "Number of videos per retry batch"
+    - name: max-workers
+      value: "10"
+      description: "Maximum number of parallel retry workers"
+    - name: max-retries
+      value: "3"
+      description: "Maximum retry attempts per video"
+
+  templates:
+  # Main workflow entry point
+  - name: retry-failed-videos
+    steps:
+    # Step 1: Query database for failed videos
+    - - name: query-failed
+        template: query-failed-videos
+        arguments:
+          parameters:
+          - name: channel-id
+            value: "{{workflow.parameters.channel-id}}"
+          - name: max-retries
+            value: "{{workflow.parameters.max-retries}}"
+
+    # Step 2: Check if there are any failed videos to retry
+    - - name: check-failed-count
+        template: check-count
+        arguments:
+          parameters:
+          - name: failed-list
+            value: "{{steps.query-failed.outputs.parameters.failed-videos}}"
+
+    # Step 3: Group failed videos into batches
+    - - name: create-batches
+        template: group-into-batches
+        when: "{{steps.check-failed-count.outputs.parameters.has-videos}} == true"
+        arguments:
+          parameters:
+          - name: video-list
+            value: "{{steps.query-failed.outputs.parameters.failed-videos}}"
+          - name: batch-size
+            value: "{{workflow.parameters.batch-size}}"
+          - name: max-workers
+            value: "{{workflow.parameters.max-workers}}"
+
+    # Step 4: Spawn workers for retry
+    - - name: retry-batch
+        template: retry-worker
+        when: "{{steps.check-failed-count.outputs.parameters.has-videos}} == true"
+        withParam: "{{steps.create-batches.outputs.result}}"
+        arguments:
+          parameters:
+          - name: batch-data
+            value: "{{item}}"
+
+    # Step 5: Generate retry report
+    - - name: generate-report
+        template: retry-report
+        arguments:
+          parameters:
+          - name: original-count
+            value: "{{steps.query-failed.outputs.parameters.failed-count}}"
+          - name: had-videos
+            value: "{{steps.check-failed-count.outputs.parameters.has-videos}}"
+
+  # Template: Query database for failed videos
+  - name: query-failed-videos
+    inputs:
+      parameters:
+      - name: channel-id
+      - name: max-retries
+    outputs:
+      parameters:
+      - name: failed-videos
+        valueFrom:
+          path: /tmp/failed-videos.json
+      - name: failed-count
+        valueFrom:
+          path: /tmp/failed-count.txt
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "10s"
+        factor: 2
+        maxDuration: "2m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=query"
+      - "--query-type=failed-videos"
+      - "--channel-id={{inputs.parameters.channel-id}}"
+      - "--max-retries={{inputs.parameters.max-retries}}"
+      - "--output=/tmp/failed-videos.json"
+      - "--count-output=/tmp/failed-count.txt"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "256Mi"
+          cpu: "250m"
+
+  # Template: Check if there are failed videos
+  - name: check-count
+    inputs:
+      parameters:
+      - name: failed-list
+    outputs:
+      parameters:
+      - name: has-videos
+        valueFrom:
+          path: /tmp/has-videos.txt
+    script:
+      image: python:3.11-alpine
+      command: [python]
+      source: |
+        import json
+
+        failed_list = '''{{inputs.parameters.failed-list}}'''
+        try:
+            videos = json.loads(failed_list)
+            has_videos = len(videos) > 0
+        except:
+            has_videos = False
+
+        with open('/tmp/has-videos.txt', 'w') as f:
+            f.write('true' if has_videos else 'false')
+
+        print(f"Has failed videos to retry: {has_videos}")
+      resources:
+        requests:
+          memory: "32Mi"
+          cpu: "25m"
+        limits:
+          memory: "64Mi"
+          cpu: "50m"
+
+  # Template: Group failed videos into batches
+  - name: group-into-batches
+    inputs:
+      parameters:
+      - name: video-list
+      - name: batch-size
+      - name: max-workers
+    script:
+      image: python:3.11-alpine
+      command: [python]
+      source: |
+        import json
+
+        video_list = json.loads('''{{inputs.parameters.video-list}}''')
+        batch_size = int({{inputs.parameters.batch-size}})
+        max_workers = int({{inputs.parameters.max-workers}})
+
+        # Split videos into batches
+        batches = []
+        for i in range(0, len(video_list), batch_size):
+            batch = video_list[i:i + batch_size]
+            batches.append({
+                "batch_id": len(batches),
+                "videos": batch,
+                "count": len(batch),
+                "is_retry": True
+            })
+
+        # Limit concurrent batches
+        result = batches[:max_workers] if len(batches) > max_workers else batches
+        print(json.dumps(result))
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+
+  # Template: Retry worker for a batch of videos
+  - name: retry-worker
+    inputs:
+      parameters:
+      - name: batch-data
+    outputs:
+      parameters:
+      - name: result
+        valueFrom:
+          path: /tmp/retry-result.json
+    # Per-video retry with exponential backoff
+    retryStrategy:
+      limit: 3
+      retryPolicy: "Always"
+      backoff:
+        duration: "2m"
+        factor: 2
+        maxDuration: "30m"
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/worker
+      command: ["/ko-app/worker"]
+      args:
+      - "--mode=download"
+      - "--batch-data={{inputs.parameters.batch-data}}"
+      - "--output-dir=/data/videos"
+      - "--result-file=/tmp/retry-result.json"
+      - "--retry-mode=true"
+      - "--log-dir=/data/logs"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: YTDLP_FORMAT
+        value: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+      - name: YTDLP_RETRIES
+        value: "5"
+      - name: LOG_LEVEL
+        value: "info"
+      volumeMounts:
+      - name: data-volume
+        mountPath: /data
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "2Gi"
+          cpu: "1000m"
+
+  # Template: Generate retry report
+  - name: retry-report
+    inputs:
+      parameters:
+      - name: original-count
+      - name: had-videos
+    outputs:
+      parameters:
+      - name: report
+        valueFrom:
+          path: /tmp/retry-report.json
+    container:
+      image: ko://github.com/timholm/ytarchive/cmd/controller
+      command: ["/ko-app/controller"]
+      args:
+      - "--mode=report"
+      - "--report-type=retry-summary"
+      - "--original-count={{inputs.parameters.original-count}}"
+      - "--had-videos={{inputs.parameters.had-videos}}"
+      - "--output=/tmp/retry-report.json"
+      - "--log-dir=/data/logs"
+      - "--notify-webui=true"
+      env:
+      - name: REDIS_URL
+        valueFrom:
+          secretKeyRef:
+            name: ytarchive-secrets
+            key: redis-url
+            optional: true
+      - name: WEBUI_URL
+        valueFrom:
+          configMapKeyRef:
+            name: ytarchive-config
+            key: webui-url
+      volumeMounts:
+      - name: logs-volume
+        mountPath: /data/logs
+        subPath: logs
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"

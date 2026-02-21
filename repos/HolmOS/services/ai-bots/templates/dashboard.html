@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HolmOS Pipeline</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #09090b;
+            --surface: #18181b;
+            --surface-2: #27272a;
+            --border: #3f3f46;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Layout */
+        .app {
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+        }
+
+        /* Header */
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Left Panel - Services & Pipelines */
+        .left-panel {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-section:last-child {
+            flex: 1;
+            overflow-y: auto;
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .service-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .service-dot:hover {
+            transform: scale(1.1);
+        }
+
+        .service-dot.healthy {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .service-dot.error {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* Pipelines */
+        .pipeline-item {
+            padding: 12px;
+            background: var(--surface-2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pipeline-item:hover {
+            background: var(--border);
+        }
+
+        .pipeline-name {
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .pipeline-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+        }
+
+        .pipeline-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pipeline-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .pipeline-status.inactive::before {
+            background: var(--text-muted);
+        }
+
+        /* Chat Tabs */
+        .chat-tabs {
+            display: flex;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chat-tab {
+            flex: 1;
+            padding: 14px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .chat-tab:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        .chat-tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--text);
+        }
+
+        .chat-tab.steve.active { border-bottom-color: #3b82f6; }
+        .chat-tab.karen.active { border-bottom-color: #ec4899; }
+
+        .chat-tab-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            margin-right: 8px;
+            vertical-align: middle;
+            line-height: 24px;
+            font-size: 12px;
+        }
+
+        .chat-tab-icon.steve { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .chat-tab-icon.karen { background: linear-gradient(135deg, #ec4899, #be185d); }
+
+        /* Main Chat Area */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            max-width: 90%;
+        }
+
+        .message.from-tim {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .avatar.steve { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .avatar.karen { background: linear-gradient(135deg, #ec4899, #be185d); }
+        .avatar.claude { background: linear-gradient(135deg, #f97316, #c2410c); }
+        .avatar.tim { background: linear-gradient(135deg, #22c55e, #15803d); }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: capitalize;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .message-bubble {
+            background: var(--surface);
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .message.from-tim .message-bubble {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .message-bubble pre {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        .message-bubble code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        /* Chat Input */
+        .chat-input-area {
+            padding: 20px 24px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .send-btn {
+            padding: 14px 28px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing-status {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            height: 18px;
+        }
+
+        /* Right Panel - Tasks */
+        .right-panel {
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .task-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-item:hover {
+            background: var(--surface-2);
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .task-priority {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .priority-high { background: rgba(239,68,68,0.2); color: var(--danger); }
+        .priority-medium { background: rgba(234,179,8,0.2); color: var(--warning); }
+        .priority-low { background: rgba(34,197,94,0.2); color: var(--success); }
+
+        .task-title {
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .task-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        @media (max-width: 1200px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+            .left-panel, .right-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">H</div>
+                <span>HolmOS Pipeline</span>
+            </div>
+            <div class="header-stats">
+                <div class="stat">
+                    <div class="stat-value" id="stat-services">-</div>
+                    <div class="stat-label">Services</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-pipelines">-</div>
+                    <div class="stat-label">Pipelines</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-tasks">-</div>
+                    <div class="stat-label">Tasks</div>
+                </div>
+            </div>
+        </header>
+
+        <aside class="left-panel">
+            <div class="panel-section">
+                <div class="section-title">Services</div>
+                <div class="services-grid" id="services-grid">
+                    <!-- Services will be loaded here -->
+                </div>
+            </div>
+            <div class="panel-section">
+                <div class="section-title">Pipelines</div>
+                <div id="pipelines-list">
+                    <div class="empty-state">No pipelines yet</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="chat-area">
+            <div class="chat-tabs">
+                <div class="chat-tab steve active" onclick="switchTab('steve')">
+                    <span class="chat-tab-icon steve">S</span>Steve
+                </div>
+                <div class="chat-tab karen" onclick="switchTab('karen')">
+                    <span class="chat-tab-icon karen">K</span>Karen
+                </div>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="empty-state">Loading conversation...</div>
+            </div>
+            <div class="chat-input-area">
+                <div class="chat-input-wrapper">
+                    <input type="text" class="chat-input" id="chat-input"
+                           placeholder="Message the team..."
+                           onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+                <div class="typing-status" id="typing-status"></div>
+            </div>
+        </main>
+
+        <aside class="right-panel">
+            <div class="panel-section">
+                <div class="section-title">Pending Tasks</div>
+            </div>
+            <div id="tasks-list" style="flex: 1; overflow-y: auto;">
+                <div class="empty-state">No pending tasks</div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let isLoading = false;
+        let activeTab = 'steve';
+        const KAREN_URL = 'http://karen-bot.holm.svc.cluster.local:8080';
+
+        function switchTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.chat-tab.${tab}`).classList.add('active');
+            document.getElementById('chat-input').placeholder = `Message ${tab}...`;
+            loadConversation();
+        }
+
+        function formatMessage(text) {
+            if (!text) return '';
+            text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+            if (text.length > 1200) text = text.substring(0, 1200) + '...';
+            return text;
+        }
+
+        function getServiceAbbrev(name) {
+            const abbrevs = {
+                'youtube-dl': 'YT',
+                'chat-hub': 'CH',
+                'calculator': 'CA',
+                'terminal-web': 'TW',
+                'file-web': 'FW',
+                'registry-ui': 'RU',
+                'metrics': 'ME',
+                'steve-bot': 'ST',
+                'karen-bot': 'KA'
+            };
+            return abbrevs[name] || name.substring(0, 2).toUpperCase();
+        }
+
+        async function loadServices() {
+            try {
+                const resp = await fetch('/api/services');
+                const data = await resp.json();
+                const grid = document.getElementById('services-grid');
+
+                if (!data.services || data.services.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">No services</div>';
+                    return;
+                }
+
+                let healthyCount = 0;
+                grid.innerHTML = data.services.map(svc => {
+                    const isHealthy = svc.status === 'WORKING';
+                    if (isHealthy) healthyCount++;
+                    return `<div class="service-dot ${isHealthy ? 'healthy' : 'error'}" title="${svc.name}: ${svc.status}">
+                        ${getServiceAbbrev(svc.name)}
+                    </div>`;
+                }).join('');
+
+                document.getElementById('stat-services').textContent = `${healthyCount}/${data.services.length}`;
+            } catch (err) {
+                console.error('Failed to load services:', err);
+            }
+        }
+
+        async function loadPipelines() {
+            try {
+                const resp = await fetch('/api/pipelines');
+                const data = await resp.json();
+                const list = document.getElementById('pipelines-list');
+
+                document.getElementById('stat-pipelines').textContent = data.pipelines?.length || 0;
+
+                if (!data.pipelines || data.pipelines.length === 0) {
+                    list.innerHTML = '<div class="empty-state">No pipelines yet.<br>Claude will create them from tasks.</div>';
+                    return;
+                }
+
+                list.innerHTML = data.pipelines.map(p => `
+                    <div class="pipeline-item">
+                        <div class="pipeline-name">${p.name}</div>
+                        <div class="pipeline-meta">
+                            <span class="pipeline-status ${p.enabled ? '' : 'inactive'}">${p.enabled ? 'Active' : 'Disabled'}</span>
+                            <span>${p.trigger_service}</span>
+                            <span>${p.run_count} runs</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                document.getElementById('pipelines-list').innerHTML = '<div class="empty-state">No pipelines yet</div>';
+                document.getElementById('stat-pipelines').textContent = '0';
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const resp = await fetch('/api/tasks?status=pending&limit=10');
+                const data = await resp.json();
+                const list = document.getElementById('tasks-list');
+
+                document.getElementById('stat-tasks').textContent = data.count || 0;
+
+                if (!data.tasks || data.tasks.length === 0) {
+                    list.innerHTML = '<div class="empty-state">No pending tasks</div>';
+                    return;
+                }
+
+                list.innerHTML = data.tasks.map(task => {
+                    const prioClass = task.priority <= 2 ? 'high' : task.priority <= 5 ? 'medium' : 'low';
+                    return `
+                        <div class="task-item">
+                            <div class="task-header">
+                                <span class="task-priority priority-${prioClass}">P${task.priority}</span>
+                                <span class="task-title">#${task.id}: ${task.title}</span>
+                            </div>
+                            <div class="task-meta">${task.task_type} • ${task.affected_service || 'general'}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Failed to load tasks:', err);
+            }
+        }
+
+        async function loadConversation() {
+            try {
+                const resp = await fetch('/api/conversation?limit=50');
+                const data = await resp.json();
+                const container = document.getElementById('chat-messages');
+
+                if (!data.messages || data.messages.length === 0) {
+                    container.innerHTML = `<div class="empty-state">No messages yet. Say hi to ${activeTab}!</div>`;
+                    return;
+                }
+
+                // Filter messages to show only conversations with the active bot
+                const filteredMessages = data.messages.filter(msg => {
+                    const speaker = msg.speaker.toLowerCase();
+                    return speaker === activeTab || speaker === 'tim';
+                });
+
+                if (filteredMessages.length === 0) {
+                    container.innerHTML = `<div class="empty-state">No messages with ${activeTab} yet. Start a conversation!</div>`;
+                    return;
+                }
+
+                container.innerHTML = filteredMessages.map(msg => {
+                    const speaker = msg.speaker.toLowerCase();
+                    const initial = speaker.charAt(0).toUpperCase();
+                    const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                    const isFromTim = speaker === 'tim';
+
+                    return `
+                        <div class="message ${isFromTim ? 'from-tim' : ''}">
+                            <div class="avatar ${speaker}">${initial}</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">${speaker}</span>
+                                    <span class="message-time">${time}</span>
+                                </div>
+                                <div class="message-bubble">${formatMessage(msg.message)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.scrollTop = container.scrollHeight;
+            } catch (err) {
+                document.getElementById('chat-messages').innerHTML = '<div class="empty-state">Could not load conversation</div>';
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const btn = document.getElementById('send-btn');
+            const message = input.value.trim();
+
+            if (!message || isLoading) return;
+
+            isLoading = true;
+            btn.disabled = true;
+            input.value = '';
+            document.getElementById('typing-status').textContent = `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} is thinking...`;
+
+            const container = document.getElementById('chat-messages');
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+
+            container.innerHTML += `
+                <div class="message from-tim">
+                    <div class="avatar tim">T</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">tim</span>
+                            <span class="message-time">${time}</span>
+                        </div>
+                        <div class="message-bubble">${formatMessage(message)}</div>
+                    </div>
+                </div>
+            `;
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                let response;
+                if (activeTab === 'steve') {
+                    const resp = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ speaker: 'tim', message, topic: 'general' })
+                    });
+                    const data = await resp.json();
+                    response = data.steve_response;
+                } else {
+                    // Karen tab - send to Karen's endpoint
+                    const resp = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ speaker: 'tim', message, topic: 'general', target: 'karen' })
+                    });
+                    const data = await resp.json();
+                    response = data.karen_response || data.response;
+                }
+
+                if (response) {
+                    const respTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                    container.innerHTML += `
+                        <div class="message">
+                            <div class="avatar ${activeTab}">${activeTab.charAt(0).toUpperCase()}</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">${activeTab}</span>
+                                    <span class="message-time">${respTime}</span>
+                                </div>
+                                <div class="message-bubble">${formatMessage(response)}</div>
+                            </div>
+                        </div>
+                    `;
+                    container.scrollTop = container.scrollHeight;
+                }
+
+                loadTasks();
+                loadPipelines();
+            } catch (err) {
+                console.error('Failed to send:', err);
+            } finally {
+                isLoading = false;
+                btn.disabled = false;
+                document.getElementById('typing-status').textContent = '';
+            }
+        }
+
+        // Initial load
+        loadServices();
+        loadPipelines();
+        loadTasks();
+        loadConversation();
+
+        // Refresh every 15 seconds
+        setInterval(() => {
+            loadServices();
+            loadPipelines();
+            loadTasks();
+        }, 15000);
+
+        // Refresh conversation every 20 seconds
+        setInterval(loadConversation, 20000);
+    </script>
+</body>
+</html>

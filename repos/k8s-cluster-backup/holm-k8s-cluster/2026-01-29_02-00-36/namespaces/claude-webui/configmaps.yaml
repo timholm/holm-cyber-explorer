@@ -1,0 +1,556 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    index.html: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>claude</title>
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #ccc;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            font-size: 14px;
+          }
+          .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+          }
+          .bar {
+            background: #111;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            border: 1px solid #333;
+            border-bottom: none;
+            flex-wrap: wrap;
+            align-items: center;
+          }
+          .bar button {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #888;
+            padding: 4px 12px;
+            font-family: monospace;
+            font-size: 12px;
+            cursor: pointer;
+          }
+          .bar button:hover { background: #2a2a2a; color: #fff; }
+          .bar button.danger { border-color: #533; color: #a66; }
+          .bar button.danger:hover { background: #322; }
+          .bar .status { margin-left: auto; color: #555; font-size: 11px; }
+          .bar .status.ok { color: #6a6; }
+          .bar .status.err { color: #a66; }
+
+          .terminal {
+            flex: 1;
+            background: #000;
+            border: 1px solid #333;
+            padding: 12px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 13px;
+            line-height: 1.4;
+            min-height: 300px;
+            max-height: 60vh;
+          }
+
+          .input-bar {
+            background: #111;
+            border: 1px solid #333;
+            border-top: none;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .prompt { color: #6a6; }
+          #mobileInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: monospace;
+            font-size: 14px;
+            outline: none;
+            caret-color: #6a6;
+          }
+
+          .keys {
+            background: #111;
+            padding: 8px 12px;
+            display: flex;
+            gap: 6px;
+            border: 1px solid #333;
+            border-top: none;
+            flex-wrap: wrap;
+          }
+          .keys button {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #666;
+            padding: 4px 10px;
+            font-family: monospace;
+            font-size: 11px;
+            cursor: pointer;
+          }
+          .keys button:hover { background: #2a2a2a; color: #fff; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="bar">
+            <button onclick="api('new')">new</button>
+            <button onclick="api('resume')">resume</button>
+            <button onclick="getOutput()">sync</button>
+            <button class="danger" onclick="key('ctrl-c')">^C</button>
+            <button onclick="api('kill')">kill</button>
+            <span class="status" id="status">ready</span>
+          </div>
+
+          <pre class="terminal" id="terminal" onclick="mobileInput.focus()">Claude Terminal
+      ───────────────
+      [new]    start fresh session
+      [resume] continue previous
+      [^C]     interrupt
+      [kill]   end session
+
+      Just start typing. Keys go to Claude.
+      Arrow keys navigate. Enter sends.</pre>
+
+          <div class="input-bar" onclick="mobileInput.focus()">
+            <span class="prompt">&gt;</span>
+            <input type="text" id="mobileInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
+
+          <div class="keys">
+            <button onclick="key('up')">↑</button>
+            <button onclick="key('down')">↓</button>
+            <button onclick="key('left')">←</button>
+            <button onclick="key('right')">→</button>
+            <button onclick="key('escape')">esc</button>
+            <button onclick="key('tab')">tab</button>
+            <button onclick="key('backspace')">bksp</button>
+            <button onclick="key('enter')">enter</button>
+          </div>
+        </div>
+
+        <script>
+          const B = window.location.pathname.replace(/\/?$/, '/');
+          const terminal = document.getElementById('terminal');
+          const input = document.getElementById('mobileInput');
+          const status = document.getElementById('status');
+
+          function st(t, c) {
+            status.textContent = t;
+            status.className = 'status ' + (c || '');
+          }
+
+          // Handle special keys on input
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (input.value) {
+                send(input.value);
+                input.value = '';
+                setTimeout(getOutput, 500);
+              } else {
+                key('enter');
+              }
+              return;
+            }
+
+            // Ctrl+C for interrupt (when no selection)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !window.getSelection().toString()) {
+              e.preventDefault();
+              key('ctrl-c');
+              return;
+            }
+          });
+
+          // Global keys when input not focused
+          document.addEventListener('keydown', (e) => {
+            if (document.activeElement === input) return;
+
+            const navKeys = {
+              'ArrowUp': 'up', 'ArrowDown': 'down',
+              'ArrowLeft': 'left', 'ArrowRight': 'right',
+              'Escape': 'escape', 'Tab': 'tab'
+            };
+
+            if (navKeys[e.key]) {
+              e.preventDefault();
+              key(navKeys[e.key]);
+              return;
+            }
+
+            if (e.key === ' ') {
+              e.preventDefault();
+              key('space');
+              return;
+            }
+
+            // Focus input for typing
+            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+              input.focus();
+            }
+          });
+
+          async function api(e) {
+            st(e + '...', '');
+            try {
+              const r = await fetch(B + 'api/' + e, { method: 'POST' });
+              const d = await r.json();
+              st(d.ok ? 'ok' : (d.error || 'err'), d.ok ? 'ok' : 'err');
+              if (d.ok) setTimeout(getOutput, 1500);
+            } catch (e) { st('err', 'err'); }
+          }
+
+          async function send(text) {
+            st('send...', '');
+            try {
+              const r = await fetch(B + 'api/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+              });
+              const d = await r.json();
+              st(d.ok ? 'sent' : 'err', d.ok ? 'ok' : 'err');
+            } catch (e) { st('err', 'err'); }
+          }
+
+          async function key(k) {
+            st(k, '');
+            try {
+              const r = await fetch(B + 'api/key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: k })
+              });
+              const d = await r.json();
+              st(d.ok ? 'ok' : 'err', d.ok ? 'ok' : 'err');
+              if (d.ok) setTimeout(getOutput, 200);
+            } catch (e) { st('err', 'err'); }
+          }
+
+          async function getOutput() {
+            st('sync...', '');
+            try {
+              const r = await fetch(B + 'api/output');
+              const d = await r.json();
+              if (d.ok && d.output) {
+                terminal.textContent = d.output;
+                st('synced', 'ok');
+              } else {
+                st('err', 'err');
+              }
+            } catch (e) { st('err', 'err'); }
+          }
+        </script>
+      </body>
+      </html>
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: claude-webui:/ConfigMap:claude-webui/claude-webui-html
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"index.html":"\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"UTF-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width,initial-scale=1\"\u003e\n  \u003ctitle\u003eclaude\u003c/title\u003e\n  \u003cstyle\u003e\n    * { box-sizing: border-box; margin: 0; padding: 0; }\n    body {\n      font-family: monospace;\n      background: #0a0a0a;\n      color: #ccc;\n      height: 100vh;\n      display: flex;\n      flex-direction: column;\n      align-items: center;\n      padding: 20px;\n      font-size: 14px;\n    }\n    .container {\n      width: 100%;\n      max-width: 900px;\n      display: flex;\n      flex-direction: column;\n      height: 100%;\n    }\n    .bar {\n      background: #111;\n      padding: 8px 12px;\n      display: flex;\n      gap: 8px;\n      border: 1px solid #333;\n      border-bottom: none;\n      flex-wrap: wrap;\n      align-items: center;\n    }\n    .bar button {\n      background: #1a1a1a;\n      border: 1px solid #444;\n      color: #888;\n      padding: 4px 12px;\n      font-family: monospace;\n      font-size: 12px;\n      cursor: pointer;\n    }\n    .bar button:hover { background: #2a2a2a; color: #fff; }\n    .bar button.danger { border-color: #533; color: #a66; }\n    .bar button.danger:hover { background: #322; }\n    .bar .status { margin-left: auto; color: #555; font-size: 11px; }\n    .bar .status.ok { color: #6a6; }\n    .bar .status.err { color: #a66; }\n\n    .terminal {\n      flex: 1;\n      background: #000;\n      border: 1px solid #333;\n      padding: 12px;\n      overflow-y: auto;\n      white-space: pre-wrap;\n      word-wrap: break-word;\n      font-size: 13px;\n      line-height: 1.4;\n      min-height: 300px;\n      max-height: 60vh;\n    }\n\n    .input-bar {\n      background: #111;\n      border: 1px solid #333;\n      border-top: none;\n      padding: 8px 12px;\n      display: flex;\n      align-items: center;\n      gap: 8px;\n    }\n    .prompt { color: #6a6; }\n    #mobileInput {\n      flex: 1;\n      background: transparent;\n      border: none;\n      color: #fff;\n      font-family: monospace;\n      font-size: 14px;\n      outline: none;\n      caret-color: #6a6;\n    }\n\n    .keys {\n      background: #111;\n      padding: 8px 12px;\n      display: flex;\n      gap: 6px;\n      border: 1px solid #333;\n      border-top: none;\n      flex-wrap: wrap;\n    }\n    .keys button {\n      background: #1a1a1a;\n      border: 1px solid #333;\n      color: #666;\n      padding: 4px 10px;\n      font-family: monospace;\n      font-size: 11px;\n      cursor: pointer;\n    }\n    .keys button:hover { background: #2a2a2a; color: #fff; }\n  \u003c/style\u003e\n\u003c/head\u003e\n\u003cbody\u003e\n  \u003cdiv class=\"container\"\u003e\n    \u003cdiv class=\"bar\"\u003e\n      \u003cbutton onclick=\"api('new')\"\u003enew\u003c/button\u003e\n      \u003cbutton onclick=\"api('resume')\"\u003eresume\u003c/button\u003e\n      \u003cbutton onclick=\"getOutput()\"\u003esync\u003c/button\u003e\n      \u003cbutton class=\"danger\" onclick=\"key('ctrl-c')\"\u003e^C\u003c/button\u003e\n      \u003cbutton onclick=\"api('kill')\"\u003ekill\u003c/button\u003e\n      \u003cspan class=\"status\" id=\"status\"\u003eready\u003c/span\u003e\n    \u003c/div\u003e\n\n    \u003cpre class=\"terminal\" id=\"terminal\" onclick=\"mobileInput.focus()\"\u003eClaude Terminal\n───────────────\n[new]    start fresh session\n[resume] continue previous\n[^C]     interrupt\n[kill]   end session\n\nJust start typing. Keys go to Claude.\nArrow keys navigate. Enter sends.\u003c/pre\u003e\n\n    \u003cdiv class=\"input-bar\" onclick=\"mobileInput.focus()\"\u003e\n      \u003cspan class=\"prompt\"\u003e\u0026gt;\u003c/span\u003e\n      \u003cinput type=\"text\" id=\"mobileInput\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\"\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"keys\"\u003e\n      \u003cbutton onclick=\"key('up')\"\u003e↑\u003c/button\u003e\n      \u003cbutton onclick=\"key('down')\"\u003e↓\u003c/button\u003e\n      \u003cbutton onclick=\"key('left')\"\u003e←\u003c/button\u003e\n      \u003cbutton onclick=\"key('right')\"\u003e→\u003c/button\u003e\n      \u003cbutton onclick=\"key('escape')\"\u003eesc\u003c/button\u003e\n      \u003cbutton onclick=\"key('tab')\"\u003etab\u003c/button\u003e\n      \u003cbutton onclick=\"key('backspace')\"\u003ebksp\u003c/button\u003e\n      \u003cbutton onclick=\"key('enter')\"\u003eenter\u003c/button\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003cscript\u003e\n    const B = window.location.pathname.replace(/\\/?$/, '/');\n    const terminal = document.getElementById('terminal');\n    const input = document.getElementById('mobileInput');\n    const status = document.getElementById('status');\n\n    function st(t, c) {\n      status.textContent = t;\n      status.className = 'status ' + (c || '');\n    }\n\n    // Handle special keys on input\n    input.addEventListener('keydown', (e) =\u003e {\n      if (e.key === 'Enter') {\n        e.preventDefault();\n        if (input.value) {\n          send(input.value);\n          input.value = '';\n          setTimeout(getOutput, 500);\n        } else {\n          key('enter');\n        }\n        return;\n      }\n\n      // Ctrl+C for interrupt (when no selection)\n      if ((e.ctrlKey || e.metaKey) \u0026\u0026 e.key === 'c' \u0026\u0026 !window.getSelection().toString()) {\n        e.preventDefault();\n        key('ctrl-c');\n        return;\n      }\n    });\n\n    // Global keys when input not focused\n    document.addEventListener('keydown', (e) =\u003e {\n      if (document.activeElement === input) return;\n\n      const navKeys = {\n        'ArrowUp': 'up', 'ArrowDown': 'down',\n        'ArrowLeft': 'left', 'ArrowRight': 'right',\n        'Escape': 'escape', 'Tab': 'tab'\n      };\n\n      if (navKeys[e.key]) {\n        e.preventDefault();\n        key(navKeys[e.key]);\n        return;\n      }\n\n      if (e.key === ' ') {\n        e.preventDefault();\n        key('space');\n        return;\n      }\n\n      // Focus input for typing\n      if (e.key.length === 1 \u0026\u0026 !e.ctrlKey \u0026\u0026 !e.metaKey) {\n        input.focus();\n      }\n    });\n\n    async function api(e) {\n      st(e + '...', '');\n      try {\n        const r = await fetch(B + 'api/' + e, { method: 'POST' });\n        const d = await r.json();\n        st(d.ok ? 'ok' : (d.error || 'err'), d.ok ? 'ok' : 'err');\n        if (d.ok) setTimeout(getOutput, 1500);\n      } catch (e) { st('err', 'err'); }\n    }\n\n    async function send(text) {\n      st('send...', '');\n      try {\n        const r = await fetch(B + 'api/send', {\n          method: 'POST',\n          headers: { 'Content-Type': 'application/json' },\n          body: JSON.stringify({ text })\n        });\n        const d = await r.json();\n        st(d.ok ? 'sent' : 'err', d.ok ? 'ok' : 'err');\n      } catch (e) { st('err', 'err'); }\n    }\n\n    async function key(k) {\n      st(k, '');\n      try {\n        const r = await fetch(B + 'api/key', {\n          method: 'POST',\n          headers: { 'Content-Type': 'application/json' },\n          body: JSON.stringify({ key: k })\n        });\n        const d = await r.json();\n        st(d.ok ? 'ok' : 'err', d.ok ? 'ok' : 'err');\n        if (d.ok) setTimeout(getOutput, 200);\n      } catch (e) { st('err', 'err'); }\n    }\n\n    async function getOutput() {\n      st('sync...', '');\n      try {\n        const r = await fetch(B + 'api/output');\n        const d = await r.json();\n        if (d.ok \u0026\u0026 d.output) {\n          terminal.textContent = d.output;\n          st('synced', 'ok');\n        } else {\n          st('err', 'err');\n        }\n      } catch (e) { st('err', 'err'); }\n    }\n  \u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"claude-webui:/ConfigMap:claude-webui/claude-webui-html"},"labels":{"app.kubernetes.io/instance":"claude-webui","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"claude-webui","app.kubernetes.io/version":"1.0.0","helm.sh/chart":"claude-webui-1.0.0"},"name":"claude-webui-html","namespace":"claude-webui"}}
+    creationTimestamp: "2026-01-20T06:57:53Z"
+    labels:
+      app.kubernetes.io/instance: claude-webui
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: claude-webui
+      app.kubernetes.io/version: 1.0.0
+      helm.sh/chart: claude-webui-1.0.0
+    name: claude-webui-html
+    namespace: claude-webui
+    resourceVersion: "713"
+    uid: 0ac27457-1c03-4039-8a50-15e22b0508bf
+- apiVersion: v1
+  data:
+    server.js: |
+      const express = require('express');
+      const app = express();
+      const PORT = process.env.PORT || 3000;
+
+      const CMD_API = process.env.CMD_API_URL || 'http://10.43.215.37';
+      const SSH_HOST = process.env.SSH_HOST || '192.168.8.116';
+      const SSH_USER = process.env.SSH_USER || 'tim';
+      const SSH_PASS = process.env.SSH_PASS || '';
+      const CLAUDE_BIN = '/Users/tim/.local/bin/claude --dangerously-skip-permissions';
+      const TMUX = 'claude-ui';
+
+      app.use(express.json());
+      app.use(express.static('public'));
+
+      // Store last output hash to detect changes
+      let lastOutputHash = '';
+      let lastOutput = '';
+
+      // SSH command helper
+      async function ssh(cmd) {
+        const fullCmd = `export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH && ${cmd}`;
+        try {
+          const res = await fetch(`${CMD_API}/ssh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              host: SSH_HOST,
+              username: SSH_USER,
+              password: SSH_PASS,
+              command: fullCmd,
+              port: 22
+            })
+          });
+          const data = await res.json();
+          if (data.error) return { ok: false, error: data.error };
+          return { ok: true, stdout: data.stdout || '', stderr: data.stderr || '' };
+        } catch (e) {
+          return { ok: false, error: e.message };
+        }
+      }
+
+      // Simple hash function
+      function hash(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+          h = ((h << 5) - h) + str.charCodeAt(i);
+          h = h & h;
+        }
+        return h.toString(16);
+      }
+
+      // ============ API ENDPOINTS ============
+
+      // GET /api/status - Check connection and session status
+      app.get('/api/status', async (req, res) => {
+        const result = await ssh(`tmux has-session -t ${TMUX} 2>/dev/null && echo ACTIVE || echo NONE`);
+        res.json({
+          connected: result.ok,
+          session: result.ok ? result.stdout.trim() : 'ERROR',
+          error: result.error || null
+        });
+      });
+
+      // POST /api/new - Start new Claude session
+      app.post('/api/new', async (req, res) => {
+        console.log('[API] POST /api/new');
+
+        // Kill existing session
+        await ssh(`tmux kill-session -t ${TMUX} 2>/dev/null || true`);
+
+        // Create new session and run claude
+        const result = await ssh(`tmux new-session -d -s ${TMUX} -x 200 -y 50 && sleep 0.5 && tmux send-keys -t ${TMUX} '${CLAUDE_BIN}' Enter`);
+
+        if (result.ok) {
+          console.log('[API] New session started');
+          res.json({ ok: true, message: 'Session started' });
+        } else {
+          console.log('[API] Error:', result.error);
+          res.json({ ok: false, error: result.error });
+        }
+      });
+
+      // POST /api/resume - Start Claude with --resume
+      app.post('/api/resume', async (req, res) => {
+        console.log('[API] POST /api/resume');
+
+        // Kill existing session
+        await ssh(`tmux kill-session -t ${TMUX} 2>/dev/null || true`);
+
+        // Create new session and run claude --resume
+        const result = await ssh(`tmux new-session -d -s ${TMUX} -x 200 -y 50 && sleep 0.5 && tmux send-keys -t ${TMUX} '${CLAUDE_BIN} --resume' Enter`);
+
+        if (result.ok) {
+          console.log('[API] Resume session started');
+          res.json({ ok: true, message: 'Resume started' });
+        } else {
+          console.log('[API] Error:', result.error);
+          res.json({ ok: false, error: result.error });
+        }
+      });
+
+      // POST /api/send - Send text to Claude
+      app.post('/api/send', async (req, res) => {
+        const { text } = req.body;
+        if (!text) return res.json({ ok: false, error: 'No text provided' });
+
+        console.log('[API] POST /api/send:', text.substring(0, 50));
+
+        // Escape single quotes for shell
+        const escaped = text.replace(/'/g, "'\\''");
+        const result = await ssh(`tmux send-keys -t ${TMUX} '${escaped}' Enter`);
+
+        res.json({ ok: result.ok, error: result.error || null });
+      });
+
+      // POST /api/key - Send special key
+      // Keys: up, down, left, right, enter, escape, tab, backspace, ctrl-c, ctrl-d
+      app.post('/api/key', async (req, res) => {
+        const { key } = req.body;
+        if (!key) return res.json({ ok: false, error: 'No key provided' });
+
+        console.log('[API] POST /api/key:', key);
+
+        // Map friendly key names to tmux keys
+        const keyMap = {
+          'up': 'Up',
+          'down': 'Down',
+          'left': 'Left',
+          'right': 'Right',
+          'enter': 'Enter',
+          'escape': 'Escape',
+          'esc': 'Escape',
+          'tab': 'Tab',
+          'space': 'Space',
+          'backspace': 'BSpace',
+          'delete': 'DC',
+          'ctrl-c': 'C-c',
+          'ctrl-d': 'C-d',
+          'ctrl-z': 'C-z',
+          'home': 'Home',
+          'end': 'End',
+          'pageup': 'PPage',
+          'pagedown': 'NPage'
+        };
+
+        const tmuxKey = keyMap[key.toLowerCase()] || key;
+        const result = await ssh(`tmux send-keys -t ${TMUX} ${tmuxKey}`);
+
+        res.json({ ok: result.ok, error: result.error || null });
+      });
+
+      // GET /api/output - Get current terminal output
+      app.get('/api/output', async (req, res) => {
+        const result = await ssh(`tmux capture-pane -t ${TMUX} -p -S -100`);
+
+        if (!result.ok) {
+          return res.json({ ok: false, error: result.error, output: '', hash: '' });
+        }
+
+        const output = result.stdout;
+        const outputHash = hash(output);
+
+        // Update cache
+        lastOutput = output;
+        lastOutputHash = outputHash;
+
+        res.json({ ok: true, output, hash: outputHash });
+      });
+
+      // GET /api/poll?hash=xxx - Long poll for changes (waits up to 10s)
+      app.get('/api/poll', async (req, res) => {
+        const clientHash = req.query.hash || '';
+        const maxWait = 10000; // 10 seconds max
+        const checkInterval = 1000; // Check every 1 second
+        const startTime = Date.now();
+
+        console.log('[API] GET /api/poll hash:', clientHash);
+
+        const check = async () => {
+          const result = await ssh(`tmux capture-pane -t ${TMUX} -p -S -100`);
+
+          if (!result.ok) {
+            return res.json({ ok: false, error: result.error, output: '', hash: '', changed: false });
+          }
+
+          const output = result.stdout;
+          const outputHash = hash(output);
+
+          // If hash changed or no client hash provided, return immediately
+          if (outputHash !== clientHash || !clientHash) {
+            lastOutput = output;
+            lastOutputHash = outputHash;
+            console.log('[API] Poll: output changed');
+            return res.json({ ok: true, output, hash: outputHash, changed: true });
+          }
+
+          // Check if we've waited long enough
+          if (Date.now() - startTime >= maxWait) {
+            console.log('[API] Poll: timeout, no change');
+            return res.json({ ok: true, output: '', hash: clientHash, changed: false });
+          }
+
+          // Wait and check again
+          setTimeout(check, checkInterval);
+        };
+
+        check();
+      });
+
+      // POST /api/kill - Kill session
+      app.post('/api/kill', async (req, res) => {
+        console.log('[API] POST /api/kill');
+        const result = await ssh(`tmux kill-session -t ${TMUX} 2>/dev/null || true`);
+        res.json({ ok: true });
+      });
+
+      // Health check
+      app.get('/health', (req, res) => {
+        res.json({ ok: true, api: CMD_API });
+      });
+
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Claude Web API v2.0 on port ${PORT}`);
+        console.log(`CMD API: ${CMD_API}`);
+        console.log(`SSH: ${SSH_USER}@${SSH_HOST}`);
+      });
+  kind: ConfigMap
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: claude-webui:/ConfigMap:claude-webui/claude-webui-server
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"server.js":"const express = require('express');\nconst app = express();\nconst PORT = process.env.PORT || 3000;\n\nconst CMD_API = process.env.CMD_API_URL || 'http://10.43.215.37';\nconst SSH_HOST = process.env.SSH_HOST || '192.168.8.116';\nconst SSH_USER = process.env.SSH_USER || 'tim';\nconst SSH_PASS = process.env.SSH_PASS || '';\nconst CLAUDE_BIN = '/Users/tim/.local/bin/claude --dangerously-skip-permissions';\nconst TMUX = 'claude-ui';\n\napp.use(express.json());\napp.use(express.static('public'));\n\n// Store last output hash to detect changes\nlet lastOutputHash = '';\nlet lastOutput = '';\n\n// SSH command helper\nasync function ssh(cmd) {\n  const fullCmd = `export PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH \u0026\u0026 ${cmd}`;\n  try {\n    const res = await fetch(`${CMD_API}/ssh`, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({\n        host: SSH_HOST,\n        username: SSH_USER,\n        password: SSH_PASS,\n        command: fullCmd,\n        port: 22\n      })\n    });\n    const data = await res.json();\n    if (data.error) return { ok: false, error: data.error };\n    return { ok: true, stdout: data.stdout || '', stderr: data.stderr || '' };\n  } catch (e) {\n    return { ok: false, error: e.message };\n  }\n}\n\n// Simple hash function\nfunction hash(str) {\n  let h = 0;\n  for (let i = 0; i \u003c str.length; i++) {\n    h = ((h \u003c\u003c 5) - h) + str.charCodeAt(i);\n    h = h \u0026 h;\n  }\n  return h.toString(16);\n}\n\n// ============ API ENDPOINTS ============\n\n// GET /api/status - Check connection and session status\napp.get('/api/status', async (req, res) =\u003e {\n  const result = await ssh(`tmux has-session -t ${TMUX} 2\u003e/dev/null \u0026\u0026 echo ACTIVE || echo NONE`);\n  res.json({\n    connected: result.ok,\n    session: result.ok ? result.stdout.trim() : 'ERROR',\n    error: result.error || null\n  });\n});\n\n// POST /api/new - Start new Claude session\napp.post('/api/new', async (req, res) =\u003e {\n  console.log('[API] POST /api/new');\n\n  // Kill existing session\n  await ssh(`tmux kill-session -t ${TMUX} 2\u003e/dev/null || true`);\n\n  // Create new session and run claude\n  const result = await ssh(`tmux new-session -d -s ${TMUX} -x 200 -y 50 \u0026\u0026 sleep 0.5 \u0026\u0026 tmux send-keys -t ${TMUX} '${CLAUDE_BIN}' Enter`);\n\n  if (result.ok) {\n    console.log('[API] New session started');\n    res.json({ ok: true, message: 'Session started' });\n  } else {\n    console.log('[API] Error:', result.error);\n    res.json({ ok: false, error: result.error });\n  }\n});\n\n// POST /api/resume - Start Claude with --resume\napp.post('/api/resume', async (req, res) =\u003e {\n  console.log('[API] POST /api/resume');\n\n  // Kill existing session\n  await ssh(`tmux kill-session -t ${TMUX} 2\u003e/dev/null || true`);\n\n  // Create new session and run claude --resume\n  const result = await ssh(`tmux new-session -d -s ${TMUX} -x 200 -y 50 \u0026\u0026 sleep 0.5 \u0026\u0026 tmux send-keys -t ${TMUX} '${CLAUDE_BIN} --resume' Enter`);\n\n  if (result.ok) {\n    console.log('[API] Resume session started');\n    res.json({ ok: true, message: 'Resume started' });\n  } else {\n    console.log('[API] Error:', result.error);\n    res.json({ ok: false, error: result.error });\n  }\n});\n\n// POST /api/send - Send text to Claude\napp.post('/api/send', async (req, res) =\u003e {\n  const { text } = req.body;\n  if (!text) return res.json({ ok: false, error: 'No text provided' });\n\n  console.log('[API] POST /api/send:', text.substring(0, 50));\n\n  // Escape single quotes for shell\n  const escaped = text.replace(/'/g, \"'\\\\''\");\n  const result = await ssh(`tmux send-keys -t ${TMUX} '${escaped}' Enter`);\n\n  res.json({ ok: result.ok, error: result.error || null });\n});\n\n// POST /api/key - Send special key\n// Keys: up, down, left, right, enter, escape, tab, backspace, ctrl-c, ctrl-d\napp.post('/api/key', async (req, res) =\u003e {\n  const { key } = req.body;\n  if (!key) return res.json({ ok: false, error: 'No key provided' });\n\n  console.log('[API] POST /api/key:', key);\n\n  // Map friendly key names to tmux keys\n  const keyMap = {\n    'up': 'Up',\n    'down': 'Down',\n    'left': 'Left',\n    'right': 'Right',\n    'enter': 'Enter',\n    'escape': 'Escape',\n    'esc': 'Escape',\n    'tab': 'Tab',\n    'space': 'Space',\n    'backspace': 'BSpace',\n    'delete': 'DC',\n    'ctrl-c': 'C-c',\n    'ctrl-d': 'C-d',\n    'ctrl-z': 'C-z',\n    'home': 'Home',\n    'end': 'End',\n    'pageup': 'PPage',\n    'pagedown': 'NPage'\n  };\n\n  const tmuxKey = keyMap[key.toLowerCase()] || key;\n  const result = await ssh(`tmux send-keys -t ${TMUX} ${tmuxKey}`);\n\n  res.json({ ok: result.ok, error: result.error || null });\n});\n\n// GET /api/output - Get current terminal output\napp.get('/api/output', async (req, res) =\u003e {\n  const result = await ssh(`tmux capture-pane -t ${TMUX} -p -S -100`);\n\n  if (!result.ok) {\n    return res.json({ ok: false, error: result.error, output: '', hash: '' });\n  }\n\n  const output = result.stdout;\n  const outputHash = hash(output);\n\n  // Update cache\n  lastOutput = output;\n  lastOutputHash = outputHash;\n\n  res.json({ ok: true, output, hash: outputHash });\n});\n\n// GET /api/poll?hash=xxx - Long poll for changes (waits up to 10s)\napp.get('/api/poll', async (req, res) =\u003e {\n  const clientHash = req.query.hash || '';\n  const maxWait = 10000; // 10 seconds max\n  const checkInterval = 1000; // Check every 1 second\n  const startTime = Date.now();\n\n  console.log('[API] GET /api/poll hash:', clientHash);\n\n  const check = async () =\u003e {\n    const result = await ssh(`tmux capture-pane -t ${TMUX} -p -S -100`);\n\n    if (!result.ok) {\n      return res.json({ ok: false, error: result.error, output: '', hash: '', changed: false });\n    }\n\n    const output = result.stdout;\n    const outputHash = hash(output);\n\n    // If hash changed or no client hash provided, return immediately\n    if (outputHash !== clientHash || !clientHash) {\n      lastOutput = output;\n      lastOutputHash = outputHash;\n      console.log('[API] Poll: output changed');\n      return res.json({ ok: true, output, hash: outputHash, changed: true });\n    }\n\n    // Check if we've waited long enough\n    if (Date.now() - startTime \u003e= maxWait) {\n      console.log('[API] Poll: timeout, no change');\n      return res.json({ ok: true, output: '', hash: clientHash, changed: false });\n    }\n\n    // Wait and check again\n    setTimeout(check, checkInterval);\n  };\n\n  check();\n});\n\n// POST /api/kill - Kill session\napp.post('/api/kill', async (req, res) =\u003e {\n  console.log('[API] POST /api/kill');\n  const result = await ssh(`tmux kill-session -t ${TMUX} 2\u003e/dev/null || true`);\n  res.json({ ok: true });\n});\n\n// Health check\napp.get('/health', (req, res) =\u003e {\n  res.json({ ok: true, api: CMD_API });\n});\n\napp.listen(PORT, '0.0.0.0', () =\u003e {\n  console.log(`Claude Web API v2.0 on port ${PORT}`);\n  console.log(`CMD API: ${CMD_API}`);\n  console.log(`SSH: ${SSH_USER}@${SSH_HOST}`);\n});\n"},"kind":"ConfigMap","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"claude-webui:/ConfigMap:claude-webui/claude-webui-server"},"labels":{"app.kubernetes.io/instance":"claude-webui","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"claude-webui","app.kubernetes.io/version":"1.0.0","helm.sh/chart":"claude-webui-1.0.0"},"name":"claude-webui-server","namespace":"claude-webui"}}
+    creationTimestamp: "2026-01-20T06:57:53Z"
+    labels:
+      app.kubernetes.io/instance: claude-webui
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: claude-webui
+      app.kubernetes.io/version: 1.0.0
+      helm.sh/chart: claude-webui-1.0.0
+    name: claude-webui-server
+    namespace: claude-webui
+    resourceVersion: "714"
+    uid: 19284277-d87a-4179-ab0d-522180b999c4
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-20T06:57:52Z"
+    name: kube-root-ca.crt
+    namespace: claude-webui
+    resourceVersion: "715"
+    uid: d271dd0e-df69-4aa4-bac6-3418b5da1583
+kind: List
+metadata:
+  resourceVersion: ""

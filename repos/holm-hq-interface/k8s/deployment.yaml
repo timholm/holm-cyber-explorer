@@ -1,0 +1,175 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: holm-hq
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: holm-hq-nginx-config
+  namespace: holm-hq
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        location /healthz {
+            access_log off;
+            return 200 'ok';
+            add_header Content-Type text/plain;
+        }
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        error_page 404 /index.html;
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: holm-hq
+  namespace: holm-hq
+  labels:
+    app.kubernetes.io/name: holm-hq
+    app.kubernetes.io/part-of: holm-chat
+    app.kubernetes.io/component: web-server
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: holm-hq
+  template:
+    metadata:
+      annotations:
+        restartedAt: "2026-02-18T06:00:00Z"
+      labels:
+        app.kubernetes.io/name: holm-hq
+        app.kubernetes.io/part-of: holm-chat
+        app.kubernetes.io/component: web-server
+    spec:
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+          - 1.1.1.1
+        searches:
+          - holm-hq.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+      initContainers:
+        - name: git-clone
+          image: alpine/git:latest
+          command:
+            - sh
+            - -c
+            - |
+              for i in 1 2 3 4 5; do
+                git clone --depth 1 https://github.com/timholm/holm-hq-interface.git /tmp/repo && break
+                echo "Attempt $i failed, retrying in 5s..."
+                sleep 5
+              done
+              cp -a /tmp/repo/. /site/
+              rm -rf /site/.git /site/k8s /site/Dockerfile
+          volumeMounts:
+            - name: site-content
+              mountPath: /site
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: site-content
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - NET_BIND_SERVICE
+                - SETGID
+                - SETUID
+      volumes:
+        - name: site-content
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: holm-hq-nginx-config
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: holm-hq
+  namespace: holm-hq
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: holm-hq
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: holm-hq
+  namespace: holm-hq
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: default
+  hostnames:
+    - "hq.holm.chat"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: holm-hq
+          port: 80

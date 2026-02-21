@@ -1,0 +1,72 @@
+name: Performance Testing
+
+on:
+  # Disabled: Pi cluster on private network
+  # schedule:
+  #   - cron: '0 6 * * 0'
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type to run'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - health
+          - full
+
+env:
+  PI_HOST: 192.168.8.197
+
+jobs:
+  check-connectivity:
+    name: Check Connectivity
+    runs-on: ubuntu-latest
+    outputs:
+      reachable: ${{ steps.check.outputs.reachable }}
+    steps:
+      - name: Check cluster
+        id: check
+        run: |
+          if curl -s --connect-timeout 5 "http://$PI_HOST:30000/health" > /dev/null 2>&1; then
+            echo "reachable=true" >> $GITHUB_OUTPUT
+          else
+            echo "reachable=false" >> $GITHUB_OUTPUT
+          fi
+
+  performance-test:
+    name: Run Performance Tests
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install k6
+        run: |
+          curl -sL https://github.com/grafana/k6/releases/download/v0.49.0/k6-v0.49.0-linux-amd64.tar.gz | tar xzf -
+          sudo mv k6-v0.49.0-linux-amd64/k6 /usr/local/bin/
+      - name: Run tests
+        working-directory: ./tests/performance
+        run: |
+          npm install
+          ./run-tests.sh ${{ github.event.inputs.test_type || 'smoke' }}
+        continue-on-error: true
+
+  summary:
+    name: Summary
+    needs: check-connectivity
+    if: needs.check-connectivity.outputs.reachable == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## ⚠️ Performance Tests Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Pi cluster at $PI_HOST is on a private network." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Run locally: \`cd tests/performance && ./run-tests.sh\`" >> $GITHUB_STEP_SUMMARY

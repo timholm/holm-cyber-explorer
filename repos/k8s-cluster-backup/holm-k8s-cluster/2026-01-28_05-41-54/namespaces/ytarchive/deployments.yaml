@@ -1,0 +1,548 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: ytarchive:apps/Deployment:ytarchive/postgres
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"ytarchive:apps/Deployment:ytarchive/postgres"},"labels":{"app.kubernetes.io/component":"database","app.kubernetes.io/name":"postgres","app.kubernetes.io/part-of":"ytarchive"},"name":"postgres","namespace":"ytarchive"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"database","app.kubernetes.io/name":"postgres","app.kubernetes.io/part-of":"ytarchive"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app.kubernetes.io/component":"database","app.kubernetes.io/name":"postgres","app.kubernetes.io/part-of":"ytarchive"}},"spec":{"containers":[{"env":[{"name":"POSTGRES_DB","value":"ytarchive"},{"name":"POSTGRES_USER","valueFrom":{"secretKeyRef":{"key":"postgres-user","name":"ytarchive-secrets","optional":true}}},{"name":"POSTGRES_PASSWORD","valueFrom":{"secretKeyRef":{"key":"postgres-password","name":"ytarchive-secrets","optional":true}}},{"name":"PGDATA","value":"/var/lib/postgresql/data/pgdata"}],"image":"postgres:16-alpine","imagePullPolicy":"IfNotPresent","livenessProbe":{"exec":{"command":["pg_isready","-U","postgres"]},"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":10,"timeoutSeconds":5},"name":"postgres","ports":[{"containerPort":5432,"name":"postgres"}],"readinessProbe":{"exec":{"command":["pg_isready","-U","postgres"]},"failureThreshold":3,"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":3},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/var/lib/postgresql/data","name":"postgres-data"}]}],"volumes":[{"name":"postgres-data","persistentVolumeClaim":{"claimName":"postgres-data"}}]}}}}
+    creationTimestamp: "2026-01-25T13:49:37Z"
+    generation: 6
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/name: postgres
+      app.kubernetes.io/part-of: ytarchive
+    name: postgres
+    namespace: ytarchive
+    resourceVersion: "1055"
+    uid: b1cbc6b8-2cbf-4198-96b7-71c092d74dbb
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: database
+        app.kubernetes.io/name: postgres
+        app.kubernetes.io/part-of: ytarchive
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: database
+          app.kubernetes.io/name: postgres
+          app.kubernetes.io/part-of: ytarchive
+      spec:
+        containers:
+        - env:
+          - name: POSTGRES_DB
+            value: ytarchive
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                key: postgres-user
+                name: ytarchive-secrets
+                optional: true
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: ytarchive-secrets
+                optional: true
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: postgres
+          ports:
+          - containerPort: 5432
+            name: postgres
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: postgres-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-25T13:49:38Z"
+      lastUpdateTime: "2026-01-25T13:49:47Z"
+      message: ReplicaSet "postgres-68b7bcb488" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T01:12:53Z"
+      lastUpdateTime: "2026-01-27T01:12:53Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 6
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: ytarchive:apps/Deployment:ytarchive/redis
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"ytarchive:apps/Deployment:ytarchive/redis"},"labels":{"app.kubernetes.io/component":"queue","app.kubernetes.io/name":"redis","app.kubernetes.io/part-of":"ytarchive"},"name":"redis","namespace":"ytarchive"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"queue","app.kubernetes.io/name":"redis","app.kubernetes.io/part-of":"ytarchive"}},"template":{"metadata":{"labels":{"app.kubernetes.io/component":"queue","app.kubernetes.io/name":"redis","app.kubernetes.io/part-of":"ytarchive"}},"spec":{"containers":[{"args":["redis-server","--appendonly","yes","--dir","/data"],"image":"redis:7-alpine","livenessProbe":{"exec":{"command":["redis-cli","ping"]},"failureThreshold":3,"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"name":"redis","ports":[{"containerPort":6379,"name":"redis","protocol":"TCP"}],"readinessProbe":{"exec":{"command":["redis-cli","ping"]},"failureThreshold":3,"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":3},"resources":{"limits":{"cpu":"250m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/data","name":"data"}]}],"volumes":[{"emptyDir":{},"name":"data"}]}}}}
+    creationTimestamp: "2026-01-22T12:05:10Z"
+    generation: 16
+    labels:
+      app.kubernetes.io/component: queue
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/part-of: ytarchive
+    name: redis
+    namespace: ytarchive
+    resourceVersion: "1056"
+    uid: b39b1b47-17a2-449b-88f2-87c5dca056d0
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: queue
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/part-of: ytarchive
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: queue
+          app.kubernetes.io/name: redis
+          app.kubernetes.io/part-of: ytarchive
+      spec:
+        containers:
+        - args:
+          - redis-server
+          - --appendonly
+          - "yes"
+          - --dir
+          - /data
+          image: redis:7-alpine
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: redis
+          ports:
+          - containerPort: 6379
+            name: redis
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: data
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-22T12:05:10Z"
+      lastUpdateTime: "2026-01-24T20:41:40Z"
+      message: ReplicaSet "redis-d9fcf85f9" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T04:38:42Z"
+      lastUpdateTime: "2026-01-27T04:38:42Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 16
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: ytarchive:apps/Deployment:ytarchive/ytarchive-controller
+      deployment.kubernetes.io/revision: "84"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"ytarchive:apps/Deployment:ytarchive/ytarchive-controller"},"labels":{"app.kubernetes.io/component":"api","app.kubernetes.io/name":"controller","app.kubernetes.io/part-of":"ytarchive"},"name":"ytarchive-controller","namespace":"ytarchive"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"api","app.kubernetes.io/name":"controller","app.kubernetes.io/part-of":"ytarchive"}},"template":{"metadata":{"labels":{"app.kubernetes.io/component":"api","app.kubernetes.io/name":"controller","app.kubernetes.io/part-of":"ytarchive"}},"spec":{"containers":[{"env":[{"name":"K8S_NAMESPACE","value":"ytarchive"},{"name":"STORAGE_PVC_NAME","value":"ytarchive-data-qnap"},{"name":"WORKER_NODE_SELECTOR","value":""},{"name":"WORKER_IMAGE","value":"ghcr.io/timholm/ytarchive/worker-3969822fa82ea98a627b895dba2b3ff7@sha256:c1591671b6d11b73515defaecacbd6138d114032a992de9b37c3da4cf9b0d7e6"},{"name":"REDIS_URL","valueFrom":{"configMapKeyRef":{"key":"REDIS_URL","name":"ytarchive-config"}}},{"name":"STORAGE_PATH","value":"/data"},{"name":"BATCH_SIZE","valueFrom":{"configMapKeyRef":{"key":"BATCH_SIZE","name":"ytarchive-config"}}},{"name":"MAX_WORKERS","valueFrom":{"configMapKeyRef":{"key":"MAX_WORKERS","name":"ytarchive-config"}}},{"name":"VIDEO_FORMAT","valueFrom":{"configMapKeyRef":{"key":"VIDEO_FORMAT","name":"ytarchive-config"}}}],"image":"ghcr.io/timholm/ytarchive/controller@sha256:42aff1e40d6c3e0ed993ab0738c3c87c9689658723843d080b8ffdeef0108f48","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz","port":"http"},"initialDelaySeconds":10,"periodSeconds":15,"timeoutSeconds":5},"name":"controller","ports":[{"containerPort":8080,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/readyz","port":"http"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":3},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}}],"dnsConfig":{"options":[{"name":"ndots","value":"1"},{"name":"single-request-reopen"}]},"imagePullSecrets":[{"name":"ghcr-secret"}],"serviceAccountName":"ytarchive-controller"}}}}
+    creationTimestamp: "2026-01-24T20:36:31Z"
+    generation: 163
+    labels:
+      app.kubernetes.io/component: api
+      app.kubernetes.io/name: controller
+      app.kubernetes.io/part-of: ytarchive
+    name: ytarchive-controller
+    namespace: ytarchive
+    resourceVersion: "1057"
+    uid: 253891bb-e708-471a-a7f0-664d0205265f
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: api
+        app.kubernetes.io/name: controller
+        app.kubernetes.io/part-of: ytarchive
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-25T07:36:42-08:00"
+        labels:
+          app.kubernetes.io/component: api
+          app.kubernetes.io/name: controller
+          app.kubernetes.io/part-of: ytarchive
+      spec:
+        containers:
+        - env:
+          - name: K8S_NAMESPACE
+            value: ytarchive
+          - name: STORAGE_PVC_NAME
+            value: ytarchive-data-qnap
+          - name: WORKER_NODE_SELECTOR
+          - name: WORKER_IMAGE
+            value: ghcr.io/timholm/ytarchive/worker-3969822fa82ea98a627b895dba2b3ff7@sha256:c1591671b6d11b73515defaecacbd6138d114032a992de9b37c3da4cf9b0d7e6
+          - name: REDIS_URL
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_URL
+                name: ytarchive-config
+          - name: STORAGE_PATH
+            value: /data
+          - name: BATCH_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: BATCH_SIZE
+                name: ytarchive-config
+          - name: MAX_WORKERS
+            valueFrom:
+              configMapKeyRef:
+                key: MAX_WORKERS
+                name: ytarchive-config
+          - name: VIDEO_FORMAT
+            valueFrom:
+              configMapKeyRef:
+                key: VIDEO_FORMAT
+                name: ytarchive-config
+          image: ghcr.io/timholm/ytarchive/controller@sha256:42aff1e40d6c3e0ed993ab0738c3c87c9689658723843d080b8ffdeef0108f48
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: controller
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsConfig:
+          options:
+          - name: ndots
+            value: "1"
+          - name: single-request-reopen
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: ghcr-secret
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: ytarchive-controller
+        serviceAccountName: ytarchive-controller
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-01-24T20:36:31Z"
+      lastUpdateTime: "2026-01-25T15:37:09Z"
+      message: ReplicaSet "ytarchive-controller-55b57bf9c9" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T01:13:25Z"
+      lastUpdateTime: "2026-01-27T01:13:25Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 163
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "29"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"downloader","app.kubernetes.io/name":"worker","app.kubernetes.io/part-of":"ytarchive"},"name":"ytarchive-worker","namespace":"ytarchive"},"spec":{"replicas":10,"selector":{"matchLabels":{"app.kubernetes.io/component":"downloader","app.kubernetes.io/name":"worker","app.kubernetes.io/part-of":"ytarchive"}},"template":{"metadata":{"labels":{"app.kubernetes.io/component":"downloader","app.kubernetes.io/name":"worker","app.kubernetes.io/part-of":"ytarchive"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app":"ytarchive-worker"}},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"env":[{"name":"REDIS_URL","valueFrom":{"configMapKeyRef":{"key":"REDIS_URL","name":"ytarchive-config"}}},{"name":"STORAGE_PATH","value":"/tmp/downloads"},{"name":"VIDEO_FORMAT","valueFrom":{"configMapKeyRef":{"key":"VIDEO_FORMAT","name":"ytarchive-config","optional":true}}},{"name":"CHANNEL_ID","valueFrom":{"configMapKeyRef":{"key":"DEFAULT_CHANNEL_ID","name":"ytarchive-config","optional":true}}},{"name":"WORKER_ID","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"CONTROLLER_URL","value":"http://ytarchive-controller.ytarchive.svc.cluster.local"},{"name":"COLLECTOR_URL","value":"http://collector.ytarchive.svc.cluster.local:8081"},{"name":"YOUTUBE_COOKIES_FILE","value":"/etc/youtube-cookies/cookies.txt"},{"name":"MAX_VIDEO_HEIGHT","value":"1080"},{"name":"PREFER_COMBINED_STREAM","value":"true"}],"image":"ghcr.io/timholm/ytarchive/worker@sha256:842844aa0ab24935ae5dd357205321adc8e565a0d1f9abd90b8c385efec8110c","imagePullPolicy":"Always","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz","port":"health"},"initialDelaySeconds":10,"periodSeconds":30,"timeoutSeconds":5},"name":"worker","ports":[{"containerPort":8080,"name":"health","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/readyz","port":"health"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":3},"resources":{"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"250m","memory":"512Mi"}},"volumeMounts":[{"mountPath":"/tmp/downloads","name":"downloads"},{"mountPath":"/etc/youtube-cookies","name":"youtube-cookies","readOnly":true}]}],"dnsConfig":{"options":[{"name":"ndots","value":"1"},{"name":"single-request-reopen"}]},"imagePullSecrets":[{"name":"ghcr-secret"}],"terminationGracePeriodSeconds":600,"volumes":[{"emptyDir":{"sizeLimit":"20Gi"},"name":"downloads"},{"name":"youtube-cookies","secret":{"optional":true,"secretName":"youtube-cookies"}}]}}}}
+    creationTimestamp: "2026-01-25T05:32:33Z"
+    generation: 89
+    labels:
+      app.kubernetes.io/component: downloader
+      app.kubernetes.io/name: worker
+      app.kubernetes.io/part-of: ytarchive
+    name: ytarchive-worker
+    namespace: ytarchive
+    resourceVersion: "99543"
+    uid: 67f48dc1-791e-4e33-8301-56a473d0db72
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 10
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: downloader
+        app.kubernetes.io/name: worker
+        app.kubernetes.io/part-of: ytarchive
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-01-25T07:30:52-08:00"
+        labels:
+          app.kubernetes.io/component: downloader
+          app.kubernetes.io/name: worker
+          app.kubernetes.io/part-of: ytarchive
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: ytarchive-worker
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - env:
+          - name: REDIS_URL
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_URL
+                name: ytarchive-config
+          - name: STORAGE_PATH
+            value: /tmp/downloads
+          - name: VIDEO_FORMAT
+            valueFrom:
+              configMapKeyRef:
+                key: VIDEO_FORMAT
+                name: ytarchive-config
+                optional: true
+          - name: CHANNEL_ID
+            valueFrom:
+              configMapKeyRef:
+                key: DEFAULT_CHANNEL_ID
+                name: ytarchive-config
+                optional: true
+          - name: WORKER_ID
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: CONTROLLER_URL
+            value: http://ytarchive-controller.ytarchive.svc.cluster.local
+          - name: COLLECTOR_URL
+            value: http://collector.ytarchive.svc.cluster.local:8081
+          - name: YOUTUBE_COOKIES_FILE
+            value: /etc/youtube-cookies/cookies.txt
+          - name: MAX_VIDEO_HEIGHT
+            value: "1080"
+          - name: PREFER_COMBINED_STREAM
+            value: "true"
+          image: ghcr.io/timholm/ytarchive/worker@sha256:842844aa0ab24935ae5dd357205321adc8e565a0d1f9abd90b8c385efec8110c
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: health
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: worker
+          ports:
+          - containerPort: 8080
+            name: health
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: health
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp/downloads
+            name: downloads
+          - mountPath: /etc/youtube-cookies
+            name: youtube-cookies
+            readOnly: true
+        dnsConfig:
+          options:
+          - name: ndots
+            value: "1"
+          - name: single-request-reopen
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: ghcr-secret
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 600
+        volumes:
+        - emptyDir:
+            sizeLimit: 20Gi
+          name: downloads
+        - name: youtube-cookies
+          secret:
+            defaultMode: 420
+            optional: true
+            secretName: youtube-cookies
+  status:
+    availableReplicas: 10
+    conditions:
+    - lastTransitionTime: "2026-01-25T05:32:33Z"
+      lastUpdateTime: "2026-01-25T15:31:31Z"
+      message: ReplicaSet "ytarchive-worker-6f66886cbf" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-01-27T02:39:59Z"
+      lastUpdateTime: "2026-01-27T02:39:59Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 89
+    readyReplicas: 10
+    replicas: 10
+    updatedReplicas: 10
+kind: List
+metadata:
+  resourceVersion: ""

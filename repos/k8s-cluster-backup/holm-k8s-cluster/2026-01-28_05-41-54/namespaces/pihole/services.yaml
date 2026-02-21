@@ -1,0 +1,179 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: pihole:/Service:pihole/pihole-dhcp
+    creationTimestamp: "2026-01-20T09:14:21Z"
+    labels:
+      app: pihole
+      app.kubernetes.io/name: pihole
+      chart: pihole-2.35.0
+      heritage: Helm
+      release: pihole
+    name: pihole-dhcp
+    namespace: pihole
+    resourceVersion: "10284"
+    uid: 28bf1dba-b6c0-410e-940b-9184fac39b41
+  spec:
+    clusterIP: 10.43.73.37
+    clusterIPs:
+    - 10.43.73.37
+    externalTrafficPolicy: Local
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: client-udp
+      nodePort: 31327
+      port: 67
+      protocol: UDP
+      targetPort: client-udp
+    selector:
+      app: pihole
+      release: pihole
+    sessionAffinity: None
+    type: NodePort
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: pihole:/Service:pihole/pihole-dns-tcp
+    creationTimestamp: "2026-01-20T09:14:21Z"
+    finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+    labels:
+      app: pihole
+      app.kubernetes.io/name: pihole
+      chart: pihole-2.35.0
+      heritage: Helm
+      release: pihole
+    name: pihole-dns-tcp
+    namespace: pihole
+    resourceVersion: "10285"
+    uid: b6560920-2d2e-45ae-9264-c2b3548b04f6
+  spec:
+    allocateLoadBalancerNodePorts: true
+    clusterIP: 10.43.187.134
+    clusterIPs:
+    - 10.43.187.134
+    externalTrafficPolicy: Local
+    healthCheckNodePort: 31819
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: dns
+      nodePort: 32202
+      port: 53
+      protocol: TCP
+      targetPort: dns
+    selector:
+      app: pihole
+      release: pihole
+    sessionAffinity: None
+    type: LoadBalancer
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 192.168.8.209
+        ipMode: VIP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: pihole:/Service:pihole/pihole-dns-udp
+    creationTimestamp: "2026-01-20T09:14:25Z"
+    finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+    labels:
+      app: pihole
+      app.kubernetes.io/name: pihole
+      chart: pihole-2.35.0
+      heritage: Helm
+      release: pihole
+    name: pihole-dns-udp
+    namespace: pihole
+    resourceVersion: "10286"
+    uid: ecd43dc5-ece0-4890-9b79-02c31ee21c04
+  spec:
+    allocateLoadBalancerNodePorts: true
+    clusterIP: 10.43.255.125
+    clusterIPs:
+    - 10.43.255.125
+    externalTrafficPolicy: Local
+    healthCheckNodePort: 32280
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: dns-udp
+      nodePort: 30263
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    selector:
+      app: pihole
+      release: pihole
+    sessionAffinity: None
+    type: LoadBalancer
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 192.168.8.209
+        ipMode: VIP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: pihole:/Service:pihole/pihole-web
+      gethomepage.dev/description: Network Ad Blocker
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/group: Infrastructure
+      gethomepage.dev/href: https://pihole.holm.chat/admin
+      gethomepage.dev/icon: pi-hole.svg
+      gethomepage.dev/name: Pi-hole
+    creationTimestamp: "2026-01-20T09:14:21Z"
+    labels:
+      app: pihole
+      app.kubernetes.io/name: pihole
+      chart: pihole-2.35.0
+      heritage: Helm
+      release: pihole
+    name: pihole-web
+    namespace: pihole
+    resourceVersion: "10287"
+    uid: b42fa8b8-df8d-41cc-bce1-592f9d20b061
+  spec:
+    clusterIP: 10.43.218.54
+    clusterIPs:
+    - 10.43.218.54
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+    selector:
+      app: pihole
+      release: pihole
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

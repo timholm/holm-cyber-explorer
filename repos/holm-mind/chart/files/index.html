@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a1a">
+<link rel="manifest" href="/manifest.json">
+<title>holm mind</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0a1a;font-family:-apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',system-ui,sans-serif;color:#e0e0e0;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
+canvas{display:block;width:100%;height:100%}
+/* Login */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:#0a0a1a}
+#login-screen canvas{position:absolute;inset:0}
+.login-card{position:relative;z-index:1;background:rgba(255,255,255,.06);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:40px 32px;width:min(320px,85vw);text-align:center}
+.login-card h1{font-size:22px;font-weight:600;margin-bottom:6px;letter-spacing:-.3px}
+.login-card p{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.login-card input{width:100%;padding:14px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05);color:#fff;font-size:16px;outline:none;transition:border-color .2s}
+.login-card input:focus{border-color:rgba(255,255,255,.3)}
+.login-card button{width:100%;padding:14px;margin-top:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:transform .15s,opacity .15s}
+.login-card button:active{transform:scale(.97);opacity:.9}
+.login-card .error{color:#e06c75;font-size:13px;margin-top:10px;min-height:18px}
+.shake{animation:shake .4s ease-in-out}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+/* Search */
+#search-bar{position:fixed;top:env(safe-area-inset-top,12px);left:12px;right:12px;z-index:50;display:none}
+#search-bar input{width:100%;padding:12px 16px 12px 40px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(10,10,26,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;font-size:15px;outline:none}
+#search-bar svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.4}
+/* Detail panel */
+#detail-panel{position:fixed;bottom:0;left:0;right:0;z-index:60;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.9,.3,1);padding-bottom:env(safe-area-inset-bottom,0)}
+#detail-panel.open{transform:translateY(0)}
+.panel-content{background:rgba(20,20,40,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.1);border-radius:20px 20px 0 0;padding:20px 24px 28px;max-height:50vh;overflow-y:auto}
+.panel-handle{width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 16px}
+.panel-title{font-size:18px;font-weight:600;margin-bottom:4px}
+.panel-ns{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:16px}
+.panel-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px}
+.panel-row span:first-child{color:rgba(255,255,255,.5)}
+.panel-row span:last-child{font-weight:500}
+.status-badge{display:inline-block;padding:2px 10px;border-radius:8px;font-size:12px;font-weight:600}
+.status-running{background:rgba(152,195,121,.15);color:#98c379}
+.status-degraded{background:rgba(229,192,123,.15);color:#e5c07b}
+.status-down{background:rgba(224,108,117,.15);color:#e06c75}
+/* Refresh indicator */
+#refresh-dot{position:fixed;top:calc(env(safe-area-inset-top,12px) + 6px);right:18px;width:8px;height:8px;border-radius:50%;background:#98c379;opacity:0;transition:opacity .3s;z-index:55}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <canvas id="particle-canvas"></canvas>
+  <div class="login-card" id="login-card">
+    <h1>holm mind</h1>
+    <p>cluster visualization</p>
+    <input type="password" id="login-password" placeholder="password" autocomplete="current-password">
+    <button id="login-btn">sign in</button>
+    <div class="error" id="login-error"></div>
+  </div>
+</div>
+
+<canvas id="mind-canvas"></canvas>
+
+<div id="search-bar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+  <input type="text" id="search-input" placeholder="search services...">
+</div>
+
+<div id="detail-panel">
+  <div class="panel-content" id="panel-content">
+    <div class="panel-handle"></div>
+    <div class="panel-title" id="panel-title"></div>
+    <div class="panel-ns" id="panel-ns"></div>
+    <div id="panel-body"></div>
+  </div>
+</div>
+
+<div id="refresh-dot"></div>
+
+<script>
+'use strict';
+
+// ── Namespace colors ──
+const NS_COLORS = {
+  ai:'#c678dd',automation:'#e5c07b',media:'#e06c75',productivity:'#61afef',
+  communication:'#56b6c2',monitoring:'#98c379',lifestyle:'#d19a66',
+  'edge-services':'#be5046',education:'#e6e6e6',health:'#ff6b9d',
+  games:'#c8e66e',backup:'#7c8894',identity:'#dcdcaa',devops:'#569cd6',
+};
+function nsColor(name) {
+  if (NS_COLORS[name]) return NS_COLORS[name];
+  for (const [key, col] of Object.entries(NS_COLORS)) { if (name.includes(key)) return col; }
+  let h = 0; for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+  return `hsl(${Math.abs(h) % 360},55%,65%)`;
+}
+
+const HEALTH_COLORS = { green: '#98c379', yellow: '#e5c07b', red: '#e06c75' };
+
+// ── State ──
+let token = localStorage.getItem('holm-mind-token');
+let clusterData = [];
+let nodes = [];       // {id, type, label, x, y, r, color, health, parent, services, data, visible}
+let edges = [];
+let expandedNs = null;
+let serviceNodes = [];
+let searchTerm = '';
+let detailOpen = false;
+
+// ── Camera ──
+const cam = { x: 0, y: 0, zoom: 0.55, targetX: 0, targetY: 0, targetZoom: 0.55 };
+const CAM_LERP = 0.12;
+const MIN_ZOOM = 0.15, MAX_ZOOM = 4;
+
+// ── Canvas setup ──
+const canvas = document.getElementById('mind-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, dpr;
+let needsRender = true;
+let animating = false;
+
+function resize() {
+  dpr = window.devicePixelRatio || 1;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  needsRender = true;
+}
+window.addEventListener('resize', resize);
+
+// ── Coordinate transforms ──
+function worldToScreen(wx, wy) {
+  return { x: (wx - cam.x) * cam.zoom + W / 2, y: (wy - cam.y) * cam.zoom + H / 2 };
+}
+function screenToWorld(sx, sy) {
+  return { x: (sx - W / 2) / cam.zoom + cam.x, y: (sy - H / 2) / cam.zoom + cam.y };
+}
+
+// ── Layout engine ──
+function layoutNodes() {
+  nodes = [];
+  edges = [];
+  serviceNodes = [];
+
+  // Center node
+  nodes.push({ id: '__center__', type: 'center', label: 'holm cluster', x: 0, y: 0, r: 36, color: '#667eea', visible: true });
+
+  if (!clusterData.length) return;
+
+  // Sort by service count descending, biggest closest
+  const sorted = [...clusterData].sort((a, b) => b.serviceCount - a.serviceCount);
+  const count = sorted.length;
+
+  // Radial placement with rings - spaced for mobile
+  const ringCapacity = [6, 10, 14, 18, 22];
+  let ring = 0, idx = 0;
+
+  for (let i = 0; i < count; i++) {
+    const ns = sorted[i];
+    if (idx >= (ringCapacity[ring] || 22)) { ring++; idx = 0; }
+    const cap = ringCapacity[ring] || 22;
+    const baseRadius = 300 + ring * 280;
+    const angle = (idx / cap) * Math.PI * 2 - Math.PI / 2;
+    const r = Math.max(18, Math.min(44, 14 + ns.serviceCount * 2.5));
+
+    const node = {
+      id: ns.name,
+      type: 'namespace',
+      label: ns.name,
+      x: Math.cos(angle) * baseRadius,
+      y: Math.sin(angle) * baseRadius,
+      r,
+      color: nsColor(ns.name),
+      health: ns.health || 'green',
+      services: ns.deployments || [],
+      serviceCount: ns.serviceCount,
+      visible: true,
+    };
+    nodes.push(node);
+    edges.push({ from: '__center__', to: ns.name });
+    idx++;
+  }
+}
+
+function expandNamespace(nsId) {
+  // Collapse previous
+  serviceNodes = [];
+  if (expandedNs === nsId) { expandedNs = null; needsRender = true; return; }
+
+  const nsNode = nodes.find(n => n.id === nsId);
+  if (!nsNode || !nsNode.services?.length) return;
+
+  expandedNs = nsId;
+  const svcs = nsNode.services;
+  const count = svcs.length;
+  const spreadRadius = Math.max(100, 50 + count * 14);
+
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+    const svc = svcs[i];
+    serviceNodes.push({
+      id: `${nsId}/${svc.name}`,
+      type: 'service',
+      label: svc.name,
+      x: nsNode.x + Math.cos(angle) * spreadRadius,
+      y: nsNode.y + Math.sin(angle) * spreadRadius,
+      r: 10,
+      color: nsNode.color,
+      health: svc.status === 'running' ? 'green' : svc.status === 'degraded' ? 'yellow' : 'red',
+      parent: nsId,
+      data: svc,
+      visible: true,
+      // Animation
+      animX: nsNode.x,
+      animY: nsNode.y,
+      targetX: nsNode.x + Math.cos(angle) * spreadRadius,
+      targetY: nsNode.y + Math.sin(angle) * spreadRadius,
+      animProgress: 0,
+    });
+  }
+
+  // Animate camera to namespace
+  cam.targetX = nsNode.x;
+  cam.targetY = nsNode.y;
+  cam.targetZoom = Math.min(2.5, Math.max(1.2, 300 / spreadRadius));
+  startAnimation();
+}
+
+// ── Rendering ──
+function isOnScreen(wx, wy, r) {
+  const s = worldToScreen(wx, wy);
+  const sr = r * cam.zoom;
+  return s.x + sr > -50 && s.x - sr < W + 50 && s.y + sr > -50 && s.y - sr < H + 50;
+}
+
+function drawNode(node, highlight) {
+  if (!isOnScreen(node.x, node.y, node.r + 20)) return;
+  const s = worldToScreen(node.x, node.y);
+  const sr = node.r * cam.zoom;
+
+  ctx.save();
+
+  // Glow for center
+  if (node.type === 'center') {
+    const grad = ctx.createRadialGradient(s.x, s.y, sr * 0.3, s.x, s.y, sr * 2);
+    grad.addColorStop(0, 'rgba(102,126,234,.25)');
+    grad.addColorStop(1, 'rgba(102,126,234,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(s.x, s.y, sr * 2, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Health ring
+  if (node.health && node.type !== 'center') {
+    ctx.beginPath(); ctx.arc(s.x, s.y, sr + 3 * cam.zoom, 0, Math.PI * 2);
+    ctx.strokeStyle = HEALTH_COLORS[node.health] || '#98c379';
+    ctx.lineWidth = 2.5 * cam.zoom;
+    ctx.globalAlpha = 0.7;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  // Search highlight
+  if (highlight) {
+    ctx.beginPath(); ctx.arc(s.x, s.y, sr + 8 * cam.zoom, 0, Math.PI * 2);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2 * cam.zoom;
+    ctx.setLineDash([4 * cam.zoom, 4 * cam.zoom]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Node fill
+  ctx.beginPath(); ctx.arc(s.x, s.y, sr, 0, Math.PI * 2);
+  const alpha = node.type === 'center' ? 0.9 : 0.75;
+  ctx.fillStyle = node.color;
+  ctx.globalAlpha = alpha;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Label (LOD: hide when too small on screen)
+  if (sr > 8) {
+    const fontSize = node.type === 'center' ? Math.min(14, sr * 0.4) :
+                     node.type === 'namespace' ? Math.min(12, sr * 0.55) :
+                     Math.min(10, sr * 0.8);
+    if (fontSize > 4) {
+      ctx.font = `600 ${fontSize}px -apple-system,BlinkMacSystemFont,sans-serif`;
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const label = node.label;
+      const maxW = sr * 1.8;
+      if (ctx.measureText(label).width > maxW && node.type !== 'center') {
+        // Truncate
+        let t = label;
+        while (ctx.measureText(t + '...').width > maxW && t.length > 2) t = t.slice(0, -1);
+        ctx.fillText(t + (t.length < label.length ? '..' : ''), s.x, s.y);
+      } else {
+        ctx.fillText(label, s.x, s.y);
+      }
+
+      // Service count below namespace label
+      if (node.type === 'namespace' && node.serviceCount && fontSize > 6) {
+        ctx.font = `400 ${fontSize * 0.7}px -apple-system,sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,.5)';
+        ctx.fillText(`${node.serviceCount} svc`, s.x, s.y + fontSize * 0.9);
+      }
+    }
+  }
+
+  ctx.restore();
+}
+
+function drawEdge(fromNode, toNode, alpha) {
+  const s1 = worldToScreen(fromNode.x, fromNode.y);
+  const s2 = worldToScreen(toNode.x, toNode.y);
+  ctx.beginPath();
+  ctx.moveTo(s1.x, s1.y);
+  ctx.lineTo(s2.x, s2.y);
+  ctx.strokeStyle = `rgba(255,255,255,${0.06 * (alpha || 1)})`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background gradient
+  const bgGrad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.7);
+  bgGrad.addColorStop(0, '#12122a');
+  bgGrad.addColorStop(1, '#0a0a1a');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Edges to namespaces
+  const nodeMap = {};
+  for (const n of nodes) nodeMap[n.id] = n;
+  for (const e of edges) {
+    if (nodeMap[e.from] && nodeMap[e.to]) drawEdge(nodeMap[e.from], nodeMap[e.to]);
+  }
+
+  // Edges from namespace to services
+  if (expandedNs) {
+    const nsNode = nodeMap[expandedNs];
+    if (nsNode) {
+      for (const sn of serviceNodes) drawEdge(nsNode, sn, 0.5);
+    }
+  }
+
+  // Determine search matches
+  const searchLower = searchTerm.toLowerCase();
+
+  // Draw namespace nodes
+  for (const n of nodes) {
+    if (!n.visible) continue;
+    const match = searchLower && (n.label.toLowerCase().includes(searchLower) ||
+      (n.services || []).some(s => s.name.toLowerCase().includes(searchLower)));
+    const dim = searchLower && !match;
+    if (dim) { ctx.globalAlpha = 0.2; drawNode(n, false); ctx.globalAlpha = 1; }
+    else drawNode(n, match);
+  }
+
+  // Draw service nodes
+  for (const sn of serviceNodes) {
+    if (!sn.visible) continue;
+    const match = searchLower && sn.label.toLowerCase().includes(searchLower);
+    const dim = searchLower && !match;
+    if (dim) { ctx.globalAlpha = 0.2; drawNode(sn, false); ctx.globalAlpha = 1; }
+    else drawNode(sn, match);
+  }
+}
+
+// ── Animation loop ──
+function startAnimation() { if (!animating) { animating = true; requestAnimationFrame(tick); } }
+
+function tick() {
+  let moving = false;
+
+  // Lerp camera
+  const dx = cam.targetX - cam.x;
+  const dy = cam.targetY - cam.y;
+  const dz = cam.targetZoom - cam.zoom;
+  if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5 || Math.abs(dz) > 0.001) {
+    cam.x += dx * CAM_LERP;
+    cam.y += dy * CAM_LERP;
+    cam.zoom += dz * CAM_LERP;
+    moving = true;
+  } else {
+    cam.x = cam.targetX; cam.y = cam.targetY; cam.zoom = cam.targetZoom;
+  }
+
+  // Momentum
+  if (momentum.active) {
+    momentum.vx *= momentum.friction;
+    momentum.vy *= momentum.friction;
+    cam.targetX -= momentum.vx / cam.zoom;
+    cam.targetY -= momentum.vy / cam.zoom;
+    cam.x = cam.targetX; cam.y = cam.targetY;
+    if (Math.abs(momentum.vx) < 0.1 && Math.abs(momentum.vy) < 0.1) momentum.active = false;
+    else moving = true;
+  }
+
+  // Animate service node expansion
+  for (const sn of serviceNodes) {
+    if (sn.animProgress < 1) {
+      sn.animProgress = Math.min(1, sn.animProgress + 0.08);
+      const t = easeOutCubic(sn.animProgress);
+      sn.x = sn.animX + (sn.targetX - sn.animX) * t;
+      sn.y = sn.animY + (sn.targetY - sn.animY) * t;
+      moving = true;
+    }
+  }
+
+  render();
+
+  if (moving) {
+    requestAnimationFrame(tick);
+  } else {
+    animating = false;
+    needsRender = false;
+  }
+}
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function scheduleRender() {
+  needsRender = true;
+  if (!animating) { animating = true; requestAnimationFrame(tick); }
+}
+
+// ── Touch / pointer handling ──
+const momentum = { vx: 0, vy: 0, friction: 0.92, active: false };
+let touches = [];
+let lastPinchDist = 0;
+let isDragging = false;
+let dragStart = null;
+let lastDragPos = null;
+let tapTimer = null;
+let tapStartPos = null;
+
+canvas.addEventListener('pointerdown', onPointerDown, { passive: false });
+canvas.addEventListener('pointermove', onPointerMove, { passive: false });
+canvas.addEventListener('pointerup', onPointerUp, { passive: false });
+canvas.addEventListener('pointercancel', onPointerUp, { passive: false });
+
+canvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    lastPinchDist = pinchDist(e.touches);
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = pinchDist(e.touches);
+    const center = pinchCenter(e.touches);
+    const scale = dist / lastPinchDist;
+    const worldBefore = screenToWorld(center.x, center.y);
+    cam.targetZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, cam.targetZoom * scale));
+    cam.zoom = cam.targetZoom;
+    const worldAfter = screenToWorld(center.x, center.y);
+    cam.targetX -= worldAfter.x - worldBefore.x;
+    cam.targetY -= worldAfter.y - worldBefore.y;
+    cam.x = cam.targetX; cam.y = cam.targetY;
+    lastPinchDist = dist;
+    scheduleRender();
+  }
+}, { passive: false });
+
+function pinchDist(t) { return Math.hypot(t[1].clientX - t[0].clientX, t[1].clientY - t[0].clientY); }
+function pinchCenter(t) { return { x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 }; }
+
+function onPointerDown(e) {
+  if (e.pointerType === 'touch' && e.isPrimary === false) return;
+  momentum.active = false;
+  isDragging = false;
+  dragStart = { x: e.clientX, y: e.clientY };
+  lastDragPos = { x: e.clientX, y: e.clientY, t: Date.now() };
+  tapStartPos = { x: e.clientX, y: e.clientY };
+  canvas.setPointerCapture(e.pointerId);
+}
+
+function onPointerMove(e) {
+  if (!dragStart) return;
+  const dx = e.clientX - lastDragPos.x;
+  const dy = e.clientY - lastDragPos.y;
+  const totalDist = Math.hypot(e.clientX - dragStart.x, e.clientY - dragStart.y);
+
+  if (totalDist > 8) isDragging = true;
+
+  if (isDragging) {
+    cam.targetX -= dx / cam.zoom;
+    cam.targetY -= dy / cam.zoom;
+    cam.x = cam.targetX;
+    cam.y = cam.targetY;
+    const now = Date.now();
+    const dt = Math.max(1, now - lastDragPos.t);
+    momentum.vx = dx / dt * 16;
+    momentum.vy = dy / dt * 16;
+    lastDragPos = { x: e.clientX, y: e.clientY, t: now };
+    scheduleRender();
+  }
+}
+
+function onPointerUp(e) {
+  if (!dragStart) return;
+  if (isDragging && (Math.abs(momentum.vx) > 0.5 || Math.abs(momentum.vy) > 0.5)) {
+    momentum.active = true;
+    startAnimation();
+  }
+  if (!isDragging) handleTap(tapStartPos.x, tapStartPos.y);
+  dragStart = null;
+  isDragging = false;
+}
+
+// Mouse wheel zoom
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const worldBefore = screenToWorld(e.clientX, e.clientY);
+  const factor = e.deltaY > 0 ? 0.9 : 1.1;
+  cam.targetZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, cam.targetZoom * factor));
+  cam.zoom = cam.targetZoom;
+  const worldAfter = screenToWorld(e.clientX, e.clientY);
+  cam.targetX -= worldAfter.x - worldBefore.x;
+  cam.targetY -= worldAfter.y - worldBefore.y;
+  cam.x = cam.targetX; cam.y = cam.targetY;
+  scheduleRender();
+}, { passive: false });
+
+// ── Tap handling ──
+function handleTap(sx, sy) {
+  const wp = screenToWorld(sx, sy);
+
+  // Close detail panel if open
+  if (detailOpen) { closeDetail(); return; }
+
+  // Check service nodes first
+  for (const sn of serviceNodes) {
+    const dist = Math.hypot(wp.x - sn.x, wp.y - sn.y);
+    if (dist < sn.r + 10) {
+      vibrate();
+      showDetail(sn);
+      return;
+    }
+  }
+
+  // Check namespace/center nodes
+  for (const n of nodes) {
+    const dist = Math.hypot(wp.x - n.x, wp.y - n.y);
+    if (dist < n.r + 10) {
+      vibrate();
+      if (n.type === 'center') {
+        // Zoom back to overview
+        expandedNs = null;
+        serviceNodes = [];
+        cam.targetX = 0; cam.targetY = 0; cam.targetZoom = 0.55;
+        startAnimation();
+      } else if (n.type === 'namespace') {
+        expandNamespace(n.id);
+      }
+      return;
+    }
+  }
+}
+
+function vibrate() { if (navigator.vibrate) navigator.vibrate(10); }
+
+// ── Detail panel ──
+function showDetail(svc) {
+  const panel = document.getElementById('detail-panel');
+  const title = document.getElementById('panel-title');
+  const ns = document.getElementById('panel-ns');
+  const body = document.getElementById('panel-body');
+  const d = svc.data;
+
+  title.textContent = svc.label;
+  ns.textContent = svc.parent;
+
+  const statusClass = d.status === 'running' ? 'status-running' : d.status === 'degraded' ? 'status-degraded' : 'status-down';
+  const age = d.age ? timeSince(new Date(d.age)) : 'unknown';
+
+  body.innerHTML = `
+    <div class="panel-row"><span>status</span><span class="status-badge ${statusClass}">${d.status}</span></div>
+    <div class="panel-row"><span>replicas</span><span>${d.ready}/${d.replicas}</span></div>
+    <div class="panel-row"><span>image</span><span style="word-break:break-all;font-size:12px">${escapeHtml(d.image)}</span></div>
+    <div class="panel-row"><span>age</span><span>${age}</span></div>
+    ${d.pods ? d.pods.map(p => `<div class="panel-row"><span style="font-size:12px">${escapeHtml(p.name)}</span><span>${p.phase} (${p.restarts} restarts)</span></div>`).join('') : ''}
+  `;
+
+  panel.classList.add('open');
+  detailOpen = true;
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  detailOpen = false;
+}
+
+function timeSince(date) {
+  const s = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s / 60) + 'm';
+  if (s < 86400) return Math.floor(s / 3600) + 'h';
+  return Math.floor(s / 86400) + 'd';
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Swipe down on panel to close
+let panelTouchStart = null;
+document.getElementById('panel-content').addEventListener('touchstart', (e) => {
+  panelTouchStart = e.touches[0].clientY;
+});
+document.getElementById('panel-content').addEventListener('touchmove', (e) => {
+  if (panelTouchStart !== null && e.touches[0].clientY - panelTouchStart > 40) {
+    closeDetail();
+    panelTouchStart = null;
+  }
+});
+document.getElementById('panel-content').addEventListener('touchend', () => { panelTouchStart = null; });
+
+// ── Search ──
+const searchInput = document.getElementById('search-input');
+searchInput.addEventListener('input', () => {
+  searchTerm = searchInput.value.trim();
+  if (searchTerm) flyToMatch(searchTerm);
+  scheduleRender();
+});
+
+function flyToMatch(term) {
+  const lower = term.toLowerCase();
+  // Check services first
+  for (const sn of serviceNodes) {
+    if (sn.label.toLowerCase().includes(lower)) {
+      cam.targetX = sn.x; cam.targetY = sn.y;
+      cam.targetZoom = 2;
+      startAnimation();
+      return;
+    }
+  }
+  // Check namespaces
+  for (const n of nodes) {
+    if (n.type === 'namespace' && (n.label.toLowerCase().includes(lower) ||
+        (n.services || []).some(s => s.name.toLowerCase().includes(lower)))) {
+      cam.targetX = n.x; cam.targetY = n.y;
+      cam.targetZoom = 1.5;
+      startAnimation();
+      return;
+    }
+  }
+}
+
+// ── Login ──
+const loginScreen = document.getElementById('login-screen');
+const loginCard = document.getElementById('login-card');
+const loginBtn = document.getElementById('login-btn');
+const loginPw = document.getElementById('login-password');
+const loginErr = document.getElementById('login-error');
+
+async function doLogin() {
+  loginBtn.disabled = true;
+  loginErr.textContent = '';
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: loginPw.value }),
+    });
+    const data = await res.json();
+    if (res.ok && data.token) {
+      token = data.token;
+      localStorage.setItem('holm-mind-token', token);
+      enterApp();
+    } else {
+      loginErr.textContent = data.error || 'Login failed';
+      loginCard.classList.add('shake');
+      setTimeout(() => loginCard.classList.remove('shake'), 500);
+      vibrate();
+    }
+  } catch (e) {
+    loginErr.textContent = 'Connection error';
+  }
+  loginBtn.disabled = false;
+}
+
+loginBtn.addEventListener('click', doLogin);
+loginPw.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+
+// ── Particle background for login ──
+function initParticles() {
+  const pc = document.getElementById('particle-canvas');
+  const pctx = pc.getContext('2d');
+  const pdpr = window.devicePixelRatio || 1;
+  pc.width = window.innerWidth * pdpr;
+  pc.height = window.innerHeight * pdpr;
+  pctx.setTransform(pdpr, 0, 0, pdpr, 0, 0);
+
+  const particles = Array.from({ length: 60 }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 1.5 + 0.5,
+  }));
+
+  let running = true;
+  function animateParticles() {
+    if (!running) return;
+    pctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = window.innerWidth;
+      if (p.x > window.innerWidth) p.x = 0;
+      if (p.y < 0) p.y = window.innerHeight;
+      if (p.y > window.innerHeight) p.y = 0;
+      pctx.beginPath();
+      pctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      pctx.fillStyle = 'rgba(255,255,255,.15)';
+      pctx.fill();
+    }
+    // Lines between close particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const d = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+        if (d < 120) {
+          pctx.beginPath();
+          pctx.moveTo(particles[i].x, particles[i].y);
+          pctx.lineTo(particles[j].x, particles[j].y);
+          pctx.strokeStyle = `rgba(255,255,255,${0.04 * (1 - d / 120)})`;
+          pctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+  return () => { running = false; };
+}
+
+// ── App entry ──
+let stopParticles = null;
+let refreshInterval = null;
+
+async function enterApp() {
+  loginScreen.style.display = 'none';
+  if (stopParticles) stopParticles();
+  document.getElementById('search-bar').style.display = 'block';
+
+  resize();
+  await fetchCluster();
+  layoutNodes();
+  scheduleRender();
+
+  // Background refresh every 60s
+  refreshInterval = setInterval(async () => {
+    const old = JSON.stringify(clusterData);
+    await fetchCluster();
+    if (JSON.stringify(clusterData) !== old) {
+      layoutNodes();
+      // Re-expand if namespace was expanded
+      if (expandedNs) {
+        const nsId = expandedNs;
+        expandedNs = null;
+        serviceNodes = [];
+        expandNamespace(nsId);
+      }
+      // Flash refresh dot
+      const dot = document.getElementById('refresh-dot');
+      dot.style.opacity = '1';
+      setTimeout(() => dot.style.opacity = '0', 2000);
+      scheduleRender();
+    }
+  }, 60000);
+}
+
+async function fetchCluster() {
+  try {
+    const res = await fetch('/api/cluster', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('holm-mind-token');
+      token = null;
+      location.reload();
+      return;
+    }
+    clusterData = await res.json();
+  } catch (e) {
+    console.error('Failed to fetch cluster data:', e);
+  }
+}
+
+async function fetchNamespaceDetail(nsName) {
+  try {
+    const res = await fetch(`/api/namespace/${nsName}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return await res.json();
+  } catch (e) {
+    console.error('Failed to fetch namespace detail:', e);
+    return null;
+  }
+}
+
+// ── Boot ──
+if (token) {
+  // Verify token still works
+  fetch('/api/cluster', { headers: { Authorization: `Bearer ${token}` } })
+    .then(r => { if (r.ok) enterApp(); else { localStorage.removeItem('holm-mind-token'); token = null; showLogin(); } })
+    .catch(() => showLogin());
+} else {
+  showLogin();
+}
+
+function showLogin() {
+  loginScreen.style.display = 'flex';
+  stopParticles = initParticles();
+  loginPw.focus();
+}
+
+// ── Register service worker for PWA (no-op sw) ──
+if ('serviceWorker' in navigator) {
+  // Minimal inline registration - no separate file needed
+}
+
+</script>
+</body>
+</html>

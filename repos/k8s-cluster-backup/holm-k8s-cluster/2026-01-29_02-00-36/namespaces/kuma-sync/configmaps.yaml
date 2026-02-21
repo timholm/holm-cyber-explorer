@@ -1,0 +1,214 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBdjCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3Njg0ODg1OTUwHhcNMjYwMTE1MTQ0OTU1WhcNMzYwMTEzMTQ0OTU1
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3Njg0ODg1OTUwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAAS5M3qca7X6I+z9JEP6m2z24D0Vxp/N9riBEnGH45Cd
+      2BskCdidQJnMjVhm+Cb/XskOINIf6xwmtSvUe0yvjF1eo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUirW/RlF+LEjL/PJV27md
+      5o8hlsUwCgYIKoZIzj0EAwIDRwAwRAIgWFi90tm3iGOxztyDXsQS5Xmt3KWl3hX5
+      GVkFVp7VWrYCIH350uTqoqKYVuEL3AXTToIVryQVnEEUCxKpDRVjLsm9
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-01-25T00:54:16Z"
+    name: kube-root-ca.crt
+    namespace: kuma-sync
+    resourceVersion: "787"
+    uid: d8eedefb-2cfa-4fc0-94f1-afe684254114
+- apiVersion: v1
+  data:
+    ANNOTATION_PREFIX: uptime-kuma.io
+    DEFAULT_INTERVAL: "60"
+    STATUS_PAGE_SLUG: holm-chat
+    UPTIME_KUMA_URL: http://uptime-kuma.monitoring.svc.cluster.local:3001
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"ANNOTATION_PREFIX":"uptime-kuma.io","DEFAULT_INTERVAL":"60","STATUS_PAGE_SLUG":"holm-chat","UPTIME_KUMA_URL":"http://uptime-kuma.monitoring.svc.cluster.local:3001"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"kuma-sync-config","namespace":"kuma-sync"}}
+    creationTimestamp: "2026-01-25T00:54:17Z"
+    name: kuma-sync-config
+    namespace: kuma-sync
+    resourceVersion: "788"
+    uid: 6454d656-c8e6-43e5-bb75-485b7b7eea24
+- apiVersion: v1
+  data:
+    main.py: "#!/usr/bin/env python3\n\"\"\"\nKuma-Sync: Kubernetes Service Discovery
+      Controller for Uptime Kuma\nWatches K8s resources and auto-registers them with
+      Uptime Kuma\n\"\"\"\nimport os\nimport sys\nimport time\nimport logging\nfrom
+      typing import Dict, Set, Optional\nfrom dataclasses import dataclass\nfrom kubernetes
+      import client, config, watch\nfrom uptime_kuma_api import UptimeKumaApi, MonitorType\n\nlogging.basicConfig(\n
+      \   level=logging.INFO,\n    format=\"%(asctime)s [%(levelname)s] %(message)s\"\n)\nlogger
+      = logging.getLogger(\"kuma-sync\")\n\n@dataclass\nclass MonitorConfig:\n    name:
+      str\n    url: str\n    monitor_type: str = \"http\"\n    interval: int = 60\n
+      \   group: str = \"Services\"\n    description: str = \"\"\n    resource_uid:
+      str = \"\"\n\nclass KumaSyncController:\n    def __init__(self):\n        self.kuma_url
+      = os.getenv(\"UPTIME_KUMA_URL\", \"http://uptime-kuma.monitoring:3001\")\n        self.kuma_username
+      = os.getenv(\"UPTIME_KUMA_USERNAME\", \"\")\n        self.kuma_password = os.getenv(\"UPTIME_KUMA_PASSWORD\",
+      \"\")\n        self.status_page_slug = os.getenv(\"STATUS_PAGE_SLUG\", \"holm-chat\")\n
+      \       self.default_interval = int(os.getenv(\"DEFAULT_INTERVAL\", \"60\"))\n
+      \       self.annotation_prefix = os.getenv(\"ANNOTATION_PREFIX\", \"uptime-kuma.io\")\n
+      \       \n        # Track managed monitors by resource UID\n        self.managed_monitors:
+      Dict[str, int] = {}\n        self.api: Optional[UptimeKumaApi] = None\n        \n
+      \       # Load K8s config\n        try:\n            config.load_incluster_config()\n
+      \           logger.info(\"Loaded in-cluster Kubernetes config\")\n        except
+      config.ConfigException:\n            config.load_kube_config()\n            logger.info(\"Loaded
+      local Kubernetes config\")\n        \n        self.v1 = client.CoreV1Api()\n
+      \       self.networking_v1 = client.NetworkingV1Api()\n        self.custom_api
+      = client.CustomObjectsApi()\n\n    def connect_kuma(self) -> bool:\n        \"\"\"Connect
+      to Uptime Kuma API\"\"\"\n        try:\n            self.api = UptimeKumaApi(self.kuma_url)\n
+      \           if self.kuma_username and self.kuma_password:\n                self.api.login(self.kuma_username,
+      self.kuma_password)\n                logger.info(f\"Connected to Uptime Kuma
+      at {self.kuma_url}\")\n            else:\n                logger.warning(\"No
+      credentials provided, some operations may fail\")\n            return True\n
+      \       except Exception as e:\n            logger.error(f\"Failed to connect
+      to Uptime Kuma: {e}\")\n            return False\n\n    def disconnect_kuma(self):\n
+      \       \"\"\"Disconnect from Uptime Kuma\"\"\"\n        if self.api:\n            try:\n
+      \               self.api.disconnect()\n            except:\n                pass\n\n
+      \   def get_annotation(self, annotations: dict, key: str, default: str = \"\")
+      -> str:\n        \"\"\"Get annotation value with prefix\"\"\"\n        if not
+      annotations:\n            return default\n        return annotations.get(f\"{self.annotation_prefix}/{key}\",
+      default)\n\n    def should_monitor(self, annotations: dict) -> bool:\n        \"\"\"Check
+      if resource should be monitored\"\"\"\n        enabled = self.get_annotation(annotations,
+      \"monitor\", \"false\")\n        return enabled.lower() in (\"true\", \"yes\",
+      \"1\")\n\n    def parse_monitor_config(self, resource) -> Optional[MonitorConfig]:\n
+      \       \"\"\"Parse monitor configuration from resource annotations\"\"\"\n
+      \       metadata = resource.metadata\n        annotations = metadata.annotations
+      or {}\n        \n        if not self.should_monitor(annotations):\n            return
+      None\n        \n        # Get URL - required\n        url = self.get_annotation(annotations,
+      \"url\")\n        if not url:\n            # Try to construct from service\n
+      \           if hasattr(resource, \"spec\") and hasattr(resource.spec, \"ports\"):\n
+      \               port = resource.spec.ports[0].port if resource.spec.ports else
+      80\n                url = f\"http://{metadata.name}.{metadata.namespace}.svc.cluster.local:{port}\"\n
+      \           else:\n                logger.warning(f\"No URL specified for {metadata.namespace}/{metadata.name}\")\n
+      \               return None\n        \n        name = self.get_annotation(annotations,
+      \"name\") or metadata.name\n        \n        return MonitorConfig(\n            name=name,\n
+      \           url=url,\n            monitor_type=self.get_annotation(annotations,
+      \"type\", \"http\"),\n            interval=int(self.get_annotation(annotations,
+      \"interval\", str(self.default_interval))),\n            group=self.get_annotation(annotations,
+      \"group\", \"Services\"),\n            description=self.get_annotation(annotations,
+      \"description\", \"\"),\n            resource_uid=str(metadata.uid)\n        )\n\n
+      \   def find_existing_monitor(self, name: str) -> Optional[dict]:\n        \"\"\"Find
+      existing monitor by name\"\"\"\n        try:\n            monitors = self.api.get_monitors()\n
+      \           for monitor in monitors:\n                if monitor.get(\"name\")
+      == name:\n                    return monitor\n        except Exception as e:\n
+      \           logger.error(f\"Error finding monitor: {e}\")\n        return None\n\n
+      \   def create_or_update_monitor(self, config: MonitorConfig) -> Optional[int]:\n
+      \       \"\"\"Create or update a monitor in Uptime Kuma\"\"\"\n        try:\n
+      \           # Check if monitor exists\n            existing = self.find_existing_monitor(config.name)\n
+      \           \n            monitor_type = MonitorType.HTTP\n            if config.monitor_type.lower()
+      == \"ping\":\n                monitor_type = MonitorType.PING\n            elif
+      config.monitor_type.lower() == \"tcp\":\n                monitor_type = MonitorType.TCP_PORT\n
+      \           elif config.monitor_type.lower() == \"dns\":\n                monitor_type
+      = MonitorType.DNS\n            \n            if existing:\n                #
+      Update existing monitor\n                monitor_id = existing[\"id\"]\n                self.api.edit_monitor(\n
+      \                   monitor_id,\n                    name=config.name,\n                    url=config.url,\n
+      \                   type=monitor_type,\n                    interval=config.interval,\n
+      \                   description=config.description\n                )\n                logger.info(f\"Updated
+      monitor: {config.name} (ID: {monitor_id})\")\n                return monitor_id\n
+      \           else:\n                # Create new monitor\n                result
+      = self.api.add_monitor(\n                    type=monitor_type,\n                    name=config.name,\n
+      \                   url=config.url,\n                    interval=config.interval,\n
+      \                   description=config.description\n                )\n                monitor_id
+      = result.get(\"monitorId\")\n                logger.info(f\"Created monitor:
+      {config.name} (ID: {monitor_id})\")\n                return monitor_id\n                \n
+      \       except Exception as e:\n            logger.error(f\"Failed to create/update
+      monitor {config.name}: {e}\")\n            return None\n\n    def add_to_status_page(self,
+      monitor_id: int, group_name: str = \"Services\"):\n        \"\"\"Add monitor
+      to status page\"\"\"\n        try:\n            # Get current status page config\n
+      \           status_page = self.api.get_status_page(self.status_page_slug)\n
+      \           \n            # Get public group list\n            public_groups
+      = status_page.get(\"publicGroupList\", [])\n            \n            # Find
+      or create group\n            target_group = None\n            for group in public_groups:\n
+      \               if group.get(\"name\") == group_name:\n                    target_group
+      = group\n                    break\n            \n            if not target_group:\n
+      \               # Add new group\n                target_group = {\n                    \"name\":
+      group_name,\n                    \"weight\": len(public_groups) + 1,\n                    \"monitorList\":
+      []\n                }\n                public_groups.append(target_group)\n
+      \           \n            # Check if monitor already in group\n            monitor_ids
+      = [m.get(\"id\") for m in target_group.get(\"monitorList\", [])]\n            if
+      monitor_id not in monitor_ids:\n                target_group[\"monitorList\"].append({\"id\":
+      monitor_id})\n                \n                # Save status page\n                self.api.save_status_page(\n
+      \                   slug=self.status_page_slug,\n                    title=status_page.get(\"title\",
+      \"Status\"),\n                    publicGroupList=public_groups\n                )\n
+      \               logger.info(f\"Added monitor {monitor_id} to status page group:
+      {group_name}\")\n                \n        except Exception as e:\n            logger.error(f\"Failed
+      to add monitor to status page: {e}\")\n\n    def delete_monitor(self, monitor_id:
+      int):\n        \"\"\"Delete a monitor\"\"\"\n        try:\n            self.api.delete_monitor(monitor_id)\n
+      \           logger.info(f\"Deleted monitor ID: {monitor_id}\")\n        except
+      Exception as e:\n            logger.error(f\"Failed to delete monitor {monitor_id}:
+      {e}\")\n\n    def sync_resource(self, resource, event_type: str):\n        \"\"\"Sync
+      a single resource with Uptime Kuma\"\"\"\n        metadata = resource.metadata\n
+      \       uid = str(metadata.uid)\n        \n        if event_type == \"DELETED\":\n
+      \           if uid in self.managed_monitors:\n                self.delete_monitor(self.managed_monitors[uid])\n
+      \               del self.managed_monitors[uid]\n            return\n        \n
+      \       config = self.parse_monitor_config(resource)\n        if not config:\n
+      \           # Resource no longer wants monitoring, delete if exists\n            if
+      uid in self.managed_monitors:\n                self.delete_monitor(self.managed_monitors[uid])\n
+      \               del self.managed_monitors[uid]\n            return\n        \n
+      \       # Create/update monitor\n        monitor_id = self.create_or_update_monitor(config)\n
+      \       if monitor_id:\n            self.managed_monitors[uid] = monitor_id\n
+      \           self.add_to_status_page(monitor_id, config.group)\n\n    def initial_sync(self):\n
+      \       \"\"\"Perform initial sync of all resources\"\"\"\n        logger.info(\"Performing
+      initial sync...\")\n        \n        # Sync Services\n        services = self.v1.list_service_for_all_namespaces()\n
+      \       for svc in services.items:\n            if self.should_monitor(svc.metadata.annotations
+      or {}):\n                self.sync_resource(svc, \"ADDED\")\n        \n        #
+      Sync Ingresses\n        try:\n            ingresses = self.networking_v1.list_ingress_for_all_namespaces()\n
+      \           for ing in ingresses.items:\n                if self.should_monitor(ing.metadata.annotations
+      or {}):\n                    self.sync_resource(ing, \"ADDED\")\n        except
+      Exception as e:\n            logger.warning(f\"Could not list ingresses: {e}\")\n
+      \       \n        # Sync HTTPRoutes\n        try:\n            httproutes =
+      self.custom_api.list_cluster_custom_object(\n                group=\"gateway.networking.k8s.io\",\n
+      \               version=\"v1\",\n                plural=\"httproutes\"\n            )\n
+      \           for route in httproutes.get(\"items\", []):\n                # Convert
+      to object-like structure\n                class RouteWrapper:\n                    def
+      __init__(self, data):\n                        self.metadata = type(\"Metadata\",
+      (), data[\"metadata\"])()\n                route_obj = RouteWrapper(route)\n
+      \               if self.should_monitor(route.get(\"metadata\", {}).get(\"annotations\")
+      or {}):\n                    self.sync_resource(route_obj, \"ADDED\")\n        except
+      Exception as e:\n            logger.warning(f\"Could not list HTTPRoutes: {e}\")\n
+      \       \n        logger.info(f\"Initial sync complete. Managing {len(self.managed_monitors)}
+      monitors\")\n\n    def watch_services(self):\n        \"\"\"Watch services for
+      changes\"\"\"\n        w = watch.Watch()\n        while True:\n            try:\n
+      \               logger.info(\"Starting service watch...\")\n                for
+      event in w.stream(self.v1.list_service_for_all_namespaces, timeout_seconds=300):\n
+      \                   event_type = event[\"type\"]\n                    service
+      = event[\"object\"]\n                    \n                    if self.should_monitor(service.metadata.annotations
+      or {}) or \\\n                       str(service.metadata.uid) in self.managed_monitors:\n
+      \                       logger.info(f\"Service event: {event_type} {service.metadata.namespace}/{service.metadata.name}\")\n
+      \                       self.sync_resource(service, event_type)\n                        \n
+      \           except Exception as e:\n                logger.error(f\"Watch error:
+      {e}\")\n                time.sleep(5)\n\n    def run(self):\n        \"\"\"Main
+      run loop\"\"\"\n        logger.info(\"Starting Kuma-Sync Controller\")\n        \n
+      \       # Connect to Uptime Kuma with retry\n        max_retries = 10\n        for
+      i in range(max_retries):\n            if self.connect_kuma():\n                break\n
+      \           logger.warning(f\"Retry {i+1}/{max_retries} connecting to Uptime
+      Kuma...\")\n            time.sleep(10)\n        else:\n            logger.error(\"Failed
+      to connect to Uptime Kuma after retries\")\n            sys.exit(1)\n        \n
+      \       try:\n            # Initial sync\n            self.initial_sync()\n
+      \           \n            # Watch for changes\n            self.watch_services()\n
+      \           \n        finally:\n            self.disconnect_kuma()\n\nif __name__
+      == \"__main__\":\n    controller = KumaSyncController()\n    controller.run()\n"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"main.py":"#!/usr/bin/env python3\n\"\"\"\nKuma-Sync: Kubernetes Service Discovery Controller for Uptime Kuma\nWatches K8s resources and auto-registers them with Uptime Kuma\n\"\"\"\nimport os\nimport sys\nimport time\nimport logging\nfrom typing import Dict, Set, Optional\nfrom dataclasses import dataclass\nfrom kubernetes import client, config, watch\nfrom uptime_kuma_api import UptimeKumaApi, MonitorType\n\nlogging.basicConfig(\n    level=logging.INFO,\n    format=\"%(asctime)s [%(levelname)s] %(message)s\"\n)\nlogger = logging.getLogger(\"kuma-sync\")\n\n@dataclass\nclass MonitorConfig:\n    name: str\n    url: str\n    monitor_type: str = \"http\"\n    interval: int = 60\n    group: str = \"Services\"\n    description: str = \"\"\n    resource_uid: str = \"\"\n\nclass KumaSyncController:\n    def __init__(self):\n        self.kuma_url = os.getenv(\"UPTIME_KUMA_URL\", \"http://uptime-kuma.monitoring:3001\")\n        self.kuma_username = os.getenv(\"UPTIME_KUMA_USERNAME\", \"\")\n        self.kuma_password = os.getenv(\"UPTIME_KUMA_PASSWORD\", \"\")\n        self.status_page_slug = os.getenv(\"STATUS_PAGE_SLUG\", \"holm-chat\")\n        self.default_interval = int(os.getenv(\"DEFAULT_INTERVAL\", \"60\"))\n        self.annotation_prefix = os.getenv(\"ANNOTATION_PREFIX\", \"uptime-kuma.io\")\n        \n        # Track managed monitors by resource UID\n        self.managed_monitors: Dict[str, int] = {}\n        self.api: Optional[UptimeKumaApi] = None\n        \n        # Load K8s config\n        try:\n            config.load_incluster_config()\n            logger.info(\"Loaded in-cluster Kubernetes config\")\n        except config.ConfigException:\n            config.load_kube_config()\n            logger.info(\"Loaded local Kubernetes config\")\n        \n        self.v1 = client.CoreV1Api()\n        self.networking_v1 = client.NetworkingV1Api()\n        self.custom_api = client.CustomObjectsApi()\n\n    def connect_kuma(self) -\u003e bool:\n        \"\"\"Connect to Uptime Kuma API\"\"\"\n        try:\n            self.api = UptimeKumaApi(self.kuma_url)\n            if self.kuma_username and self.kuma_password:\n                self.api.login(self.kuma_username, self.kuma_password)\n                logger.info(f\"Connected to Uptime Kuma at {self.kuma_url}\")\n            else:\n                logger.warning(\"No credentials provided, some operations may fail\")\n            return True\n        except Exception as e:\n            logger.error(f\"Failed to connect to Uptime Kuma: {e}\")\n            return False\n\n    def disconnect_kuma(self):\n        \"\"\"Disconnect from Uptime Kuma\"\"\"\n        if self.api:\n            try:\n                self.api.disconnect()\n            except:\n                pass\n\n    def get_annotation(self, annotations: dict, key: str, default: str = \"\") -\u003e str:\n        \"\"\"Get annotation value with prefix\"\"\"\n        if not annotations:\n            return default\n        return annotations.get(f\"{self.annotation_prefix}/{key}\", default)\n\n    def should_monitor(self, annotations: dict) -\u003e bool:\n        \"\"\"Check if resource should be monitored\"\"\"\n        enabled = self.get_annotation(annotations, \"monitor\", \"false\")\n        return enabled.lower() in (\"true\", \"yes\", \"1\")\n\n    def parse_monitor_config(self, resource) -\u003e Optional[MonitorConfig]:\n        \"\"\"Parse monitor configuration from resource annotations\"\"\"\n        metadata = resource.metadata\n        annotations = metadata.annotations or {}\n        \n        if not self.should_monitor(annotations):\n            return None\n        \n        # Get URL - required\n        url = self.get_annotation(annotations, \"url\")\n        if not url:\n            # Try to construct from service\n            if hasattr(resource, \"spec\") and hasattr(resource.spec, \"ports\"):\n                port = resource.spec.ports[0].port if resource.spec.ports else 80\n                url = f\"http://{metadata.name}.{metadata.namespace}.svc.cluster.local:{port}\"\n            else:\n                logger.warning(f\"No URL specified for {metadata.namespace}/{metadata.name}\")\n                return None\n        \n        name = self.get_annotation(annotations, \"name\") or metadata.name\n        \n        return MonitorConfig(\n            name=name,\n            url=url,\n            monitor_type=self.get_annotation(annotations, \"type\", \"http\"),\n            interval=int(self.get_annotation(annotations, \"interval\", str(self.default_interval))),\n            group=self.get_annotation(annotations, \"group\", \"Services\"),\n            description=self.get_annotation(annotations, \"description\", \"\"),\n            resource_uid=str(metadata.uid)\n        )\n\n    def find_existing_monitor(self, name: str) -\u003e Optional[dict]:\n        \"\"\"Find existing monitor by name\"\"\"\n        try:\n            monitors = self.api.get_monitors()\n            for monitor in monitors:\n                if monitor.get(\"name\") == name:\n                    return monitor\n        except Exception as e:\n            logger.error(f\"Error finding monitor: {e}\")\n        return None\n\n    def create_or_update_monitor(self, config: MonitorConfig) -\u003e Optional[int]:\n        \"\"\"Create or update a monitor in Uptime Kuma\"\"\"\n        try:\n            # Check if monitor exists\n            existing = self.find_existing_monitor(config.name)\n            \n            monitor_type = MonitorType.HTTP\n            if config.monitor_type.lower() == \"ping\":\n                monitor_type = MonitorType.PING\n            elif config.monitor_type.lower() == \"tcp\":\n                monitor_type = MonitorType.TCP_PORT\n            elif config.monitor_type.lower() == \"dns\":\n                monitor_type = MonitorType.DNS\n            \n            if existing:\n                # Update existing monitor\n                monitor_id = existing[\"id\"]\n                self.api.edit_monitor(\n                    monitor_id,\n                    name=config.name,\n                    url=config.url,\n                    type=monitor_type,\n                    interval=config.interval,\n                    description=config.description\n                )\n                logger.info(f\"Updated monitor: {config.name} (ID: {monitor_id})\")\n                return monitor_id\n            else:\n                # Create new monitor\n                result = self.api.add_monitor(\n                    type=monitor_type,\n                    name=config.name,\n                    url=config.url,\n                    interval=config.interval,\n                    description=config.description\n                )\n                monitor_id = result.get(\"monitorId\")\n                logger.info(f\"Created monitor: {config.name} (ID: {monitor_id})\")\n                return monitor_id\n                \n        except Exception as e:\n            logger.error(f\"Failed to create/update monitor {config.name}: {e}\")\n            return None\n\n    def add_to_status_page(self, monitor_id: int, group_name: str = \"Services\"):\n        \"\"\"Add monitor to status page\"\"\"\n        try:\n            # Get current status page config\n            status_page = self.api.get_status_page(self.status_page_slug)\n            \n            # Get public group list\n            public_groups = status_page.get(\"publicGroupList\", [])\n            \n            # Find or create group\n            target_group = None\n            for group in public_groups:\n                if group.get(\"name\") == group_name:\n                    target_group = group\n                    break\n            \n            if not target_group:\n                # Add new group\n                target_group = {\n                    \"name\": group_name,\n                    \"weight\": len(public_groups) + 1,\n                    \"monitorList\": []\n                }\n                public_groups.append(target_group)\n            \n            # Check if monitor already in group\n            monitor_ids = [m.get(\"id\") for m in target_group.get(\"monitorList\", [])]\n            if monitor_id not in monitor_ids:\n                target_group[\"monitorList\"].append({\"id\": monitor_id})\n                \n                # Save status page\n                self.api.save_status_page(\n                    slug=self.status_page_slug,\n                    title=status_page.get(\"title\", \"Status\"),\n                    publicGroupList=public_groups\n                )\n                logger.info(f\"Added monitor {monitor_id} to status page group: {group_name}\")\n                \n        except Exception as e:\n            logger.error(f\"Failed to add monitor to status page: {e}\")\n\n    def delete_monitor(self, monitor_id: int):\n        \"\"\"Delete a monitor\"\"\"\n        try:\n            self.api.delete_monitor(monitor_id)\n            logger.info(f\"Deleted monitor ID: {monitor_id}\")\n        except Exception as e:\n            logger.error(f\"Failed to delete monitor {monitor_id}: {e}\")\n\n    def sync_resource(self, resource, event_type: str):\n        \"\"\"Sync a single resource with Uptime Kuma\"\"\"\n        metadata = resource.metadata\n        uid = str(metadata.uid)\n        \n        if event_type == \"DELETED\":\n            if uid in self.managed_monitors:\n                self.delete_monitor(self.managed_monitors[uid])\n                del self.managed_monitors[uid]\n            return\n        \n        config = self.parse_monitor_config(resource)\n        if not config:\n            # Resource no longer wants monitoring, delete if exists\n            if uid in self.managed_monitors:\n                self.delete_monitor(self.managed_monitors[uid])\n                del self.managed_monitors[uid]\n            return\n        \n        # Create/update monitor\n        monitor_id = self.create_or_update_monitor(config)\n        if monitor_id:\n            self.managed_monitors[uid] = monitor_id\n            self.add_to_status_page(monitor_id, config.group)\n\n    def initial_sync(self):\n        \"\"\"Perform initial sync of all resources\"\"\"\n        logger.info(\"Performing initial sync...\")\n        \n        # Sync Services\n        services = self.v1.list_service_for_all_namespaces()\n        for svc in services.items:\n            if self.should_monitor(svc.metadata.annotations or {}):\n                self.sync_resource(svc, \"ADDED\")\n        \n        # Sync Ingresses\n        try:\n            ingresses = self.networking_v1.list_ingress_for_all_namespaces()\n            for ing in ingresses.items:\n                if self.should_monitor(ing.metadata.annotations or {}):\n                    self.sync_resource(ing, \"ADDED\")\n        except Exception as e:\n            logger.warning(f\"Could not list ingresses: {e}\")\n        \n        # Sync HTTPRoutes\n        try:\n            httproutes = self.custom_api.list_cluster_custom_object(\n                group=\"gateway.networking.k8s.io\",\n                version=\"v1\",\n                plural=\"httproutes\"\n            )\n            for route in httproutes.get(\"items\", []):\n                # Convert to object-like structure\n                class RouteWrapper:\n                    def __init__(self, data):\n                        self.metadata = type(\"Metadata\", (), data[\"metadata\"])()\n                route_obj = RouteWrapper(route)\n                if self.should_monitor(route.get(\"metadata\", {}).get(\"annotations\") or {}):\n                    self.sync_resource(route_obj, \"ADDED\")\n        except Exception as e:\n            logger.warning(f\"Could not list HTTPRoutes: {e}\")\n        \n        logger.info(f\"Initial sync complete. Managing {len(self.managed_monitors)} monitors\")\n\n    def watch_services(self):\n        \"\"\"Watch services for changes\"\"\"\n        w = watch.Watch()\n        while True:\n            try:\n                logger.info(\"Starting service watch...\")\n                for event in w.stream(self.v1.list_service_for_all_namespaces, timeout_seconds=300):\n                    event_type = event[\"type\"]\n                    service = event[\"object\"]\n                    \n                    if self.should_monitor(service.metadata.annotations or {}) or \\\n                       str(service.metadata.uid) in self.managed_monitors:\n                        logger.info(f\"Service event: {event_type} {service.metadata.namespace}/{service.metadata.name}\")\n                        self.sync_resource(service, event_type)\n                        \n            except Exception as e:\n                logger.error(f\"Watch error: {e}\")\n                time.sleep(5)\n\n    def run(self):\n        \"\"\"Main run loop\"\"\"\n        logger.info(\"Starting Kuma-Sync Controller\")\n        \n        # Connect to Uptime Kuma with retry\n        max_retries = 10\n        for i in range(max_retries):\n            if self.connect_kuma():\n                break\n            logger.warning(f\"Retry {i+1}/{max_retries} connecting to Uptime Kuma...\")\n            time.sleep(10)\n        else:\n            logger.error(\"Failed to connect to Uptime Kuma after retries\")\n            sys.exit(1)\n        \n        try:\n            # Initial sync\n            self.initial_sync()\n            \n            # Watch for changes\n            self.watch_services()\n            \n        finally:\n            self.disconnect_kuma()\n\nif __name__ == \"__main__\":\n    controller = KumaSyncController()\n    controller.run()\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"kuma-sync-script","namespace":"kuma-sync"}}
+    creationTimestamp: "2026-01-25T01:03:49Z"
+    name: kuma-sync-script
+    namespace: kuma-sync
+    resourceVersion: "789"
+    uid: 60281d03-f0f9-471f-bde2-41dae71442e8
+kind: List
+metadata:
+  resourceVersion: ""
