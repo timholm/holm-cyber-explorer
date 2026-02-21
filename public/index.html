@@ -732,6 +732,21 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(function() {});
 }
 
+async function openRandom() {
+  try {
+    var res = await fetch('/api/random');
+    if (!res.ok) throw new Error();
+    var doc = await res.json();
+    if (doc && doc.docId) openDoc(doc.docId);
+  } catch(e) {
+    // Fallback: pick random from allDocs
+    if (allDocs.length > 0) {
+      var idx = Math.floor(Math.random() * allDocs.length);
+      openDoc(allDocs[idx].docId);
+    }
+  }
+}
+
 /* ── Init ── */
 async function init() {
   try {
