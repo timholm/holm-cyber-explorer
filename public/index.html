@@ -233,11 +233,19 @@ body.offline main { padding-top: 2.5rem; }
 
 /* ── Table of Contents ── */
 .toc { margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; }
-.toc-title { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.toc a { display: block; font-size: 0.75rem; color: var(--muted); padding: 0.15rem 0; transition: color 0.1s; }
+.toc-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; -webkit-user-select: none; }
+.toc-title { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.toc-toggle { font-size: 0.6rem; color: var(--muted); transition: transform 0.2s ease, color 0.15s; padding: 0.15rem 0.3rem; }
+.toc-header:hover .toc-toggle { color: var(--cyan); }
+.toc-body { overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease; max-height: 2000px; opacity: 1; margin-top: 0.5rem; }
+.toc.collapsed .toc-body { max-height: 0; opacity: 0; margin-top: 0; }
+.toc.collapsed .toc-toggle { transform: rotate(-90deg); }
+.toc a { display: block; font-size: 0.75rem; color: var(--muted); padding: 0.15rem 0; transition: color 0.15s; border-left: 2px solid transparent; padding-left: 0.5rem; }
 .toc a:hover { color: var(--cyan); text-decoration: none; }
-.toc a.toc-h2 { padding-left: 0.8rem; }
-.toc a.toc-h3 { padding-left: 1.6rem; font-size: 0.7rem; }
+.toc a.toc-active { color: var(--cyan); border-left-color: var(--cyan); }
+.toc a.toc-h2 { padding-left: 1.3rem; }
+.toc a.toc-h3 { padding-left: 2.1rem; font-size: 0.7rem; }
+.doc-content h1[id], .doc-content h2[id], .doc-content h3[id] { scroll-margin-top: 1rem; }
 
 /* ── Document Nav ── */
 .doc-nav-footer { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
@@ -405,6 +413,24 @@ function addRecent(docId) {
   if (recent.length > 8) recent = recent.slice(0, 8);
   sessionStorage.setItem('holm-recent', JSON.stringify(recent));
 }
+function getBookmarks() {
+  try { return JSON.parse(localStorage.getItem('holm-bookmarks') || '[]'); } catch(e) { return []; }
+}
+
+function isBookmarked(docId) {
+  return getBookmarks().indexOf(docId) !== -1;
+}
+
+function toggleBookmark(docId) {
+  var bm = getBookmarks();
+  var idx = bm.indexOf(docId);
+  if (idx !== -1) { bm.splice(idx, 1); toast('Bookmark removed'); }
+  else { bm.unshift(docId); toast('Bookmarked'); }
+  localStorage.setItem('holm-bookmarks', JSON.stringify(bm));
+  var btn = document.getElementById('bookmark-btn');
+  if (btn) { btn.textContent = isBookmarked(docId) ? '\u2605' : '\u2606'; btn.className = 'bookmark-btn' + (isBookmarked(docId) ? ' active' : ''); }
+}
+
 
 function toast(msg, type) {
   var t = document.createElement('div');
@@ -553,6 +579,16 @@ function renderHome() {
   html += '<h1>holm.chat</h1>';
   html += '<div class="subtitle">' + allDocs.length + ' documents across ' + keys.length + ' domains</div>';
 
+  var bookmarks = getBookmarks();
+  if (bookmarks.length > 0) {
+    html += '<div class="bookmarks"><div class="bookmarks-title">\u2605 Bookmarks</div><div class="bookmarks-list">';
+    bookmarks.forEach(function(id) {
+      var d = docsById[id];
+      if (d) html += '<span class="bookmark-chip" onclick="openDoc(\'' + esc(id) + '\')">' + esc(d.title) + '</span>';
+    });
+    html += '</div></div>';
+  }
+
   var recent = getRecent();
   if (recent.length > 0) {
     html += '<div class="recent"><div class="recent-title">Recently viewed</div><div class="recent-list">';
@@ -592,16 +628,54 @@ function buildTOC(content) {
   div.innerHTML = content || '';
   var headings = div.querySelectorAll('h1, h2, h3');
   if (headings.length < 3) return { toc: '', content: content };
-  var tocHtml = '<div class="toc"><div class="toc-title">Contents</div>';
+  var isMobile = window.innerWidth < 768;
+  var tocHtml = '<div class="toc' + (isMobile ? ' collapsed' : '') + '">';
+  tocHtml += '<div class="toc-header" onclick="toggleToc(this)">';
+  tocHtml += '<span class="toc-title">Contents</span>';
+  tocHtml += '<span class="toc-toggle">&#9660;</span>';
+  tocHtml += '</div>';
+  tocHtml += '<div class="toc-body">';
   for (var i = 0; i < headings.length; i++) {
     var h = headings[i];
     var id = 'h-' + h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
     h.id = id;
     var level = h.tagName.toLowerCase();
-    tocHtml += '<a href="#' + id + '" class="toc-' + level + '">' + h.textContent.trim() + '</a>';
+    tocHtml += '<a data-target="' + id + '" class="toc-' + level + '" onclick="scrollToHeading(\'' + id + '\');return false">' + h.textContent.trim() + '</a>';
   }
-  tocHtml += '</div>';
+  tocHtml += '</div></div>';
   return { toc: tocHtml, content: div.innerHTML };
+}
+
+function toggleToc(header) {
+  var toc = header.closest('.toc');
+  if (toc) toc.classList.toggle('collapsed');
+}
+
+function scrollToHeading(id) {
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+var tocObserver = null;
+
+function setupTocObserver() {
+  if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
+  var headings = document.querySelectorAll('.doc-content h1[id], .doc-content h2[id], .doc-content h3[id]');
+  if (headings.length === 0) return;
+  var tocLinks = document.querySelectorAll('.toc a[data-target]');
+  if (tocLinks.length === 0) return;
+
+  tocObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(function(a) { a.classList.remove('toc-active'); });
+        var active = document.querySelector('.toc a[data-target="' + entry.target.id + '"]');
+        if (active) active.classList.add('toc-active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+
+  headings.forEach(function(h) { tocObserver.observe(h); });
 }
 
 async function renderDoc(id) {
@@ -655,7 +729,10 @@ async function renderDoc(id) {
   html += '<button class="copy-btn" onclick="copyDocText()">Copy text</button>';
   html += '</div>';
 
-  html += '<h1>' + esc(doc.title) + '</h1>';
+  html += '<div style="display:flex;align-items:flex-start;gap:0.5rem">';
+  html += '<h1 style="flex:1">' + esc(doc.title) + '</h1>';
+  html += '<button id="bookmark-btn" class="bookmark-btn' + (isBookmarked(id) ? ' active' : '') + '" onclick="toggleBookmark(\'' + esc(id) + '\')">' + (isBookmarked(id) ? '\u2605' : '\u2606') + '</button>';
+  html += '</div>';
 
   html += '<div class="doc-meta">';
   html += '<span class="tag domain">' + esc(doc.domain) + '</span>';
@@ -709,6 +786,7 @@ async function renderDoc(id) {
   if (saved) document.getElementById('c-author').value = saved;
 
   loadComments(id);
+  setupTocObserver();
 }
 
 /* ── Document Navigation ── */
@@ -830,10 +908,16 @@ async function doSearch(q) {
     var results = await res.json();
     if (results.length === 0) { el.innerHTML = '<div class="search-empty">No results</div>'; return; }
     el.innerHTML = results.map(function(r) {
-      return '<div class="search-result" onclick="closeSearch();openDoc(\'' + esc(r.docId) + '\')">' +
-        '<div class="sr-id">' + esc(r.docId) + ' · ' + esc(r.domainName || r.domain) + '</div>' +
-        '<div class="sr-title">' + esc(r.title) + '</div>' +
-        '<div class="sr-snippet">' + (r.snippet || '') + '</div></div>';
+      var badgeColor = domainBadgeColor(r.domain);
+      var domainLabel = DOMAIN_NAMES[r.domain] || r.domainName || r.domain;
+      var snippetHtml = highlightMatch((r.snippet || '').replace(/<[^>]*>/g, ''), q);
+      return '<div class="search-result" onclick="closeSearch();openDoc(\'' + esc(r.docId) + '\')">'+
+        '<div class="sr-header">'+
+          '<span class="sr-domain-badge" style="color:' + badgeColor + ';border-color:' + badgeColor + '">' + esc(domainLabel) + '</span>'+
+          '<span class="sr-id">' + esc(r.docId) + '</span>'+
+        '</div>'+
+        '<div class="sr-title">' + highlightMatch(r.title, q) + '</div>'+
+        '<div class="sr-snippet">' + snippetHtml + '</div></div>';
     }).join('');
   } catch(e) { el.innerHTML = '<div class="search-empty">Search failed</div>'; }
 }
