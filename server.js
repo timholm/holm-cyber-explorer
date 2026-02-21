@@ -54,6 +54,31 @@ async function connectDB() {
   }
   await db.collection('comments').createIndex({ docId: 1 });
   await db.collection('comments').createIndex({ createdAt: -1 });
+
+  // Activity stream (TTL 7 days)
+  await db.collection('activity').createIndex({ createdAt: -1 });
+  await db.collection('activity').createIndex({ createdAt: 1 }, { expireAfterSeconds: 604800 });
+
+  // Tasks / roadmap
+  try {
+    await db.collection('tasks').createIndex({ taskId: 1 }, { unique: true });
+  } catch (e) {
+    console.warn('tasks taskId index:', e.codeName);
+    await db.collection('tasks').createIndex({ taskId: 1 });
+  }
+  await db.collection('tasks').createIndex({ status: 1, priority: 1 });
+
+  // Agent state singleton
+  await db.collection('agent_state').updateOne(
+    { _id: 'current' },
+    { $setOnInsert: {
+      autopilotRunning: false, currentIteration: 0, maxIterations: 0,
+      ollamaStatus: 'idle', claudeStatus: 'idle', currentTask: '',
+      lastUpdate: new Date(), startedAt: null
+    }},
+    { upsert: true }
+  );
+
   console.log('Indexes created');
 }
 
@@ -600,6 +625,229 @@ app.get('/doc/:id', async (req, res) => {
 </head><body><p>Redirecting to <a href="/#${doc.docId}">${title.replace(/</g, '&lt;')}</a>...</p></body></html>`);
   } catch (err) {
     res.redirect('/#' + req.params.id.toUpperCase());
+  }
+});
+
+// ── SSE Infrastructure ──
+const sseClients = [];
+
+function broadcastSSE(eventName, data) {
+  const msg = `event: ${eventName}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (let i = sseClients.length - 1; i >= 0; i--) {
+    try {
+      sseClients[i].write(msg);
+    } catch {
+      sseClients.splice(i, 1);
+    }
+  }
+}
+
+// SSE stream — long-lived EventSource connection
+app.get('/api/activity/stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no'
+  });
+  res.write('event: connected\ndata: {"status":"ok"}\n\n');
+  sseClients.push(res);
+  req.on('close', () => {
+    const idx = sseClients.indexOf(res);
+    if (idx !== -1) sseClients.splice(idx, 1);
+  });
+});
+
+// Post activity event
+app.post('/api/activity', authMiddleware, async (req, res) => {
+  try {
+    const { type, iteration, message, detail, agent, status } = req.body;
+    if (!type || !message) return res.status(400).json({ error: 'type and message required' });
+    const event = {
+      type,
+      iteration: iteration || 0,
+      message,
+      detail: (detail || '').slice(0, 2000),
+      agent: agent || 'system',
+      status: status || 'info',
+      duration: req.body.duration || null,
+      createdAt: new Date()
+    };
+    await db.collection('activity').insertOne(event);
+    broadcastSSE('activity', event);
+    res.status(201).json(event);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Recent activity
+app.get('/api/activity', async (req, res) => {
+  try {
+    const events = await db.collection('activity')
+      .find({})
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .toArray();
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get agent state
+app.get('/api/agent-state', async (req, res) => {
+  try {
+    const state = await db.collection('agent_state').findOne({ _id: 'current' });
+    res.json(state || { autopilotRunning: false, ollamaStatus: 'idle', claudeStatus: 'idle' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update agent state
+app.put('/api/agent-state', authMiddleware, async (req, res) => {
+  try {
+    const update = { ...req.body, lastUpdate: new Date() };
+    delete update._id;
+    await db.collection('agent_state').updateOne(
+      { _id: 'current' },
+      { $set: update },
+      { upsert: true }
+    );
+    const state = await db.collection('agent_state').findOne({ _id: 'current' });
+    broadcastSSE('state', state);
+    res.json(state);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// List tasks (roadmap)
+app.get('/api/tasks', async (req, res) => {
+  try {
+    const tasks = await db.collection('tasks')
+      .find({})
+      .sort({ status: 1, priority: 1, createdAt: -1 })
+      .toArray();
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create task
+app.post('/api/tasks', authMiddleware, async (req, res) => {
+  try {
+    const { title, description, priority, source, tags } = req.body;
+    if (!title) return res.status(400).json({ error: 'title required' });
+
+    // Auto-generate TASK-NNN
+    const last = await db.collection('tasks')
+      .find({})
+      .sort({ createdAt: -1 })
+      .limit(1)
+      .toArray();
+    let nextNum = 1;
+    if (last.length > 0 && last[0].taskId) {
+      const m = last[0].taskId.match(/TASK-(\d+)/);
+      if (m) nextNum = parseInt(m[1]) + 1;
+    }
+    const taskId = 'TASK-' + String(nextNum).padStart(3, '0');
+
+    const task = {
+      taskId,
+      title,
+      description: description || '',
+      status: 'planned',
+      priority: Math.min(5, Math.max(1, parseInt(priority) || 3)),
+      iteration: req.body.iteration || null,
+      source: source || 'manual',
+      tags: tags || [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      completedAt: null
+    };
+    await db.collection('tasks').insertOne(task);
+    broadcastSSE('task', task);
+    res.status(201).json(task);
+  } catch (err) {
+    if (err.code === 11000) return res.status(409).json({ error: 'Task already exists' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update task
+app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
+  try {
+    const update = { $set: { updatedAt: new Date() } };
+    const allowed = ['title', 'description', 'status', 'priority', 'tags', 'iteration'];
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) update.$set[key] = req.body[key];
+    }
+    if (req.body.status === 'completed') update.$set.completedAt = new Date();
+
+    const result = await db.collection('tasks').updateOne(
+      { taskId: req.params.id.toUpperCase() },
+      update
+    );
+    if (result.matchedCount === 0) return res.status(404).json({ error: 'Task not found' });
+    const task = await db.collection('tasks').findOne({ taskId: req.params.id.toUpperCase() });
+    broadcastSSE('task', task);
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create work log document from autopilot
+app.post('/api/activity/doc', authMiddleware, async (req, res) => {
+  try {
+    const { iteration, summary, analysis, duration, tasksCompleted } = req.body;
+    if (!summary) return res.status(400).json({ error: 'summary required' });
+
+    // Auto-generate LOG-NNN
+    const lastLog = await db.collection('documents')
+      .find({ domain: 'LOG' })
+      .sort({ createdAt: -1 })
+      .limit(1)
+      .toArray();
+    let nextNum = 1;
+    if (lastLog.length > 0 && lastLog[0].docId) {
+      const m = lastLog[0].docId.match(/LOG-(\d+)/);
+      if (m) nextNum = parseInt(m[1]) + 1;
+    }
+    const docId = 'LOG-' + String(nextNum).padStart(3, '0');
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+
+    const content = `<h1>Autopilot Work Log — Iteration ${iteration || '?'}</h1>
+<p><strong>Date:</strong> ${dateStr} &nbsp; <strong>Duration:</strong> ${duration || '?'}s</p>
+<h2>Summary</h2>
+<p>${(summary || '').replace(/</g, '&lt;').replace(/\n/g, '<br>')}</p>
+${analysis ? `<h2>Analysis</h2><p>${analysis.replace(/</g, '&lt;').replace(/\n/g, '<br>')}</p>` : ''}
+${tasksCompleted ? `<h2>Tasks Completed</h2><p>${tasksCompleted.replace(/</g, '&lt;').replace(/\n/g, '<br>')}</p>` : ''}`;
+
+    const doc = {
+      docId,
+      title: `Work Log ${docId} — ${dateStr}`,
+      domain: 'LOG',
+      domainName: 'Autopilot Work Log',
+      content,
+      tags: ['autopilot', 'work-log', `iteration-${iteration || 0}`],
+      dependsOn: [],
+      dependedBy: [],
+      source: 'autopilot',
+      filename: `${docId.toLowerCase()}.html`,
+      createdAt: now,
+      updatedAt: now
+    };
+    await db.collection('documents').insertOne(doc);
+    broadcastSSE('doc_created', { docId, title: doc.title });
+    res.status(201).json(doc);
+  } catch (err) {
+    if (err.code === 11000) return res.status(409).json({ error: 'Log already exists' });
+    res.status(500).json({ error: err.message });
   }
 });
 

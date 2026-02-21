@@ -390,6 +390,18 @@ body.offline main { padding-top: 2.5rem; }
 /* ── Section Heading ── */
 .section-heading { font-size: 0.8rem; font-weight: 600; color: var(--cyan); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
 
+/* ── Domain Filter ── */
+.domain-filter { margin-bottom: 1.5rem; }
+.domain-filter input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 0.8rem 0.6rem 2rem; color: var(--text); font-size: 0.8rem; font-family: var(--font); outline: none; }
+.domain-filter input:focus { border-color: var(--cyan); }
+.domain-filter input::placeholder { color: var(--dim); }
+.domain-filter-wrap { position: relative; }
+.domain-filter-wrap::before { content: '\2315'; position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--dim); font-size: 0.9rem; pointer-events: none; }
+.domain-filter .filter-count { font-size: 0.65rem; color: var(--dim); margin-top: 0.3rem; }
+.expand-controls { display: flex; gap: 0.75rem; margin-bottom: 0.75rem; }
+.expand-controls button { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.04em; }
+.expand-controls button:hover { color: var(--cyan); }
+
 /* ── Projects Grid ── */
 .projects-section { margin-bottom: 2.5rem; }
 .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
@@ -420,6 +432,67 @@ body.offline main { padding-top: 2.5rem; }
 .back-top { position: fixed; bottom: calc(1.5rem + var(--safe-b)); right: 1rem; width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, color 0.15s; z-index: 50; }
 .back-top.show { opacity: 1; pointer-events: auto; }
 .back-top:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* ── Mission Control ── */
+.mission-control { margin-bottom: 2.5rem; }
+.mc-agents { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+.mc-agent { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
+.mc-agent-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dim); flex-shrink: 0; transition: background 0.3s, box-shadow 0.3s; }
+.mc-agent-dot.thinking, .mc-agent-dot.working { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); animation: pulse-dot 1.5s ease-in-out infinite; }
+.mc-agent-dot.done { background: #00e676; box-shadow: 0 0 6px #00e676; }
+.mc-agent-dot.error { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
+.mc-agent-name { font-size: 0.75rem; font-weight: 600; }
+.mc-agent-status { font-size: 0.6rem; color: var(--muted); }
+.mc-agent-info { flex: 1; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+
+.mc-iteration { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; }
+.mc-iter-num { font-size: 1.3rem; font-weight: 700; color: var(--cyan); min-width: 2.5rem; text-align: center; }
+.mc-iter-bar { flex: 1; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.mc-iter-fill { height: 100%; background: var(--cyan); border-radius: 2px; transition: width 0.4s ease; box-shadow: 0 0 4px rgba(0,240,255,0.3); }
+.mc-iter-label { font-size: 0.65rem; color: var(--muted); }
+
+.mc-task { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; padding: 0.4rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; }
+.mc-task strong { color: var(--magenta); }
+
+.mc-feed { max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); }
+.mc-feed-header { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.mc-feed-live { display: flex; align-items: center; gap: 0.3rem; }
+.mc-feed-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #00e676; animation: pulse-dot 2s ease-in-out infinite; }
+.mc-feed-list { padding: 0.25rem 0; }
+.mc-event { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.3rem 0.75rem; font-size: 0.7rem; border-bottom: 1px solid rgba(34,34,51,0.5); }
+.mc-event:last-child { border-bottom: none; }
+.mc-event-time { color: var(--dim); font-size: 0.6rem; min-width: 3.5rem; flex-shrink: 0; padding-top: 0.05rem; }
+.mc-event-agent { font-size: 0.55rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 3px; min-width: 3.5rem; text-align: center; flex-shrink: 0; }
+.mc-event-agent.brain { background: rgba(255,0,170,0.15); color: var(--magenta); }
+.mc-event-agent.claude { background: rgba(0,240,255,0.15); color: var(--cyan); }
+.mc-event-agent.system { background: rgba(102,102,120,0.15); color: var(--muted); }
+.mc-event-msg { flex: 1; color: var(--text); }
+
+/* ── Roadmap ── */
+.roadmap-section { margin-bottom: 2.5rem; }
+.roadmap-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.roadmap-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; }
+.roadmap-status { width: 8px; height: 8px; border-radius: 50%; margin-top: 0.3rem; flex-shrink: 0; }
+.roadmap-status.planned { background: var(--dim); }
+.roadmap-status.in_progress { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); animation: pulse-dot 1.5s ease-in-out infinite; }
+.roadmap-status.completed { background: #00e676; box-shadow: 0 0 4px #00e676; }
+.roadmap-status.skipped { background: var(--dim); opacity: 0.4; }
+.roadmap-info { flex: 1; }
+.roadmap-title { font-size: 0.8rem; font-weight: 500; }
+.roadmap-desc { font-size: 0.65rem; color: var(--muted); margin-top: 0.15rem; }
+.roadmap-meta { display: flex; gap: 0.3rem; margin-top: 0.25rem; flex-wrap: wrap; }
+.roadmap-tag { font-size: 0.5rem; padding: 0.08rem 0.3rem; border-radius: 3px; border: 1px solid var(--border); color: var(--muted); }
+.roadmap-priority { font-size: 0.55rem; font-weight: 700; padding: 0.08rem 0.35rem; border-radius: 3px; }
+.roadmap-priority.p1 { background: rgba(255,68,68,0.15); color: #ff4444; }
+.roadmap-priority.p2 { background: rgba(255,152,0,0.15); color: #ff9800; }
+.roadmap-priority.p3 { background: rgba(0,240,255,0.15); color: var(--cyan); }
+.roadmap-priority.p4, .roadmap-priority.p5 { background: rgba(102,102,120,0.15); color: var(--muted); }
+.roadmap-empty { font-size: 0.75rem; color: var(--dim); text-align: center; padding: 1.5rem; }
+
+@media (max-width: 500px) {
+  .mc-agents { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -471,7 +544,8 @@ const DOMAIN_NAMES = {
   '13':'Evolution & Adaptation','14':'Research & Theory','15':'Ethics & Safeguards',
   '16':'Federation & External','17':'Federation Protocol','18':'Data Pipeline',
   '19':'Advanced Automation','20':'Meta & Documentation',
-  'META':'Meta','FW':'Framework','HIC':'HIC Architecture','PROJ':'Projects & Repositories'
+  'META':'Meta','FW':'Framework','HIC':'HIC Architecture','PROJ':'Projects & Repositories',
+  'LOG':'Autopilot Work Log'
 };
 
 function computeDomainHealth(docs) {
@@ -714,11 +788,42 @@ function renderHome() {
   html += '<div class="hero-subtitle">Personal Sovereign Intelligence System</div>';
   html += '<div class="hero-desc">A fully air-gapped system interacted with through voice only. No screens, no keyboards, no phones — a private intelligence agency running on local hardware.</div>';
   html += '<div class="hero-stats">';
+  var totalDeps = 0;
+  allDocs.forEach(function(d) { totalDeps += (d.dependsOn || []).length; });
   html += '<div class="hero-stat"><div class="hero-stat-value">' + allDocs.length + '</div><div class="hero-stat-label">Documents</div></div>';
   html += '<div class="hero-stat"><div class="hero-stat-value">' + keys.length + '</div><div class="hero-stat-label">Domains</div></div>';
-  html += '<div class="hero-stat"><div class="hero-stat-value">13</div><div class="hero-stat-label">Projects</div></div>';
-  html += '<div class="hero-stat"><div class="hero-stat-value">13</div><div class="hero-stat-label">Nodes</div></div>';
+  html += '<div class="hero-stat"><div class="hero-stat-value" id="hero-projects">-</div><div class="hero-stat-label">Projects</div></div>';
+  html += '<div class="hero-stat"><div class="hero-stat-value">' + totalDeps + '</div><div class="hero-stat-label">Dependencies</div></div>';
   html += '</div></div>';
+
+  // ── Mission Control ──
+  html += '<div class="mission-control">';
+  html += '<div class="section-heading">Mission Control</div>';
+
+  // Agent status row
+  html += '<div class="mc-agents">';
+  html += '<div class="mc-agent"><div class="mc-agent-dot" id="mc-dot-ollama"></div><div class="mc-agent-info"><div class="mc-agent-name">qwen3:8b</div><div class="mc-agent-status" id="mc-status-ollama">idle</div></div></div>';
+  html += '<div class="mc-agent"><div class="mc-agent-dot" id="mc-dot-claude"></div><div class="mc-agent-info"><div class="mc-agent-name">Claude Code</div><div class="mc-agent-status" id="mc-status-claude">idle</div></div></div>';
+  html += '</div>';
+
+  // Iteration counter
+  html += '<div class="mc-iteration"><div class="mc-iter-num" id="mc-iter-num">0</div><div style="flex:1"><div class="mc-iter-label" id="mc-iter-label">No autopilot session</div><div class="mc-iter-bar"><div class="mc-iter-fill" id="mc-iter-fill" style="width:0%"></div></div></div></div>';
+
+  // Current task
+  html += '<div class="mc-task" id="mc-task"><strong>Waiting:</strong> No active task</div>';
+
+  // Live activity feed
+  html += '<div class="mc-feed">';
+  html += '<div class="mc-feed-header"><span>Live Activity</span><span class="mc-feed-live"><span class="mc-feed-live-dot" id="mc-live-dot"></span> <span id="mc-live-label">connecting...</span></span></div>';
+  html += '<div class="mc-feed-list" id="mc-feed-list"><div style="font-size:0.7rem;color:var(--dim);text-align:center;padding:1rem">No recent activity</div></div>';
+  html += '</div>';
+  html += '</div>';
+
+  // ── Roadmap ──
+  html += '<div class="roadmap-section">';
+  html += '<div class="section-heading">Roadmap</div>';
+  html += '<div class="roadmap-list" id="roadmap-list"><div class="roadmap-empty">Loading tasks...</div></div>';
+  html += '</div>';
 
   // ── Projects Grid ──
   html += '<div class="projects-section">';
@@ -778,25 +883,33 @@ function renderHome() {
     html += '</div></div>';
   }
 
-  // ── Domain Sections (existing) ──
+  // ── Domain Filter ──
+  html += '<div class="section-heading">Document Index</div>';
+  html += '<div class="domain-filter"><div class="domain-filter-wrap"><input type="text" id="domain-filter" placeholder="Filter domains and documents..." oninput="filterDomains(this.value)"></div>';
+  html += '<div class="filter-count" id="filter-count"></div></div>';
+  html += '<div class="expand-controls"><button onclick="expandAllDomains()">Expand all</button><button onclick="collapseAllDomains()">Collapse all</button></div>';
+
+  // ── Domain Sections ──
+  html += '<div id="domain-list">';
   for (var i = 0; i < keys.length; i++) {
     var k = keys[i];
     var docs = domains[k].sort(function(a, b) { return a.docId.localeCompare(b.docId); });
     var name = DOMAIN_NAMES[k] || (docs[0] && docs[0].domainName) || k;
-    html += '<div class="domain-section">';
-    html += '<div class="domain-heading" onclick="openDomain(\'' + esc(k) + '\')">' + esc(name) + ' <span>' + docs.length + '</span></div>';
+    html += '<div class="domain-section collapsed" data-domain="' + esc(k) + '" data-name="' + esc(name.toLowerCase()) + '">';
+    html += '<div class="domain-heading" onclick="toggleDomainSection(this.parentNode)">' + esc(name) + ' <span>' + docs.length + '</span></div>';
     var health = computeDomainHealth(docs);
     var hClass = health > 80 ? 'green' : (health >= 50 ? 'yellow' : 'red');
     html += '<div class="domain-health"><div class="health-bar"><div class="health-fill ' + hClass + '" style="width:' + health + '%"></div></div><span class="health-score">' + health + '%</span></div>';
     for (var j = 0; j < docs.length; j++) {
       var d = docs[j];
-      html += '<div class="doc-link" onclick="openDoc(\'' + esc(d.docId) + '\')">';
+      html += '<div class="doc-link" onclick="openDoc(\'' + esc(d.docId) + '\')" data-id="' + esc(d.docId.toLowerCase()) + '" data-title="' + esc(d.title.toLowerCase()) + '">';
       html += '<span class="doc-link-id">' + esc(d.docId) + '</span>';
       html += '<span class="doc-link-title">' + esc(d.title) + '</span>';
       html += '</div>';
     }
     html += '</div>';
   }
+  html += '</div>';
   html += '</div>';
   el.innerHTML = html;
   window.scrollTo(0, 0);
@@ -805,7 +918,165 @@ function renderHome() {
   loadProjects().then(function(projects) {
     var grid = document.getElementById('projects-grid');
     if (grid) renderProjectCards(projects, grid);
+    var heroP = document.getElementById('hero-projects');
+    if (heroP) heroP.textContent = projects.length || 0;
   });
+
+  // Load Mission Control data
+  loadAgentState();
+  loadActivity();
+  loadTasks();
+  connectSSE();
+}
+
+/* ── Mission Control ── */
+var sseSource = null;
+
+function connectSSE() {
+  if (sseSource) { try { sseSource.close(); } catch(e) {} }
+  sseSource = new EventSource('/api/activity/stream');
+  sseSource.addEventListener('connected', function() {
+    var dot = document.getElementById('mc-live-dot');
+    var label = document.getElementById('mc-live-label');
+    if (dot) dot.style.background = '#00e676';
+    if (label) label.textContent = 'connected';
+  });
+  sseSource.addEventListener('activity', function(e) {
+    try {
+      var event = JSON.parse(e.data);
+      prependActivityEvent(event);
+    } catch(err) {}
+  });
+  sseSource.addEventListener('state', function(e) {
+    try { updateAgentIndicators(JSON.parse(e.data)); } catch(err) {}
+  });
+  sseSource.addEventListener('task', function(e) {
+    loadTasks();
+  });
+  sseSource.addEventListener('doc_created', function(e) {
+    refreshDocsQuietly();
+  });
+  sseSource.onerror = function() {
+    var label = document.getElementById('mc-live-label');
+    if (label) label.textContent = 'reconnecting...';
+  };
+}
+
+function loadAgentState() {
+  fetch('/api/agent-state').then(function(r) { return r.json(); }).then(function(state) {
+    updateAgentIndicators(state);
+  }).catch(function() {});
+}
+
+function updateAgentIndicators(state) {
+  if (!state) return;
+  var dotO = document.getElementById('mc-dot-ollama');
+  var dotC = document.getElementById('mc-dot-claude');
+  var stO = document.getElementById('mc-status-ollama');
+  var stC = document.getElementById('mc-status-claude');
+  var iterNum = document.getElementById('mc-iter-num');
+  var iterFill = document.getElementById('mc-iter-fill');
+  var iterLabel = document.getElementById('mc-iter-label');
+  var taskEl = document.getElementById('mc-task');
+
+  if (dotO) { dotO.className = 'mc-agent-dot ' + (state.ollamaStatus || 'idle'); }
+  if (dotC) { dotC.className = 'mc-agent-dot ' + (state.claudeStatus || 'idle'); }
+  if (stO) stO.textContent = state.ollamaStatus || 'idle';
+  if (stC) stC.textContent = state.claudeStatus || 'idle';
+  if (iterNum) iterNum.textContent = state.currentIteration || 0;
+  if (iterFill && state.maxIterations > 0) {
+    var pct = Math.min(100, Math.round((state.currentIteration / state.maxIterations) * 100));
+    iterFill.style.width = pct + '%';
+  }
+  if (iterLabel) {
+    if (state.autopilotRunning) {
+      iterLabel.textContent = 'Iteration ' + (state.currentIteration || 0) + ' of ' + (state.maxIterations || '?');
+    } else {
+      iterLabel.textContent = state.currentIteration > 0 ? 'Completed ' + state.currentIteration + ' iterations' : 'No autopilot session';
+    }
+  }
+  if (taskEl) {
+    if (state.currentTask) {
+      taskEl.innerHTML = '<strong>Working on:</strong> ' + esc(state.currentTask);
+    } else {
+      taskEl.innerHTML = '<strong>Waiting:</strong> No active task';
+    }
+  }
+}
+
+function loadActivity() {
+  fetch('/api/activity').then(function(r) { return r.json(); }).then(function(events) {
+    updateActivityFeed(events);
+  }).catch(function() {});
+}
+
+function updateActivityFeed(events) {
+  var list = document.getElementById('mc-feed-list');
+  if (!list) return;
+  if (!events || events.length === 0) {
+    list.innerHTML = '<div style="font-size:0.7rem;color:var(--dim);text-align:center;padding:1rem">No recent activity</div>';
+    return;
+  }
+  list.innerHTML = events.map(function(ev) {
+    var agentClass = (ev.agent === 'ollama' || ev.agent === 'brain') ? 'brain' : (ev.agent === 'claude' ? 'claude' : 'system');
+    var agentLabel = agentClass === 'brain' ? 'BRAIN' : (agentClass === 'claude' ? 'CLAUDE' : 'SYS');
+    var t = new Date(ev.createdAt);
+    var timeStr = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return '<div class="mc-event"><span class="mc-event-time">' + timeStr + '</span><span class="mc-event-agent ' + agentClass + '">' + agentLabel + '</span><span class="mc-event-msg">' + esc(ev.message) + '</span></div>';
+  }).join('');
+}
+
+function prependActivityEvent(ev) {
+  var list = document.getElementById('mc-feed-list');
+  if (!list) return;
+  // Clear "no activity" placeholder
+  if (list.querySelector('div[style]') && list.children.length === 1) list.innerHTML = '';
+  var agentClass = (ev.agent === 'ollama' || ev.agent === 'brain') ? 'brain' : (ev.agent === 'claude' ? 'claude' : 'system');
+  var agentLabel = agentClass === 'brain' ? 'BRAIN' : (agentClass === 'claude' ? 'CLAUDE' : 'SYS');
+  var t = new Date(ev.createdAt);
+  var timeStr = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  var div = document.createElement('div');
+  div.className = 'mc-event';
+  div.innerHTML = '<span class="mc-event-time">' + timeStr + '</span><span class="mc-event-agent ' + agentClass + '">' + agentLabel + '</span><span class="mc-event-msg">' + esc(ev.message) + '</span>';
+  list.insertBefore(div, list.firstChild);
+  // Cap at 50 events
+  while (list.children.length > 50) list.removeChild(list.lastChild);
+}
+
+function loadTasks() {
+  fetch('/api/tasks').then(function(r) { return r.json(); }).then(function(tasks) {
+    updateRoadmap(tasks);
+  }).catch(function() {});
+}
+
+function updateRoadmap(tasks) {
+  var list = document.getElementById('roadmap-list');
+  if (!list) return;
+  if (!tasks || tasks.length === 0) {
+    list.innerHTML = '<div class="roadmap-empty">No roadmap tasks yet</div>';
+    return;
+  }
+  list.innerHTML = tasks.map(function(t) {
+    var priorityClass = 'p' + (t.priority || 3);
+    var tagsHtml = (t.tags || []).map(function(tag) { return '<span class="roadmap-tag">' + esc(tag) + '</span>'; }).join('');
+    return '<div class="roadmap-item">' +
+      '<div class="roadmap-status ' + (t.status || 'planned') + '"></div>' +
+      '<div class="roadmap-info">' +
+        '<div class="roadmap-title">' + esc(t.title) + '</div>' +
+        (t.description ? '<div class="roadmap-desc">' + esc(t.description).slice(0, 120) + '</div>' : '') +
+        '<div class="roadmap-meta"><span class="roadmap-priority ' + priorityClass + '">P' + (t.priority || 3) + '</span>' + tagsHtml + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function refreshDocsQuietly() {
+  fetch('/api/docs').then(function(r) { return r.json(); }).then(function(docs) {
+    allDocs = docs;
+    docsById = {};
+    allDocs.forEach(function(d) { docsById[d.docId] = d; });
+    var dc = document.getElementById('doc-count');
+    if (dc) dc.textContent = allDocs.length + ' docs';
+  }).catch(function() {});
 }
 
 /* ── Document Page ── */
@@ -986,7 +1257,7 @@ async function renderDoc(id) {
     '6':'#7c4dff','7':'#00bcd4','8':'#ffeb3b','9':'#e040fb','10':'#76ff03',
     '11':'#ff6e40','12':'#f44336','13':'#64ffda','14':'#448aff','15':'#ea80fc',
     '16':'#ffd740','17':'#b388ff','18':'#84ffff','19':'#ff80ab','20':'#69f0ae',
-    'META':'#666678','FW':'#666678','HIC':'#00f0ff','PROJ':'#00ff88'
+    'META':'#666678','FW':'#666678','HIC':'#00f0ff','PROJ':'#00ff88','LOG':'#ffcc00'
   };
   var dColor = domainColors[doc.domain] || 'var(--cyan)';
 
@@ -1186,7 +1457,7 @@ function domainBadgeColor(domain) {
     '6':'#8888ff','7':'#ffcc00','8':'#00ccff','9':'#ff6688','10':'#88ff00',
     '11':'#cc88ff','12':'#ff4444','13':'#00ffcc','14':'#ff88cc','15':'#88ccff',
     '16':'#ffaa44','17':'#44ffaa','18':'#aa88ff','19':'#ff6644','20':'#44aaff',
-    'META':'#888','FW':'#aaa','HIC':'#ccc','PROJ':'#00ff88'
+    'META':'#888','FW':'#aaa','HIC':'#ccc','PROJ':'#00ff88','LOG':'#ffcc00'
   };
   return colors[domain] || 'var(--muted)';
 }
@@ -1210,6 +1481,64 @@ async function doSearch(q) {
         '<div class="sr-snippet">' + snippetHtml + '</div></div>';
     }).join('');
   } catch(e) { el.innerHTML = '<div class="search-empty">Search failed</div>'; }
+}
+
+/* ── Domain Section Controls ── */
+function toggleDomainSection(el) {
+  el.classList.toggle('collapsed');
+}
+
+function expandAllDomains() {
+  var sections = document.querySelectorAll('#domain-list .domain-section');
+  sections.forEach(function(s) { s.classList.remove('collapsed'); });
+}
+
+function collapseAllDomains() {
+  var sections = document.querySelectorAll('#domain-list .domain-section');
+  sections.forEach(function(s) { s.classList.add('collapsed'); });
+}
+
+function filterDomains(q) {
+  var sections = document.querySelectorAll('#domain-list .domain-section');
+  var term = (q || '').toLowerCase().trim();
+  var countEl = document.getElementById('filter-count');
+  if (!term) {
+    sections.forEach(function(s) {
+      s.style.display = '';
+      s.classList.add('collapsed');
+      var links = s.querySelectorAll('.doc-link');
+      links.forEach(function(l) { l.style.display = ''; });
+    });
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+  var matchedDocs = 0;
+  var matchedDomains = 0;
+  sections.forEach(function(s) {
+    var domainName = s.getAttribute('data-name') || '';
+    var domainMatch = domainName.indexOf(term) !== -1;
+    var links = s.querySelectorAll('.doc-link');
+    var visibleCount = 0;
+    links.forEach(function(l) {
+      var id = l.getAttribute('data-id') || '';
+      var title = l.getAttribute('data-title') || '';
+      if (domainMatch || id.indexOf(term) !== -1 || title.indexOf(term) !== -1) {
+        l.style.display = '';
+        visibleCount++;
+      } else {
+        l.style.display = 'none';
+      }
+    });
+    if (visibleCount > 0) {
+      s.style.display = '';
+      s.classList.remove('collapsed');
+      matchedDocs += visibleCount;
+      matchedDomains++;
+    } else {
+      s.style.display = 'none';
+    }
+  });
+  if (countEl) countEl.textContent = matchedDocs + ' docs in ' + matchedDomains + ' domains';
 }
 
 /* ── Keyboard Shortcuts ── */
