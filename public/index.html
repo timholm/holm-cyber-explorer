@@ -792,7 +792,6 @@ function renderHome() {
   allDocs.forEach(function(d) { totalDeps += (d.dependsOn || []).length; });
   html += '<div class="hero-stat"><div class="hero-stat-value">' + allDocs.length + '</div><div class="hero-stat-label">Documents</div></div>';
   html += '<div class="hero-stat"><div class="hero-stat-value">' + keys.length + '</div><div class="hero-stat-label">Domains</div></div>';
-  html += '<div class="hero-stat"><div class="hero-stat-value" id="hero-projects">-</div><div class="hero-stat-label">Projects</div></div>';
   html += '<div class="hero-stat"><div class="hero-stat-value">' + totalDeps + '</div><div class="hero-stat-label">Dependencies</div></div>';
   html += '</div></div>';
 
@@ -824,42 +823,6 @@ function renderHome() {
   html += '<div class="section-heading">Roadmap</div>';
   html += '<div class="roadmap-list" id="roadmap-list"><div class="roadmap-empty">Loading tasks...</div></div>';
   html += '</div>';
-
-  // ── Projects Grid ──
-  html += '<div class="projects-section">';
-  html += '<div class="section-heading">Active Projects</div>';
-  html += '<div class="projects-grid" id="projects-grid"><div style="color:var(--dim);font-size:0.75rem;padding:1rem">Loading projects...</div></div>';
-  html += '</div>';
-
-  // ── Architecture Diagram ──
-  html += '<div class="arch-section">';
-  html += '<div class="section-heading">System Architecture</div>';
-  html += '<div class="arch-diagram"><pre>';
-  html += '<span class="arch-layer-voice">┌─────────────────────────────────────────────────────────┐</span>\n';
-  html += '<span class="arch-layer-voice">│  VOICE LAYER                                            │</span>\n';
-  html += '<span class="arch-layer-voice">│  Whisper.cpp (STT) · Piper TTS · Wake Word Detection    │</span>\n';
-  html += '<span class="arch-layer-voice">└───────────────────────────┬─────────────────────────────┘</span>\n';
-  html += '                            │\n';
-  html += '<span class="arch-layer-intel">┌───────────────────────────┴─────────────────────────────┐</span>\n';
-  html += '<span class="arch-layer-intel">│  INTELLIGENCE LAYER                                     │</span>\n';
-  html += '<span class="arch-layer-intel">│  Local LLM (llama.cpp) · Knowledge Graph · Briefings    │</span>\n';
-  html += '<span class="arch-layer-intel">└───────────────────────────┬─────────────────────────────┘</span>\n';
-  html += '                            │\n';
-  html += '<span class="arch-layer-platform">┌───────────────────────────┴─────────────────────────────┐</span>\n';
-  html += '<span class="arch-layer-platform">│  PLATFORM LAYER                                         │</span>\n';
-  html += '<span class="arch-layer-platform">│  holm.chat · Animus · BookForge · Sentinel · Mind       │</span>\n';
-  html += '<span class="arch-layer-platform">└───────────────────────────┬─────────────────────────────┘</span>\n';
-  html += '                            │\n';
-  html += '<span class="arch-layer-infra">┌───────────────────────────┴─────────────────────────────┐</span>\n';
-  html += '<span class="arch-layer-infra">│  INFRASTRUCTURE LAYER                                   │</span>\n';
-  html += '<span class="arch-layer-infra">│  K3s · ArgoCD · Gitea · Ansible · Cloudflare            │</span>\n';
-  html += '<span class="arch-layer-infra">└───────────────────────────┬─────────────────────────────┘</span>\n';
-  html += '                            │\n';
-  html += '<span class="arch-layer-hardware">┌───────────────────────────┴─────────────────────────────┐</span>\n';
-  html += '<span class="arch-layer-hardware">│  HARDWARE LAYER                                         │</span>\n';
-  html += '<span class="arch-layer-hardware">│  13x Raspberry Pi · Longhorn Storage · Local Network    │</span>\n';
-  html += '<span class="arch-layer-hardware">└─────────────────────────────────────────────────────────┘</span>\n';
-  html += '</pre></div></div>';
 
   // ── Bookmarks (existing) ──
   var bookmarks = getBookmarks();
@@ -913,14 +876,6 @@ function renderHome() {
   html += '</div>';
   el.innerHTML = html;
   window.scrollTo(0, 0);
-
-  // Load projects async
-  loadProjects().then(function(projects) {
-    var grid = document.getElementById('projects-grid');
-    if (grid) renderProjectCards(projects, grid);
-    var heroP = document.getElementById('hero-projects');
-    if (heroP) heroP.textContent = projects.length || 0;
-  });
 
   // Load Mission Control data
   loadAgentState();
