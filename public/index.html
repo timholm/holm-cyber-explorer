@@ -890,12 +890,12 @@ var sseSource = null;
 function connectSSE() {
   if (sseSource) { try { sseSource.close(); } catch(e) {} }
   sseSource = new EventSource('/api/activity/stream');
-  sseSource.addEventListener('connected', function() {
+  sseSource.onopen = function() {
     var dot = document.getElementById('mc-live-dot');
     var label = document.getElementById('mc-live-label');
     if (dot) dot.style.background = '#00e676';
     if (label) label.textContent = 'connected';
-  });
+  };
   sseSource.addEventListener('activity', function(e) {
     try {
       var event = JSON.parse(e.data);
