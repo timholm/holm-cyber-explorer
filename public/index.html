@@ -1411,16 +1411,30 @@ async function initGraph() {
 
     const alpha = Math.max(0.001, 1 - iterations / maxIterations);
 
-    // Repulsion between all nodes
-    for (let i = 0; i < graphNodes.length; i++) {
-      for (let j = i + 1; j < graphNodes.length; j++) {
-        const a = graphNodes[i], b = graphNodes[j];
-        let dx = b.x - a.x, dy = b.y - a.y;
-        let dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const force = -300 / (dist * dist) * alpha;
-        const fx = (dx / dist) * force, fy = (dy / dist) * force;
-        a.vx -= fx; a.vy -= fy;
-        b.vx += fx; b.vy += fy;
+    // Repulsion using spatial grid (avoids O(n²) for distant nodes)
+    const cellSize = 120;
+    const grid = {};
+    for (const n of graphNodes) {
+      const cx = Math.floor(n.x / cellSize), cy = Math.floor(n.y / cellSize);
+      const key = cx + ',' + cy;
+      if (!grid[key]) grid[key] = [];
+      grid[key].push(n);
+    }
+    for (const n of graphNodes) {
+      const cx = Math.floor(n.x / cellSize), cy = Math.floor(n.y / cellSize);
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const cell = grid[(cx + dx) + ',' + (cy + dy)];
+          if (!cell) continue;
+          for (const other of cell) {
+            if (other === n) continue;
+            let ddx = other.x - n.x, ddy = other.y - n.y;
+            let dist = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+            const force = -300 / (dist * dist) * alpha;
+            n.vx += (ddx / dist) * force;
+            n.vy += (ddy / dist) * force;
+          }
+        }
       }
     }
 
