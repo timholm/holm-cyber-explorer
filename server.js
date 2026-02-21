@@ -67,6 +67,15 @@ async function connectWithRetry() {
   }
 }
 
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 // Middleware
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -283,6 +292,14 @@ app.get('/api/docs/:id/comments', async (req, res) => {
 
 // Add a comment (rate-limited, server-side sanitized)
 const commentRateLimit = {};
+// Clean up expired rate limit entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const ip in commentRateLimit) {
+    commentRateLimit[ip] = commentRateLimit[ip].filter(t => now - t < 60000);
+    if (commentRateLimit[ip].length === 0) delete commentRateLimit[ip];
+  }
+}, 300000);
 app.post('/api/docs/:id/comments', async (req, res) => {
   try {
     // Simple IP-based rate limiting (5 comments per minute)
