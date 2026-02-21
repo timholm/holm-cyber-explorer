@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CON-010 — Technology Philosophy - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details open>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li class="active"><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="CON-010">
+  <h1>CON-010 &mdash; Technology Philosophy</h1>
+  <aside class="metadata">
+    <dl>
+      <dt>Document ID</dt><dd>CON-010</dd>
+      <dt>Domain</dt><dd>1 -- Constitution &amp; Philosophy</dd>
+      <dt>Version</dt><dd>1.0.0</dd>
+      <dt>Date</dt><dd>2026-02-17</dd>
+      <dt>Status</dt><dd>Draft</dd>
+    </dl>
+  </aside>
+
+  <section>
+    <h2>Purpose</h2>
+    <p>This article defines the institution's relationship with technology. It establishes that technology is a tool in service of the institution's mission, never an end in itself. It articulates the commitment to understanding every layer of the technology stack, the rejection of black boxes and opaque systems, and the principle that technology choices must be evaluated on a fifty-year horizon rather than a five-year one.</p>
+    <p>This article is necessary because technology is the medium in which the institution operates. Every system, every data store, every process depends on technology. Yet technology is also the most volatile element of the institution. Hardware becomes obsolete. Software is abandoned by its developers. Formats become unreadable. Standards change. On the timescale this institution is designed for, every specific technology will be replaced, probably more than once.</p>
+    <p>The institution must therefore have a relationship with technology that is committed but not attached -- deeply engaged with current tools but never dependent on any particular one. This article defines that relationship.</p>
+  </section>
+
+  <section>
+    <h2>Scope</h2>
+    <p>This article governs the institution's approach to all technology decisions, including but not limited to:</p>
+    <ul>
+      <li>Hardware selection and replacement.</li>
+      <li>Software selection, deployment, and retirement.</li>
+      <li>Data format selection and migration.</li>
+      <li>The adoption or rejection of new technologies.</li>
+      <li>The institution's stance on automation, artificial intelligence, and emerging computational paradigms.</li>
+    </ul>
+    <p>This article does not make specific technology choices. Those belong to Domains 4 (Infrastructure) and 5 (Platform). It defines the philosophy that those choices must reflect.</p>
+  </section>
+
+  <section>
+    <h2>Background</h2>
+    <p>The history of computing is a graveyard of technologies that were once essential: floppy disks, SCSI interfaces, CRT monitors, serial ports, Flash media, specific programming languages, specific operating systems, specific network protocols. Each was, in its time, the standard. Each is now either dead or niche. The cycle accelerates: the half-life of a technology stack shrinks with each generation.</p>
+    <p>An institution designed to last fifty years cannot anchor itself to any specific technology. But it must use technology -- it is a digital institution. This creates a tension that must be managed through philosophy rather than resolved through technology choice. No choice is permanent. The philosophy of choosing must be.</p>
+    <p>The institution's technology philosophy draws from several traditions: the Unix philosophy of small, composable tools; the archival community's emphasis on open formats and migration planning; the engineering tradition of understanding what you build; and the practical experience of systems administrators who have watched technologies come and go while the data they serve persists.</p>
+  </section>
+
+  <section>
+    <h2>System Model</h2>
+    <h3>Foundational Commitments</h3>
+    <p><strong>Technology as tool, not identity.</strong> The institution is not a "Linux institution" or a "BSD institution" or a "ZFS institution." It is an institution that currently uses these technologies because they serve its mission. If better tools emerge that serve the mission more effectively, the institution will adopt them. Technological loyalty is a category error -- loyalty belongs to principles, not to tools. When someone proposes adopting a new technology, the question is not "is this exciting?" but "does this serve the mission better than what we have, evaluated on a fifty-year horizon?"</p>
+    <p><strong>Understanding every layer.</strong> The operator must understand every layer of the technology stack, from the hardware up through the operating system, the file system, the networking, the applications, and the data formats. This does not mean expertise in every layer -- it means comprehension. The operator must be able to explain what each layer does, why it was chosen, how it fails, and how it is replaced. A layer that the operator cannot explain is a layer that the operator cannot troubleshoot, and a layer that cannot be troubleshot is a liability.</p>
+    <p><strong>Rejection of black boxes.</strong> A black box is any system whose internal operation is opaque to its user. Proprietary software with no source code is a black box. A complex system with insufficient documentation is a black box. A machine learning model whose decisions cannot be explained is a black box. The institution rejects black boxes not because they do not work but because their failure modes are unpredictable and their replacement is difficult. When a transparent alternative exists, it is preferred over a superior but opaque one.</p>
+    <p><strong>Migration readiness.</strong> Every technology in use must have a documented migration path to at least one alternative. This is not contingency planning for unlikely scenarios; it is routine planning for certain eventualities. Every technology currently in use will eventually become obsolete. The question is not whether migration will be needed but when and to what. Maintaining migration readiness ensures that when the time comes, the migration is planned rather than panicked.</p>
+
+    <h3>Technology Evaluation Framework</h3>
+    <p>When evaluating a technology for adoption, the following criteria apply in order of priority:</p>
+    <ol>
+      <li><strong>Longevity:</strong> How long is this technology likely to remain viable? Technologies with long track records, large communities, and stable governance are preferred over new technologies that may not survive a decade.</li>
+      <li><strong>Transparency:</strong> Can the operator fully understand this technology? Is the source code available? Is the documentation sufficient? Can the technology be audited?</li>
+      <li><strong>Simplicity:</strong> Is this technology the simplest solution that meets the need? Simpler technologies have fewer failure modes, require less expertise to maintain, and are easier to replace.</li>
+      <li><strong>Independence:</strong> Does this technology introduce external dependencies? Technologies that require network connections, vendor relationships, or ongoing subscriptions are strongly disfavored.</li>
+      <li><strong>Compatibility:</strong> Does this technology integrate with the institution's existing systems? Does it use open standards? Can its data be extracted in open formats?</li>
+      <li><strong>Capability:</strong> Does this technology actually do what the institution needs? This criterion is listed last deliberately -- capability matters, but it is the criterion most likely to be overweighted in the absence of a framework like this one.</li>
+    </ol>
+
+    <h3>The Boring Technology Principle</h3>
+    <p>The institution defaults to boring technology. Boring technology is technology that has been widely deployed, extensively tested, well documented, and thoroughly understood. It is technology whose failure modes are known, whose edge cases are catalogued, and whose communities have been answering the same questions for years.</p>
+    <p>Boring does not mean inferior. It means that the technology has survived long enough for its strengths and weaknesses to be fully understood. On a fifty-year horizon, this understanding is worth more than any feature advantage. The institution will adopt new technology when the new technology has become boring -- when it has proven itself over years, not when it has generated excitement over months.</p>
+
+    <h3>The Stance on Artificial Intelligence and Automation</h3>
+    <p>Artificial intelligence and machine learning systems present a particular challenge to the institution's technology philosophy. They are powerful but often opaque. They produce results that are useful but not always explainable. They evolve rapidly in ways that make long-term stability uncertain.</p>
+    <p>The institution's stance is as follows: AI and ML tools may be used as aids to the operator but never as autonomous decision-makers within the institution. They may suggest, analyze, and assist. They may not decide, commit, or modify. The operator remains the sole decision-maker. Any AI or ML system used within the institution must be locally operated (no cloud dependency), must be explainable in its general operation (even if not in every specific output), and must have a documented removal plan.</p>
+  </section>
+
+  <section>
+    <h2>Rules and Constraints</h2>
+    <ul>
+      <li><strong>R-CON-010-01:</strong> Every technology in production use must have a technology assessment document that evaluates it against the six criteria in the Technology Evaluation Framework. This document must be reviewed whenever a major version change occurs or every three years, whichever comes first.</li>
+      <li><strong>R-CON-010-02:</strong> Every technology in production use must have a documented migration plan to at least one alternative technology. The migration plan must include: the target technology, the estimated effort, the data migration procedure, and any capability changes.</li>
+      <li><strong>R-CON-010-03:</strong> No technology may be adopted solely on the basis of capability. It must satisfy the Longevity, Transparency, and Independence criteria before capability is evaluated.</li>
+      <li><strong>R-CON-010-04:</strong> The operator must maintain demonstrable understanding of every technology layer in the institution's stack. "Demonstrable understanding" means the ability to explain, in documentation or conversation, what the layer does, how it fails, and how it is replaced. If the operator cannot demonstrate understanding of a layer, that layer must be documented until understanding is achieved or replaced with a technology the operator does understand.</li>
+      <li><strong>R-CON-010-05:</strong> AI and ML systems, if used, must operate entirely within the institution's air gap, must not make autonomous decisions affecting institutional data or configuration, and must be documented with particular attention to their limitations and failure modes.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Failure Modes</h2>
+    <p><strong>Technology attachment.</strong> The operator becomes emotionally attached to a specific technology and resists migration even when the technology is clearly obsolete or inadequate. The institution's technology philosophy is subordinated to personal preference. Mitigation: the technology assessment reviews force regular evaluation. The principle that technology is a tool, not identity, must be internalized.</p>
+    <p><strong>Novelty chasing.</strong> The operator constantly adopts new technologies, chasing features and excitement at the expense of stability. The institution becomes a perpetual technology experiment. Mitigation: the Boring Technology Principle. New technology must justify itself against the full evaluation framework, including longevity.</p>
+    <p><strong>Stack ossification.</strong> The opposite of novelty chasing -- the operator refuses all change, and the technology stack becomes so outdated that it cannot be maintained, its hardware cannot be sourced, and its software cannot be updated. Mitigation: the migration readiness requirement. Migration plans should be maintained and updated so that when migration is necessary, it can be executed from a plan rather than improvised.</p>
+    <p><strong>Understanding decay.</strong> The operator's understanding of the technology stack degrades over time as memory fades and documentation is not reviewed. They continue to operate systems they no longer truly understand. Mitigation: the demonstrable understanding requirement (R-CON-010-04) and the documentation review schedule.</p>
+    <p><strong>Opaque dependency creep.</strong> Black-box components enter the system gradually -- a binary driver here, an undocumented library there. Each individual component seems harmless, but collectively they erode the transparency principle. Mitigation: regular technology audits that specifically check for opaque components.</p>
+  </section>
+
+  <section>
+    <h2>Recovery Procedures</h2>
+    <ol>
+      <li><strong>If a technology has become obsolete:</strong> Execute the migration plan. If the plan is outdated, update it first. Do not continue operating on obsolete technology while hoping it will last a little longer -- plan and execute the migration while it can still be done in a controlled manner.</li>
+      <li><strong>If the operator's understanding has degraded:</strong> Schedule a study period. Review the documentation for the affected technology layers. If the documentation is inadequate, improve it as part of the study. If the technology is too complex to understand, consider simplification or replacement.</li>
+      <li><strong>If opaque components have accumulated:</strong> Conduct a transparency audit. List every component that cannot be fully inspected. For each, determine: is a transparent alternative available? If yes, plan migration. If no, document the opacity and accept the risk explicitly, adding the component to the institution's known risk register.</li>
+      <li><strong>If a critical technology fails without a migration plan:</strong> Stabilize the situation. Assess what alternatives exist. Develop an emergency migration plan. Execute it, documenting the process thoroughly so that the resulting system is fully understood. Add migration readiness to the post-incident review as a root-cause factor.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Evolution Path</h2>
+    <p><strong>Years 0-5:</strong> The initial technology stack is selected and documented. Technology assessment documents are created for every component. Migration plans are drafted. The operator builds deep understanding of every layer through the process of building the institution.</p>
+    <p><strong>Years 5-15:</strong> The first technology migrations occur as components reach end of life. The evaluation framework and migration planning process are tested against real migrations. Lessons learned are documented and the framework is refined.</p>
+    <p><strong>Years 15-30:</strong> Major architectural changes may be necessary as entire technology generations turn over. The technology philosophy must prove that it can guide the institution through transformative change while preserving data, documentation, and institutional identity.</p>
+    <p><strong>Years 30-50+:</strong> Technologies that do not exist today will be the mainstream. The technology philosophy must be abstract enough to apply to these unknown technologies while concrete enough to guide actual decisions. The evaluation framework should survive even if every specific technology mentioned in this article has been replaced.</p>
+  </section>
+
+  <section>
+    <h2>Founder Commentary</h2>
+    <p>[Reserved for manual notes]</p>
+  </section>
+
+  <section>
+    <h2>Internal References</h2>
+    <ul>
+      <li>CON-001 -- The Founding Mandate (defines the mission that technology serves)</li>
+      <li>CON-002 -- Core Principles and Non-Negotiable Values (the Simplicity and Transparency principles are implemented here)</li>
+      <li>CON-003 -- The Refusal Registry (REF-B01, REF-B03, REF-D03 relate to technology constraints)</li>
+      <li>CON-005 -- The Theory of Knowledge Preservation (governs how technology understanding is documented)</li>
+      <li>Domain 4 -- Infrastructure &amp; Power (implements hardware technology choices)</li>
+      <li>Domain 5 -- Platform &amp; Core Systems (implements software technology choices)</li>
+      <li>Domain 13 -- Evolution &amp; Adaptation (governs the process of technology change)</li>
+    </ul>
+  </section>
+</article>
+</main>
+</body>
+</html>

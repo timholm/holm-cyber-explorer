@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D20-011 — Memory Taxonomy &amp; Classification - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li class="active"><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d20-011">
+  <h1>D20-011 &mdash; Memory Taxonomy &amp; Classification</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D20-011</dd>
+  <dt>Domain</dt>
+  <dd>20 &mdash; Institutional Memory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D20-001 (Philosophy)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D20-005 (Oral History), D20-003 (Timeline), D20-009 (Accessibility)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the classification system for all institutional memory records. It provides a structured taxonomy of memory types, event categories, significance levels, and retention priorities that enables the institution to organize, prioritize, and navigate its memory systematically rather than as an undifferentiated mass of records.</p>
+
+<p>Without a taxonomy, institutional memory is a pile. With a taxonomy, it is an organized archive. The difference is the difference between a library with a catalog and a warehouse with no inventory. Both contain the same books; only one allows you to find the book you need.</p>
+
+<p>The taxonomy defined here serves multiple purposes: it guides the creation of new memory records (by telling the creator what type of record to create and what fields to fill), it structures the index (by providing the classification dimensions that D20-009 uses for indexing), it informs retention decisions (by specifying which categories of memory have which retention requirements), and it supports quality assessment (by providing Domain 19 with a framework for evaluating whether the memory system is complete).</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The classification of memory records by type (what kind of record).</li>
+<li>The classification of recorded events by category (what kind of event).</li>
+<li>Significance levels for memory records (how important).</li>
+<li>Retention tiers and their relationship to the three-tier architecture in D20-001.</li>
+<li>The process for classifying new records.</li>
+<li>The process for reclassifying existing records when circumstances change.</li>
+<li>Alignment with the QA taxonomy in Domain 19.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The storage mechanism for records (covered by Infrastructure Domains).</li>
+<li>The retention policies and sunset criteria themselves (see D20-012).</li>
+<li>The indexing and search system that uses this taxonomy (see D20-009).</li>
+<li>The content or format of individual record types (covered by their respective articles: D20-002 for decision logs, D20-005 for oral histories, etc.).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Classification Matters</h3>
+
+<p>An institution generates many different kinds of records: decisions, events, observations, corrections, oral histories, lessons learned, audit results, personnel changes, system changes, and more. Each kind of record has different characteristics: different creation triggers, different audiences, different retention requirements, and different value curves over time.</p>
+
+<p>Without classification, all records are treated equally. A routine configuration change is stored alongside a foundational governance decision. A minor maintenance note occupies the same status as an oral history from a departing founder. This equality is false and wasteful. It makes the important records harder to find by burying them among the routine ones. It applies inappropriate retention rules to records with different lifespans. It prevents the institution from prioritizing its memory maintenance efforts.</p>
+
+<h3>3.2 The Three-Tier Architecture Revisited</h3>
+
+<p>D20-001 introduced the three-tier memory architecture: Permanent (Tier 1), Active (Tier 2), and Transient (Tier 3). This article defines the criteria for assigning records to tiers, which D20-001 described only in general terms. The tier assignment is one dimension of classification; this article adds additional dimensions that allow finer-grained organization within each tier.</p>
+
+<h3>3.3 Alignment with Domain 19</h3>
+
+<p>Domain 19 (Quality Assurance) uses its own taxonomy for quality events. Memory classification must align with the QA taxonomy so that quality events can be properly stored, indexed, and retrieved as institutional memory. The alignment is described in Section 4.4 of this article.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Record Type Taxonomy</h3>
+
+<table>
+<tr><th>Record Type</th><th>Definition</th><th>Default Tier</th><th>Examples</th></tr>
+<tr><td>Decision</td><td>A record of a choice made by an authorized person or body</td><td>Tier 1</td><td>Governance decisions, policy changes, architectural choices</td></tr>
+<tr><td>Event</td><td>A record of something that happened</td><td>Tier 1 or 2</td><td>System failures, personnel changes, milestones, sync events</td></tr>
+<tr><td>Commentary</td><td>An informal, dated observation by an institutional member</td><td>Tier 1</td><td>Article commentary entries, operational notes, reflections</td></tr>
+<tr><td>Oral History</td><td>A recorded interview capturing tacit knowledge</td><td>Tier 1</td><td>Departure interviews, periodic knowledge capture sessions</td></tr>
+<tr><td>Lesson Learned</td><td>A structured extraction of knowledge from an experience</td><td>Tier 1</td><td>Post-mortem findings, retrospective conclusions</td></tr>
+<tr><td>Correction</td><td>A record that corrects a factual error in a prior record</td><td>Same as corrected record</td><td>Decision log corrections, timeline corrections</td></tr>
+<tr><td>Audit Result</td><td>The findings of a quality or compliance audit</td><td>Tier 2</td><td>Memory completeness audits, integrity verification results</td></tr>
+<tr><td>Operational Log</td><td>A routine record of system or process operation</td><td>Tier 2 or 3</td><td>Backup logs, maintenance records, access logs</td></tr>
+<tr><td>Legacy Profile</td><td>A narrative record of a contributor's institutional tenure</td><td>Tier 1</td><td>Contributor profiles per D20-006</td></tr>
+<tr><td>Conflict Record</td><td>A record of a memory conflict between federated nodes</td><td>Tier 1</td><td>Merge conflicts per D20-010</td></tr>
+<tr><td>Forgetting Record</td><td>A record of a deliberate decision to retire or forget a record</td><td>Tier 1</td><td>Sunset decisions per D20-012</td></tr>
+</table>
+
+<h3>4.2 Event Category Taxonomy</h3>
+
+<table>
+<tr><th>Category</th><th>Description</th><th>Typical Significance</th></tr>
+<tr><td>Governance</td><td>Decisions about rules, policies, authority, and structure</td><td>High</td></tr>
+<tr><td>Personnel</td><td>Arrivals, departures, role changes, succession events</td><td>High</td></tr>
+<tr><td>Technical</td><td>System changes, hardware events, software changes, configuration changes</td><td>Variable</td></tr>
+<tr><td>Operational</td><td>Routine operations, maintenance, scheduled activities</td><td>Low to Moderate</td></tr>
+<tr><td>Quality</td><td>Audit results, defect reports, quality assessments</td><td>Moderate</td></tr>
+<tr><td>Security</td><td>Security incidents, integrity violations, access events</td><td>High</td></tr>
+<tr><td>Federation</td><td>Node events, synchronization events, topology changes</td><td>High</td></tr>
+<tr><td>Crisis</td><td>Failures, emergencies, disaster recovery activations</td><td>High</td></tr>
+<tr><td>Milestone</td><td>Significant achievements, completions, anniversaries</td><td>Moderate to High</td></tr>
+<tr><td>External</td><td>Events outside the institution that affect it</td><td>Variable</td></tr>
+</table>
+
+<h3>4.3 Significance Levels</h3>
+
+<p>Every memory record is assigned a significance level that influences its retention tier, its synchronization priority (D20-010), and its prominence in search results (D20-009):</p>
+
+<table>
+<tr><th>Level</th><th>Definition</th><th>Retention</th><th>Examples</th></tr>
+<tr><td>Foundational</td><td>Records that define the institution's identity, purpose, or structure</td><td>Tier 1, permanent, no exceptions</td><td>Root documents, founding decisions, constitutional changes</td></tr>
+<tr><td>Significant</td><td>Records that materially affect institutional operations or direction</td><td>Tier 1, permanent</td><td>Major policy decisions, system architecture changes, personnel succession events</td></tr>
+<tr><td>Operational</td><td>Records that support ongoing operations but do not define institutional direction</td><td>Tier 2, reviewed annually</td><td>Routine audit results, maintenance logs, configuration changes</td></tr>
+<tr><td>Routine</td><td>Records created as part of normal operation with limited long-term value</td><td>Tier 3, defined expiration</td><td>Daily backup logs, cache states, temporary configurations</td></tr>
+</table>
+
+<h3>4.4 QA Taxonomy Alignment</h3>
+
+<p>Domain 19 classifies quality events using its own taxonomy (defects, audit findings, compliance results). These events must be classifiable within the Domain 20 taxonomy as well. The mapping is:</p>
+<ul>
+<li>QA defect reports map to Record Type: Event, Category: Quality, Significance: variable (depends on defect severity).</li>
+<li>QA audit results map to Record Type: Audit Result, Category: Quality, Significance: Operational or Significant depending on scope.</li>
+<li>QA compliance findings map to Record Type: Event, Category: Quality or Governance, Significance: Significant.</li>
+</ul>
+
+<p>This dual classification ensures that quality events are properly stored in institutional memory while remaining findable through both the QA-specific interface and the general memory search.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D20-11-01: Every Record Is Classified.</strong> No memory record may be stored without classification along three dimensions: Record Type, Event Category, and Significance Level. Unclassified records are indexed as "UNCLASSIFIED" and are flagged for classification within 30 days.</p></li>
+
+<li><p><strong>R-D20-11-02: Classification Determines Retention.</strong> The retention tier of a record is determined by its significance level per the mapping in Section 4.3. Records may be promoted to a higher tier (Tier 3 to Tier 2, or Tier 2 to Tier 1) at any time. Demotion (moving a record to a lower tier) requires a documented decision per D20-012.</p></li>
+
+<li><p><strong>R-D20-11-03: The Taxonomy Is Extensible.</strong> New record types, event categories, or significance levels may be added to the taxonomy through a governance decision recorded in the decision log. Existing categories may not be removed (they may be deprecated with a successor mapping). The taxonomy is append-only, like the memory records it classifies.</p></li>
+
+<li><p><strong>R-D20-11-04: Reclassification Is Documented.</strong> If a record's classification changes (for example, a routine operational log entry is reclassified as significant because it later proved relevant to a major decision), the reclassification must be documented: original classification, new classification, reason for change, and who authorized the change.</p></li>
+
+<li><p><strong>R-D20-11-05: Classification Is Reviewable.</strong> Domain 19 (Quality Assurance) may audit the classification of memory records to verify that they are correctly classified. Systematic misclassification -- for example, significant decisions being classified as routine to avoid permanent retention -- is a quality defect and must be corrected.</p></li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Classification neglect.</strong> Records are created but not classified. They accumulate in the "UNCLASSIFIED" category, making them unfindable by type, category, or significance. Severity: moderate. Likelihood: high (classification is easy to skip). Detection: the 30-day classification deadline and periodic audits. Mitigation: build classification into the record creation workflow so it is part of the same step, not a separate task.</p></li>
+
+<li><p><strong>Significance inflation.</strong> Everything is classified as "Foundational" or "Significant" to ensure permanent retention. The taxonomy becomes meaningless because it does not distinguish between truly important and merely cautious. Severity: moderate (degrades search and navigation). Likelihood: moderate. Detection: periodic distribution analysis of significance levels. Mitigation: the significance definitions in Section 4.3 are designed to be discriminating. If more than 20% of records in any period are classified as Foundational, the classification criteria may be being misapplied.</p></li>
+
+<li><p><strong>Significance deflation.</strong> Important records are classified as routine to reduce the burden of permanent retention. Critical decisions are lost when routine records expire. Severity: high. Likelihood: low (but consequences are severe). Detection: D19 audit of classification accuracy. Mitigation: R-D20-11-05 mandates reviewability; the classification review includes sampling of routine records to verify they are truly routine.</p></li>
+
+<li><p><strong>Taxonomy rigidity.</strong> The taxonomy does not evolve to accommodate new types of events or records. Records that do not fit existing categories are either forced into inappropriate categories or left unclassified. Severity: moderate. Likelihood: moderate over long time periods. Detection: accumulation of "UNCLASSIFIED" records or misfit classifications. Mitigation: R-D20-11-03 mandates extensibility; the taxonomy review is part of the annual memory system review.</p></li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If a backlog of unclassified records has accumulated:</strong> Conduct a classification sprint. Prioritize by creation date (oldest first) and by likely significance (records associated with major events or decisions first). Accept that some records may be difficult to classify retroactively; classify them to the best of current knowledge and note the late classification date.</p></li>
+
+<li><p><strong>If significance inflation has been detected:</strong> Review the classification criteria. Provide training or examples that illustrate the distinction between Foundational, Significant, Operational, and Routine. Reclassify inflated records downward where appropriate, documenting the reclassification per R-D20-11-04.</p></li>
+
+<li><p><strong>If significance deflation has caused loss:</strong> Determine what was lost by reviewing records that were retired under Tier 3 sunset policies. If the lost records can be restored from backup, restore them and reclassify. If they cannot be restored, document the loss as a KNOWLEDGE GAP in the decision log and implement safeguards (such as a review step before any Tier 3 records are retired).</p></li>
+
+<li><p><strong>If the taxonomy needs extension:</strong> Propose the new categories through the governance process. Document the rationale for the new categories, provide examples of records that would be classified under them, and update this article's taxonomy tables. Reclassify any existing records that fit the new categories better than their current classification.</p></li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> The taxonomy is new and being tested against real records. Some categories may prove too broad or too narrow. Refine the taxonomy based on the actual distribution of records. The goal is a taxonomy that feels natural to users -- where the correct classification is obvious for most records.</p></li>
+
+<li><p><strong>Years 5-15:</strong> The taxonomy stabilizes. New categories are added occasionally to accommodate new types of institutional activity. The relationship between classification and retention (D20-012) is tested as the first records reach their review dates.</p></li>
+
+<li><p><strong>Years 15-30:</strong> The taxonomy may need generational review. Terms that were clear to the founders may be opaque to current users. Ensure the taxonomy descriptions are written in plain language per D20-009's accessibility standards. Consider whether the significance scale is still calibrated correctly: does "Foundational" mean the same thing it meant 20 years ago?</p></li>
+
+<li><p><strong>Years 30-50:</strong> The taxonomy is a mature classification system with decades of records organized under it. Its value is proven by its utility: can a researcher find what they need by navigating the taxonomy? If so, it has succeeded. If not, it needs revision -- but revision must preserve backward compatibility, since decades of records are classified under the existing scheme.</p></li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Taxonomy is one of those things that seems bureaucratic until you need it. The first time you search for "all decisions related to federation governance" and the system can answer that query instantly because every decision is classified by type and category, the taxonomy pays for itself.</p>
+
+<p>I have tried to keep the taxonomy simple. The temptation to create a deeply nested hierarchical classification with dozens of sub-categories is real, but it would be unused. People will not classify records if the classification requires reading a manual. The three dimensions (Record Type, Event Category, Significance Level) should be sufficient for most purposes. If they are not, the taxonomy can be extended per R-D20-11-03, but the extension should be motivated by actual need, not theoretical completeness.</p>
+
+<p>A note on significance levels: I expect "Operational" to be the most common classification, with "Routine" second, "Significant" third, and "Foundational" rare. If the distribution looks different from this, something is wrong -- either the definitions are not clear or the classifiers are not applying them correctly. Monitor the distribution and investigate anomalies.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D20-001 -- Institutional Memory Philosophy (three-tier architecture: Permanent, Active, Transient)</li>
+<li>D20-002 -- Decision Log Operations (decision records as primary classified type)</li>
+<li>D20-005 -- Oral History Capture Methodology (oral history classification)</li>
+<li>D20-009 -- Memory Accessibility &amp; Discoverability (taxonomy as indexing structure)</li>
+<li>D20-010 -- Distributed Memory Across Federated Nodes (classification drives sync priority)</li>
+<li>D20-012 -- Forgetting &amp; Sunset Policies (retention tied to classification)</li>
+<li>Domain 19 -- Quality Assurance (QA taxonomy alignment; classification audit)</li>
+<li>GOV-001 -- Authority Model (governance decisions as highest-significance records)</li>
+<li>OPS-001 -- Operations Philosophy (operational records classification)</li>
+</ul>
+
+</section>
+</article>
+</main>
+</body>
+</html>

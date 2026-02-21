@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D12-003 — System Rebuild Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li class="active"><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d12-003">
+  <h1>D12-003 &mdash; System Rebuild Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D12-003</dd>
+  <dt>Domain</dt>
+  <dd>12 -- Disaster Recovery</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D12-001, D12-002, D6-002, SEC-002, SEC-003, D5-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D13-002. All articles involving catastrophic recovery, hardware replacement, or institutional continuity after total loss.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article is the most important disaster recovery document in the institution. It defines how to rebuild the entire holm.chat Documentation Institution from scratch -- from bare metal to a fully operational system -- after catastrophic loss.</p>
+<p>Catastrophic loss means that the primary site, primary hardware, or primary storage is gone. Not degraded, not partially damaged -- gone. The operator is standing in front of new (or different) hardware with nothing but backup media, printed documentation, and the knowledge in their head. This article tells them what to do.</p>
+<p>D12-001 introduced the rebuild mindset: the practice of designing every system with reconstruction in mind. This article is the operational expression of that mindset. It is the procedure that the rebuild mindset was designed to make possible. If D12-001 is the philosophy, this article is the playbook.</p>
+<p>This article is deliberately written to be understandable by a person who did not build the original system. The succession scenario (GOV-004) includes situations where a new operator must rebuild the institution from documentation alone. This article must serve that reader as well as the founding operator.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The complete rebuild sequence from bare hardware to operational institution.
+- Hardware assessment and procurement for replacement systems.
+- Operating system installation and base configuration.
+- Storage setup and encryption.
+- Data restoration from backup media.
+- Service and application configuration.
+- Verification and validation of the rebuilt system.
+- The rebuild kit: what it contains and how to maintain it.
+- Rebuild timeline estimates and prioritization.</p>
+<p><strong>Out of scope:</strong>
+- The philosophy of disaster recovery (D12-001).
+- Specific backup creation procedures (D6-002; this article consumes backups, it does not create them).
+- Specific encryption key generation (SEC-003; this article uses existing keys from backup).
+- Ongoing operations after rebuild (OPS-001 and Domain 10 articles).
+- Drill procedures for testing the rebuild (D12-002).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Rebuild Scenario</h3>
+<p>The rebuild scenario is the worst case that the institution is designed to survive. Everything at the primary site is lost. The operator must reconstruct the institution on new hardware, potentially in a new location, using only what was stored off-site.</p>
+<p>This scenario is unlikely in any given year. Over fifty years, it is not unlikely at all. Fires, floods, earthquakes, theft, and structural failures are all plausible mechanisms. SEC-001 Section 4.2 rates physical threats as "near certain for at least one instance" over the fifty-year horizon. The rebuild procedure is the institution's response to that certainty.</p>
+<h3>3.2 The Minimum Viable Rebuild</h3>
+<p>Not everything needs to be rebuilt simultaneously. The institution can operate at reduced capability (D12-001 Section 4.2, graceful degradation) while the rebuild progresses. The rebuild sequence is therefore ordered by criticality: the most essential functions are restored first, and less critical functions are added as time and resources permit.</p>
+<p>The minimum viable rebuild is: one functioning machine, with encrypted storage, containing the restored documentation corpus, the decision log, the operational log, and the backup system. From this minimum, the operator can consult the documentation to rebuild everything else. The documentation is the seed. Everything else grows from it.</p>
+<h3>3.3 The Hardware Question</h3>
+<p>The original hardware will not always be available for a rebuild. If the primary site is destroyed, the hardware is destroyed with it. Even if the loss is less dramatic -- a single server failure, for instance -- the exact same hardware may no longer be manufactured.</p>
+<p>This article is therefore hardware-agnostic at the architectural level. The procedures describe what capabilities the hardware must provide, not which specific products to buy. The specific hardware choices are documented in the institutional asset registry (D11-002) and the procurement plan (subsequent Domain 11 articles), which are updated as hardware generations change.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Rebuild Kit</h3>
+<p>The rebuild kit is the minimum set of artifacts needed to reconstruct the institution on new hardware. It is stored off-site (Zone 3 per SEC-002) and maintained per D12-001 R-DR-04. It contains:</p>
+<p><strong>Physical components:</strong>
+- Bootable installation media for the institution's operating system (USB drive or optical disc, updated annually).
+- Off-site backup media (Location C per D6-002) containing the most recent Tier 1, Tier 2, and Tier 3 backups.
+- Encryption key backup (Tier C per SEC-003) with the sealed passphrase envelope.
+- Printed copy of this article (D12-003).
+- Printed copy of the rebuild checklist (Section 4.7 of this article).
+- Printed copy of the system configuration summary (a condensed version of the institutional architecture maintained as part of the rebuild kit, updated after every significant system change).</p>
+<p><strong>Documentation components (stored on the backup media):</strong>
+- The complete documentation corpus.
+- The complete decision log and operational log.
+- System configuration files and service definitions.
+- The asset registry (D11-002).
+- All recovery procedures.</p>
+<p><strong>Maintenance requirements:</strong>
+- The rebuild kit must be updated after every significant system change (Tier 2 or Tier 3 decision that modifies system architecture).
+- The bootable installation media must be refreshed at least annually with the current OS version.
+- The printed materials must be reprinted whenever the underlying documents change.
+- The rebuild kit must be verified annually during the annual operations cycle by confirming that all components are present, readable, and current.</p>
+<h3>4.2 Phase 1: Assessment and Procurement (Day 1-7)</h3>
+<p>Before rebuilding, assess what is available and what is needed.</p>
+<p><strong>Step 1: Assess surviving assets.</strong>
+- What hardware survived, if any? Is it functional?
+- Is the rebuild kit intact? Verify all components are present.
+- Are the off-site backups accessible? Can the backup media be read?
+- Are the encryption keys accessible? Can the Tier C backup be decrypted?
+- Is the printed documentation available?</p>
+<p><strong>Step 2: Assess the rebuild site.</strong>
+- Where will the rebuilt institution be located?
+- Is adequate power available (considering off-grid requirements per CON-001)?
+- Is the physical space suitable for equipment (temperature, humidity, physical security)?
+- Can Zone 1, Zone 2, and Zone 3 (SEC-002) be established at the new site?</p>
+<p><strong>Step 3: Determine hardware requirements.</strong>
+The rebuilt institution requires, at minimum:
+- One general-purpose computer capable of running the institution's operating system. Minimum specifications: 64-bit processor, 16GB RAM (32GB preferred), sufficient storage for the institution's data (consult the asset registry for current data volume plus 50% growth margin).
+- Primary storage: one or more drives with capacity for the full institutional data set. SSDs preferred for primary storage; HDDs acceptable.
+- Backup storage: at least one separate drive for local backups (Location A per D6-002).
+- Removable media reader compatible with the backup media format (USB, optical, etc.).
+- UPS (uninterruptible power supply) or battery system sufficient for orderly shutdown.
+- Monitor, keyboard, and input devices.</p>
+<p><strong>Step 4: Procure missing hardware.</strong>
+If hardware must be purchased, prioritize:
+1. The primary compute platform (the machine itself).
+2. Primary storage.
+3. Backup storage.
+4. UPS/power protection.
+5. Peripheral devices.</p>
+<p>Use the procurement procedures in subsequent Domain 11 articles. If those procedures are not available (because the documentation is being restored), apply these principles: buy from reputable vendors, prefer widely-available hardware over exotic hardware, prefer hardware with published specifications and open-source driver support, and retain all receipts and documentation for the asset registry.</p>
+<h3>4.3 Phase 2: Operating System Installation (Day 2-3)</h3>
+<p><strong>Step 1: Prepare the installation media.</strong>
+If the rebuild kit contains bootable installation media, use it. If the media is damaged or outdated, a new installation image must be obtained. In an air-gapped institution, this means physically transporting installation media from an external source. Follow the quarantine procedures in Domain 18 for any media entering the institution from external sources.</p>
+<p><strong>Step 2: Boot from installation media.</strong>
+- Configure the new hardware's BIOS/UEFI to boot from the installation media (USB or optical).
+- Disable all network interfaces in BIOS/UEFI (enforce the air gap at the hardware level per SEC-001 R-SEC-01).
+- Disable wireless radios if present (Wi-Fi, Bluetooth).
+- Boot the installation media.</p>
+<p><strong>Step 3: Partition and encrypt the storage.</strong>
+- Create the partition layout. The recommended layout is:
+  - /boot -- 1GB, unencrypted (contains the bootloader and kernel).
+  - / (root) -- remainder of the primary drive, LUKS-encrypted.
+  - If a separate data drive exists: /data -- entire drive, LUKS-encrypted with a separate key.
+- Initialize LUKS encryption on the root partition:
+  <code>cryptsetup luksFormat /dev/[root-partition]</code>
+  Use the disk encryption key from the rebuild kit (Tier C backup). If the original key is being reused, enter it when prompted. If a new key is being generated (because the original is compromised or unavailable), follow SEC-003 Section 4.2.
+- Open the encrypted partition:
+  <code>cryptsetup open /dev/[root-partition] crypt-root</code>
+- Format the partitions:
+  <code>mkfs.ext4 /dev/[boot-partition]
+  mkfs.ext4 /dev/mapper/crypt-root</code></p>
+<p><strong>Step 4: Install the operating system.</strong>
+- Follow the installer prompts, targeting the encrypted partitions.
+- Set the hostname to the institution's standard hostname (documented in the system configuration summary in the rebuild kit).
+- Set the timezone.
+- Create the root account with a strong password per SEC-003.
+- Do not enable any network services. The institution is air-gapped.</p>
+<p><strong>Step 5: Post-installation base configuration.</strong>
+- Boot into the newly installed system.
+- Verify the air gap: <code>ip link show</code> -- all network interfaces should be DOWN or absent.
+- Set the default umask to 077 per SEC-002 R-SEC2-04:
+  Add <code>umask 077</code> to /etc/profile and /etc/bash.bashrc (or equivalent for the installed shell).
+- Configure the system clock. If no NTP is available (air-gapped), set the time manually and document the time source.
+- Update the bootloader configuration if necessary.</p>
+<h3>4.4 Phase 3: Account Setup (Day 3)</h3>
+<p>Create the account architecture defined in SEC-002 Section 4.1:</p>
+<p><strong>Step 1: Create the administrative account.</strong>
+<code>useradd -m -s /bin/bash -G sudo [admin-username]
+passwd [admin-username]</code>
+Set a strong, unique password per SEC-003.</p>
+<p><strong>Step 2: Create the operator account.</strong>
+<code>useradd -m -s /bin/bash [operator-username]
+passwd [operator-username]</code>
+Set a strong, unique password.</p>
+<p><strong>Step 3: Configure sudo.</strong>
+Ensure the administrative account requires password authentication for every sudo invocation (do not configure NOPASSWD).</p>
+<p><strong>Step 4: Create service accounts as needed.</strong>
+Service accounts are created during Phase 5 (service configuration) as each service is restored.</p>
+<p><strong>Step 5: Verify account architecture.</strong>
+- Log in as each account and verify access levels.
+- Verify that the operator account cannot perform administrative actions without sudo.
+- Verify that the root account prompt is visually distinctive (configure PS1 in root's .bashrc).</p>
+<h3>4.5 Phase 4: Data Restoration (Day 3-5)</h3>
+<p><strong>Step 1: Prepare the backup media.</strong>
+- Connect the off-site backup media (Location C).
+- Decrypt the backup media using the Tier C passphrase from the sealed envelope:
+  <code>cryptsetup open /dev/[backup-device] crypt-backup
+  mount /dev/mapper/crypt-backup /mnt/backup</code></p>
+<p><strong>Step 2: Verify backup integrity.</strong>
+- Check the backup manifest:
+  <code>cat /mnt/backup/MANIFEST.txt</code>
+- Spot-check checksums on several files to confirm the backup is readable and uncorrupted.</p>
+<p><strong>Step 3: Restore Tier 1 data first.</strong>
+Tier 1 data is the institutional memory: the documentation corpus, decision log, operational log, key inventory, and governance records.
+<code>mkdir -p /data/tier1
+tar -xzf /mnt/backup/tier1-[date].tar.gz -C /data/tier1/</code>
+Verify:
+- Compare file count against the manifest.
+- Spot-check critical files (open the documentation index, read the most recent decision log entry).
+- If checksum manifests are available, verify:
+  <code>cd /data/tier1 &amp;&amp; sha256sum -c /mnt/backup/tier1-[date].sha256</code></p>
+<p><strong>Step 4: Restore Tier 2 data.</strong>
+Tier 2 data includes system configurations, active project data, and automation scripts.
+<code>mkdir -p /data/tier2
+tar -xzf /mnt/backup/tier2-[date].tar.gz -C /data/tier2/</code>
+Verify as with Tier 1.</p>
+<p><strong>Step 5: Restore Tier 3 data.</strong>
+Tier 3 data includes reference materials, research archives, and imported knowledge bases.
+<code>mkdir -p /data/tier3
+tar -xzf /mnt/backup/tier3-[date].tar.gz -C /data/tier3/</code>
+Verify as with Tier 1.</p>
+<p><strong>Step 6: Set ownership and permissions.</strong>
+<code>chown -R [operator-username]:[operator-username] /data/tier1 /data/tier2 /data/tier3
+chmod -R 700 /data/tier1 /data/tier2 /data/tier3</code>
+Adjust group ownership for files that need to be accessible to service accounts per SEC-002 Section 4.2.</p>
+<p><strong>Step 7: Unmount and secure the backup media.</strong>
+<code>umount /mnt/backup
+cryptsetup close crypt-backup</code>
+Return the backup media to secure storage.</p>
+<h3>4.6 Phase 5: Service Configuration (Day 5-10)</h3>
+<p>With the OS installed and data restored, configure the services that make the institution operational.</p>
+<p><strong>Step 1: Consult the restored documentation.</strong>
+Open the documentation corpus (now restored in /data/tier1). Locate the system configuration documentation. This documentation, maintained as part of the institutional corpus, describes every service running on the institution's systems, its purpose, its configuration, and its dependencies.</p>
+<p><strong>Step 2: Prioritize service restoration.</strong>
+Restore services in this order:
+1. Backup system (D6-002) -- so that the rebuilt system is immediately protected.
+2. Integrity verification (D6-003) -- so that restored data can be verified.
+3. Documentation access tools -- so that the documentation corpus is navigable.
+4. Operational logging -- so that the rebuild itself is documented.
+5. All remaining services in order of criticality as defined in the system configuration documentation.</p>
+<p><strong>Step 3: For each service:</strong>
+a. Create the service account if required per SEC-002 Section 4.1.
+b. Install the service software from the rebuild kit or from packages on the installation media.
+c. Apply the service configuration from the restored Tier 2 data or from the documented configuration.
+d. Test the service.
+e. Document any deviations from the original configuration (new hardware, different paths, etc.).</p>
+<p><strong>Step 4: Restore automation.</strong>
+Restore cron jobs, scheduled tasks, and automated monitoring per the documentation. Verify each automated task by running it manually once before enabling the schedule.</p>
+<h3>4.7 Phase 6: Verification and Validation (Day 10-14)</h3>
+<p><strong>Step 1: System verification checklist.</strong>
+Execute the following checks and record the results:</p>
+<p>```
+SYSTEM REBUILD VERIFICATION CHECKLIST</p>
+<p>Date: <strong><em>_</em></strong><strong><em>_</em></strong><em>
+Operator: <strong><em>_</em></strong><strong><em>_</em></strong></em>
+Rebuild start date: <strong><em>_</em></strong><strong><em>_</em></strong><em>
+Rebuild complete date: <strong><em>_</em></strong><strong><em>_</em></strong></em></p>
+<p>HARDWARE:
+[ ] All hardware functional and documented in asset registry
+[ ] Air gap verified -- no active network interfaces
+[ ] UPS/power protection functional
+[ ] Physical security established (Zone 1, Zone 2, Zone 3)</p>
+<p>OPERATING SYSTEM:
+[ ] OS installed and bootable
+[ ] Full-disk encryption active and verified
+[ ] Account architecture matches SEC-002 (root, admin, operator, service accounts)
+[ ] Default umask set to 077
+[ ] System clock accurate</p>
+<p>DATA:
+[ ] Tier 1 data restored and verified
+[ ] Tier 2 data restored and verified
+[ ] Tier 3 data restored and verified
+[ ] File permissions correct
+[ ] Checksums verified against backup manifests</p>
+<p>SERVICES:
+[ ] Backup system operational -- first backup created on rebuilt system
+[ ] Integrity verification operational
+[ ] Documentation access functional
+[ ] Operational logging functional
+[ ] All critical services operational</p>
+<p>SECURITY:
+[ ] Encryption keys installed and functional
+[ ] Key inventory accurate for rebuilt system
+[ ] Access controls verified
+[ ] Physical security zones established</p>
+<p>DOCUMENTATION:
+[ ] Rebuild process documented in operational log
+[ ] Any deviations from this procedure documented
+[ ] Asset registry updated for new hardware
+[ ] Decision log updated with rebuild decision (Tier 2)
+```</p>
+<p><strong>Step 2: First backup of rebuilt system.</strong>
+Immediately after verification, create a full backup of the rebuilt system per D6-002. This backup becomes the new baseline. Store copies at Locations A and B. Schedule the next off-site transport.</p>
+<p><strong>Step 3: Operational log entry.</strong>
+Record the rebuild in the operational log:
+- Date of the disaster or event that triggered the rebuild.
+- Date rebuild started and completed.
+- Hardware used (make, model, specifications).
+- Backup media used (date of backup, location source).
+- Any data that could not be restored (documenting the loss per ETH-001 Principle 6).
+- Any deviations from this procedure and the reasons.
+- Total rebuild time.</p>
+<p><strong>Step 4: Decision log entry.</strong>
+Record the rebuild as a Tier 2 decision in the decision log per GOV-001.</p>
+<h3>4.8 Rebuild Timeline Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Activities</th>
+<th>Estimated Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Assessment &amp; Procurement</td>
+<td>Assess surviving assets, evaluate rebuild site, determine and procure hardware</td>
+<td>1-7 days (hardware-dependent)</td>
+</tr>
+<tr>
+<td>2. OS Installation</td>
+<td>Prepare media, partition, encrypt, install, base configuration</td>
+<td>1 day</td>
+</tr>
+<tr>
+<td>3. Account Setup</td>
+<td>Create account architecture per SEC-002</td>
+<td>0.5 day</td>
+</tr>
+<tr>
+<td>4. Data Restoration</td>
+<td>Restore Tier 1, 2, 3 from backup, verify</td>
+<td>2-3 days</td>
+</tr>
+<tr>
+<td>5. Service Configuration</td>
+<td>Restore and configure all services</td>
+<td>3-5 days</td>
+</tr>
+<tr>
+<td>6. Verification</td>
+<td>Checklist, first backup, logging</td>
+<td>1-2 days</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td></td>
+<td><strong>8-18 days</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The timeline assumes hardware is available. If hardware must be procured, add procurement lead time. The institution is operational at minimum viable capability (documentation accessible, backup system running) by the end of Phase 4 -- approximately 4-6 days after hardware is available.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D12-03-01:</strong> The rebuild kit must be maintained at an off-site location and updated after every significant system change per D12-001 R-DR-04.</li>
+<li><strong>R-D12-03-02:</strong> The rebuild kit must be verified annually by confirming all components are present, readable, and current.</li>
+<li><strong>R-D12-03-03:</strong> This article (D12-003) must be stored in printed form in the rebuild kit. The printed copy must be updated whenever this article is amended.</li>
+<li><strong>R-D12-03-04:</strong> A full or partial rebuild drill per D12-002 must be conducted at least annually to validate these procedures.</li>
+<li><strong>R-D12-03-05:</strong> The system configuration summary in the rebuild kit must be updated after every Tier 2 or Tier 3 decision that modifies the institutional system architecture.</li>
+<li><strong>R-D12-03-06:</strong> Data restoration must follow tier priority: Tier 1 first, then Tier 2, then Tier 3. No Tier 2 or 3 data restoration may delay or compromise Tier 1 restoration.</li>
+<li><strong>R-D12-03-07:</strong> The rebuilt system must pass the verification checklist (Section 4.7) before being declared operational.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Rebuild kit decay.</strong> The rebuild kit is created once and never updated. When needed, it contains outdated OS installation media, stale backup media, and printed documentation that references systems and configurations that no longer exist. Mitigation: R-D12-03-01 and R-D12-03-02 require regular updates and annual verification.</p>
+</li>
+<li>
+<p><strong>Hardware incompatibility.</strong> The available replacement hardware is incompatible with the OS version on the installation media, or with the system configurations in the backup. Drivers are missing. Hardware-specific configurations do not apply. Mitigation: the rebuild kit should include the most recent stable OS version, which will have the broadest hardware support. The procedures in Section 4.3 are hardware-agnostic. The annual rebuild kit refresh keeps the installation media current.</p>
+</li>
+<li>
+<p><strong>Backup media failure.</strong> The off-site backup media is unreadable -- physical damage, media degradation, or encryption key problems. Mitigation: D6-002 requires periodic verification of backup media. SEC-003 ensures encryption keys exist in multiple copies. The annual rebuild kit verification includes a spot-check of backup media readability.</p>
+</li>
+<li>
+<p><strong>Documentation dependency loop.</strong> The rebuild procedure references documentation that is stored in the backup that has not yet been restored. The operator cannot follow the procedure because the information it references is not yet accessible. Mitigation: this article and the rebuild checklist are printed and stored in the rebuild kit. The most critical information for the rebuild is in these printed materials, not in the backup. Phase 4 (data restoration) makes the full documentation available.</p>
+</li>
+<li>
+<p><strong>Skill atrophy.</strong> The operator has not performed a bare-metal installation in years. The procedures are documented but the operator's hands are unpracticed. Steps that should take minutes take hours. Mitigation: D12-002 requires annual rebuild drills that exercise these procedures.</p>
+</li>
+<li>
+<p><strong>Scope paralysis.</strong> The operator, facing the enormity of rebuilding everything, is paralyzed by the scale of the task. They do not know where to start, or they try to rebuild everything simultaneously. Mitigation: the phased approach in this article provides a clear sequence. Phase 1 assesses. Phase 2 installs the OS. Phase 3 creates accounts. Phase 4 restores data. Each phase has a defined scope and a defined deliverable. Follow the phases in order.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p>The recovery procedures for this article address failures of the rebuild process itself.</p>
+<ol>
+<li>
+<p><strong>If the rebuild kit is missing or destroyed:</strong> The institution must be rebuilt from whatever survives. If any backup media exists at any location (Locations A, B, or C per D6-002), the data can be restored. If no backup media survives, the institution has suffered total data loss. In this case, the documentation that exists only in human memory and in any printed materials must be used to rebuild the institutional framework from scratch. This is the worst-case scenario. It is survivable only if the operator (or successor) remembers or has access to the fundamental architecture of the institution. Begin with a fresh OS installation and start rebuilding the documentation corpus from memory and available references.</p>
+</li>
+<li>
+<p><strong>If the OS installation fails:</strong> Troubleshoot the installation. Common causes: incompatible hardware (try different hardware), corrupt installation media (obtain new media), insufficient storage (use a larger drive). If the institution's standard OS cannot be installed on available hardware, any compatible Unix-like operating system can serve as a platform. The institutional procedures are designed to be OS-independent at the application level. Document the OS substitution and update the system configuration documentation accordingly.</p>
+</li>
+<li>
+<p><strong>If data restoration from backup fails:</strong> Attempt restoration from an alternate backup (a different date, a different location). If the backup archive is partially corrupt, extract what can be extracted and document the loss. If the backup encryption key does not work, follow SEC-003 recovery procedures for key loss. If all backup copies are unreadable, the data protected by those backups is lost. Document the loss honestly per ETH-001 Principle 6.</p>
+</li>
+<li>
+<p><strong>If service configuration fails:</strong> Consult the restored documentation for the service's configuration guide. If the configuration assumes hardware or software that is no longer available, adapt the configuration to the current platform. Document all adaptations. If a service cannot be restored on the new platform, assess whether it is critical to the institution's mission. Non-critical services can be deferred; critical services must be replaced with functional equivalents.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> These procedures are being written against the institution's founding hardware and software. The first rebuild drill will likely reveal gaps -- steps that are too vague, assumptions that are undocumented, tools that are referenced but not included in the rebuild kit. Expect significant revision after the first annual drill.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Hardware generations begin to change. The rebuild procedures must evolve to accommodate new hardware while maintaining the same architectural principles. Each hardware change triggers a rebuild kit refresh and a procedure review.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The institution may have undergone one or more real rebuilds by this point. The lessons from those rebuilds -- captured in the operational log and the after-action reports -- are the most valuable updates to these procedures. Real experience always surpasses planned procedures.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The technology landscape is unrecognizable compared to founding. The specific commands in this article are almost certainly outdated. The sequence -- assess, install, configure, restore, verify -- is not. Future operators should follow the sequence, adapt the commands, and update this article.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+This article is the institution's answer to the question: what survives the fire? Not the hardware. Not the building. Not even the operator, necessarily. What survives is what was stored off-site: the backups, the keys, the printed documentation, and the knowledge encoded in all three.</p>
+<p>I have designed the rebuild process to be executable by someone who is not me. This is deliberate. If I am the one rebuilding after a disaster, I will have knowledge beyond what is in these documents and the rebuild will go faster. But if a successor is rebuilding -- if I am the disaster the institution must survive -- these documents must be sufficient on their own.</p>
+<p>The eight-to-eighteen-day timeline may seem slow. In a world of cloud computing, where a server can be provisioned in minutes, two weeks to rebuild a personal institution seems archaic. But this institution is not a cloud server. It is an air-gapped, encrypted, documented, self-sovereign system built to last fifty years. Rebuilding it carefully in two weeks is preferable to rebuilding it hastily in two days and discovering three months later that something critical was missed.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity; Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (air-gap, off-grid, self-built requirements)</li>
+<li>GOV-001 -- Authority Model (Tier 2 decisions for rebuild, decision logging)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (air-gap enforcement, physical threats)</li>
+<li>SEC-002 -- Access Control Procedures (account architecture, physical zones)</li>
+<li>SEC-003 -- Cryptographic Key Management (key recovery from Tier C backup)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle, operational tempo post-rebuild)</li>
+<li>D12-001 -- Disaster Recovery Philosophy (rebuild mindset, rebuild kit concept)</li>
+<li>D12-002 -- Disaster Recovery Drill Framework (rebuild drills)</li>
+<li>D6-002 -- Backup Doctrine (backup locations, backup media, restoration procedures)</li>
+<li>D6-003 -- Data Integrity Verification (post-restoration verification)</li>
+<li>D5-002 -- Operating System Maintenance Procedures (OS installation and configuration)</li>
+<li>D11-002 -- Asset Inventory and Tracking (asset registry for replacement hardware)</li>
+<li>GOV-004 -- Succession Planning and Execution (successor rebuild scenario)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

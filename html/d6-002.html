@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D6-002 — Backup Doctrine - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li class="active"><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d6-002">
+  <h1>D6-002 &mdash; Backup Doctrine</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D6-002</dd>
+  <dt>Domain</dt>
+  <dd>6 -- Data & Archives</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, SEC-002, SEC-003, OPS-001, D6-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-003, D10-003. All articles involving data recovery, disaster recovery, or data durability.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the complete backup strategy for the holm.chat Documentation Institution. It specifies what gets backed up, how often, where backups are stored, in what format, how backups are verified, how restorations are tested, and what to do when a backup fails.</p>
+<p>A backup that has not been tested is not a backup. It is a hope. This article is written to eliminate hope from the backup process and replace it with verified, documented, reproducible procedures. Every backup created under these procedures will have been verified at creation and tested through periodic restoration. Every backup failure will be detected, documented, and remediated.</p>
+<p>This article implements the data redundancy requirements of D6-001 (particularly R-D6-02: Tier 1 data in at least three copies on two media types with geographic separation) and the backup verification requirements of OPS-001 (monthly test restorations). It translates those requirements into specific, step-by-step procedures that a single operator can execute.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The backup strategy: what is backed up and at what frequency.</li>
+<li>The 3-2-1 rule as adapted for air-gapped, off-grid operation.</li>
+<li>Backup media selection and management.</li>
+<li>Step-by-step backup procedures for each data tier.</li>
+<li>Backup verification: how to confirm a backup is complete and correct.</li>
+<li>Test restoration procedures: how to verify a backup can actually be restored.</li>
+<li>Backup rotation and retention: how long backups are kept and when they are recycled.</li>
+<li>Backup encryption: how backup media is protected.</li>
+<li>The backup log: what is recorded and why.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Data integrity verification beyond backup verification (see D6-003).</li>
+<li>Full disaster recovery procedures (see subsequent Domain 12 articles).</li>
+<li>Storage hardware selection and maintenance (see subsequent Domain 6 articles).</li>
+<li>Key management for backup encryption keys (see SEC-003).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The 3-2-1 Rule</h3>
+<p>The 3-2-1 rule is the industry standard for backup resilience: maintain at least 3 copies of data, on at least 2 different types of media, with at least 1 copy off-site. This rule was developed for networked environments where "off-site" might mean a cloud backup or a remote data center. For an air-gapped institution, the rule must be adapted.</p>
+<p><strong>The adapted 3-2-1 rule for this institution:</strong>
+- <strong>3 copies:</strong> The primary data on the institution's active storage, a local backup on separate physical media, and an off-site backup at a geographically separate location.
+- <strong>2 media types:</strong> The active storage and at least one backup should be on different types of media (e.g., if active storage is on SSDs, at least one backup should be on spinning disks, or on tape, or on optical media). This protects against media-class failures -- a manufacturing defect that affects a batch of SSDs will not affect your spinning disk backup.
+- <strong>1 off-site:</strong> At least one backup copy must be stored at a location far enough from the primary site that a single disaster (fire, flood, earthquake) cannot destroy both. "Far enough" depends on the threat model. For most scenarios, a separate building at least 30 kilometers away is sufficient. For maximum resilience, a separate geographic region.</p>
+<h3>3.2 The Air-Gap Backup Challenge</h3>
+<p>In a networked environment, backups can be automated end-to-end: a backup agent runs, compresses and encrypts the data, transmits it to a remote server, and verifies the transfer. In an air-gapped environment, the off-site copy requires physical transport. Someone must physically carry a backup medium from the primary site to the off-site location. This introduces delay, effort, and the risk of loss or damage during transport.</p>
+<p>This article addresses the air-gap challenge by defining clear procedures for backup creation, encryption, physical labeling, transport, and verification at both origin and destination. The process is manual by necessity but structured to minimize the chance of error.</p>
+<h3>3.3 What Backups Protect Against</h3>
+<p>Backups protect against: hardware failure (disk death), software corruption (filesystem errors, application bugs), operator error (accidental deletion, misconfiguration), and site-level disasters (fire, flood, theft). They do not protect against: threats that the operator is unaware of (if all copies are corrupted silently, the backups are also corrupted), or threats that affect all copies simultaneously (if the backup encryption key is lost, all encrypted backups are inaccessible).</p>
+<p>Understanding what backups do and do not protect against is essential. Backups are one layer of defense. They complement, but do not replace, data integrity verification (D6-003), access controls (SEC-002), and key management (SEC-003).</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 What Gets Backed Up</h3>
+<p>All institutional data is backed up according to its tier classification per D6-001:</p>
+<p><strong>Tier 1: Institutional Memory (backed up daily).</strong>
+- The documentation corpus (all articles, all versions).
+- The decision log and operational log.
+- The key inventory (not the keys themselves -- those are managed per SEC-003).
+- Commentary sections and all governance records.
+- Backup frequency: daily incremental, weekly full.</p>
+<p><strong>Tier 2: Operational Data (backed up weekly).</strong>
+- System configurations and service definitions.
+- Active project data and working documents.
+- Automation scripts and service account configurations per D8-001.
+- Backup frequency: weekly incremental, monthly full.</p>
+<p><strong>Tier 3: Reference Data (backed up monthly).</strong>
+- Research materials, imported knowledge bases, archived media.
+- Backup frequency: monthly full.</p>
+<p><strong>Tier 4: Transient Data (not backed up).</strong>
+- Temporary files, scratch data, working copies.
+- Per D6-001, Tier 4 data has no preservation requirement.</p>
+<h3>4.2 The Backup Architecture</h3>
+<p>The institution maintains three backup locations, implementing the adapted 3-2-1 rule:</p>
+<p><strong>Location A: On-site local backup.</strong>
+- Physical media: a dedicated storage device (external drive, NAS, or secondary internal drive) separate from the active storage.
+- Media type: should differ from active storage if possible (if active is SSD, backup to HDD or vice versa).
+- Contents: all Tier 1, Tier 2, and Tier 3 backups.
+- Encryption: the backup device is encrypted with the backup encryption key per SEC-003.
+- Stored in Zone 1 per SEC-002.</p>
+<p><strong>Location B: On-site archival backup.</strong>
+- Physical media: a set of removable media (external HDDs, optical discs, or tape) stored in Zone 1.
+- This is the monthly archival snapshot -- a complete image of all backed-up data.
+- Encryption: each medium is encrypted.
+- These are rotated on a schedule defined in Section 4.5.</p>
+<p><strong>Location C: Off-site backup.</strong>
+- Physical media: removable media transported to Zone 3 per SEC-002.
+- Contents: all Tier 1 data (always), Tier 2 data (at least quarterly), Tier 3 data (at least annually).
+- Encryption: each medium is encrypted with the backup encryption key. The decryption key is available at the off-site location per SEC-003 Tier C provisions.
+- Transport schedule: monthly for Tier 1 updates, quarterly for comprehensive off-site backup.</p>
+<h3>4.3 Step-by-Step Backup Procedures</h3>
+<p><strong>Daily Incremental Backup (Tier 1 data to Location A):</strong></p>
+<ol>
+<li>Log in to the administrative account.</li>
+<li>Verify the backup destination device is connected and mounted.</li>
+<li>Run the backup tool. The recommended approach is <code>rsync</code> with checksums:
+   <code>rsync -avz --checksum --delete \
+     --backup --backup-dir=/backup/incremental/$(date +%Y-%m-%d) \
+     /path/to/tier1-data/ \
+     /path/to/backup-location-a/tier1/current/</code>
+   This creates a current mirror of Tier 1 data with changed files preserved in dated incremental directories.</li>
+<li>Verify the backup completed without errors. Check the rsync exit code: <code>echo $?</code> should be 0.</li>
+<li>Verify the backup size: <code>du -sh /path/to/backup-location-a/tier1/current/</code> -- compare against the source size. They should be within 1% of each other.</li>
+<li>Generate a checksum manifest of the backup:
+   <code>find /path/to/backup-location-a/tier1/current/ -type f -exec sha256sum {} \; &gt; \
+     /path/to/backup-location-a/tier1/manifests/$(date +%Y-%m-%d).sha256</code></li>
+<li>Record the backup in the backup log: date, time, type (daily incremental), source, destination, size, exit code, any errors.</li>
+<li>Unmount the backup device if it is removable.</li>
+</ol>
+<p><strong>Weekly Full Backup (Tier 1 data to Location A):</strong></p>
+<ol>
+<li>Follow steps 1-2 of the daily procedure.</li>
+<li>Create a full archive:
+   <code>tar -czf /path/to/backup-location-a/tier1/weekly/$(date +%Y-%m-%d)-full.tar.gz \
+     /path/to/tier1-data/</code></li>
+<li>Generate a checksum of the archive:
+   <code>sha256sum /path/to/backup-location-a/tier1/weekly/$(date +%Y-%m-%d)-full.tar.gz &gt; \
+     /path/to/backup-location-a/tier1/weekly/$(date +%Y-%m-%d)-full.tar.gz.sha256</code></li>
+<li>Verify the archive is valid:
+   <code>tar -tzf /path/to/backup-location-a/tier1/weekly/$(date +%Y-%m-%d)-full.tar.gz &gt; /dev/null</code>
+   This lists the archive contents without extracting, confirming the archive is readable. Exit code 0 means success.</li>
+<li>Record in the backup log.</li>
+</ol>
+<p><strong>Monthly Full Backup (All tiers to Location B):</strong></p>
+<ol>
+<li>Prepare the Location B medium: connect the external drive or prepare optical media.</li>
+<li>If the medium is new, format and encrypt it per SEC-003.</li>
+<li>Create full archives of each tier:
+   <code>tar -czf /path/to/location-b/tier1-$(date +%Y-%m-%d).tar.gz /path/to/tier1-data/
+   tar -czf /path/to/location-b/tier2-$(date +%Y-%m-%d).tar.gz /path/to/tier2-data/
+   tar -czf /path/to/location-b/tier3-$(date +%Y-%m-%d).tar.gz /path/to/tier3-data/</code></li>
+<li>Generate checksums for each archive.</li>
+<li>Create a manifest file listing all archives, their sizes, and their checksums.</li>
+<li>Verify each archive is valid (tar -tzf test).</li>
+<li>Label the physical medium: "MONTHLY BACKUP -- [date] -- TIERS 1/2/3"</li>
+<li>Store in Zone 1 per SEC-002.</li>
+<li>Record in the backup log.</li>
+</ol>
+<p><strong>Off-site Backup (to Location C):</strong></p>
+<ol>
+<li>Prepare the removable medium. Format and encrypt per SEC-003.</li>
+<li>Copy the most recent Tier 1 full backup and all incremental backups since the last off-site update.</li>
+<li>On quarterly intervals, include Tier 2 data. On annual intervals, include Tier 3 data.</li>
+<li>Generate checksums and a manifest.</li>
+<li>Label the medium: "OFF-SITE BACKUP -- [date] -- CONTENTS: [tier list]"</li>
+<li>Transport to Zone 3. Handle with care. Do not leave unattended during transport.</li>
+<li>At the off-site location, verify the medium is readable: mount, check the manifest, spot-check one or two files.</li>
+<li>Record the transport in the backup log: date, contents, destination, verification result.</li>
+</ol>
+<h3>4.4 Backup Verification Procedures</h3>
+<p><strong>Verification at creation (every backup):</strong>
+- Check tool exit codes (0 = success).
+- Compare source and destination sizes.
+- Generate and store checksum manifests.
+- Verify archive readability (tar -tzf or equivalent).</p>
+<p><strong>Monthly test restoration:</strong>
+Per OPS-001, a randomly selected backup set must be test-restored monthly. The procedure:</p>
+<ol>
+<li>Select a backup to test. Use a random selection method: roll a die to choose the tier, then select a date.</li>
+<li>Prepare a test restoration target: a scratch partition or temporary directory that will be erased after the test.</li>
+<li>Copy the backup to the test target.</li>
+<li>Extract the backup:
+   <code>tar -xzf /path/to/test-target/backup-archive.tar.gz -C /path/to/test-target/restored/</code></li>
+<li>Verify the restored data:
+   - Compare file counts: <code>find /path/to/test-target/restored/ -type f | wc -l</code> vs. expected.
+   - Spot-check individual files: open several, verify content is correct and readable.
+   - If a checksum manifest exists for the backup, verify checksums:
+     <code>cd /path/to/test-target/restored/ &amp;&amp; sha256sum -c /path/to/manifest.sha256</code></li>
+<li>Record the test results in the backup log: date, backup tested (date and tier), restoration success (yes/no), any issues found, time taken.</li>
+<li>Clean up the test target: securely erase the restored data.</li>
+</ol>
+<p>If the test restoration fails:
+- Identify the failure point: was the archive corrupt, was the checksum wrong, or was the restoration procedure incorrect?
+- Attempt restoration from a different backup of the same data.
+- If multiple backups fail, escalate per D10-003 (incident response).
+- Do not wait until the next monthly test. Fix the backup process immediately.</p>
+<h3>4.5 Backup Rotation and Retention</h3>
+<p>Backups are retained according to this schedule:</p>
+<ul>
+<li><strong>Daily incrementals:</strong> Retained for 30 days. After 30 days, deleted to reclaim space.</li>
+<li><strong>Weekly full backups:</strong> Retained for 12 weeks (approximately 3 months).</li>
+<li><strong>Monthly full backups (Location B):</strong> Retained for 12 months. After 12 months, the medium is recycled (securely erased and reformatted for reuse).</li>
+<li><strong>Off-site backups (Location C):</strong> The most recent 4 off-site backups are retained (approximately 4 months of monthly transports). Older media is retrieved, securely erased, and recycled.</li>
+<li><strong>Annual archival snapshot:</strong> One full backup from each year is retained permanently as a historical archive. This is a Tier 1 data artifact. It is stored at both Location B and Location C.</li>
+</ul>
+<p><strong>Secure erasure procedure for recycled backup media:</strong>
+1. Overwrite the entire medium: <code>dd if=/dev/urandom of=/dev/[device] bs=4M status=progress</code>
+2. Verify the overwrite by attempting to mount the medium (it should fail or show no recognizable data).
+3. Reformat and re-encrypt the medium.
+4. Record the recycling in the backup log: date, medium identifier, confirmation of erasure.</p>
+<h3>4.6 The Backup Log</h3>
+<p>The backup log is a Tier 1 data artifact per D6-001. It records every backup operation, every verification, every test restoration, and every failure. It is the audit trail that proves the backup process is functioning.</p>
+<p>Each entry contains:
+- Date and time.
+- Operation type: daily backup, weekly backup, monthly backup, off-site transport, test restoration, rotation/recycling.
+- Source and destination.
+- Data tiers included.
+- Size of backup.
+- Exit codes and verification results.
+- Any errors or anomalies.
+- Operator identifier.</p>
+<p>The backup log is itself backed up as part of the Tier 1 data.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D6B-01:</strong> Tier 1 data must be backed up daily. No exceptions. If the daily backup is missed, it must be performed the next day and the gap documented in the backup log.</li>
+<li><strong>R-D6B-02:</strong> All backups must be verified at creation per Section 4.4. An unverified backup is not counted toward the 3-2-1 requirement.</li>
+<li><strong>R-D6B-03:</strong> Test restorations must be performed monthly per Section 4.4. Test results must be recorded in the backup log. A failed test restoration triggers immediate investigation.</li>
+<li><strong>R-D6B-04:</strong> All backup media must be encrypted per SEC-003. Unencrypted backup media is a security violation.</li>
+<li><strong>R-D6B-05:</strong> Off-site backups must be transported at least monthly for Tier 1 data. The transport must be documented in the backup log.</li>
+<li><strong>R-D6B-06:</strong> The backup log is Tier 1 data and is subject to all Tier 1 preservation requirements per D6-001.</li>
+<li><strong>R-D6B-07:</strong> Backup media that reaches the end of its retention period must be securely erased before recycling per Section 4.5.</li>
+<li><strong>R-D6B-08:</strong> The annual archival snapshot must be created and stored at both Location B and Location C. It is retained permanently.</li>
+<li><strong>R-D6B-09:</strong> Backup procedures must be documented in sufficient detail that a successor can execute them from the documentation alone, per D9-001's self-teaching requirement.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Backup neglect.</strong> Backups are not performed on schedule. The gap between the last backup and current data grows. When a failure occurs, the data loss is measured in weeks or months instead of hours. Mitigation: R-D6B-01 makes daily Tier 1 backup mandatory. The daily checklist per D10-002 includes a backup verification item.</p>
+</li>
+<li>
+<p><strong>Silent backup failure.</strong> The backup tool runs but produces corrupt or incomplete output. The operator sees "backup complete" and moves on. The backup is useless. Mitigation: the verification procedures in Section 4.4, which check exit codes, compare sizes, generate checksums, and verify archive readability.</p>
+</li>
+<li>
+<p><strong>Untested backups.</strong> Backups are created and verified but never test-restored. When a real restoration is needed, it fails due to a problem that verification alone could not detect. Mitigation: R-D6B-03 mandates monthly test restorations.</p>
+</li>
+<li>
+<p><strong>Backup media degradation.</strong> Physical media degrades over time. A backup that was valid when created becomes unreadable years later. Mitigation: the rotation schedule limits how long any single medium is relied upon. The annual archival snapshot is stored on fresh media each year.</p>
+</li>
+<li>
+<p><strong>All-eggs-in-one-basket.</strong> All backups are stored in the same physical location. A fire, flood, or theft destroys everything -- primary data and all backups. Mitigation: the 3-2-1 rule with mandatory off-site backup (Location C).</p>
+</li>
+<li>
+<p><strong>Encryption key loss for backup media.</strong> The backup encryption key is lost, rendering all backups inaccessible. Mitigation: SEC-003 requires the backup encryption key to exist in three copies with geographic separation. The succession packet includes the key.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>7.1 If a daily backup was missed:</strong>
+1. Perform the backup immediately when the gap is discovered.
+2. Record the gap in the backup log: dates missed, reason (if known).
+3. If more than 3 consecutive daily backups were missed, also perform a weekly full backup to ensure a complete baseline exists.
+4. Review why the backup was missed. If the procedure is too burdensome, consider automation at Level 2 or 3 per D8-001 (supervised or monitored autonomous).</p>
+<p><strong>7.2 If a test restoration fails:</strong>
+1. Do not panic. The fact that you discovered the failure during a test is the system working correctly.
+2. Identify the failure point: archive corruption, checksum mismatch, extraction error, or content error.
+3. Test a different backup of the same data (different date, different location).
+4. If multiple backups fail, assess the scope: is the backup tool producing bad output, or has the source data been corrupted?
+5. If the backup tool is at fault, fix or replace the tool, then create new backups immediately.
+6. If the source data is corrupted, this is a data integrity incident per D6-003.
+7. Document everything in the backup log and the operational log.</p>
+<p><strong>7.3 If backup media has failed:</strong>
+1. Replace the failed media.
+2. Create fresh backups on the new media.
+3. Verify the new backups per Section 4.4.
+4. If the failed media was the only copy at its location (e.g., the only Location B medium), the institution has dropped below the 3-2-1 threshold. Prioritize creating the replacement immediately.
+5. Document the failure in the backup log. Note the media type, age, and any signs of degradation to inform future media selection.</p>
+<p><strong>7.4 If the off-site backup is inaccessible:</strong>
+1. Assess why it is inaccessible: location unavailable, media damaged, encryption key missing.
+2. If the location is temporarily unavailable, create an additional on-site backup to maintain redundancy until off-site access is restored.
+3. If the off-site media is damaged, transport a fresh off-site backup as soon as possible.
+4. If the encryption key is missing, follow SEC-003 recovery procedures.
+5. The institution should never operate with zero off-site backups for more than 30 days.</p>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The backup procedures are being established. The first year is about building the habit: daily backups, weekly fulls, monthly archives, monthly test restorations. Expect to refine the procedures as you discover what works and what does not. The backup log will be sparse at first and should grow into a rich record.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The backup procedures should be stable and habitual. The first media replacements will occur as backup drives age out. The first annual archival snapshots will accumulate. This is when the long-term storage strategy begins to be tested by reality.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Storage technology will have changed. The media types used for backups may need to migrate to new technology. Plan media migrations proactively -- do not wait until the old media can no longer be read. The backup log's history becomes a valuable record of the institution's data resilience over time.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The annual archival snapshots span decades. The backup architecture has been through multiple media technology transitions. A successor inheriting the institution should find a clear, documented backup system that they can continue operating from the documentation alone.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The most important sentence in this article is: "A backup that has not been tested is not a backup." I have been burned by this exact failure in previous systems. Backups ran faithfully for months. The logs said "success." The checksums were generated. Everything looked perfect. Then the disk died, the restoration was attempted, and it failed -- because the backup tool had been silently misconfigured and was backing up an empty directory. The verification procedures in this article exist because of that experience.</p>
+<p>The air-gap constraint makes backups harder than they need to be in a connected world. I cannot use rsync over SSH to a remote server. I cannot spin up a cloud backup. Every off-site backup requires me to physically carry a drive to another location. This is annoying. It is also the price of sovereignty. The off-site backup that I physically transport is the off-site backup that no one can remotely delete, corrupt, or hold hostage.</p>
+<p>The monthly test restoration is the procedure I most dread and most value. It takes time. It feels wasteful when everything is working. And it is the only way to know that the backups are real. I have committed to it in this document, and I am holding myself to it. Future operators: hold yourselves to it too.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (data sovereignty, self-contained operation)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (Category 1: Physical Threats, Category 2: Data Integrity Threats)</li>
+<li>SEC-002 -- Access Control Procedures (physical zones for backup storage)</li>
+<li>SEC-003 -- Cryptographic Key Management (backup encryption keys)</li>
+<li>OPS-001 -- Operations Philosophy (monthly test restorations, operational tempo)</li>
+<li>D6-001 -- Data Philosophy (data tier system, R-D6-02 redundancy requirements, backup log as Tier 1 data)</li>
+<li>D6-003 -- Data Integrity Verification (complementary integrity procedures)</li>
+<li>D8-001 -- Automation Philosophy (automation levels for backup processes)</li>
+<li>D10-002 -- Daily Operations Doctrine (daily backup verification in checklist)</li>
+<li>D10-003 -- Incident Response Procedures (escalation for backup failures)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

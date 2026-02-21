@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D16-010 — Multi-Generational Interface Continuity - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li class="active"><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d16-010">
+  <h1>D16-010 &mdash; Multi-Generational Interface Continuity</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D16-010</dd>
+  <dt>Domain</dt>
+  <dd>16 -- Interface & Navigation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D16-001 (Interface Philosophy), D16-014 (Component Catalog)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D16-012 (Localization), D16-013 (Onboarding)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article addresses the central challenge of a fifty-year interface: how to evolve the interface over time without disorienting the users who depend on it. The institution will outlive every design trend, every hardware generation, and every aesthetic sensibility of its founding era. Its interface must change. But change, handled badly, is indistinguishable from destruction. A user who opens the institution one morning to find that everything has moved, been renamed, or been reorganised will experience not an upgrade but a loss.</p>
+
+<p>This article defines the strategies, processes, and constraints that govern interface evolution. It ensures that change happens deliberately, gradually, and with full documentation of what changed, why, and how users can adapt. It also ensures that the institution retains the ability to explain its own interface history -- why the interface looks the way it does, what it used to look like, and what decisions led to the current state.</p>
+
+<p>This article is addressed to every person who will propose, design, approve, or implement a change to the institution's interface. It is also addressed to the user who experiences a change and needs to understand what happened and why.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The classification of interface changes by scope and impact.</li>
+<li>The change governance process: who may propose, approve, and implement changes.</li>
+<li>Transition strategies for major interface changes.</li>
+<li>User notification requirements for interface changes.</li>
+<li>Interface versioning and the preservation of interface history.</li>
+<li>The relationship between interface evolution and the four-layer model defined in D16-001.</li>
+<li>Criteria for when interface change is necessary versus when it is merely desired.</li>
+<li>Protection against both stagnation (refusing to change when change is needed) and churn (changing when stability is needed).</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The specific visual design of any particular interface version (covered by D16-007).</li>
+<li>The content or structure of the information architecture (covered by D16-002; changes to IA are the most impactful and are governed by that article's own evolution process).</li>
+<li>Localization changes that adapt the interface for different languages or cultures (covered by D16-012, though this article's transition strategies apply).</li>
+<li>Quality assurance procedures for validating interface changes (covered by Domain 19).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>The Problem of Interface Entropy</h3>
+
+<p>Interfaces decay in two ways. The first is stagnation: an interface that never changes becomes progressively more alien as the conventions around it evolve. Users who grew up with different interaction paradigms find it confusing. Metaphors that were obvious at launch become obscure. The interface fossilises while the world around it moves on. The second is churn: an interface that changes too frequently never allows users to develop fluency. Each change resets the user's learning curve. Muscle memory is disrupted. Landmarks are removed. The user who was expert yesterday is a novice today.</p>
+
+<p>The institution must navigate between these two hazards. It must change -- but only when change serves the user, and only at a pace the user can absorb. This requires explicit governance, because without governance, the pace of change is set by whoever has the ability to modify the interface, not by what the users can absorb.</p>
+
+<h3>Lessons from Long-Lived Institutions</h3>
+
+<p>Physical institutions offer useful precedent. Libraries, churches, and government buildings evolve their physical interfaces over decades. The principles they follow are instructive: change the interior while preserving the entrance (users must always be able to find the front door). Change one section at a time, not everything simultaneously. Mark changes clearly (new signage, temporary notices, guided maps). Preserve the core wayfinding structures (main corridors, central desks, stairways) even as peripheral areas are remodelled.</p>
+
+<p>The institution's digital interface should follow the same principles. The primary navigation structures are the main corridors. The search system is the central desk. The information architecture is the building layout. These change only when the institution's purpose changes. Peripheral elements -- visual styling, interaction refinements, new convenience features -- can change more frequently, because their change does not disorient the user's fundamental understanding of where things are.</p>
+
+<h3>The Layer Model Revisited</h3>
+
+<p>D16-001 defines four layers: philosophical, structural, interaction, and presentation. Each layer has a different rate of acceptable change. The philosophical layer should change only in response to fundamental institutional shifts. The structural layer should change only when the institution's content scope or organisation genuinely requires it. The interaction layer should change when new input modalities or user research justify it. The presentation layer may change every five to ten years to remain visually current. This article governs the process by which changes at each layer are proposed, evaluated, approved, and communicated.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<pre>
+INTERFACE CHANGE CLASSIFICATION
+=================================
+
+Class     Layer           Frequency       Approval         Transition
+-----     -----           ---------       --------         ----------
+Minor     Presentation    As needed       Domain 16 lead   Ship directly, log
+                                                           in changelog
+
+Moderate  Interaction     1-2x per year   Domain 16 lead   Announce 30 days
+                                          + 1 peer review  before; document
+                                                           in release notes
+
+Major     Structural      Max 1x per      Full domain      Announce 90 days
+                          5 years         review + user    before; parallel
+                                          testing          operation period
+
+Critical  Philosophical   Only when       Institutional    Full article
+                          institution     governance       amendment per
+                          mission changes (GOV framework)  ETH-001 process
+
+
+TRANSITION PROTOCOL FOR MAJOR CHANGES
+=======================================
+
+Phase 1: ANNOUNCE (90 days before)
+  - Publish change description accessible from every interface page
+  - Describe what will change, what will not change, and why
+  - Provide timeline with specific dates
+
+Phase 2: PARALLEL (30 days, overlapping with announcement)
+  - Both old and new interface available simultaneously
+  - User can switch between them at will
+  - All data and state is shared; only presentation/structure differs
+
+Phase 3: DEFAULT FLIP (Day 0)
+  - New interface becomes the default
+  - Old interface remains available via explicit "use previous version" option
+  - Transition guide prominently displayed on first load
+
+Phase 4: SUNSET OLD (90 days after default flip)
+  - Old interface is removed
+  - Change documentation is archived per D20 standards
+  - Any user feedback received during transition is logged in Commentary
+</pre>
+
+<h3>Interface Changelog</h3>
+
+<p>The institution maintains a permanent, append-only changelog of all interface modifications. Each entry records: the date, the change class, a description of what changed, the rationale for the change, the articles or standards that authorised the change, and any user feedback received. The changelog is itself navigable through the interface and is never purged.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D16-10-01: No Surprise Changes.</strong> No interface change that affects user workflow may be deployed without advance notification. Minor changes (visual polish, bug fixes that do not alter behaviour) may be deployed with changelog entries only. Moderate changes require 30 days' advance notice. Major changes require 90 days' advance notice and a parallel operation period.</p></li>
+
+<li><p><strong>R-D16-10-02: Change Justification Required.</strong> Every proposed interface change MUST include a written justification that answers three questions: (1) What problem does this change solve? (2) Who is affected by the current state? (3) Why is this change the right solution, and what alternatives were considered? Changes motivated solely by aesthetic preference or trend-following MUST be rejected unless they demonstrably improve usability.</p></li>
+
+<li><p><strong>R-D16-10-03: One Major Change at a Time.</strong> No more than one major (structural) interface change may be in progress at any time. This prevents the compounding disorientation that occurs when multiple foundational elements shift simultaneously. If multiple structural changes are needed, they MUST be sequenced with sufficient time between them for users to adapt to each one.</p></li>
+
+<li><p><strong>R-D16-10-04: Preserve Navigation Landmarks.</strong> The primary navigation entry points -- the main menu, the search bar, the home link, and the breadcrumb trail -- MUST NOT be removed or relocated in a major change without a transition period that maintains both the old and new locations simultaneously. These are the user's wayfinding anchors. Moving them without transition is equivalent to rearranging the streets of a city overnight.</p></li>
+
+<li><p><strong>R-D16-10-05: Interface History Preservation.</strong> Screenshots, descriptions, or other records of every major interface version MUST be archived per D20 standards. Future maintainers must be able to see what the interface looked like at any point in the institution's history. This serves both historical understanding and practical debugging (identifying when a specific interaction problem was introduced).</p></li>
+
+<li><p><strong>R-D16-10-06: User Feedback Integration.</strong> Every major interface change MUST include a mechanism for users to provide feedback during the transition period. This feedback MUST be reviewed before the old interface is sunset. If significant usability problems are reported, the sunset MUST be delayed until the problems are addressed.</p></li>
+
+<li><p><strong>R-D16-10-07: Rollback Capability.</strong> For any moderate or major interface change, a rollback plan MUST exist before deployment. If the change causes critical usability problems, it MUST be possible to revert to the previous version within 24 hours. The rollback plan MUST be tested before the change is deployed.</p></li>
+
+<li><p><strong>R-D16-10-08: Stagnation Review.</strong> If no moderate or major interface changes have been made for five years, a mandatory review MUST be conducted to determine whether the interface is still serving its users well or whether it has stagnated. Stagnation is not safety; it is deferred risk. The review must include user testing with participants who represent the current user population, not the founding population.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Redesign shock.</strong> A major interface redesign is deployed without adequate transition, and long-time users are suddenly unable to find basic functions. Productivity drops. Trust erodes. Some users refuse to use the system until the old interface is restored. Likelihood: high without the governance process defined in this article. Severity: critical (can effectively remove users from the institution). Detection: user feedback during transition; task-completion metrics before and after the change.</p></li>
+
+<li><p><strong>Change aversion lock-in.</strong> The governance process becomes so burdensome that all interface changes are blocked. The interface stagnates. New users find it increasingly incomprehensible. Maintainers are unable to fix known usability problems because the approval process is prohibitive. Likelihood: moderate (governance processes tend toward increasing friction over time). Severity: high (stagnation is as harmful as churn, just slower). Detection: the five-year stagnation review (R-D16-10-08); tracking proposed changes that were abandoned due to process burden.</p></li>
+
+<li><p><strong>Incremental drift.</strong> Many small "minor" changes accumulate over time, each individually insignificant but collectively transforming the interface without any of the governance safeguards that apply to moderate or major changes. The interface of 2036 bears little resemblance to the interface of 2026, but no single change was large enough to trigger the transition protocol. Likelihood: high. Severity: moderate to high. Detection: periodic comparison of the current interface against archived screenshots from the previous review cycle; automated tracking of cumulative change magnitude.</p></li>
+
+<li><p><strong>Parallel period abuse.</strong> During the parallel operation period for a major change, users overwhelmingly prefer the old interface. Rather than investigating why, the maintainers sunset the old interface on schedule, assuming the preference is mere familiarity. In fact, the new interface has a genuine usability regression. Likelihood: moderate. Severity: high. Detection: R-D16-10-06 requires feedback review before sunset; additionally, task-completion metrics must be compared between old and new versions.</p></li>
+
+<li><p><strong>History loss.</strong> Interface versions are not archived. Future maintainers cannot understand why the interface looks the way it does because they cannot see what it evolved from. Design decisions that were reactions to specific problems appear arbitrary. Likelihood: moderate (archiving is easy to neglect). Severity: high over time (compounds with each lost version). Detection: D20 audit of interface history completeness as part of the standard institutional memory review.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If a redesign has caused user disorientation:</strong> Immediately activate the rollback plan. Restore the previous version while the new version's problems are identified and addressed. Conduct user testing to pinpoint the specific elements that caused disorientation. Do not re-deploy the new version until those elements are fixed. Extend the parallel operation period to give users more time to adapt.</p></li>
+
+<li><p><strong>If the change process has become a bottleneck:</strong> Review the governance process itself. Distinguish between changes that genuinely need governance (structural, navigational) and changes that do not (bug fixes, minor visual adjustments). Streamline the process for lower-impact changes. Consider delegating minor and moderate change approval to a single domain lead rather than requiring committee review.</p></li>
+
+<li><p><strong>If incremental drift is detected:</strong> Conduct a comprehensive comparison between the current interface and the last major-version archive. Document all differences. Classify each difference as intentional-and-documented, intentional-but-undocumented, or unintentional. For undocumented and unintentional changes, decide whether to formalise them (by documenting them) or to revert them. Update the changelog retroactively for all intentional-but-undocumented changes.</p></li>
+
+<li><p><strong>If interface history has been lost:</strong> Reconstruct what can be reconstructed from available sources: screenshots in documentation, user-facing changelogs, version control history, and the memories of current participants (captured via D20-003 oral history methods). Document the gap in the historical record. Establish automated archiving to prevent future loss.</p></li>
+
+<li><p><strong>If the interface has stagnated for more than five years:</strong> Conduct the mandatory stagnation review. Test the interface with new users who have no familiarity with it. Identify metaphors, conventions, or patterns that are no longer comprehensible. Develop a phased modernisation plan that addresses the most critical comprehension gaps first, following the transition protocol for each change.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> The interface is new and will undergo rapid iteration. Most changes in this period will be classified as moderate or minor. Establish the changelog from the first day. Archive the first production version immediately. Begin building the user feedback infrastructure. The governance process during this period should be lightweight to avoid impeding necessary iteration, but every change must still be logged.</p></li>
+
+<li><p><strong>Years 5-15:</strong> The interface should stabilise. Changes become less frequent and more deliberate. The governance process can tighten as the cost of disruption increases (more users, more established habits). Expect the first stagnation review around year 10. This is the period where the discipline of documenting change rationale pays off: new maintainers arriving in this period can read the changelog to understand how the interface reached its current state.</p></li>
+
+<li><p><strong>Years 15-30:</strong> This is the highest-risk period for generational disconnect. Users who joined the institution in its second decade may find the founding-era interface conventions alien. A major presentation refresh is likely and appropriate. The transition protocol defined in this article exists for exactly this moment. The refresh must respect all structural and philosophical principles while updating the presentation and interaction layers.</p></li>
+
+<li><p><strong>Years 30-50:</strong> The interface will have been through at least one major refresh. The governance process itself should be reviewed: does it still serve the institution, or has it become an obstacle? The changelog should contain decades of institutional learning about what works and what does not. This accumulated knowledge is a strategic asset. Protect it per D20 standards.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The hardest lesson in interface design is that your users' muscle memory is not your enemy. It is your greatest asset. A user who can navigate the interface without thinking is a user who can focus on the content. Every interface change disrupts that muscle memory, at least temporarily. Some disruption is necessary -- the interface must evolve -- but it must be weighed against the cost.</p>
+
+<p>I have set the transition period for major changes at 90 days before and 90 days after, with a 30-day parallel period. These numbers are estimates based on organisational change research suggesting that people need roughly three months to fully adjust to a significant workflow change. Future maintainers should adjust these durations based on observed user behaviour, not based on impatience to ship the new version.</p>
+
+<p>The one-major-change-at-a-time rule will be tested. There will come a moment when multiple structural improvements are urgently needed. Resist the urge to bundle them. Each major change should be experienced, absorbed, and evaluated independently. Sequential pain is recoverable. Simultaneous pain is catastrophic.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D16-001 -- Interface Philosophy (four-layer model; evolution path framework)</li>
+<li>D16-002 -- Information Architecture Model (structural changes to IA)</li>
+<li>D16-007 -- Typography, Layout & Visual Structure (presentation layer changes)</li>
+<li>D16-012 -- Interface Localization & Cultural Adaptation (cultural dimension of change)</li>
+<li>D16-013 -- User Onboarding & Training Pathways (retraining after changes)</li>
+<li>D16-014 -- Interface Component Catalog (component deprecation and replacement)</li>
+<li>D19-006 -- Review Gate Definitions (quality gates for interface changes)</li>
+<li>D20-002 -- Decision Log Architecture (logging change decisions)</li>
+<li>D20-005 -- Timeline Construction (interface milestones in institutional timeline)</li>
+<li>ETH-001 -- Ethical Foundations (amendment process for philosophical changes)</li>
+<li>GOV framework -- Institutional governance for critical-class changes</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

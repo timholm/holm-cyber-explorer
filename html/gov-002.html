@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOV-002 — Decision Record Keeping - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li class="active"><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="gov-002">
+  <h1>GOV-002 &mdash; Decision Record Keeping</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>GOV-002</dd>
+  <dt>Domain</dt>
+  <dd>2 -- Governance & Authority</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>GOV-003, GOV-004, GOV-005, GOV-006, GOV-007. All articles that produce or consume decision records. Referenced by all domains that record governance decisions.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how decisions are recorded, stored, retrieved, and used for institutional learning within the holm.chat Documentation Institution. It operationalizes the decision record concept introduced in GOV-001 Section 4.2 into a complete, practical system.</p>
+<p>GOV-001 established that every decision at Tier 1, 2, or 3 must be recorded in the institutional decision log with specific fields. This article defines the detailed format of those records, the physical and logical structure of the decision log, the procedures for creating and indexing entries, the classification system that makes records retrievable, and the methods by which the decision log serves as a tool for institutional learning.</p>
+<p>The decision log is not bureaucratic overhead. It is the institution's governance memory. When the operator wonders, five years from now, why a specific system is configured a particular way, the decision log provides the answer. When a successor inherits the institution and encounters a policy they do not understand, the decision log explains the reasoning. When a dispute arises about whether a past decision was correct, the decision log provides the evidence. And when the institution needs to learn from its own history -- to identify patterns in its decision-making, to detect systematic biases, to improve the quality of future decisions -- the decision log provides the data.</p>
+<p>Without the decision log, the institution suffers from what CON-001 calls "purpose amnesia": the gradual loss of understanding of why things are the way they are. With the decision log, every configuration, every policy, every architectural choice is traceable to a specific decision, made on a specific date, for specific reasons. This traceability is the foundation of institutional coherence over decades.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The decision record format: all fields, their definitions, and their usage rules.
+- The decision log structure: how records are organized and stored.
+- Classification of decisions by tier, domain, and topic.
+- The decision record creation procedure.
+- Indexing and search procedures for retrieving past decisions.
+- The decision log as a tool for institutional learning.
+- Integration with Commentary Sections, the operational log, and other institutional records.
+- Maintenance and preservation of the decision log.</p>
+<p><strong>Out of scope:</strong>
+- The governance tier system itself (GOV-001 Section 4.1).
+- Specific decision-making procedures for specific domains (addressed in each domain's operational articles).
+- Dispute resolution involving past decisions (GOV-003).
+- The amendment process for root documents (GOV-001).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Decision Record as Institutional DNA</h3>
+<p>Every institution is the sum of its decisions. The hardware, the software, the policies, the procedures -- all of these are the current expression of decisions made at specific points in time by specific people for specific reasons. In most personal technology projects, these decisions exist only in the operator's memory, which means they exist approximately and temporarily. Memory fades, distorts, and eventually disappears.</p>
+<p>The decision record is the mechanism by which this institution preserves its decisions in durable, exact form. Each record captures not just what was decided but why it was decided, what alternatives were considered, and what trade-offs were accepted. This "why" is the most valuable part of the record. A system configuration tells you what the institution does. A decision record tells you why it does it. Without the why, future operators can only guess at intent, and guesses compound into misunderstanding over decades.</p>
+<h3>3.2 The Append-Only Principle</h3>
+<p>GOV-001 R-GOV-03 establishes that the decision log is append-only. Entries may not be modified or deleted. Corrections must be recorded as new entries that reference the original. This principle is the decision log's most important property.</p>
+<p>The append-only principle serves three functions. First, it creates an indelible audit trail. Any future reader -- including a successor, an auditor, or the operator's own future self -- can see the complete history of institutional governance, including mistakes, corrections, and changes of direction. Second, it prevents historical revisionism. The temptation to clean up past decisions, to make them look more logical than they were, to erase the reasoning that turned out to be wrong -- this temptation is real, and the append-only principle removes it. Third, it supports institutional learning. You cannot learn from decisions you have erased. The record of decisions that were later reversed is often more instructive than the record of decisions that stood.</p>
+<h3>3.3 The Relationship to Other Records</h3>
+<p>The institution maintains several types of records, each serving a different purpose:</p>
+<ul>
+<li><strong>The decision log</strong> (this article): records governance decisions (Tier 1-3).</li>
+<li><strong>The operational log</strong> (OPS-001): records daily operations, maintenance actions, and Tier 4 decisions.</li>
+<li><strong>The Commentary Sections</strong> (embedded in each article): records interpretive context, lessons learned, and evolving understanding.</li>
+<li><strong>The asset registry</strong> (D11-002): records the institution's material state.</li>
+<li><strong>The backup log</strong> (D6-002): records backup operations and verifications.</li>
+<li><strong>The key inventory</strong> (SEC-003): records cryptographic key metadata.</li>
+</ul>
+<p>These records are complementary, not competing. A decision recorded in the decision log may reference an operational log entry that prompted the decision. A Commentary Section entry may reference a decision log entry that it interprets. The decision log is the governance spine that connects the other records into a coherent institutional narrative.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Decision Record Format</h3>
+<p>Each decision record contains the following fields, expanding on the format defined in GOV-001 Section 4.2:</p>
+<p>```
+DECISION RECORD</p>
+<p>Decision ID:        DEC-[YYYY]-[sequential number]
+Date:               [Date the decision was made -- not the proposal date, the decision date]
+Author:             [Identifier of the person who made the decision]
+Tier:               [1 / 2 / 3]
+Status:             [Proposed / Waiting / Ratified / Superseded / Reversed]</p>
+<p>SUMMARY:
+[One sentence describing the decision. This is the record's headline.
+It should be clear enough that someone scanning the log can understand
+the decision without reading the full record.]</p>
+<p>DOMAIN(S):
+[Which domain(s) this decision affects. Use domain numbers and names.]</p>
+<p>TOPIC TAGS:
+[2-5 keywords for indexing. Examples: backup, encryption, hardware,
+migration, governance, succession, security, format, procedure.]</p>
+<p>CONTEXT:
+[What prompted this decision? What situation, problem, observation,
+or scheduled review led to this decision being considered?
+Reference operational log entries, drill findings, audit results,
+or other records that provide context.]</p>
+<p>ALTERNATIVES CONSIDERED:
+[What other options were evaluated? For each alternative:]
+  Alternative 1: [Description]
+    Pros: [...]
+    Cons: [...]
+    Why rejected: [...]</p>
+<p>Alternative 2: [Description]
+    Pros: [...]
+    Cons: [...]
+    Why rejected: [...]</p>
+<p>[Additional alternatives as needed]</p>
+<p>RATIONALE:
+[Why this decision was made. What principles, evidence, or reasoning
+led to choosing this option over the alternatives. Reference root
+documents (ETH-001, CON-001, etc.) where applicable.
+This is the most important section of the record.]</p>
+<p>IMPACT:
+[What systems, processes, documents, or data are affected by this
+decision. Be specific. This section helps future readers understand
+the scope of the decision's effects.]</p>
+<p>IMPLEMENTATION:
+[Brief description of how the decision will be implemented.
+Reference the specific articles or procedures that will be
+updated or created as a result of this decision.]</p>
+<p>REVERSIBILITY:
+  Reversible:       [Yes / Partially / No]
+  Reversal Cost:    [Low / Medium / High / Catastrophic]
+  Reversal Procedure: [Brief description of how this decision
+                       could be undone, if applicable]</p>
+<p>WAITING PERIOD:
+  Start Date:       [Date the waiting period began]
+  End Date:         [Date the waiting period ends]
+  Review Date(s):   [Date(s) when the decision was reviewed during
+                     the waiting period, per R-GOV-02]</p>
+<p>REVIEW SCHEDULE:
+  Next Review:      [Date when this decision should be reviewed
+                     for continued appropriateness]
+  Review Frequency: [How often this decision should be reviewed --
+                     annually, biennially, or on a specific trigger]</p>
+<p>RELATED DECISIONS:
+[References to other decision records that are related to this one.
+Include: decisions this one supersedes, decisions this one depends on,
+decisions that depend on this one.]</p>
+<p>AMENDMENTS:
+[This section is populated only after the decision is made.
+If the decision is later modified, superseded, or reversed,
+record the reference to the new decision here.]
+  [DEC-YYYY-NNN: brief description of amendment]
+```</p>
+<h3>4.2 The Decision Log Structure</h3>
+<p>The decision log is a Tier 1 data artifact per D6-001. It is stored as a collection of plain-text files (per D11-001 R-ADM-05 and D13-001 R-EVL-04), one file per decision record, organized in a directory structure:</p>
+<p><code>/data/tier1/decision-log/
+  index.txt                    -- Master index of all decisions
+  by-year/
+    2026/
+      DEC-2026-001.txt
+      DEC-2026-002.txt
+      ...
+    2027/
+      DEC-2027-001.txt
+      ...
+  by-tier/
+    tier1/                     -- Symbolic links to Tier 1 decisions
+    tier2/                     -- Symbolic links to Tier 2 decisions
+    tier3/                     -- Symbolic links to Tier 3 decisions
+  by-domain/
+    domain-01/                 -- Symbolic links to decisions in each domain
+    domain-02/
+    ...
+    domain-20/
+    cross-domain/              -- Decisions affecting multiple domains</code></p>
+<p>The canonical copy of each decision is in the <code>by-year/</code> directory. The <code>by-tier/</code> and <code>by-domain/</code> directories contain symbolic links that provide alternative access paths for searching.</p>
+<h3>4.3 The Master Index</h3>
+<p>The master index (<code>index.txt</code>) is a summary listing of every decision in the log. It provides a scannable overview of the institution's governance history.</p>
+<p><strong>Index format:</strong></p>
+<p>```
+DECISION LOG -- MASTER INDEX</p>
+<p>Last Updated: [date]
+Total Decisions: [count]</p>
+
+</section>
+<section>
+<h2>[Decision ID] | [Date] | [Tier] | [Status] | [Summary]</h2>
+
+<p>DEC-2026-001  | 2026-02-16 | T1 | Ratified  | Founding of the institution...
+DEC-2026-002  | 2026-02-16 | T2 | Ratified  | Adoption of LUKS full-disk...
+DEC-2026-003  | 2026-03-01 | T3 | Ratified  | Set daily backup schedule...
+...
+```</p>
+<p>The index is updated whenever a new decision is recorded or an existing decision's status changes. It is a convenience document, not the authoritative record -- the individual decision files are authoritative. If the index and a decision file disagree, the decision file prevails.</p>
+<h3>4.4 The Decision Record Creation Procedure</h3>
+<p><strong>Step 1: Identify the decision.</strong>
+Determine that a governance decision is being made (as opposed to a routine operational action). If the action involves changing policy, architecture, security posture, or any item that a future operator would benefit from understanding, it is a governance decision requiring a record.</p>
+<p><strong>Step 2: Classify the tier.</strong>
+Using GOV-001 Section 4.1:
+- Does it amend a root document? Tier 1.
+- Does it change the security, data, or infrastructure architecture? Tier 2.
+- Does it change operational procedures or policies? Tier 3.
+- Is it routine? Tier 4 (operational log only, no decision record required).</p>
+<p><strong>Step 3: Draft the record.</strong>
+Create a new file using the format in Section 4.1. Fill in all fields. The most important fields to draft carefully are:
+- <strong>Summary:</strong> Must be clear to someone who reads only this line.
+- <strong>Alternatives Considered:</strong> Must be honest. If no alternatives were considered, say so -- and explain why.
+- <strong>Rationale:</strong> Must explain the reasoning, not just state the conclusion. "We chose option A" is not rationale. "We chose option A because it satisfies ETH-001 Principle 4 while option B introduces a dependency that violates CON-001 Section 5.3" is rationale.</p>
+<p><strong>Step 4: Initiate the waiting period.</strong>
+Set the Status to "Waiting." Record the waiting period start date. Set a calendar reminder for the review date(s) and the end date.</p>
+<p><strong>Step 5: Review during the waiting period.</strong>
+Per GOV-001 R-GOV-02, review the decision at least once during the waiting period. During review:
+- Re-read the rationale. Does it still hold?
+- Re-read the alternatives. Has new information changed the evaluation?
+- Re-read the impact assessment. Is it complete?
+- Record the review date in the Waiting Period section.</p>
+<p><strong>Step 6: Ratify or withdraw.</strong>
+At the end of the waiting period:
+- If the decision still stands, update Status to "Ratified."
+- If the decision has been reconsidered, update Status to "Withdrawn" and record the reason in the Amendments section.
+- Update the master index.</p>
+<p><strong>Step 7: Implement.</strong>
+Proceed with implementation per the Implementation field. Record the implementation in the operational log and reference the Decision ID.</p>
+<h3>4.5 Search and Retrieval Procedures</h3>
+<p>The decision log must be searchable. Without effective retrieval, the log is a write-only archive -- decisions go in but never come out for consultation. The following search methods are supported:</p>
+<p><strong>Search by ID:</strong> If you know the Decision ID (referenced from another document or log entry), navigate directly to the file:
+<code>cat /data/tier1/decision-log/by-year/[year]/DEC-[year]-[number].txt</code></p>
+<p><strong>Search by keyword:</strong> Use text search across all decision records:
+<code>grep -r -l "[keyword]" /data/tier1/decision-log/by-year/</code>
+For more specific searches:
+<code>grep -r -l "TOPIC TAGS:.*encryption" /data/tier1/decision-log/by-year/</code></p>
+<p><strong>Search by tier:</strong> Browse the symbolic links in the tier directory:
+<code>ls /data/tier1/decision-log/by-tier/tier2/</code></p>
+<p><strong>Search by domain:</strong> Browse the symbolic links in the domain directory:
+<code>ls /data/tier1/decision-log/by-domain/domain-12/</code></p>
+<p><strong>Search by date range:</strong> Browse the year directories and filter by date:
+<code>grep "Date:" /data/tier1/decision-log/by-year/2028/*.txt | grep "2028-0[1-6]"</code></p>
+<p><strong>Search by status:</strong> Find all active (non-superseded, non-reversed) decisions:
+<code>grep -r -l "Status:.*Ratified" /data/tier1/decision-log/by-year/</code></p>
+<p><strong>Browse the master index:</strong> For a high-level scan:
+<code>cat /data/tier1/decision-log/index.txt</code></p>
+<h3>4.6 The Decision Log as a Learning Tool</h3>
+<p>The decision log's highest-value function is not record-keeping -- it is institutional learning. The log contains the raw material for understanding how the institution makes decisions, where its reasoning is strong, where it is weak, and how it can improve.</p>
+<p><strong>Quarterly Decision Review (during quarterly operations per OPS-001):</strong>
+1. Read all decision records created in the past quarter.
+2. For each decision, ask: has the rationale held up? Have the predicted impacts materialized? Have any unforeseen consequences appeared?
+3. If a decision's rationale has not held up, initiate a review per GOV-001 (potentially leading to a superseding decision).
+4. Record the quarterly review findings in the operational log.</p>
+<p><strong>Annual Decision Audit (during annual operations per OPS-001):</strong>
+1. Review all decisions created in the past year.
+2. Generate statistics: how many decisions per tier? Per domain? What is the average number of alternatives considered? How many decisions have been superseded or reversed?
+3. Identify patterns:
+   - Are certain domains generating disproportionate decision volume? (May indicate instability in that domain.)
+   - Are Tier 3 decisions frequently being reclassified upward? (May indicate the operator is underestimating decision significance.)
+   - Are decisions frequently being reversed? (May indicate inadequate analysis or changed circumstances.)
+   - Are the same types of decisions recurring? (May indicate a structural issue that should be addressed at a higher tier.)
+4. Review a random sample of decisions from previous years: are the rationales still relevant? Do the decisions reflect the institution's principles as currently understood?
+5. Record the audit findings in the operational log and, if significant patterns are discovered, in the Commentary Section of this article.</p>
+<p><strong>Succession Context:</strong>
+During succession (GOV-004), the decision log is one of the most important documents the successor reads. The decision log tells the successor not just what the institution does but why it does it. For the successor:
+- Read all Tier 1 and Tier 2 decisions in full.
+- Read the summaries of all Tier 3 decisions.
+- Pay particular attention to decisions that were reversed or superseded -- these reveal how the institution's understanding evolved.
+- Record your own reactions in your first-impressions journal (GOV-004 Section 4.5).</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-GOV-02-01:</strong> Every Tier 1, Tier 2, and Tier 3 decision must be recorded in the decision log using the format defined in Section 4.1. No exceptions.</li>
+<li><strong>R-GOV-02-02:</strong> The decision log is append-only per GOV-001 R-GOV-03. Entries may not be modified or deleted. Corrections, amendments, supersessions, and reversals must be recorded as new entries that reference the original.</li>
+<li><strong>R-GOV-02-03:</strong> The Summary field of every decision record must be comprehensible to a reader who reads only that field. It must convey what was decided, not merely that a decision was made.</li>
+<li><strong>R-GOV-02-04:</strong> The Rationale field must explain why the decision was made, not merely state what was decided. A record without rationale is incomplete and must be corrected (by adding a supplementary record with the rationale).</li>
+<li><strong>R-GOV-02-05:</strong> The Alternatives Considered field must list at least one alternative for Tier 1 and Tier 2 decisions. If no alternatives were considered, this must be explicitly stated with an explanation of why.</li>
+<li><strong>R-GOV-02-06:</strong> The master index must be updated within 24 hours of any new decision being recorded or any decision's status changing.</li>
+<li><strong>R-GOV-02-07:</strong> The decision log must be maintained as Tier 1 data per D6-001. It is backed up daily per D6-002.</li>
+<li><strong>R-GOV-02-08:</strong> The quarterly decision review and annual decision audit defined in Section 4.6 are mandatory components of the operational tempo per OPS-001.</li>
+<li><strong>R-GOV-02-09:</strong> Every decision record must include a Review Schedule with a next review date. No decision may be recorded without a plan for eventual reassessment.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Decision log neglect.</strong> Decisions are made without being recorded. The log falls silent for weeks or months. When it is consulted, it describes an institution that existed in the past, not the institution that exists now. Mitigation: R-GOV-02-01 makes recording mandatory. The quarterly decision review (Section 4.6) will reveal gaps. The operational tempo in OPS-001 includes time for governance record-keeping.</p>
+</li>
+<li>
+<p><strong>Rationale omission.</strong> Decisions are recorded with what was decided but not why. Five years later, the record says "we switched from format A to format B" but not why. Was it performance? Compatibility? A philosophical preference? Without the rationale, the decision is nearly useless for institutional learning. Mitigation: R-GOV-02-04 requires rationale. The decision creation procedure (Section 4.4) explicitly prompts for rationale and distinguishes it from summary.</p>
+</li>
+<li>
+<p><strong>Index decay.</strong> The master index is not updated. New decisions exist as files in the directory but are not reflected in the index. The index becomes an unreliable search tool. Mitigation: R-GOV-02-06 requires index updates within 24 hours. The decision creation procedure includes index update as a step.</p>
+</li>
+<li>
+<p><strong>Search failure.</strong> The decision log exists but is effectively unsearchable because the topic tags are inconsistent, the summaries are vague, or the directory structure has degraded. Decisions that were made are not found when searched for. Mitigation: the search procedures in Section 4.5 provide multiple access paths. The annual decision audit includes an assessment of search effectiveness.</p>
+</li>
+<li>
+<p><strong>Learning deficit.</strong> The decision log is maintained but never consulted for learning. Decisions are made without checking whether similar decisions were made in the past. The same reasoning errors recur because no one reviews the history. Mitigation: the quarterly and annual reviews in Section 4.6 are mandatory. The self-dispute protocol in GOV-003 includes consulting the decision log for precedent (Level 3 escalation).</p>
+</li>
+<li>
+<p><strong>Append-only erosion.</strong> The operator begins editing past decision records -- correcting typos at first, then clarifying language, then subtly adjusting the rationale to make past decisions look better. The append-only property is lost without any visible violation. Mitigation: the append-only principle is a structural safeguard (D15-002 Section 4.1). Technical enforcement (checksums on historical records, write-protection) should be implemented where possible. Cultural enforcement (the practice of creating amendment records rather than editing) must be maintained through discipline.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If the decision log has been neglected:</strong> Reconstruct what can be reconstructed. Review the operational log for the neglect period. For every operational log entry that describes a Tier 1, 2, or 3 decision, create a decision record retroactively. Mark these records as "RECONSTRUCTED -- recorded retroactively on [date], original decision made on [estimated date]." The rationale for reconstructed records will necessarily be less detailed than for real-time records. Record what can be remembered, and honestly note where memory is uncertain. Going forward, adhere strictly to the recording requirements.</p>
+</li>
+<li>
+<p><strong>If the decision log has been corrupted or lost:</strong> Restore from the most recent backup per D6-002. If the most recent backup is also corrupted, use the next-oldest backup. If no backup contains an intact decision log, begin reconstruction from the operational log, Commentary Sections, and the operator's memory. This is a significant institutional loss. Record the loss and the reconstruction effort as a Tier 2 decision.</p>
+</li>
+<li>
+<p><strong>If the master index is out of date:</strong> Regenerate the index from the actual decision record files. The files are authoritative; the index is derived. Walk through every file in the <code>by-year/</code> directories and rebuild the index entries. Update the symbolic links in <code>by-tier/</code> and <code>by-domain/</code> directories.</p>
+</li>
+<li>
+<p><strong>If search is ineffective:</strong> Audit the topic tags across all records. Standardize the tagging vocabulary. Update records that have vague or missing tags (this is an exception to the append-only rule: metadata tags may be added for indexing purposes, but the substantive content of the record must not change). Consider creating a topic tag glossary that defines the standard tags for the institution.</p>
+</li>
+<li>
+<p><strong>If the append-only principle has been violated:</strong> Detect the violation through checksums or version comparison against backups. Restore the original records from backup. Create a new decision record documenting the violation: what was changed, when, and (if known) why. Add an entry to the Commentary Section of this article documenting the violation and the corrective action. Implement technical controls to prevent recurrence (file permissions, write-protection, integrity monitoring).</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The decision log is being established. The first records will feel formal and slow. This is intentional. The habits formed now -- thorough rationale, honest alternatives, specific summaries -- will define the quality of the institution's governance record for decades. Expect the record format to be refined as practical experience reveals which fields are useful and which are overhead.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The decision log contains hundreds of records. The annual audit begins to reveal patterns. The log becomes genuinely useful for institutional learning -- not just record-keeping but actual improvement in decision quality based on reviewing past decisions. The search procedures become critical as the volume grows.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The decision log is a substantial historical document. Succession planning incorporates the decision log as a primary training resource. The accumulated rationale and alternatives provide rich context that no other document can offer. Consider whether the index and search mechanisms are adequate for the volume of records.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The decision log spans generations of operators. It tells the complete governance story of the institution. It is one of the most valuable documents in the corpus -- not because any individual record is transformative, but because the aggregate record reveals how an institution thinks, learns, and evolves. Preserve it with the same care as any other Tier 1 data.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I have kept informal decision records before -- notes in text files, comments in configuration files, half-remembered conversations with myself about why I chose one approach over another. They were better than nothing, but only slightly. The problem was always the rationale. I would record what I decided but not why, because the why seemed obvious at the time. Six months later, the why was gone, and I was left with a configuration I could not explain to myself.</p>
+<p>This formal system is designed to prevent that specific failure. The rationale field is the heart of the decision record. Everything else -- the summary, the alternatives, the impact assessment -- serves the rationale. If I can only fill in one field, it should be the rationale.</p>
+<p>I am also honest about the append-only principle: it will be tempting to violate. Not for malicious reasons -- I will not want to cover up mistakes -- but for aesthetic ones. I will want to fix a typo in a three-year-old decision record. I will want to clarify a rationale that now seems poorly worded. I will want to update an impact assessment that turned out to be wrong. The answer to all of these temptations is: create a new record. Reference the old one. Let the history stand as it was. The imperfection is the point. It is the record of a real institution making real decisions with incomplete information, which is the only kind of institution there is.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity; Principle 3: Transparency; Principle 6: Honest Accounting)</li>
+<li>CON-001 -- The Founding Mandate (purpose amnesia as institutional failure mode)</li>
+<li>GOV-001 -- Authority Model (decision record definition, tier system, waiting periods, append-only rule R-GOV-03, review requirement R-GOV-02)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo for quarterly and annual reviews, documentation-first principle)</li>
+<li>D15-002 -- Safeguards Architecture (append-only logs as structural safeguard)</li>
+<li>GOV-003 -- Dispute Resolution Procedures (decision log consultation for precedent)</li>
+<li>GOV-004 -- Succession Planning and Execution (decision log as successor training resource)</li>
+<li>GOV-007 -- Institutional Health Assessment (quarterly governance health check includes decision log review)</li>
+<li>D6-001 -- Data Philosophy (Tier 1 classification for the decision log)</li>
+<li>D6-002 -- Backup Doctrine (daily backup of Tier 1 data including decision log)</li>
+<li>D11-001 -- Administration Philosophy (record-keeping as institutional memory, Lightness Principle)</li>
+</ul>
+<hr />
+<hr />
+<p><em>End of Stage 3 Operational Doctrine -- Batch 2</em></p>
+<p><strong>Document Total:</strong> 5 articles
+<strong>Article IDs:</strong> D12-002, D12-003, D11-002, D13-002, GOV-002
+<strong>Status:</strong> All five articles ratified as of 2026-02-16.
+<strong>Next Stage:</strong> Continue with additional Stage 3 operational articles across remaining domains.</p>
+</section>
+</article>
+</main>
+</body>
+</html>

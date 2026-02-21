@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOV-007 — Institutional Health Assessment - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li class="active"><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="gov-007">
+  <h1>GOV-007 &mdash; Institutional Health Assessment</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>GOV-007</dd>
+  <dt>Domain</dt>
+  <dd>2 -- Governance & Authority</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, GOV-003, GOV-004, GOV-005, GOV-006</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All articles. This article defines the assessment framework that evaluates every domain's health.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution evaluates its own health. An institution, like a body, can appear functional while harboring conditions that will eventually cause failure. A backup system can run for years before anyone discovers the backups are empty. A governance process can be followed for a decade before anyone realizes the decisions it produces have drifted far from the institution's founding principles. A security posture can feel solid while a slowly expanding vulnerability goes unnoticed.</p>
+<p>The purpose of institutional health assessment is to detect these slow-moving failures before they become irreversible. It provides a systematic, repeatable process for examining every dimension of the institution's operations and governance, identifying weaknesses, and prescribing corrective action. It is the institutional equivalent of a medical examination: regular, comprehensive, and honest about what it finds.</p>
+<p>This article defines the metrics, indicators, and warning signs that constitute institutional health. It defines the quarterly health review (a focused check on key indicators) and the annual comprehensive assessment (a thorough examination of all twenty domains). It defines what to do when health scores decline. And it provides the framework for an institution that is honest with itself about its own condition -- which, per ETH-001 Principle 6, is not optional but foundational.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition of institutional health and its dimensions.</li>
+<li>Health indicators for all twenty domains.</li>
+<li>The quarterly health review procedure.</li>
+<li>The annual comprehensive assessment procedure.</li>
+<li>Warning signs, thresholds, and escalation triggers.</li>
+<li>Corrective action frameworks for declining health.</li>
+<li>The relationship between health assessment and the other governance articles.</li>
+</ul>
+<p>This article does not cover the specific technical metrics for individual systems (those belong in the relevant domain articles). It covers the governance-level assessment of whether the institution as a whole is fulfilling its mission, maintaining its integrity, and operating sustainably.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>Most personal technology projects have no concept of health assessment. They either work or they do not. When they work, no assessment is needed. When they fail, it is too late for assessment. This binary view of system health is adequate for short-lived projects but catastrophic for institutions designed to last decades.</p>
+<p>Institutional health is not binary. It is a spectrum. An institution can be fully functional in its daily operations while its documentation is falling behind, its governance discipline is eroding, its security posture is degrading, and its succession preparations are nonexistent. By every immediate measure, the institution is healthy. By every long-term measure, it is dying.</p>
+<p>The purpose of health assessment is to make the long-term measures visible to the short-term operator. It forces the operator to step back from daily operations and evaluate the institution from a higher vantage point, using criteria that reflect the institution's fifty-year mission rather than its today's functionality.</p>
+<p>Health assessment is also the primary mechanism for institutional learning. Each assessment produces a record of the institution's condition at a point in time. Over years, these records reveal trends that no individual assessment can detect. Is documentation quality improving or declining? Is the governance process becoming more disciplined or more perfunctory? Are security drills revealing new vulnerabilities or confirming that the same vulnerabilities persist? Trend data is the institution's most valuable diagnostic tool, and it can only be produced through consistent, periodic assessment.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Dimensions of Institutional Health</h3>
+<p>Institutional health is assessed across five dimensions, each of which encompasses multiple domains:</p>
+<p><strong>Dimension 1: Governance Health.</strong>
+Is the institution being governed according to its own rules? Are decisions being made at the correct tier? Are waiting periods being respected? Is the decision log current? Are disputes being resolved through the formal process? Is the succession plan current?</p>
+<p>Domains assessed: 1 (Constitution), 2 (Governance), 20 (Institutional Memory).</p>
+<p>Key indicators:
+- Decision log currency: are entries current within one week?
+- Tier compliance: have decisions been classified and processed at the correct tier?
+- Waiting period compliance: have all required waiting periods been observed?
+- Succession Readiness Package: has it been updated within the past twelve months?
+- Dispute resolution: have any unresolved disputes persisted beyond 90 days?</p>
+<p><strong>Dimension 2: Technical Health.</strong>
+Are the institution's technical systems operating correctly, maintaining data integrity, and performing within expected parameters?</p>
+<p>Domains assessed: 4 (Infrastructure), 5 (Platform), 6 (Data), 7 (Intelligence), 8 (Automation), 9 (Education).</p>
+<p>Key indicators:
+- System uptime: are all critical systems operational?
+- Hardware health: are SMART data, temperature readings, and other hardware indicators within normal ranges?
+- Data integrity: have all scheduled integrity checks passed?
+- Backup verification: has the most recent backup been tested through restoration?
+- Capacity utilization: are storage, compute, and power resources within sustainable ranges?
+- Software currency: is all software at documented, intentional versions?</p>
+<p><strong>Dimension 3: Security Health.</strong>
+Is the institution's security posture being maintained? Are threats being monitored? Are defenses being tested?</p>
+<p>Domains assessed: 3 (Security), 18 (Import &amp; Quarantine).</p>
+<p>Key indicators:
+- Air-gap integrity: has the air gap been maintained without breach since the last assessment?
+- Security drill execution: have all scheduled drills been completed?
+- Threat model currency: has the threat model been reviewed within the past twelve months?
+- Access control: are all credentials current and properly secured?
+- Quarantine compliance: has all incoming media passed through the quarantine process?</p>
+<p><strong>Dimension 4: Operational Health.</strong>
+Is the institution being operated according to its operational philosophy? Is the maintenance tempo being sustained? Is documentation keeping pace with operations?</p>
+<p>Domains assessed: 10 (Operations), 11 (Workflow), 12 (Disaster Recovery), 13 (Content Production), 14 (Research), 16 (Maintenance), 17 (Testing).</p>
+<p>Key indicators:
+- Operational tempo compliance: have daily, weekly, monthly, and quarterly cycles been completed?
+- Documentation currency: is documentation current within 30 days of any system change?
+- Complexity budget: has the quarterly complexity assessment been completed? Is the budget balanced?
+- Maintenance backlog: are there overdue maintenance items? How many? How old?
+- Recovery procedure testing: have recovery procedures been tested within the past twelve months?</p>
+<p><strong>Dimension 5: Philosophical Health.</strong>
+Is the institution still aligned with its founding principles? Is it still fulfilling its mission? Is the operator still engaged with the institution's purpose?</p>
+<p>Domains assessed: 1 (Constitution), 15 (Ethics), 19 (Evolution), 20 (Institutional Memory).</p>
+<p>Key indicators:
+- Mission alignment: can the operator articulate how every active system serves the institutional mission?
+- Ethical compliance: have any ethical principle exceptions been logged in the past twelve months? Were they reviewed?
+- Evolution coherence: are changes to the institution deliberate and documented, or reactive and ad hoc?
+- Operator engagement: does the operator experience the institution as meaningful work, routine obligation, or burdensome duty?
+- Commentary Section vitality: are Commentary Sections receiving new entries? Are they being consulted?</p>
+<h3>4.2 Health Scoring</h3>
+<p>Each indicator within each dimension is assessed on a three-level scale:</p>
+<p><strong>Green: Healthy.</strong> The indicator is within expected parameters. No corrective action needed. Continue current practices.</p>
+<p><strong>Amber: Warning.</strong> The indicator shows degradation or partial non-compliance. Corrective action is recommended within 90 days. The specific concern should be documented in the assessment record.</p>
+<p><strong>Red: Critical.</strong> The indicator shows significant failure or non-compliance. Corrective action is required immediately. The concern must be documented and addressed as a minimum Tier 3 governance decision, with higher tiers as appropriate for the severity.</p>
+<p>The overall dimension score is the worst score among its indicators. If any indicator within Governance Health is Red, the Governance Health dimension is Red. This is deliberately conservative. It ensures that a single critical failure is not hidden by otherwise healthy indicators.</p>
+<p>The overall institutional health score is the collection of all five dimension scores. There is intentionally no single aggregate score. An institution that is technically healthy but philosophically adrift is in a different kind of trouble than an institution that is philosophically sound but technically failing. The dimensions must be assessed individually to be useful.</p>
+<h3>4.3 The Quarterly Health Review</h3>
+<p>The quarterly health review is conducted as part of the quarterly operations cycle defined in OPS-001, Section 4.1. It takes approximately half a day and focuses on the most time-sensitive indicators.</p>
+<p><strong>Quarterly review procedure:</strong></p>
+<ol>
+<li>
+<p><strong>Prepare.</strong> Gather the decision log, operational log, and the previous quarter's health assessment. Review any notes or concerns flagged during weekly and monthly operations.</p>
+</li>
+<li>
+<p><strong>Assess Governance Health.</strong> Review decision log for currency, tier compliance, and waiting period compliance. Check the status of the succession plan. Review any disputes logged during the quarter.</p>
+</li>
+<li>
+<p><strong>Assess Technical Health.</strong> Review system health reports from the monthly operations cycle. Check backup verification results. Review any hardware warnings or anomalies.</p>
+</li>
+<li>
+<p><strong>Assess Security Health.</strong> Confirm that air-gap integrity has been maintained. Review any security-relevant events from the quarter. Confirm that scheduled drills have been completed.</p>
+</li>
+<li>
+<p><strong>Assess Operational Health.</strong> Review operational tempo compliance. Check documentation currency. Conduct the complexity budget assessment. Review the maintenance backlog.</p>
+</li>
+<li>
+<p><strong>Assess Philosophical Health.</strong> This is the most subjective dimension and the most important to perform honestly. Ask: Am I still aligned with the mission? Am I still engaged? Am I cutting corners? Am I honest with myself about the institution's condition?</p>
+</li>
+<li>
+<p><strong>Score and record.</strong> Assign Green/Amber/Red scores to each indicator. Record the complete assessment in the governance health log. Compare with the previous quarter's assessment to identify trends.</p>
+</li>
+<li>
+<p><strong>Plan corrective actions.</strong> For any Amber or Red indicators, draft a corrective action plan with a timeline. For Red indicators, initiate the appropriate governance decision immediately.</p>
+</li>
+</ol>
+<h3>4.4 The Annual Comprehensive Assessment</h3>
+<p>The annual comprehensive assessment is conducted during the annual operations cycle defined in OPS-001, Section 4.1. It takes two to three days and covers every domain in depth.</p>
+<p>The annual assessment includes everything in the quarterly review, plus:</p>
+<ul>
+<li><strong>Full domain-by-domain review.</strong> Each of the twenty domains is assessed against its domain philosophy article (the D-001 articles from Stage 2). Is each domain fulfilling its stated purpose? Are the principles in the domain philosophy being followed?</li>
+<li><strong>Cross-domain integration assessment.</strong> Are the domains working together coherently? Are there conflicts between domain practices that have not been addressed?</li>
+<li><strong>Trend analysis.</strong> Review all quarterly assessments from the past year. Identify trends. Are dimensions improving, stable, or declining? Pay particular attention to dimensions that have been Amber for multiple quarters -- chronic Amber is often worse than acute Red because it indicates a problem that is being tolerated rather than addressed.</li>
+<li><strong>Root document review.</strong> Re-read all five root documents (ETH-001, CON-001, GOV-001, SEC-001, OPS-001). Are they still relevant? Are their Commentary Sections receiving new entries? Are any amendments needed?</li>
+<li><strong>Strategic assessment.</strong> Where should the institution evolve in the coming year? What capabilities should be added, modified, or removed? What is the state of the complexity budget? What is the succession plan status?</li>
+<li><strong>External perspective.</strong> If a Technical Advisor or External Auditor role has been activated (see GOV-006), their input should be solicited for the annual assessment. If no external perspective is available, the operator should attempt to assess the institution as a newcomer would, using the Succession Readiness Package as a test of external comprehensibility.</li>
+</ul>
+<p>The annual assessment produces a comprehensive written report that is stored in the institutional governance archive. This report becomes part of the institutional record and is available to future operators.</p>
+<h3>4.5 Responding to Declining Health</h3>
+<p>When health scores decline, the response depends on the severity and pattern:</p>
+<p><strong>Single Amber indicator:</strong> Address within 90 days as part of normal operations. No escalation needed unless the indicator persists across two consecutive quarterly reviews.</p>
+<p><strong>Multiple Amber indicators in the same dimension:</strong> The dimension has a systemic issue. Escalate to a Tier 3 governance decision. Draft a remediation plan that addresses the root cause, not just the individual indicators.</p>
+<p><strong>Any Red indicator:</strong> Immediate escalation. If the Red indicator involves data integrity, security, or system availability, assess whether an emergency declaration (GOV-005) is warranted. If not, initiate a Tier 3 minimum governance decision to address the issue.</p>
+<p><strong>Persistent Amber (same indicator Amber for three or more consecutive quarters):</strong> Escalate to Tier 2. Persistent Amber indicates a structural problem that routine corrective action has failed to resolve. The assessment should consider whether the institution's architecture, procedures, or resource allocation needs fundamental change.</p>
+<p><strong>Declining trend across multiple dimensions:</strong> This is the most serious pattern. It suggests institutional decay. The response should be a full strategic review (Tier 2 minimum) that considers whether the institution's operational model is sustainable. Review OPS-001's sustainability requirement. Consider whether the institution has grown beyond the operator's capacity. Consider whether the operator needs to activate minimum viable governance (GOV-006, Section 4.5) to stabilize before rebuilding.</p>
+<p><strong>Philosophical Health decline:</strong> This deserves special attention because it is the hardest to address and the most consequential to ignore. If the operator is no longer engaged with the institution's mission, no technical fix will help. The response should begin with re-reading the root documents, especially the Commentary Sections. If the disengagement persists, the operator should consider whether the institution needs to evolve (through the amendment process in GOV-001) or whether the operator needs to initiate succession (through GOV-004).</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-GOV-07-01:</strong> The quarterly health review must be completed within one week of the end of each calendar quarter. The results must be recorded in the governance health log.</li>
+<li><strong>R-GOV-07-02:</strong> The annual comprehensive assessment must be completed within 30 days of the institution's founding anniversary each year. The written report must be stored in the governance archive.</li>
+<li><strong>R-GOV-07-03:</strong> Red indicators must be addressed through a formal governance decision (Tier 3 minimum) within 30 days of identification.</li>
+<li><strong>R-GOV-07-04:</strong> Persistent Amber indicators (three or more consecutive quarters) must be escalated to Tier 2 governance.</li>
+<li><strong>R-GOV-07-05:</strong> The health assessment scoring must be honest. Scoring an indicator Green when it is actually Amber, or Amber when it is actually Red, is a governance violation of the same severity as the underlying issue. ETH-001, Principle 6 (Honest Accounting of Limitations) applies directly.</li>
+<li><strong>R-GOV-07-06:</strong> Health assessment records may not be modified or deleted. If an assessment score is later determined to be incorrect, a correction entry must be appended to the governance health log, referencing the original entry.</li>
+<li><strong>R-GOV-07-07:</strong> The annual comprehensive assessment must include a comparison with the previous year's assessment, with explicit commentary on trends.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Assessment theater.</strong> The health review is performed as a ritual without genuine engagement. Scores are assigned quickly, everything is marked Green, and the operator moves on. The assessment produces paperwork without producing insight. Mitigation: R-GOV-07-05 makes dishonest scoring a governance violation. The quarterly review procedure in Section 4.3 includes a philosophical health assessment that is explicitly designed to resist mechanical execution.</li>
+<li><strong>Indicator fixation.</strong> The operator focuses on indicators that are easy to measure and ignores those that are difficult. Technical health is assessed rigorously because it has clear metrics. Philosophical health is assessed superficially because it requires honest self-reflection. The easiest dimensions crowd out the most important ones. Mitigation: the annual comprehensive assessment includes all five dimensions with equal weight.</li>
+<li><strong>Corrective action fatigue.</strong> The operator identifies problems in every assessment but never follows through on corrections. The health log becomes a catalogue of known issues rather than a tool for improvement. Mitigation: the quarterly review includes a review of the previous quarter's corrective action plans. Incomplete corrective actions should trigger a reassessment of whether the plans were realistic or the operator needs structural support.</li>
+<li><strong>Score manipulation.</strong> The operator -- consciously or unconsciously -- adjusts scoring criteria to avoid Red indicators. "It is not really Red; it is a high Amber." Over time, the scoring scale inflates, and Red conditions are routinely classified as Amber. Mitigation: the scoring criteria in Section 4.2 are deliberately simple (three levels, no ambiguous boundaries). The annual assessment includes a calibration step where previous scores are reviewed for consistency.</li>
+<li><strong>Assessment avoidance.</strong> The operator skips assessments entirely, either because they are too busy, too demoralized by the results, or too confident that everything is fine. Mitigation: the operational tempo in OPS-001 explicitly schedules assessment time. Skipping an assessment is itself an Amber indicator on the Governance Health dimension and will be flagged in the next assessment that does occur.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If health assessments have been skipped:</strong> Conduct an immediate quarterly review covering the current quarter. Do not attempt to retroactively score missed quarters; the data is unreliable. Record the gap in the governance health log. Going forward, adhere to the assessment schedule. If assessments were skipped due to workload, evaluate whether the operational tempo needs adjustment (Tier 3 decision).</li>
+<li><strong>If assessments have been performed dishonestly:</strong> Re-assess the affected quarters as honestly as possible. Record the re-assessment in the governance health log with a note explaining the dishonesty and its cause. Treat this as a Philosophical Health Red indicator and address it accordingly. The institutional culture of honest self-assessment must be restored; without it, the entire governance framework is compromised.</li>
+<li><strong>If corrective actions have accumulated without completion:</strong> Prioritize the list. Address Red items first, then persistent Amber items, then recent Amber items. If the list is too long to address within a single quarter, draft a multi-quarter remediation plan as a Tier 3 decision. Consider whether minimum viable governance (GOV-006, Section 4.5) would allow focus on the most critical corrections.</li>
+<li><strong>If institutional health is declining across multiple dimensions:</strong> This is a institutional crisis. Initiate a full strategic review as a Tier 2 decision. The review should consider radical simplification, operational tempo reduction, or succession initiation. Read CON-001 Section 7 (Recovery Procedures) and ETH-001 Section 7 (Recovery Procedures) for guidance on institutional recovery. An institution that acknowledges its decline has already begun to recover. An institution that denies its decline cannot.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The health assessment framework is being calibrated. Early assessments will reveal which indicators are useful and which are not. Expect to refine the indicator list and scoring criteria based on operational experience. The first annual assessment will be the most difficult and the most valuable.</li>
+<li><strong>Years 5-15:</strong> The framework should be stable. Trend data becomes available. The most valuable insight comes not from individual assessments but from comparing assessments across years. The operator should develop a sense for the institution's natural rhythm -- which dimensions fluctuate seasonally and which are stable.</li>
+<li><strong>Years 15-30:</strong> The assessment framework serves double duty: evaluating institutional health and preparing for succession. The comprehensive assessment report becomes a key document for successor orientation. A successor who reads five years of annual assessments understands the institution's trajectory in a way that no single document can convey.</li>
+<li><strong>Years 30-50+:</strong> The assessment archive spans decades. It is a record of institutional evolution, challenges, and resilience. New operators should read the full archive as part of their training. The framework itself may need amendment, but the practice of regular, honest self-assessment should be among the institution's most durable traditions.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The hardest indicator to assess honestly will be Philosophical Health. Technical systems either work or they do not. Governance procedures are either followed or they are not. But whether I am still aligned with the institution's mission, still engaged with its purpose, still finding meaning in the work -- those questions require a level of self-honesty that is difficult to maintain over years.</p>
+<p>I have tried to build safeguards against self-deception into the assessment framework. The three-level scoring system is simple enough that there is little room for creative interpretation. The requirement to compare with previous assessments creates accountability across time. The rule that dishonest scoring is itself a governance violation creates a structural incentive for honesty.</p>
+<p>But ultimately, the integrity of the health assessment depends on the integrity of the assessor. No procedure can force a person to be honest with themselves. All it can do is create space for honesty and make the consequences of dishonesty visible. That is what this article attempts to do. The rest is character.</p>
+<p>I expect the first quarterly assessment to reveal many Amber indicators. The institution is newly founded. Many systems are not yet built. Many procedures are not yet tested. That is expected and acceptable. The assessment framework is not designed to produce perfect scores. It is designed to produce honest ones.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (the mission against which institutional health is measured)</li>
+<li>GOV-001 -- Authority Model (the governance framework that health assessment monitors)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (security health indicators)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo that schedules assessments; sustainability requirement)</li>
+<li>GOV-003 -- Dispute Resolution Procedures (disputes arising from assessment findings)</li>
+<li>GOV-004 -- Succession Planning and Execution (succession readiness as a health indicator)</li>
+<li>GOV-005 -- Emergency Governance Protocols (emergency patterns as a health indicator)</li>
+<li>GOV-006 -- Role Definitions and Responsibility Matrix (role health, RACI compliance)</li>
+<li>Domain 3 -- Security &amp; Integrity (security-specific health metrics)</li>
+<li>Domain 4 -- Infrastructure &amp; Power (hardware health metrics)</li>
+<li>Domain 6 -- Data &amp; Archives (data integrity metrics)</li>
+<li>Domain 10 -- User Operations (operational compliance metrics)</li>
+<li>Domain 12 -- Disaster Recovery (recovery readiness metrics)</li>
+<li>Domain 20 -- Institutional Memory (institutional record health)</li>
+</ul>
+<hr />
+<hr />
+<p><em>End of Stage 3 Governance Operations -- Five Operational Doctrine Articles</em></p>
+<p><strong>Document Total:</strong> 5 articles (GOV-003 through GOV-007)
+<strong>Combined Estimated Word Count:</strong> ~14,500 words
+<strong>Status:</strong> All five articles ratified as of 2026-02-16.
+<strong>Previous Stage:</strong> Stage 2 Core Charter (ETH-001, CON-001, GOV-001, SEC-001, OPS-001)
+<strong>Next:</strong> Stage 3 continues with operational doctrine articles for additional domains.</p>
+</section>
+</article>
+</main>
+</body>
+</html>

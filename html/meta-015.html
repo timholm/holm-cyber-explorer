@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>META-015 — The Living Document Manifesto - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li class="active"><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="meta-015">
+  <h1>META-015 &mdash; The Living Document Manifesto</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>META-015</dd>
+  <dt>Domain</dt>
+  <dd>0 -- Meta-Documentation & Standards</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, SEC-001, META-001, META-011, META-012, META-013, META-014</dd>
+  <dt>Depended Upon By</dt>
+  <dd>This article is the capstone of the meta-documentation layer. All articles in the institution are governed by the principle it declares.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article is a declaration. It declares the principle that no document in this institution is final. Every article, every procedure, every rule, every policy, every philosophy -- including the ethical foundations, including the founding mandate, including this article itself -- is provisional. Not provisional in the sense of being untrustworthy or unserious. Provisional in the sense of being the best current understanding, subject to revision when better understanding arrives.</p>
+<p>This is not a weakness. It is the institution's greatest strength.</p>
+<p>An institution that cannot revise its own documentation in the face of new evidence, new technology, new understanding, or new circumstances is an institution that has traded intellectual integrity for the comfort of false certainty. This institution refuses that trade. It chooses the harder path: the path of provisional knowledge, where every document earns its authority through accuracy, relevance, and honesty -- and loses that authority the moment it ceases to reflect reality.</p>
+<p>This article exists to make that choice explicit, permanent, and binding. It is the capstone of the meta-documentation layer -- the last article in the series that examines the documentation system itself. And it ends the series with a commitment: the commitment to never treat any document as beyond question, beyond revision, or beyond improvement.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The philosophical foundation for the "living document" principle.</li>
+<li>Why provisional knowledge is stronger than false certainty.</li>
+<li>The relationship between intellectual humility and institutional resilience.</li>
+<li>The practical implications of the living document principle for how articles are written, reviewed, maintained, and respected.</li>
+<li>The distinction between "provisional" and "unreliable."</li>
+<li>The relationship between this declaration and the institution's governance and ethical foundations.</li>
+<li>The living document principle as institutional policy, not individual preference.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The specific revision procedures (see Stage 1 Meta-Framework, Section 4).</li>
+<li>The governance process for amending root documents (see GOV-001).</li>
+<li>The version history practices that record revisions (see META-012).</li>
+<li>The capacity constraints that limit how many documents can be maintained (see META-014).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Temptation of the Final Draft</h3>
+<p>Every person who writes documentation feels the temptation: the desire to write the definitive version, the one that will never need revision, the one that gets it right the first time and for all time. This desire is understandable. Revision is work. Admitting that something you wrote is wrong, or incomplete, or based on assumptions that have changed, is uncomfortable. There is a psychological satisfaction in declaring something "done" that revision denies.</p>
+<p>But the desire for a final draft is the desire for a world that does not change. And the world changes. Hardware fails in ways you did not predict. Software evolves in directions you did not anticipate. Procedures that worked perfectly for five years become inadequate when the context shifts. Knowledge that was current when the article was published becomes outdated when new information arrives. An institution that treats its documents as final is an institution that has decided to stop learning.</p>
+<h3>3.2 The Cost of False Certainty</h3>
+<p>The alternative to provisional knowledge is not certainty. It is false certainty -- the appearance of authority without the substance. A document that presents itself as definitive when it is actually outdated is more dangerous than no document at all, because it commands a trust it has not earned. The operator follows the procedure, trusts the architecture, relies on the threat model -- and discovers, too late, that the document was written for a world that no longer exists.</p>
+<p>False certainty is the institutional equivalent of overconfidence. It feels like strength. It is actually brittleness. An institution built on false certainty will not bend when reality pushes against it. It will break.</p>
+<h3>3.3 The Paradox of Authoritative Provisionality</h3>
+<p>How can a document be both authoritative and provisional? How can the operator trust a document that admits it might be wrong? This seems paradoxical, but it is not. The resolution lies in understanding what "authoritative" means in this institution.</p>
+<p>A document is authoritative not because it is final, but because it is the best current understanding, maintained through a rigorous process of review, revision, and honest assessment. Its authority comes from the process that produced it, not from a claim of perfection. When you follow a procedure in this institution, you trust it not because someone declared it perfect, but because it has been reviewed, tested, corrected, and maintained. That trust is stronger than the trust placed in a document that claims to be final, because the trust is based on evidence of ongoing care rather than a one-time declaration.</p>
+<p>Provisional does not mean unreliable. It means: reliable because it is maintained, not reliable because it is old.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Living Document Principle</h3>
+<p>The living document principle can be stated in a single sentence:</p>
+<p><strong>Every document in this institution is the best current understanding, subject to revision when better understanding arrives.</strong></p>
+<p>This principle has the following implications:</p>
+<p><strong>Implication 1: No document is exempt.</strong> The ethical foundations. The founding mandate. The governance model. The security architecture. This manifesto itself. All are subject to revision. The governance process (GOV-001) ensures that revision of root documents is deliberate and slow, but it does not prevent it. There is no document in this institution that cannot be questioned, challenged, or changed.</p>
+<p><strong>Implication 2: Revision is not failure.</strong> A document that is revised is not a document that failed. It is a document that succeeded in one era and is being updated for another. The version history records this evolution with pride, not shame. An article at v4.0.0 is more trustworthy than an article at v1.0.0, because it has been through more cycles of testing against reality.</p>
+<p><strong>Implication 3: The obligation to revise is as strong as the obligation to write.</strong> The documentation-first principle (OPS-001) creates the obligation to write. The living document principle creates the obligation to keep writing -- to maintain, to revise, to correct, to improve. An unrevised document is not a stable document. It is a neglected document. The two are not the same.</p>
+<p><strong>Implication 4: Honesty about uncertainty is required.</strong> If a document contains a claim that the author is not sure about, the document must say so. If a procedure has not been tested, the procedure must say so. If a threat model is based on assumptions that may not hold, the model must say so. The institution's relationship with uncertainty is one of acknowledgment, per ETH-001, Principle 6. The living document principle extends this: uncertainty is not something to be eliminated before publication. It is something to be documented and tracked until it is resolved.</p>
+<p><strong>Implication 5: Old documents are not sacred.</strong> The age of a document confers no authority. A founding-era document that has not been revised in twenty years is not venerable. It is suspect. Either the domain it covers has genuinely not changed in twenty years (rare), or the document has been neglected (common). The annual review cycle (OPS-001) exists to distinguish these two cases.</p>
+<h3>4.2 The Trust Model for Living Documents</h3>
+<p>Trust in a living document is calibrated by three factors:</p>
+<p><strong>Recency of review.</strong> When was the document last reviewed? A document reviewed last quarter is more trustworthy than one reviewed three years ago, all else being equal. The version history and the <code>last_modified</code> date provide this signal.</p>
+<p><strong>Depth of revision history.</strong> How many cycles of revision has the document undergone? A document with a rich version history has been tested against reality many times. Each revision represents a correction, an improvement, or an adaptation. The depth of the history is a measure of how thoroughly the document has been refined.</p>
+<p><strong>Honesty of the Commentary.</strong> Does the document's Commentary Section acknowledge limitations, doubts, and areas of uncertainty? A document that presents itself as perfect despite years of operation is less trustworthy than one that honestly notes where it falls short. The Commentary Section is the canary in the coal mine -- when it falls silent, the document may be maintained mechanically without genuine reflection.</p>
+<h3>4.3 The Relationship to Governance</h3>
+<p>The living document principle does not override governance. It operates within governance. The principle says that every document can be revised. The governance process (GOV-001) says how revisions happen, at what speed, and with what level of scrutiny.</p>
+<p>Root documents (ETH-001, CON-001, GOV-001) can be revised -- but only through the Tier 1 process, with a 90-day waiting period, full ethical review, and permanent documentation. Policy documents can be revised through Tier 3, with a 7-day waiting period. Operational documents can be revised at Tier 4, with documentation in the operational log.</p>
+<p>The governance process is the living document principle's governor -- the mechanism that ensures revision happens at the right speed for the right reasons. Without governance, the living document principle would produce chaos: documents changing constantly, without deliberation, without records. With governance, the principle produces steady, documented evolution.</p>
+<h3>4.4 What "Living" Does Not Mean</h3>
+<p>The living document principle does not mean:</p>
+<ul>
+<li><strong>Documents change on a whim.</strong> Every change must be justified, governed, and documented.</li>
+<li><strong>Documents are always in flux.</strong> A document that has been stable for five years because it accurately describes a stable system is not failing the living document principle. It is succeeding.</li>
+<li><strong>Old knowledge is worthless.</strong> Knowledge that has endured through multiple review cycles is more valuable, not less. The living document principle values knowledge that has been tested, and old knowledge that has survived testing is tested knowledge.</li>
+<li><strong>Everything is uncertain.</strong> Some things are known with high confidence. The living document principle does not inject uncertainty where none exists. It acknowledges uncertainty where it does exist and commits to tracking it.</li>
+<li><strong>Revision is the default action.</strong> The default action for any review cycle is to confirm that the document is still accurate. Revision happens when accuracy demands it, not on a schedule.</li>
+</ul>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-META-15-01:</strong> No article in the institution may be declared "final," "permanent," "unchangeable," or any synonym thereof. Every article, without exception, is subject to revision through the appropriate governance tier.</li>
+<li><strong>R-META-15-02:</strong> Every article must be reviewed at least once per year during the annual operations cycle (OPS-001). The review must be substantive: the reviewer must attest that the article still accurately reflects the system, procedure, or policy it describes. Cursory reviews ("no changes") must include a positive affirmation: "Confirmed accurate as of [date] by [reviewer]."</li>
+<li><strong>R-META-15-03:</strong> When an article is found to be inaccurate, outdated, or incomplete, revision must be initiated within 30 days. If the revision is complex and cannot be completed in 30 days, the article must be annotated with a visible notice: "REVISION IN PROGRESS -- some content may not reflect current state."</li>
+<li><strong>R-META-15-04:</strong> Version histories must be maintained per META-012. The version history is the evidence that the living document principle is being honored -- that documents are actually being maintained, not merely declared "living."</li>
+<li><strong>R-META-15-05:</strong> Commentary Sections should be used actively. The silence of a Commentary Section for more than two years on an actively used article is a signal that reflection has ceased, and should be investigated during the annual review.</li>
+<li><strong>R-META-15-06:</strong> The living document principle is institutional policy, not individual preference. It binds all operators, current and future. A future operator who wishes to declare certain documents final must first amend this article through the Tier 1 governance process -- and must articulate, in the amendment proposal, why finality serves the institution better than provisionality.</li>
+<li><strong>R-META-15-07:</strong> Intellectual humility is an institutional value, not just a personal virtue. The institution's documentation must model the principle that being wrong is not shameful but failing to correct a known error is. Error correction must be treated as a normal, routine part of institutional life, not as an exceptional event that requires apology.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Document fossilization.</strong> Despite the living document principle, individual articles gradually become treated as untouchable -- too important to change, too complex to update, too old to question. The principle exists on paper but not in practice. Mitigation: the annual review (R-META-15-02) forces engagement with every article. The version history (META-012) makes staleness visible. The quarterly review identifies articles that have not changed in the expected timeframes.</p>
+</li>
+<li>
+<p><strong>Revision fatigue.</strong> The operator tires of the constant obligation to maintain and revise. Documentation maintenance begins to feel Sisyphean -- an endless cycle of updates that never reaches completion. Mitigation: the operational tempo (OPS-001) is designed to be sustainable. META-014 ensures the article count remains within carrying capacity. The living document principle does not demand perfection. It demands maintenance.</p>
+</li>
+<li>
+<p><strong>Erosion of authority.</strong> If revisions are too frequent or too poorly communicated, the operator and any future readers may lose trust in the documentation. "It keeps changing, so why bother reading it?" Mitigation: the governance process ensures that revisions are deliberate. Version histories explain what changed and why. The living document principle must be balanced with stability -- documents should change when they need to, not when they can.</p>
+</li>
+<li>
+<p><strong>Selective provisionality.</strong> The operator treats some documents as living and others as effectively final, based on personal attachment rather than institutional need. The founding-era articles, because they carry emotional weight, become exempt from the scrutiny that other articles receive. Mitigation: R-META-15-01 is universal. The annual review must cover root documents with the same rigor as operational documents.</p>
+</li>
+<li>
+<p><strong>Performative revision.</strong> The operator revises documents to maintain the appearance of a living system, but the revisions are cosmetic: reworded sentences, reformatted tables, version bumps without substance. The version history shows activity, but the articles have not actually been tested against reality. Mitigation: the annual review requires substantive engagement, not surface changes. Version history summaries (META-012) must describe real changes, not cosmetic ones.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<h3>7.1 Recovery from Document Fossilization</h3>
+<ol>
+<li>Identify fossilized articles: articles that have not been substantively revised in more than three years despite being in active domains.</li>
+<li>For each fossilized article, perform a comprehensive review: read the entire article against current reality. Note every discrepancy, every outdated assumption, every procedure that has drifted from practice.</li>
+<li>Classify the discrepancies as minor (patch), substantive (minor version), or fundamental (major version).</li>
+<li>Execute the revisions. If multiple articles are fossilized, prioritize by dependency count (hub articles first) and operational criticality.</li>
+<li>Record the defossilization in the Commentary Section: "This article was effectively fossilized from [date] to [date]. The following discrepancies accumulated: [list]. This revision brings the article back into alignment with current state."</li>
+</ol>
+<h3>7.2 Recovery from Revision Fatigue</h3>
+<ol>
+<li>Acknowledge the fatigue. It is a legitimate signal that the operational tempo or the article count may be unsustainable.</li>
+<li>Review the carrying capacity assessment (META-014). Is the institution over capacity?</li>
+<li>If over capacity, reduce the article count per META-014's procedures.</li>
+<li>If within capacity, evaluate whether the operational tempo's allocation for documentation maintenance is sufficient. Adjust per GOV-001, Tier 3.</li>
+<li>Consider whether the revision process itself is inefficient. Are reviews taking too long because articles are poorly organized? Could templates, checklists, or tooling reduce the per-article cost?</li>
+<li>Do not push through fatigue with willpower alone. If the system is unsustainable, change the system.</li>
+</ol>
+<h3>7.3 Recovery from Erosion of Authority</h3>
+<ol>
+<li>Identify the cause. Is the erosion due to too-frequent changes (instability), poorly communicated changes (transparency failure), or low-quality changes (standards failure)?</li>
+<li>For instability: review the governance tier classification of recent revisions. Are operational changes being made at Tier 4 when they should be Tier 3? Is the governance process providing sufficient stability?</li>
+<li>For transparency failure: improve version history summaries per META-012. Ensure that every change is explained clearly enough that a reader understands why it happened.</li>
+<li>For standards failure: invoke the quality audit from META-014, Section 7.2. Ensure that revisions are substantive and correct, not hasty and error-prone.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The living document principle is being established for the first time. Most articles are at v1.0.0. The principle is more aspiration than practice. The primary risk is that the principle is stated but not internalized -- that articles are written with the unconscious assumption that they are final.</li>
+<li><strong>Years 5-15:</strong> The first major revision cycle occurs. Articles written during the founding period are reviewed against five to fifteen years of operational experience. This is the living document principle's first real test: will the institution actually revise its founding-era documents when they need it, or will it treat them as untouchable?</li>
+<li><strong>Years 15-30:</strong> A successor operator may inherit the institution. The living document principle is their license to change things. It tells them explicitly: these documents are yours to improve. The founder does not speak from beyond the page with the authority of finality. The founder speaks as one voice in a conversation that continues.</li>
+<li><strong>Years 30-50+:</strong> The documentation corpus has been through multiple generations of revision. Some articles may be on v5.0.0 or v8.0.0. The version histories are rich, layered records of institutional learning. The living document principle has been vindicated not by argument but by practice: the institution endures because it revised, not despite revising.</li>
+<li><strong>Ultimate measure of success:</strong> If, in fifty years, a maintainer reads this manifesto and finds it still accurate, the principle has succeeded. If they find it outdated and revise it, the principle has also succeeded. The only failure is if they find it outdated and do not revise it.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+This article is the last in the meta-documentation series, and I wanted it to end with something that feels like a commitment rather than a procedure. Every other article in this institution tells you what to do. This one tells you why it matters. The "why" is simple: because we do not know everything, because we will be wrong about some things, and because an institution that cannot admit error and correct course is an institution that has already begun to die, even if it does not know it yet.</p>
+<p>I have seen documentation systems that treat their founding documents as scripture. Those systems calcify. They become monuments to a moment in time rather than living tools for the present. I have also seen documentation systems that revise so freely that nothing can be trusted from one week to the next. Those systems dissolve. Neither extreme serves the people who depend on them.</p>
+<p>This institution chooses the middle path: revise deliberately, revise honestly, revise with the discipline that governance provides and the humility that reality demands. No document is final. Every document is maintained. The difference between these two statements is the difference between a dead archive and a living institution. We choose life. We choose the ongoing, imperfect, never-finished work of getting it right. And we accept that "right" is always provisional, always subject to what we learn next.</p>
+<p>That is not a weakness. That is the strongest foundation I know how to build.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 6: Honest Accounting of Limitations -- the ethical basis for provisionality)</li>
+<li>CON-001 -- The Founding Mandate (the documentation-first principle that creates the corpus this manifesto governs)</li>
+<li>GOV-001 -- Authority Model (the governance process that ensures revision is deliberate, not chaotic)</li>
+<li>OPS-001 -- Operations Philosophy (the operational tempo that makes maintenance sustainable)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (the security mindset: "a list of controls will not last five years" -- an implicit living document argument)</li>
+<li>META-001 -- Stage 1 Meta-Framework (the structural foundation for versioning, review, and revision)</li>
+<li>META-011 -- The Documentation Dependency Graph (structural maintenance as a form of the living document principle)</li>
+<li>META-012 -- Version History as Institutional Memory (the evidentiary record that the living document principle is honored)</li>
+<li>META-013 -- The Self-Referential Problem (this manifesto applies to itself -- the self-referential resolution)</li>
+<li>META-014 -- Documentation Capacity Planning (the sustainability constraint that ensures the living document principle does not produce unbounded revision)</li>
+</ul>
+<hr />
+<hr />
+<p><em>End of Stage 5 Meta-Documentation Batch 3 -- Five Self-Analysis Articles</em></p>
+<p><strong>Document Total:</strong> 5 articles
+<strong>Combined Estimated Word Count:</strong> ~14,500 words
+<strong>Status:</strong> All five articles ratified as of 2026-02-16.
+<strong>Next Stage:</strong> These articles complete the meta-documentation self-analysis layer. The institution now possesses the diagnostic and philosophical tools to examine itself. What remains is the ongoing work of applying them.</p>
+</section>
+</article>
+</main>
+</body>
+</html>

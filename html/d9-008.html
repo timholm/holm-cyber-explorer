@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D9-008 — Cross-Training Requirements - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li class="active"><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d9-008">
+  <h1>D9-008 &mdash; Cross-Training Requirements</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D9-008</dd>
+  <dt>Domain</dt>
+  <dd>9 -- Education &amp; Training</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D9-001, D9-002, D9-003, D9-004, GOV-001, OPS-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D9-010 (degraded-capacity planning requires the cross-training matrix), D10 (operations scheduling accounts for cross-training coverage), D12-001 (disaster recovery assumes cross-trained personnel)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the cross-training requirements for the holm.chat Documentation Institution. Its central concern is the elimination of single points of failure in human knowledge. A single point of failure exists whenever exactly one person possesses the knowledge required to perform a critical institutional function. When that person becomes unavailable -- through illness, departure, death, or simply being unreachable for an extended period -- the function cannot be performed, and the institution's operational capacity degrades or collapses.</p>
+<p>Cross-training is the systematic practice of ensuring that more than one person can perform each critical function. In a large organization, this happens naturally through team structures and overlapping responsibilities. In a small institution -- potentially one with only two or three people, or even one person preparing for eventual succession -- cross-training must be deliberate, documented, and enforced.</p>
+<p>This article establishes the cross-training matrix: a structured mapping of institutional functions to the people who can perform them, the minimum number of people who must be capable of each function, and the training pathway for developing that capability. The matrix is not a static document. It is a living instrument that must be updated whenever personnel change, whenever new functions are created, and whenever a gap analysis reveals uncovered functions.</p>
+<p>The philosophical justification for cross-training is established in D9-001: the institution must be able to reproduce its own competence. Cross-training is one of the primary mechanisms for that reproduction. Without it, the institution's competence is fragile -- concentrated in individuals rather than distributed across the institution's membership.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition and classification of institutional functions for cross-training purposes.</li>
+<li>The cross-training matrix: structure, population, and maintenance.</li>
+<li>Minimum coverage requirements: how many people must be able to perform each category of function.</li>
+<li>Single-point-of-failure identification and remediation.</li>
+<li>Cross-training scheduling: how to balance cross-training with operational demands.</li>
+<li>Competency levels for cross-training: the distinction between primary competency and backup competency.</li>
+<li>The solo-operator special case: cross-training when there is only one person.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The specific curriculum for any institutional function (see D9-003).</li>
+<li>Assessment and certification of cross-trained personnel (see D9-004).</li>
+<li>The degraded-capacity scenario where cross-training coverage has collapsed (see D9-010).</li>
+<li>The mentorship relationship through which cross-training is often delivered (see D9-005).</li>
+<li>The training materials used for cross-training (see D9-009).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Bus Factor</h3>
+<p>The "bus factor" of a project is the number of people who would need to become simultaneously unavailable before the project could no longer continue. A bus factor of one means a single departure kills the project. The holm.chat Documentation Institution, in its early years, has a bus factor of one by definition -- there is one operator. The purpose of cross-training is to raise the bus factor as the institution grows, and to prepare for that growth even while the institution remains a single-operator system.</p>
+<p>In the solo-operator phase, cross-training takes a different form: it means ensuring that the documentation is sufficient for a newcomer to learn every function (the self-teaching requirement of D9-001, R-D9-01), and it means the operator themselves maintaining breadth across all institutional functions rather than allowing knowledge to atrophy in areas they rarely exercise.</p>
+
+<h3>3.2 Function Criticality Classification</h3>
+<p>Not all institutional functions carry equal weight. The cross-training matrix assigns each function a criticality tier that determines the minimum coverage requirement:</p>
+<ul>
+<li><strong>Tier A -- Existential Functions:</strong> Functions without which the institution ceases to operate within days. Examples: backup execution, backup verification, system health monitoring, security incident response. These functions must have the highest cross-training priority.</li>
+<li><strong>Tier B -- Structural Functions:</strong> Functions without which the institution degrades significantly within weeks. Examples: documentation review, decision log maintenance, import pipeline operation, quarterly audit execution. These functions must be covered but tolerate brief gaps.</li>
+<li><strong>Tier C -- Enhancement Functions:</strong> Functions that improve the institution but whose absence does not threaten survival within months. Examples: documentation quality improvement, training material development, intelligence analysis, format migration. These functions may be covered by a single person provided that person's knowledge is documented.</li>
+</ul>
+
+<h3>3.3 The Coverage Requirement Principle</h3>
+<p>The minimum coverage requirement is derived from a simple principle: no Tier A function may have fewer than two people capable of performing it. No Tier B function may have fewer than two people capable of performing it when the institution has three or more members. Tier C functions require at least one capable person plus documentation sufficient for self-teaching.</p>
+<p>When the institution has only one or two members, these requirements cannot be met through personnel alone. In that case, the coverage is provided by the combination of one capable person plus documentation that meets the self-teaching requirement (D9-001, R-D9-01). The documentation itself is the "second person."</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Cross-Training Matrix</h3>
+<p>The cross-training matrix is a table with institutional functions as rows and personnel as columns. Each cell contains a competency level indicator:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Label</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>Primary</td>
+<td>This person performs this function routinely and can train others. Corresponds to D9-001 Stage 4 (Adaptive Mastery) or Stage 3 (Independent Execution).</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Backup</td>
+<td>This person can perform this function independently when the primary is unavailable. Corresponds to D9-001 Stage 3 (Independent Execution).</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Guided</td>
+<td>This person can perform this function with reference to documentation. Corresponds to D9-001 Stage 2 (Guided Execution).</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Aware</td>
+<td>This person knows this function exists and can identify when it needs to be performed. Corresponds to D9-001 Stage 1 (Awareness).</td>
+</tr>
+<tr>
+<td>0</td>
+<td>None</td>
+<td>This person has no knowledge of this function.</td>
+</tr>
+</tbody>
+</table>
+<p>The matrix is populated during onboarding (D9-002/D9-011) as new members are assessed, updated after each training event, and reviewed annually during the cross-training audit.</p>
+
+<h3>4.2 The Function Inventory</h3>
+<p>The function inventory is derived from the operational articles across all domains. Every procedure documented in any domain's operational articles constitutes an institutional function. The inventory groups these functions by domain and assigns a criticality tier. A representative (not exhaustive) inventory follows:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Source Domain</th>
+<th>Criticality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backup execution and verification</td>
+<td>Domain 4, Domain 6</td>
+<td>Tier A</td>
+</tr>
+<tr>
+<td>System health monitoring</td>
+<td>Domain 4</td>
+<td>Tier A</td>
+</tr>
+<tr>
+<td>Security incident detection and response</td>
+<td>Domain 3</td>
+<td>Tier A</td>
+</tr>
+<tr>
+<td>Air-gap maintenance and verification</td>
+<td>Domain 3</td>
+<td>Tier A</td>
+</tr>
+<tr>
+<td>Content import pipeline operation</td>
+<td>Domain 18</td>
+<td>Tier B</td>
+</tr>
+<tr>
+<td>Decision log maintenance</td>
+<td>Domain 2, Domain 20</td>
+<td>Tier B</td>
+</tr>
+<tr>
+<td>Documentation review and quality audit</td>
+<td>Domain 19</td>
+<td>Tier B</td>
+</tr>
+<tr>
+<td>Quarterly operational cycle execution</td>
+<td>Domain 10</td>
+<td>Tier B</td>
+</tr>
+<tr>
+<td>Hardware replacement and maintenance</td>
+<td>Domain 4</td>
+<td>Tier B</td>
+</tr>
+<tr>
+<td>Training material development</td>
+<td>Domain 9</td>
+<td>Tier C</td>
+</tr>
+<tr>
+<td>Intelligence analysis</td>
+<td>Domain 7</td>
+<td>Tier C</td>
+</tr>
+<tr>
+<td>Documentation writing and improvement</td>
+<td>Domain 9, Domain 19</td>
+<td>Tier C</td>
+</tr>
+<tr>
+<td>Format migration</td>
+<td>Domain 6</td>
+<td>Tier C</td>
+</tr>
+</tbody>
+</table>
+<p>The complete function inventory is maintained as a living document appended to this article. It must be updated whenever a new operational procedure is created in any domain.</p>
+
+<h3>4.3 Gap Analysis Process</h3>
+<p>A cross-training gap exists whenever a function's coverage falls below its minimum requirement. The gap analysis process runs annually (at minimum) and whenever personnel change:</p>
+<ol>
+<li>Update the function inventory from current domain documentation.</li>
+<li>Update each person's competency level for each function based on recent assessments and operational performance.</li>
+<li>For each Tier A function, verify that at least two people hold Level 3 or above. If not, flag as a critical gap.</li>
+<li>For each Tier B function, verify that at least two people hold Level 2 or above (when the institution has three or more members). If not, flag as a significant gap.</li>
+<li>For each Tier C function, verify that at least one person holds Level 3 or above and that documentation meets self-teaching requirements. If not, flag as a minor gap.</li>
+<li>Produce a prioritized gap remediation plan. Critical gaps take absolute priority.</li>
+</ol>
+
+<h3>4.4 The Solo-Operator Model</h3>
+<p>When the institution has only one operator, the cross-training matrix has only one column of personnel. Every function shows a single person. By the coverage definitions above, every function is technically uncovered. This is the institution's highest-risk configuration.</p>
+<p>In the solo-operator model, cross-training takes three forms:</p>
+<ul>
+<li><strong>Self-cross-training:</strong> The operator periodically exercises functions they do not perform routinely, to prevent skill atrophy. A function performed only once a year may be forgotten by the next occurrence.</li>
+<li><strong>Documentation as backup:</strong> The documentation must meet the self-teaching requirement for every function, because the documentation is the only other "person" capable of reproducing the knowledge.</li>
+<li><strong>Tacit knowledge capture:</strong> Per D9-007, the operator records narrated demonstrations, decision reasoning, and experiential observations for all Tier A and Tier B functions, so that a future learner has more than written procedures to learn from.</li>
+</ul>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D9-08-01:</strong> Every institutional function must be listed in the cross-training function inventory with an assigned criticality tier. No function may be omitted on the grounds that "everyone knows how to do this." If it is an institutional function, it is in the inventory.</li>
+<li><strong>R-D9-08-02:</strong> No Tier A function may have a coverage level below two people at Level 3 or above, except during the solo-operator phase. During the solo-operator phase, every Tier A function must have documentation that meets the self-teaching requirement (D9-001, R-D9-01) plus at least one tacit knowledge capture artifact (D9-007).</li>
+<li><strong>R-D9-08-03:</strong> A cross-training gap analysis must be performed at minimum annually, and within thirty days of any personnel change (departure, addition, or prolonged absence exceeding ninety days).</li>
+<li><strong>R-D9-08-04:</strong> Critical gaps (Tier A functions below minimum coverage) must be remediated within ninety days of identification. If remediation requires training a new person, the ninety-day clock begins when training starts, not when the gap is identified.</li>
+<li><strong>R-D9-08-05:</strong> The cross-training matrix must be accessible to all institutional members. It is not a confidential document. Every member should know which functions they are expected to cover and at what level.</li>
+<li><strong>R-D9-08-06:</strong> Cross-training must not be treated as optional professional development. It is a mandatory institutional requirement. Time allocated to cross-training is operational time, not discretionary time. The operational tempo (OPS-001) must account for cross-training hours.</li>
+<li><strong>R-D9-08-07:</strong> The solo operator must exercise every Tier A function at least quarterly and every Tier B function at least semi-annually, even if normal operations do not require that frequency, to prevent skill atrophy.</li>
+<li><strong>R-D9-08-08:</strong> Cross-training competency is verified through the assessment methods defined in D9-004. Self-reported competency is not sufficient. A person is not counted as coverage until they have demonstrated the claimed competency level through practical assessment.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>The phantom coverage problem.</strong> The matrix shows two people at Level 3 for a function, but one of them has not actually performed the function in two years and has forgotten critical details. The coverage is illusory. Mitigation: R-D9-08-08 requires practical assessment verification. Annual re-assessment prevents coverage decay. R-D9-08-07 requires periodic exercise of all functions.</p>
+</li>
+<li>
+<p><strong>The priority inversion.</strong> Cross-training is consistently deferred because operational demands consume all available time. The matrix gaps grow wider. Eventually a personnel change exposes the accumulated deficit. Mitigation: R-D9-08-06 establishes cross-training as mandatory operational time, not discretionary. The annual gap analysis makes the growing risk visible before it becomes a crisis.</p>
+</li>
+<li>
+<p><strong>The documentation substitute illusion.</strong> The institution treats documentation as equivalent to a trained person and stops prioritizing cross-training. Documentation is necessary but not sufficient -- it provides Stage 2 capability, not Stage 3. Mitigation: the coverage requirements distinguish between documentation-backed coverage and person-backed coverage. Documentation alone satisfies coverage requirements only during the solo-operator phase and only in combination with tacit knowledge artifacts.</p>
+</li>
+<li>
+<p><strong>The specialization trap.</strong> As the institution grows, each person gravitates toward their area of expertise and stops maintaining breadth. Cross-training atrophies through natural specialization. Mitigation: annual re-assessment, periodic rotation of operational responsibilities, and the quarterly exercise requirement (R-D9-08-07).</p>
+</li>
+<li>
+<p><strong>The simultaneous unavailability.</strong> Two people who cover the same Tier A function both become unavailable at the same time (illness, travel, or correlated risk). Mitigation: for institutions with more than three members, consider three-person coverage for the most critical Tier A functions. For smaller institutions, accept the risk but ensure documentation meets the self-teaching requirement as a fallback.</p>
+</li>
+<li>
+<p><strong>Inventory drift.</strong> New functions are created in other domains but never added to the cross-training inventory. They exist in an uncovered state without anyone realizing it. Mitigation: the annual gap analysis begins by rebuilding the function inventory from current domain documentation. The inventory is derived from the source, not maintained independently.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a critical gap is discovered during gap analysis:</strong> Immediately classify as a Tier 2 governance event (GOV-001). Record in the decision log. Assign a specific person to begin training on the uncovered function. Set a ninety-day remediation deadline. If no person is available for training, escalate to D9-010 (degraded-capacity procedures).</p>
+</li>
+<li>
+<p><strong>If a person with unique Tier A knowledge announces departure:</strong> Initiate emergency knowledge transfer. Prioritize tacit knowledge capture (D9-007) immediately -- do not wait for formal cross-training to complete. Document everything the departing person does during their remaining time. Assign a specific trainee and create an accelerated cross-training schedule. The departing person's primary responsibility shifts from operations to knowledge transfer.</p>
+</li>
+<li>
+<p><strong>If a person with unique Tier A knowledge becomes suddenly unavailable:</strong> Activate D9-010 degraded-capacity procedures. The institution enters survival mode for the affected functions. Assign the most capable remaining person to learn the function from documentation and tacit knowledge artifacts. Accept Stage 2 (Guided Execution) as the interim target. Resume normal operations only when Stage 3 coverage is restored.</p>
+</li>
+<li>
+<p><strong>If cross-training assessment reveals that coverage has decayed (a person no longer performs at the level recorded in the matrix):</strong> Update the matrix to reflect actual competency. If this creates a coverage gap, treat it as a new gap and follow the remediation process. Investigate why the decay occurred: was it lack of practice, lack of assessment, or documentation inadequacy?</p>
+</li>
+<li>
+<p><strong>If the function inventory is found to be incomplete:</strong> Perform an emergency inventory rebuild from current domain documentation. Treat any newly discovered uncovered functions as gaps and prioritize by criticality tier. Record the inventory failure in the decision log and investigate why the function was missed.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5 (Solo Operator):</strong> The cross-training matrix has one column. Every function shows a single person. The primary work is documentation quality: ensuring that every Tier A and Tier B function has documentation meeting the self-teaching requirement, and that tacit knowledge capture artifacts exist for all Tier A functions. The operator practices periodic self-cross-training by exercising all functions on the schedule defined in R-D9-08-07. The matrix exists primarily as a planning tool for the day when a second person arrives.</p>
+</li>
+<li>
+<p><strong>Years 5-15 (First Growth):</strong> The institution may gain a second or third member. This is the period of highest cross-training urgency. The matrix transitions from a planning document to an operational instrument. The first gap analysis with multiple personnel will reveal priorities. Expect the initial cross-training workload to be heavy -- the new members need to reach Stage 2 or Stage 3 on many functions simultaneously. The operational tempo must accommodate this investment.</p>
+</li>
+<li>
+<p><strong>Years 15-30 (Maturation):</strong> Cross-training should be routine. The annual gap analysis is a normal operational activity, not a crisis response. Coverage should be stable. The focus shifts from building coverage to maintaining it -- preventing the specialization trap, keeping assessments current, and ensuring that the function inventory keeps pace with institutional evolution.</p>
+</li>
+<li>
+<p><strong>Years 30-50+ (Generational Transfer):</strong> The institution has survived at least one generational transition. The cross-training matrix has been used in real succession events. Its structure should be validated by experience. The function inventory should reflect decades of institutional evolution. The coverage requirements may need adjustment as the institution's scale and complexity change. The core principle remains: no single point of failure in human knowledge.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Writing about cross-training for a one-person institution requires a peculiar form of honesty. The cross-training matrix, as I write it today, is a single column of ones and fours. I am the only person who knows anything, and I know everything -- or at least everything that has been built so far. The matrix is maximally fragile.</p>
+<p>The honest statement is this: right now, if I become unavailable, the institution's competence drops to whatever the documentation can teach a stranger. That is the real cross-training test. Not whether I have trained a backup person -- I have not, because there is no one to train -- but whether the documentation is good enough to be the backup person.</p>
+<p>The quarterly exercise requirement (R-D9-08-07) is directed at my future self. It is easy, when you built a system, to assume you remember how it works. You do not. Memory degrades. Procedures you wrote six months ago now have steps you would skip because you "know" what comes next -- except you do not, quite. The quarterly exercise is a forcing function: touch every critical system regularly, follow the documentation, and notice when the documentation is wrong or when your memory has drifted from reality.</p>
+<p>When a second person joins this institution, the cross-training matrix will finally become what it is designed to be: a tool for distributing knowledge across people rather than concentrating it in one. That day will be the most important training event in the institution's history. I need to be ready for it, and this article is part of being ready.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D9-001 -- Education Philosophy: Reproducing Institutional Competence (competence stages, self-teaching requirement)</li>
+<li>D9-002 -- The Competency Model: What Everyone Must Know (baseline competencies inform cross-training baseline)</li>
+<li>D9-003 -- Role-Specific Curriculum Design (curricula provide the training pathways for cross-training)</li>
+<li>D9-004 -- Skill Assessment &amp; Certification Standards (assessment methods verify cross-training competency)</li>
+<li>D9-005 -- Mentorship &amp; Apprenticeship Framework (mentorship is a primary delivery mechanism for cross-training)</li>
+<li>D9-007 -- Tacit Knowledge Capture Strategies (tacit knowledge artifacts supplement cross-training documentation)</li>
+<li>D9-010 -- Degraded-Capacity Education Plan (activated when cross-training coverage is insufficient)</li>
+<li>GOV-001 -- Authority Model (succession protocol, governance events)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo must account for cross-training time)</li>
+<li>D12-001 -- Disaster Recovery (recovery procedures assume cross-trained personnel)</li>
+<li>All domain operational articles (source of the function inventory)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

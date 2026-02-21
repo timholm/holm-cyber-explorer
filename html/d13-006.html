@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D13-006 — Version Management and Compatibility Policy - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li class="active"><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d13-006">
+  <h1>D13-006 &mdash; Version Management and Compatibility Policy</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D13-006</dd>
+  <dt>Title</dt>
+  <dd>Version Management and Compatibility Policy</dd>
+  <dt>Domain</dt>
+  <dd>13 -- Evolution &amp; Adaptation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, D13-001, D11-001, D11-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D13-007, D13-008, D13-009, D13-010, D13-011, D13-012, D13-013. Referenced by all domains that track versioned artifacts.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes the version numbering scheme, version tracking procedures, and forward and backward compatibility requirements for all systems, software, data formats, and documentation within the holm.chat Documentation Institution. Versioning is the language of change. Without a consistent version scheme, it is impossible to know what state a system is in, what changed between states, what is compatible with what, or when something was last updated.</p>
+
+<p>D13-001 establishes the philosophy of managed change. This article provides the infrastructure for that management. Every component in the institution -- from the operating system to the documentation framework to individual data format specifications -- must have a version identifier that communicates its lifecycle status. The version scheme must be simple enough that a single operator can maintain it without overhead, robust enough to survive fifty years of continuous use, and expressive enough to distinguish between trivial changes and breaking ones.</p>
+
+<p>This article also defines the compatibility policy: the rules governing whether a new version of a component is required to work with the old version's data and interfaces, and for how long. Compatibility is the bridge that makes evolution possible without disruption. Without compatibility guarantees, every version change is a potential crisis. With them, version changes become orderly transitions.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The institutional version numbering scheme (major.minor.patch) and its semantic meaning.
+- Version lifecycle stages: active, deprecated, sunset, archived.
+- Version tracking: where version information is recorded and how it is maintained.
+- Forward compatibility: the obligation for new versions to read old data.
+- Backward compatibility: the obligation for old systems to handle new data gracefully.
+- Compatibility windows: how long old versions must be supported after a new version is released.
+- Version conflict resolution: what happens when components at different versions must interact.
+- Version numbering for documentation, configuration, and data formats.</p>
+
+<p><strong>Out of scope:</strong>
+- Specific migration procedures between versions (D13-002).
+- Hardware lifecycle tracking (D13-003, D11-002).
+- Document content revision tracking (D20-001 handles institutional memory; this article handles the numbering scheme).
+- Software sunset procedures (D13-004).</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Problem of Unnamed Change</h3>
+<p>In personal computing, version management is typically informal. Files are overwritten. Configurations are changed in place. Software is updated and the old version vanishes. This works -- until it does not. When a problem appears, the operator cannot determine what changed. When a backup is restored, the operator cannot determine what version it represents. When a data file fails to open, the operator cannot determine whether the file or the software is at fault.</p>
+
+<p>This institution cannot afford unnamed change. Every change must be traceable to a version increment. Every state of every significant component must be identifiable by its version number. The version number is the institution's way of asserting: "I know exactly what state this is, and I can distinguish it from every other state."</p>
+
+<h3>3.2 Semantic Versioning as a Foundation</h3>
+<p>The industry standard approach to version numbering -- semantic versioning (major.minor.patch) -- provides a solid foundation. The major version increments when backward-incompatible changes are introduced. The minor version increments when new functionality is added in a backward-compatible way. The patch version increments for backward-compatible fixes. This institution adopts semantic versioning with institutional-specific extensions for lifecycle status and compatibility guarantees.</p>
+
+<h3>3.3 Compatibility as an Engineering Discipline</h3>
+<p>Compatibility is not an afterthought. It is a design constraint that must be considered at the time a component is created, not when a new version is released. The principle from D13-001 -- data sovereignty, interface stability, modularity -- are the architectural foundations of compatibility. This article makes those principles concrete by specifying what compatibility means, how long it lasts, and what happens when it cannot be maintained.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Version Numbering Scheme</h3>
+<p>All versioned artifacts in the institution use the format: <code>MAJOR.MINOR.PATCH</code></p>
+
+<p><strong>MAJOR</strong> (integer, starting at 1): Incremented when a change breaks backward compatibility. A consumer of version 1.x.x data or interfaces cannot assume it will work with version 2.0.0 without migration. Major version increments are Tier 2 decisions under GOV-001.</p>
+
+<p><strong>MINOR</strong> (integer, starting at 0): Incremented when new capabilities are added without breaking existing capabilities. A consumer of version 1.2.x data should be able to consume version 1.3.0 data, though it may not use the new capabilities. Minor version increments are Tier 3 decisions.</p>
+
+<p><strong>PATCH</strong> (integer, starting at 0): Incremented for bug fixes, corrections, and clarifications that do not change capabilities. A consumer of version 1.2.3 should see no functional difference from version 1.2.4. Patch increments are operational decisions requiring no governance approval beyond documentation.</p>
+
+<h3>4.2 Version Lifecycle Stages</h3>
+<p>Every versioned artifact passes through four lifecycle stages:</p>
+
+<p><strong>Active.</strong> The current recommended version. Receiving updates (minor and patch increments). All new work should target this version. There is exactly one active major version for each artifact at any time.</p>
+
+<p><strong>Deprecated.</strong> A version that is still functional and supported but is no longer the recommended version. A newer major version has been released. The deprecated version receives only critical patches (security fixes, data integrity fixes). No new features. Deprecation is announced with a sunset date -- the date after which the deprecated version will no longer be supported. The minimum deprecation period is 12 months for major system components and 6 months for minor components.</p>
+
+<p><strong>Sunset.</strong> A version that is no longer supported. It may still function but will not receive patches. Data in this version's format should be migrated to the active version. Sunset is a defined event recorded in the institutional timeline (D20-003).</p>
+
+<p><strong>Archived.</strong> A version that has been fully retired. Its documentation is preserved in the institutional archive. Its data has been migrated. It no longer runs in any production capacity. Archive is the final state.</p>
+
+<h3>4.3 The Version Registry</h3>
+<p>The version registry is a document maintained as part of the asset registry (D11-002). It lists every versioned artifact in the institution with its current version number, lifecycle stage, and key dates (creation date, deprecation date if applicable, sunset date if applicable). The registry is updated whenever a version changes. It is reviewed during the annual institutional review (OPS-001).</p>
+
+<p>The registry format is a plain-text table (to ensure durability per D13-001 R-EVL-04):</p>
+
+<pre>
+ARTIFACT                  CURRENT VERSION  STAGE       ACTIVE SINCE  DEPRECATED  SUNSET
+operating-system          24.04.2          Active      2024-04-01    --          --
+documentation-framework   1.0.0            Active      2026-02-16    --          --
+backup-format             1.2.0            Active      2026-01-15    --          --
+encryption-scheme         1.0.0            Active      2026-02-16    --          --
+</pre>
+
+<h3>4.4 Forward Compatibility Requirements</h3>
+<p>Forward compatibility means that newer versions can consume data and interfaces produced by older versions. The rule is strict: <strong>every new version must be able to read data produced by any prior version within the same major version line.</strong> Version 1.5.0 must be able to read data produced by version 1.0.0. If a new minor or patch version cannot read old data, it is by definition a major version increment.</p>
+
+<p>Across major version boundaries, forward compatibility is strongly recommended but not strictly required. Version 2.0.0 should include a migration path from version 1.x.x data, but it is not required to read version 1.x.x data natively. Instead, a conversion tool or procedure must be documented as part of the major version release.</p>
+
+<h3>4.5 Backward Compatibility Requirements</h3>
+<p>Backward compatibility means that older versions can handle data produced by newer versions gracefully. Full backward compatibility is not required -- an older version may not understand new features. But it must not crash, corrupt data, or silently lose information when encountering data from a newer minor version. At minimum, old versions must recognize that the data is from a newer version and report this clearly rather than failing silently.</p>
+
+<p>Across major version boundaries, backward compatibility is not required but failure must be graceful: clear error messages, no data corruption, no silent degradation.</p>
+
+<h3>4.6 Compatibility Windows</h3>
+<p>When a new major version is released, the previous major version enters the deprecated stage. The compatibility window is the period during which both versions are supported and data can flow between them (via conversion tools). Minimum compatibility windows:</p>
+
+<table>
+<thead>
+<tr><th>Artifact Type</th><th>Minimum Compatibility Window</th></tr>
+</thead>
+<tbody>
+<tr><td>Data formats (Tier 1 data)</td><td>24 months</td></tr>
+<tr><td>Data formats (Tier 2/3 data)</td><td>12 months</td></tr>
+<tr><td>System configurations</td><td>12 months</td></tr>
+<tr><td>Documentation formats</td><td>18 months</td></tr>
+<tr><td>Interface specifications</td><td>12 months</td></tr>
+</tbody>
+</table>
+
+<p>During the compatibility window, conversion tools and migration procedures must be maintained and tested. At the end of the compatibility window, the deprecated version enters sunset.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-VMP-01:</strong> All versioned artifacts must use the MAJOR.MINOR.PATCH numbering scheme defined in Section 4.1. No alternative schemes are permitted without Tier 2 approval and documented justification.</li>
+<li><strong>R-VMP-02:</strong> Major version increments are Tier 2 decisions under GOV-001. They must be accompanied by a migration path from the previous major version and documented compatibility windows.</li>
+<li><strong>R-VMP-03:</strong> Forward compatibility within a major version line is mandatory. A newer minor or patch version must read data produced by any older version in the same major line.</li>
+<li><strong>R-VMP-04:</strong> The version registry must be maintained and reviewed at least annually. Every version change must be recorded within 7 days of the change.</li>
+<li><strong>R-VMP-05:</strong> Deprecated versions must have an explicit sunset date established at the time of deprecation. The sunset date must respect the minimum compatibility windows in Section 4.6.</li>
+<li><strong>R-VMP-06:</strong> No versioned artifact may transition directly from active to sunset. The deprecation stage is mandatory to provide transition time.</li>
+<li><strong>R-VMP-07:</strong> Archived versions must have their documentation preserved in the institutional archive. The documentation must include: version number, date range of active use, reason for archival, and location of any migration tools or procedures.</li>
+<li><strong>R-VMP-08:</strong> When version conflicts arise between components, the resolution must preserve data integrity above all other concerns. Performance degradation and feature loss are acceptable; data loss is not.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Version drift.</strong> The version registry falls out of sync with actual deployed versions. The operator believes a component is at version 1.2.0 when it is actually at 1.3.1. Compatibility assumptions based on the registry are incorrect. Mitigation: R-VMP-04 mandates timely registry updates. The annual review includes a physical verification of deployed versions against the registry.</li>
+
+<li><strong>Silent incompatibility.</strong> A minor version update introduces a subtle incompatibility that is not detected because the change was classified as backward-compatible when it was not. Data produced by the new version cannot be read correctly by the old version. Mitigation: R-VMP-03 mandates forward compatibility testing. Pre-migration testing (D13-002) must include compatibility verification.</li>
+
+<li><strong>Compatibility window violation.</strong> A deprecated version is sunset before the compatibility window expires, leaving data stranded in the old format. Mitigation: R-VMP-05 mandates explicit sunset dates that respect minimum windows. R-VMP-06 prevents skipping the deprecation stage.</li>
+
+<li><strong>Version number exhaustion.</strong> Over decades, version numbers may grow large. Version 47.0.0 is unwieldy but functional. This is an aesthetic concern, not a functional one. The scheme does not require resetting numbers. Large numbers are a badge of institutional longevity, not a problem to solve.</li>
+
+<li><strong>Orphaned conversion tools.</strong> A conversion tool for migrating from version N to version N+1 is lost or becomes non-functional. Data in version N format cannot be migrated. Mitigation: conversion tools are treated as Tier 2 data artifacts and preserved in the institutional archive. They are tested annually as part of the compatibility window verification.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If the version registry is out of sync:</strong> Conduct a full audit. For each versioned artifact, determine the actually deployed version by examining the artifact directly (configuration files, software version commands, data format headers). Update the registry. Document the discrepancies and their causes. Implement procedural safeguards to prevent recurrence.</li>
+
+<li><strong>If a silent incompatibility is discovered:</strong> Assess the scope of affected data. If data has been produced by the incompatible version, determine whether it can be converted. If the incompatibility was introduced in a minor version, this represents a version classification error -- the change should have been a major version increment. Reclassify, create a migration path, and update the registry.</li>
+
+<li><strong>If a compatibility window has been violated:</strong> If the deprecated version's data still exists, restore the conversion tools from the archive and perform the migration. If the conversion tools are unavailable, treat this as a data format recovery event and use forensic techniques to reconstruct the migration path. Document the violation and enforce compliance going forward.</li>
+
+<li><strong>If a conversion tool has been lost:</strong> Check the institutional archive for backup copies. If none exist, attempt to reconstruct the tool from documentation. If reconstruction is not possible, the data in the old format may need to be read by restoring the old version of the software from archive. This is a strong argument for R-VMP-07's requirement to preserve archived version documentation.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Most artifacts are at version 1.x.x. The version registry is small and easy to maintain. The compatibility policy is theoretical -- no major version transitions have occurred. Use this period to build the discipline of version tracking. Every change, no matter how small, gets a version increment.</li>
+
+<li><strong>Years 5-15:</strong> The first major version transitions occur. The compatibility windows are tested in practice. The conversion tools are used for the first time. Expect to discover that some compatibility windows are too short and some conversion tools are inadequate. Revise based on experience.</li>
+
+<li><strong>Years 15-30:</strong> The version registry has grown significantly. Multiple major version lines have been navigated. The archived versions section of the registry tells the story of the institution's technological evolution. Version management is routine.</li>
+
+<li><strong>Years 30-50+:</strong> Version numbers are large but meaningful. The registry is a comprehensive history of every significant change in the institution. Conversion tools spanning decades of versions are preserved in the archive. The version scheme itself has proven its durability -- or has been revised through the Evolution Decision Framework if it proved inadequate.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Version management feels like bureaucratic overhead when you are a single operator maintaining a personal system. I know what version everything is because I installed it. But I will not always be the operator. And even if I am, my memory of what version I installed three years ago will fade. The version registry and the version numbering scheme are not for today's operator who remembers everything. They are for tomorrow's operator -- or today's operator in five years -- who needs to know exactly what state the institution is in without relying on memory. The discipline of incrementing a version number for every change is a small tax on the present that pays enormous dividends to the future. I have chosen semantic versioning because it communicates intent, not just sequence. A major version change tells the reader: something important shifted. A patch tells the reader: this is a minor correction. The number itself carries meaning, and meaning survives longer than memory.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D13-001 -- Evolution Philosophy (conservatism imperative, data sovereignty, interface stability, R-EVL-04, R-EVL-05)</li>
+<li>D11-001 -- Administration Philosophy (asset stewardship, resource tracking)</li>
+<li>D11-002 -- Asset Inventory and Tracking (asset registry as version registry host)</li>
+<li>D13-002 -- Technology Migration Playbook (migration procedures triggered by major version transitions)</li>
+<li>D13-004 -- Software Sunset Procedures (sunset stage operationalization)</li>
+<li>D20-001 -- Institutional Memory Philosophy (archived version documentation preservation)</li>
+<li>D20-003 -- Timeline Construction and Maintenance (recording version lifecycle events)</li>
+<li>GOV-001 -- Authority Model (decision tiers for version changes)</li>
+<li>OPS-001 -- Operations Philosophy (annual review includes version registry audit)</li>
+<li>CON-001 -- The Founding Mandate (lifetime operation requirement drives compatibility windows)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

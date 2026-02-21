@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-009 — Topology Models &amp; Selection Criteria - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li class="active"><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-009">
+  <h1>D17-009 &mdash; Topology Models &amp; Selection Criteria</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-009</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling &amp; Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-001 (Federation Philosophy), D17-002 (Node Identity &amp; Lifecycle)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D17-003 (Air-Gapped Sync), D17-004 (Conflict Resolution), D17-010 (Resource Allocation), D17-015 (Federation Health). Referenced by D16-003 (Navigation Structures) for cross-node navigation adaptation.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the topology models available to a federation of holm.chat nodes and establishes the criteria by which operators select, evaluate, and evolve the shape of their federation. Topology -- the pattern of connections between nodes -- determines how sync packages flow, how quickly information propagates, how resilient the federation is to the loss of any individual node, and how much coordination overhead each node bears.</p>
+
+<p>A federation of two nodes has no topology decision to make: there is exactly one connection. A federation of three or more nodes must choose a shape, and that choice has consequences that compound over decades. A poorly chosen topology creates bottleneck nodes, single points of failure, and uneven synchronization delays. A well-chosen topology distributes load, minimizes the number of hops between any two nodes, and degrades gracefully when nodes become unreachable.</p>
+
+<p>This article is addressed to every operator who participates in or is considering a federation of three or more nodes. It is also addressed to the operator of a two-node federation who wants to prepare for future growth. The topology decision should be made deliberately, recorded in institutional memory (Domain 20), and reviewed on a five-year cycle as the federation evolves.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The four canonical topology models applicable to air-gapped federations: star, ring, full mesh, and hierarchical.</li>
+<li>Hybrid topologies and how they combine elements of canonical models.</li>
+<li>Selection criteria: how to choose a topology based on node count, geographic distribution, transport capacity, operator availability, and resilience requirements.</li>
+<li>Topology evolution: how to transition from one topology to another as the federation grows or contracts.</li>
+<li>The relationship between topology and sync propagation delay.</li>
+<li>Topology documentation requirements.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The specific sync protocols used on each link (see D17-003).</li>
+<li>The physical transport mechanisms for moving sync packages (see D17-014).</li>
+<li>Conflict resolution when sync propagation paths cause ordering ambiguities (see D17-004).</li>
+<li>Trust relationships between nodes, which are independent of topology (see D17-005).</li>
+<li>The governance process for deciding on topology changes (see D17-008).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Topology Matters for Air-Gapped Federations</h3>
+<p>In a networked federation, topology is often abstracted away. Any node can send a message to any other node through the network layer, regardless of the physical path. In an air-gapped federation, topology is concrete and consequential. A sync package must be physically carried from one node to another. If Node A wants to send data to Node C but has no direct transport link to Node C, the package must travel through an intermediary node -- Node B -- which adds delay, increases handling, and creates a dependency on Node B's availability and cooperation.</p>
+
+<p>The choice of topology therefore determines the real-world logistics of federation. It determines who carries sync packages to whom, how many intermediary hops a package requires, and what happens when a particular transport route becomes unavailable. These are not abstract concerns. They are questions about who drives to which location, how often, carrying what physical media. The topology must match the real-world capacity for physical transport.</p>
+
+<h3>3.2 Prior Art in Distributed Systems</h3>
+<p>Network topology is a well-studied field. The canonical models -- star, ring, mesh, tree, bus -- are taught in every networking course. However, most of this prior art assumes electronic communication where topology can be reconfigured dynamically and where multi-hop routing is handled automatically by protocols. None of these assumptions hold for air-gapped federation. Each topology model must be re-evaluated in the context of physical media transport, batch synchronization, and human-carried packages.</p>
+
+<h3>3.3 The Tension Between Resilience and Simplicity</h3>
+<p>A full mesh topology -- where every node has a direct transport link to every other node -- provides maximum resilience and minimum propagation delay. It also requires the most transport links: for N nodes, N*(N-1)/2 bidirectional links. For a federation of ten nodes, that is 45 transport links to maintain. Each link represents a regular physical transport trip. This quickly exceeds the practical capacity of most communities.</p>
+
+<p>A star topology -- where one central node connects to all others -- minimizes the number of transport links to N-1. It is simple to manage. It also creates a single point of failure and a bottleneck at the center. If the hub node becomes unavailable, the entire federation loses its only synchronization path.</p>
+
+<p>Every topology choice is a negotiation between these extremes. The selection criteria in this article are designed to make that negotiation explicit and informed.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Canonical Topology Models</h3>
+
+<p><strong>Star Topology.</strong> One node serves as the hub. All other nodes (spokes) maintain a direct transport link only to the hub. Sync packages between two spoke nodes must pass through the hub. Properties: N-1 transport links for N nodes. Maximum two hops between any two nodes. Single point of failure at the hub. Low coordination complexity. Best suited for small federations (3-5 nodes) where one node has significantly better transport access to all others.</p>
+
+<pre>
+        Spoke-A
+           \
+  Spoke-B -- Hub -- Spoke-C
+           /
+        Spoke-D
+</pre>
+
+<p><strong>Ring Topology.</strong> Each node maintains transport links to exactly two neighbors, forming a closed loop. Sync packages travel around the ring in one or both directions. Properties: exactly N transport links for N nodes. Maximum N/2 hops between any two nodes (if bidirectional). No single point of failure (any one link can fail and the ring degrades to a chain). Higher propagation delay than star for distant nodes. Best suited for federations where nodes are arranged in a geographic circuit (e.g., a series of communities along a road or river).</p>
+
+<pre>
+  Node-A --- Node-B
+    |             |
+  Node-D --- Node-C
+</pre>
+
+<p><strong>Full Mesh Topology.</strong> Every node maintains a direct transport link to every other node. Properties: N*(N-1)/2 transport links. One hop between any two nodes. Maximum resilience -- the loss of any node or link has no effect on connectivity between remaining nodes. Highest transport overhead. Best suited for very small federations (3-4 nodes) where transport capacity is abundant, or for critical federations where propagation delay must be minimized.</p>
+
+<pre>
+  Node-A --- Node-B
+    | \     / |
+    |   \ /   |
+    |   / \   |
+    | /     \ |
+  Node-D --- Node-C
+</pre>
+
+<p><strong>Hierarchical Topology.</strong> Nodes are organized in a tree structure with multiple levels. Each non-leaf node connects to a parent and one or more children. Properties: N-1 transport links. Maximum hops equal to twice the tree depth. No cycles, so a single link failure partitions the tree. Low coordination complexity at each node. Best suited for federations that mirror an organizational hierarchy (e.g., a regional node coordinating several local nodes, which in turn coordinate site-level nodes).</p>
+
+<pre>
+           Root
+          /    \
+      Region-A  Region-B
+      /    \        |
+  Site-1  Site-2  Site-3
+</pre>
+
+<h3>4.2 Hybrid Topologies</h3>
+<p>In practice, most federations beyond five nodes will adopt a hybrid topology that combines elements of the canonical models. Common hybrids include:</p>
+
+<p><strong>Star-mesh hybrid.</strong> A core group of well-connected nodes forms a partial or full mesh, while peripheral nodes connect in a star pattern to their nearest core node. This provides resilience in the core and simplicity at the periphery. It mirrors the common real-world situation where a few nodes have good transport access to each other while others are more remote.</p>
+
+<p><strong>Hierarchical with cross-links.</strong> A tree structure augmented with additional transport links between nodes at the same level. This provides the organizational clarity of a hierarchy with improved resilience against single-link failures. Cross-links at the regional level, for example, allow regions to synchronize directly without routing through the root.</p>
+
+<p><strong>Multi-hub star.</strong> Multiple hub nodes, each serving a cluster of spoke nodes, with the hubs connected to each other. This is essentially a two-level hierarchy but is conceptualized differently: the hubs are peers, not parent-child. It works well for geographically distributed federations with natural clustering (e.g., several nodes in each of three cities, with regular transport between cities).</p>
+
+<h3>4.3 Topology Documentation</h3>
+<p>Every federation MUST maintain a topology document that records:</p>
+<ul>
+<li>A diagram of the current topology (text-based, as in the examples above).</li>
+<li>The list of all transport links, including the two connected nodes, the transport method (foot courier, postal service, vehicle), the typical transport frequency, and the typical one-way latency.</li>
+<li>The designation of any hub, relay, or root nodes with special routing responsibilities.</li>
+<li>The date of the last topology review.</li>
+<li>The rationale for the current topology choice (referencing the selection criteria in Section 4.4).</li>
+</ul>
+<p>This document is included in every governance sync (D17-008) so that all nodes maintain an accurate picture of the federation's shape.</p>
+
+<h3>4.4 Selection Criteria</h3>
+<p>The following criteria should guide topology selection. Each criterion is scored qualitatively (high, medium, low) for each candidate topology, and the results are recorded in the topology decision document.</p>
+
+<table>
+<tr><th>Criterion</th><th>Definition</th><th>Favors</th></tr>
+<tr><td>Transport capacity</td><td>How many transport links can the federation sustain? Each link requires regular physical courier trips.</td><td>Star or hierarchical when capacity is low; mesh when capacity is high.</td></tr>
+<tr><td>Resilience requirement</td><td>How critical is it that any two nodes can synchronize even if one or more intermediary nodes are unavailable?</td><td>Mesh or hybrid with cross-links when resilience is critical; star or tree acceptable when resilience is less critical.</td></tr>
+<tr><td>Propagation delay tolerance</td><td>How quickly must information propagate across the entire federation? Measured in sync cycles (not time).</td><td>Mesh minimizes hops; star has max 2 hops; ring and tree may have many hops.</td></tr>
+<tr><td>Node count</td><td>How many nodes are in the federation?</td><td>Mesh is impractical above 5-6 nodes. Star works well up to 8-10. Hierarchical scales to dozens.</td></tr>
+<tr><td>Geographic distribution</td><td>How are nodes physically distributed? Clustered, linear, scattered?</td><td>Clustered favors multi-hub star. Linear favors ring. Scattered favors hierarchical.</td></tr>
+<tr><td>Operator capacity</td><td>How much routing and relay work can hub or intermediary node operators absorb?</td><td>If hub capacity is limited, avoid star. Mesh distributes load evenly. Ring distributes routing but increases hops.</td></tr>
+<tr><td>Growth expectation</td><td>Is the federation likely to add nodes? How many? How quickly?</td><td>Hierarchical accommodates growth most gracefully. Mesh becomes impractical. Star requires hub capacity to scale.</td></tr>
+</table>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D17-009-01: Topology Must Be Documented.</strong> Every federation of three or more nodes MUST maintain a topology document as described in Section 4.3. This document is a required component of the federation's institutional memory. A federation operating without a documented topology is operating without a map.</p></li>
+
+<li><p><strong>R-D17-009-02: No Mandatory Hub Role.</strong> No node may be required to serve as a hub, relay, or root against its will. Hub roles carry additional coordination burden and MUST be accepted voluntarily. If no node is willing to serve as a hub, the federation must select a topology that does not require one (ring or mesh).</p></li>
+
+<li><p><strong>R-D17-009-03: Topology Changes Require Governance.</strong> Changes to the federation topology -- adding or removing transport links, changing a node's role from spoke to hub, or restructuring from one model to another -- are governance actions that MUST follow the D17-008 governance protocol. Category B (Standard Changes) threshold applies. Emergency topology changes (e.g., a hub node becomes permanently unavailable) may be implemented immediately with retroactive governance approval within 90 days.</p></li>
+
+<li><p><strong>R-D17-009-04: Single Points of Failure Must Be Acknowledged.</strong> If the chosen topology contains any single point of failure -- a node or link whose loss would partition the federation -- this MUST be documented in the topology document with an explicit risk acceptance statement. The risk acceptance must name the specific nodes or links that are single points of failure and state the contingency plan if they fail.</p></li>
+
+<li><p><strong>R-D17-009-05: Propagation Delay Must Be Calculated.</strong> For each topology, the maximum number of hops between any two nodes MUST be calculated and recorded. The expected real-world propagation delay (hops multiplied by typical per-hop transport time) MUST be recorded. If this delay exceeds the deliberation periods in D17-008, the governance protocol timelines MUST be extended accordingly.</p></li>
+
+<li><p><strong>R-D17-009-06: Topology Must Match Real Transport.</strong> The topology document must reflect actual, sustained transport links -- not aspirational ones. A transport link that has not been used for sync in over six months SHOULD be marked as dormant. A link that has not been used in over twelve months SHOULD be removed from the active topology.</p></li>
+
+<li><p><strong>R-D17-009-07: Every Node Must Have At Least One Link.</strong> No node in the federation may be topologically isolated. Every node MUST have at least one active transport link to at least one other node. A node whose last transport link becomes dormant is effectively partitioned and should be treated as a candidate for withdrawal review per D17-006.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Hub overload.</strong> In a star topology, the hub node bears disproportionate transport and processing burden. As the federation grows, the hub operator becomes overwhelmed. Sync packages are delayed or dropped. The hub becomes a bottleneck that degrades the entire federation's synchronization. Likelihood: high for star topologies above 6-8 nodes. Severity: high, as it affects all spoke nodes. Detection: increasing delay in hub-originated sync packages; hub operator reports overload during quarterly review.</p></li>
+
+<li><p><strong>Topology-reality mismatch.</strong> The documented topology does not reflect actual transport patterns. Links exist on paper that are not being used. The federation believes it has a mesh but actually operates as a star because one node handles most transport. Decisions based on the documented topology (e.g., resilience assessments) are wrong. Likelihood: medium. Severity: medium to high, especially if a crisis reveals the true topology is less resilient than believed. Detection: audit of actual sync package transport logs against the topology document during annual review.</p></li>
+
+<li><p><strong>Cascade partition.</strong> In a hierarchical or chain topology, the loss of a single intermediary node partitions multiple downstream nodes simultaneously. Unlike a single-node loss in a mesh, a cascade partition affects the federation's ability to synchronize with an entire branch. Likelihood: low to medium, depending on topology. Severity: high for hierarchical topologies. Detection: missing or overdue sync packages from multiple nodes in the same branch.</p></li>
+
+<li><p><strong>Topology ossification.</strong> The federation's topology was chosen early when conditions were different (fewer nodes, different geography, different transport capacity). Conditions have changed but the topology has not been reviewed because the governance process for changing topology is perceived as too burdensome. The topology is no longer optimal but inertia prevents change. Likelihood: medium over decades. Severity: medium, as the federation continues to function but with increasing inefficiency. Detection: periodic topology review per the five-year review cycle.</p></li>
+
+<li><p><strong>Transport link failure without fallback.</strong> A transport link that the topology depends on becomes unavailable (the courier moves away, the road becomes impassable, the node relocates). If no fallback link exists, the nodes on either side of the failed link are partitioned. Likelihood: medium over years. Severity: depends on topology -- catastrophic for star (hub link failure), moderate for mesh (one of many links). Detection: missed scheduled sync exchange.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If a hub node becomes overloaded:</strong> Transition to a multi-hub or hybrid topology. Identify one or two spoke nodes that can accept a hub role for a subset of spokes. Redistribute transport links accordingly. This is a governance action (Category B) but may be initiated as an emergency with retroactive approval. During the transition, the original hub continues to serve all spokes while the new hubs are brought online.</p></li>
+
+<li><p><strong>If topology-reality mismatch is discovered:</strong> Conduct a full transport audit. For each documented link, determine the last actual sync exchange date. Mark dormant links. Update the topology document to reflect reality. Assess whether the real topology meets the federation's resilience requirements. If not, initiate a topology change proposal through governance.</p></li>
+
+<li><p><strong>If a cascade partition occurs:</strong> Treat each partitioned sub-group as an independent operating unit per D17-012 (Partition Tolerance). When the intermediary node is restored or an alternative transport link is established, perform reunion synchronization for the entire branch. Prioritize establishing the alternative link; do not wait indefinitely for the original intermediary to return.</p></li>
+
+<li><p><strong>If topology ossification is detected:</strong> Conduct a fresh topology selection using the criteria in Section 4.4 with current data. Compare the recommended topology to the current one. If they differ, prepare a governance proposal for the transition. Include a migration plan that specifies the order in which links are added and removed, ensuring the federation is never less connected during the transition than it was before.</p></li>
+
+<li><p><strong>If a critical transport link fails:</strong> Activate the contingency plan documented in the topology document (per R-D17-009-04). If no contingency was documented, identify the nearest alternative transport path (even if it requires additional hops). Establish a temporary link. Record the incident in institutional memory and update the topology document with a contingency plan to prevent recurrence.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> Most federations will be two to three nodes. Topology is trivial (a single link or a triangle). Use this period to establish the topology documentation practice and the selection criteria process, even when the outcome is obvious. The habit matters more than the decision at this scale.</p></li>
+
+<li><p><strong>Years 5-15:</strong> Federations may grow to five to ten nodes. Topology decisions become consequential. The first topology transitions may occur as the initial star or chain topology proves inadequate. This is the period when hybrid topologies typically emerge, driven by the practical realities of transport capacity and geographic distribution.</p></li>
+
+<li><p><strong>Years 15-30:</strong> Mature federations will have stable topologies with established transport links. The primary concern shifts from growth to maintenance: are the transport links still active? Has the geographic distribution changed? Are hub nodes still willing and able to serve? The five-year topology review becomes critical for detecting ossification.</p></li>
+
+<li><p><strong>Years 30-50+:</strong> The federation may have undergone complete personnel turnover. The topology must be understandable to operators who were not involved in its design. The topology document must explain not just what the topology is but why it was chosen. Future operators will inherit a topology shaped by decisions made decades earlier and must be equipped to evaluate whether those decisions still serve the federation's needs.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The instinct will be to start with a full mesh because it seems like the "best" topology -- maximum connectivity, minimum delay, no single points of failure. Resist this instinct. A full mesh of five nodes requires ten transport links. If each link requires a monthly courier trip, that is ten trips per month across the federation. For a community of volunteers, this is a substantial commitment. Start with the simplest topology that meets your resilience requirements. You can always add links later. You cannot easily sustain links you should not have committed to.</p>
+
+<p>I also want to note that the concept of "topology" for an air-gapped federation is more intimate than for a networked one. Each link in the topology is not a cable or a wireless signal. It is a person carrying a physical object from one place to another. The topology is a map of human relationships and human willingness to make regular trips. It must respect the limits of human endurance and human reliability. A topology that looks optimal on paper but requires unsustainable human effort is worse than a suboptimal topology that people will actually maintain for decades.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D17-001 -- Federation Philosophy (sovereignty principle; no-central-authority constraint; Section 4.1 federation model)</li>
+<li>D17-002 -- Node Identity &amp; Lifecycle (node commissioning; node identity as topology vertex)</li>
+<li>D17-003 -- Air-Gapped Synchronization Procedures (sync protocols that operate over topology links)</li>
+<li>D17-004 -- Conflict Resolution Between Nodes (ordering ambiguities from multi-hop propagation)</li>
+<li>D17-005 -- Trust Establishment and Verification (trust relationships independent of but informed by topology)</li>
+<li>D17-006 -- Node Withdrawal and Data Separation (topology impact of node departure)</li>
+<li>D17-008 -- Distributed Governance Protocol (governance process for topology changes; Category B threshold)</li>
+<li>D17-012 -- Partition Tolerance as Default State (partition handling when topology links fail)</li>
+<li>D17-014 -- Physical Transport Protocols (transport mechanisms that instantiate topology links)</li>
+<li>D16-003 -- Navigation Structures (interface adaptation to topology-dependent sync status)</li>
+<li>Domain 20 -- Institutional Memory (topology decision recording; transport audit logs)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

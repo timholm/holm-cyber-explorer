@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D7-006 — Threat Assessment Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li class="active"><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d7-006">
+  <h1>D7-006 &mdash; Threat Assessment Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D7-006</dd>
+  <dt>Domain</dt>
+  <dd>7 -- Intelligence & Analysis</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D6-001, D7-001, D7-002, D7-003, D7-004, D7-005</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D7-008, D7-010, SEC-002, D10-003. All articles that depend on institutional threat awareness.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the complete procedure for conducting formal threat assessments within the holm.chat Documentation Institution. It specifies how to identify threats, assess their capability and intent, map the institution's vulnerabilities, calculate risk, and produce a documented threat assessment that informs security decisions, resource allocation, and operational planning.</p>
+<p>SEC-001 established the institution's threat model and security philosophy. D7-001 established the intelligence philosophy that governs how the institution thinks about uncertainty and risk. This article takes both foundations and produces a practical, repeatable procedure for the institution's most consequential analytical product: the answer to "what threatens us, how badly, and what should we do about it?"</p>
+<p>Threat assessment is where the entire intelligence function proves its value. If the assessments are accurate, the institution allocates resources effectively and avoids preventable harm. If they are inaccurate -- if threats are overestimated, underestimated, or missed entirely -- the institution either wastes resources on phantom dangers or is blindsided by real ones. The procedures in this article are designed to produce assessments that are honest, structured, and improvable over time.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The threat assessment framework: the five components of a formal threat assessment (threat identification, capability assessment, intent analysis, vulnerability mapping, and risk calculation).</li>
+<li>Step-by-step procedures for each component.</li>
+<li>The threat register: a living inventory of identified threats with current assessments.</li>
+<li>Scoring rubrics for capability, intent, vulnerability, and risk.</li>
+<li>The annual threat review: a comprehensive reassessment of the institution's threat landscape.</li>
+<li>The ad hoc threat assessment: how to assess a newly identified threat outside the annual cycle.</li>
+<li>Templates for all threat assessment products.</li>
+<li>Integration with the intelligence cycle, monitoring procedures, and security operations.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophical basis for threat awareness (see D7-001).</li>
+<li>The intelligence cycle that feeds threat assessment (see D7-002).</li>
+<li>Specific analytical techniques used within assessment (see D7-003, though they are referenced).</li>
+<li>Specific monitoring targets that provide threat indicators (see D7-005).</li>
+<li>Incident response when a threat materializes (see D10-003).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 What Is a Threat?</h3>
+<p>In this institution's usage, a threat is any actor, condition, or event that has the potential to cause harm to the institution's mission, assets, people, or continuity. Threats include:</p>
+<ul>
+<li><strong>Deliberate human threats:</strong> Theft, vandalism, unauthorized access, hostile legal action, social engineering.</li>
+<li><strong>Accidental human threats:</strong> Operator error, visitor damage, successor incompetence.</li>
+<li><strong>Technical threats:</strong> Hardware failure, software corruption, data degradation, format obsolescence, encryption algorithm compromise.</li>
+<li><strong>Environmental threats:</strong> Fire, flood, earthquake, severe weather, power grid failure, climate change.</li>
+<li><strong>Systemic threats:</strong> Economic collapse affecting resource availability, legal changes criminalizing encryption or data hoarding, social instability affecting physical security, supply chain disruption for critical components.</li>
+</ul>
+<p>SEC-001 defines the institution's threat categories. This article provides the procedure for assessing each category and comparing threats against each other for prioritization.</p>
+<h3>3.2 Why Formal Assessment?</h3>
+<p>Informal threat awareness is natural -- the operator worries about drive failures, thinks about fire, notices a suspicious stranger. But informal awareness is subject to every cognitive bias in D7-004: threats that are vivid and recent dominate attention while threats that are slow and abstract are ignored, even if the slow threats are more likely and more damaging. The formal assessment procedure corrects for this by requiring the analyst to evaluate every identified threat using the same rubric, making comparisons explicit and biases visible.</p>
+<h3>3.3 The Over-Assessment Trap</h3>
+<p>An air-gapped, security-conscious institution is especially vulnerable to threat overestimation. When your posture is defensive and your philosophy emphasizes vigilance, the temptation is to rate every threat as severe and every vulnerability as critical. This leads to resource exhaustion, operational paralysis, and the boy-who-cried-wolf effect where genuine threats are lost in a sea of overestimated ones. The scoring rubrics in this article include explicit calibration points to prevent systematic overestimation. The devil's advocate requirement per D7-001 R-D7-02 also applies: for every threat you rate as severe, argue the case that it is not.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Five-Component Framework</h3>
+<p>Every formal threat assessment addresses five components in order. Skipping a component produces an incomplete assessment.</p>
+<p><strong>Component 1: Threat Identification.</strong>
+What could go wrong? This is the brainstorming phase. The analyst identifies all plausible threats relevant to the assessment scope, drawing from the threat categories in SEC-001, the monitoring data from D7-005, the requirements register from D7-002, and their own experience and imagination.</p>
+<p>Procedure:
+1. Define the scope: are you assessing threats to the entire institution, to a specific system, to a specific process, or to a specific asset?
+2. For each threat category (deliberate human, accidental human, technical, environmental, systemic), brainstorm specific threats relevant to the scope.
+3. Include threats that seem unlikely. Unlikely threats that materialize cause the most damage precisely because they were not expected.
+4. For each identified threat, write a one-sentence description in the form: "[Actor/Condition] could [action/event] resulting in [harm to institution]."
+5. Assign each threat a Threat ID (format: TH-[YYYY]-[NNN]).</p>
+<p><strong>Component 2: Capability Assessment.</strong>
+For each identified threat, assess: can it actually cause the harm described? Capability is the threat's ability to act, regardless of whether it intends to.</p>
+<p>Scoring rubric for capability:</p>
+<table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Level</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Negligible</td>
+<td>The threat lacks the basic means to cause harm. Theoretical only.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Low</td>
+<td>The threat has some capability but faces significant barriers. Success requires unusual circumstances.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Moderate</td>
+<td>The threat has meaningful capability. Success is plausible under normal circumstances.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>High</td>
+<td>The threat has strong capability. Few barriers to successful action.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Extreme</td>
+<td>The threat has overwhelming capability. The institution cannot prevent the threat from acting if it chooses to.</td>
+</tr>
+</tbody>
+</table>
+<p>For non-human threats (environmental, technical), "capability" means the physical potential for the event to occur and cause damage. A flood in a flood plain has high capability. A flood on a hilltop has low capability. Hardware failure for a drive past its rated lifespan has high capability.</p>
+<p><strong>Component 3: Intent Analysis.</strong>
+For each identified threat, assess: does it want to cause the harm described? Or, for non-deliberate threats, how likely is it to occur?</p>
+<p>Scoring rubric for intent/likelihood:</p>
+<table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Level</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Negligible</td>
+<td>No intent to harm the institution, or event is extremely unlikely (less than 1% in assessment period).</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Low</td>
+<td>No known intent, but intent could develop, or event is unlikely (1-10% in assessment period).</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Moderate</td>
+<td>Possible intent, or event is plausible (10-40% in assessment period).</td>
+</tr>
+<tr>
+<td>4</td>
+<td>High</td>
+<td>Probable intent, or event is likely (40-75% in assessment period).</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Near-Certain</td>
+<td>Demonstrated intent or active targeting, or event is virtually certain (&gt;75% in assessment period).</td>
+</tr>
+</tbody>
+</table>
+<p>For non-human threats, replace "intent" with "likelihood" -- the probability that the event will occur within the assessment period (typically one year for the annual review).</p>
+<p><strong>Component 4: Vulnerability Mapping.</strong>
+For each identified threat, assess: how exposed is the institution? Vulnerability is the degree to which the institution's defenses, redundancies, and mitigations would fail to prevent or reduce the harm.</p>
+<p>Scoring rubric for vulnerability:</p>
+<table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Level</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Minimal</td>
+<td>Strong defenses in place and tested. Multiple layers of protection. The threat would need to defeat several independent safeguards.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Low</td>
+<td>Good defenses in place. Some redundancy. The threat would face meaningful resistance.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Moderate</td>
+<td>Some defenses in place but gaps exist. Single points of failure present. The threat would face partial resistance.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>High</td>
+<td>Weak or untested defenses. Significant gaps. The threat would face minimal resistance.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Critical</td>
+<td>No meaningful defense. The institution is fully exposed to this threat.</td>
+</tr>
+</tbody>
+</table>
+<p>Vulnerability assessment must be honest. The temptation is to rate vulnerability low because defenses exist on paper -- but defenses that have not been tested are not defenses. Rate vulnerability based on the tested, verified state of the institution's protections, not on the intended or planned state.</p>
+<p><strong>Component 5: Risk Calculation.</strong>
+Risk is the combination of capability, intent/likelihood, and vulnerability. The risk score determines the institution's response priority.</p>
+<p><strong>Risk Score = (Capability + Intent) x Vulnerability / 2</strong></p>
+<p>This formula weights vulnerability as a multiplier -- the same threat is much more dangerous to a vulnerable institution than to a defended one. The division by 2 normalizes the scale.</p>
+<p>Risk score interpretation:</p>
+<table>
+<thead>
+<tr>
+<th>Score Range</th>
+<th>Risk Level</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0 - 4.0</td>
+<td>Low</td>
+<td>Monitor. No additional mitigation required beyond existing measures. Review annually.</td>
+</tr>
+<tr>
+<td>4.1 - 8.0</td>
+<td>Moderate</td>
+<td>Active monitoring. Review existing mitigations for adequacy. Address gaps within the annual cycle.</td>
+</tr>
+<tr>
+<td>8.1 - 15.0</td>
+<td>High</td>
+<td>Priority attention. Develop or strengthen specific mitigations. Review quarterly. Report in threat assessment.</td>
+</tr>
+<tr>
+<td>15.1 - 25.0</td>
+<td>Critical</td>
+<td>Immediate action required. Develop and implement mitigations as a priority task. Review monthly until reduced. Tier 2 decision per GOV-001.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 The Threat Register</h3>
+<p>The threat register is the master inventory of all identified threats with their current assessments. It is a living document, updated during the annual threat review and whenever a new threat is identified or an existing threat's assessment changes materially.</p>
+<p>Threat register format:</p>
+<p>```
+THREAT REGISTER
+Last Full Review: [Date]
+Next Scheduled Review: [Date]</p>
+<table>
+<thead>
+<tr>
+<th>Threat ID</th>
+<th>Description</th>
+<th>Category</th>
+<th>Capability</th>
+<th>Intent/Likelihood</th>
+<th>Vulnerability</th>
+<th>Risk Score</th>
+<th>Risk Level</th>
+<th>Last Assessed</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TH-2026-001</td>
+<td>[Description]</td>
+<td>[Category]</td>
+<td>[1-5]</td>
+<td>[1-5]</td>
+<td>[1-5]</td>
+<td>[Calc]</td>
+<td>[Level]</td>
+<td>[Date]</td>
+<td>Active/Mitigated/Retired</td>
+</tr>
+<tr>
+<td>```</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Each threat register entry also has an associated detail page containing:</p>
+<ul>
+<li>Full threat description and analysis.</li>
+<li>Evidence supporting the capability and intent scores.</li>
+<li>Detailed vulnerability assessment with specific gaps identified.</li>
+<li>Existing mitigations and their effectiveness.</li>
+<li>Recommended additional mitigations.</li>
+<li>Monitoring indicators (what would signal this threat is increasing).</li>
+<li>Review history (dates and score changes).</li>
+</ul>
+<h3>4.3 The Annual Threat Review</h3>
+<p>The annual threat review is the institution's most comprehensive intelligence exercise. It reassesses the entire threat landscape and produces the Annual Threat Assessment -- the capstone intelligence product that drives security and operational planning for the coming year.</p>
+<p><strong>Procedure:</strong></p>
+<p><strong>Phase 1: Preparation (Week 1).</strong>
+1. Gather all inputs: current threat register, past year's monitoring data (D7-005), incident reports (D10-003), intelligence products from the past year, external information imported over the past year.
+2. Review the previous Annual Threat Assessment. Note which predictions were accurate and which were not. Feed this into the calibration tracking per D7-004.
+3. Review SEC-001 threat categories to ensure the assessment covers all relevant categories.</p>
+<p><strong>Phase 2: Threat Identification Review (Week 2).</strong>
+1. For each existing threat in the register: Is it still relevant? Has its nature changed? Should the description be updated?
+2. Brainstorm new threats. Use the categories as a guide. Consider: what has changed in the past year (physically, technically, geopolitically) that creates new threats?
+3. Conduct a Red Team exercise per D7-003 Section 4.4 for the institution's most critical assets. Think as an adversary. What would you target and how?
+4. Update the threat register with new threats, retired threats, and modified descriptions.</p>
+<p><strong>Phase 3: Scoring (Week 3).</strong>
+1. For each active threat, assess capability, intent/likelihood, and vulnerability using the rubrics in Section 4.1.
+2. Calculate risk scores.
+3. Apply the bias checklist per D7-004 Section 4.1. Threat assessment is a high-bias-risk activity. Specifically check for: availability bias (overweighting threats that are vivid or recent), status quo bias (assuming last year's ratings are still correct), and overconfidence (rating vulnerability low without tested evidence).
+4. For any threat rated Critical (risk score 15.1-25.0), apply Devil's Advocate Analysis per D7-003 Section 4.2. Argue the case that the threat is lower than assessed.
+5. For any threat rated Low (risk score 1.0-4.0) that was previously rated higher, apply the same devil's advocate in reverse: argue the case that it should still be rated higher.</p>
+<p><strong>Phase 4: Production (Week 4).</strong>
+1. Produce the Annual Threat Assessment document. Structure:
+   - Executive Summary: Top threats, major changes from last year, overall risk posture.
+   - Threat-by-Threat Assessment: For each active threat, the full five-component analysis.
+   - Trend Analysis: How the overall threat landscape has shifted.
+   - Gaps and Blind Spots: What the institution does not know that it should. What monitoring gaps exist.
+   - Recommendations: Specific mitigations to implement, monitoring to add, and decisions to make.
+   - Key Assumptions: Per D7-003 Section 4.3. What must remain true for this assessment to hold?
+2. File the product in the intelligence archive per D7-008.
+3. Present the findings to the decision function per GOV-001 (even when the analyst and decision-maker are the same person, the presentation must be documented in the decision log).
+4. Update the intelligence requirements register based on the assessment's gaps and recommendations.</p>
+<h3>4.4 Ad Hoc Threat Assessment</h3>
+<p>When a new threat is identified outside the annual review cycle -- through monitoring, through an incident, through imported information, or through changed circumstances -- an ad hoc assessment is conducted.</p>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>Enter the new threat in the threat register with a temporary Threat ID.</li>
+<li>Conduct an abbreviated five-component assessment. Use available information; do not wait for a full collection cycle if the threat appears time-sensitive.</li>
+<li>Calculate the risk score.</li>
+<li>If the risk score is Moderate or higher, produce a Threat Flash -- a brief intelligence product (one to two pages) that describes the threat, provides the preliminary assessment, identifies immediate monitoring actions, and recommends immediate mitigations if needed.</li>
+<li>If the risk score is Critical, escalate to a decision per GOV-001 immediately.</li>
+<li>Schedule a full assessment during the next routine intelligence cycle unless the ad hoc assessment is sufficient.</li>
+</ol>
+<h3>4.5 Threat Assessment Template</h3>
+<p>```
+THREAT ASSESSMENT
+Product ID: [TA-YYYY-NNN]
+Classification: [Routine / Priority / Crisis]
+Date: [Date]
+Analyst: [Operator ID]
+Scope: [What this assessment covers]</p>
+<p>THREAT IDENTIFICATION
+Threat ID: [TH-YYYY-NNN]
+Category: [Deliberate Human / Accidental Human / Technical / Environmental / Systemic]
+Description: [One-paragraph description of the threat]</p>
+<p>CAPABILITY ASSESSMENT
+Score: [1-5]
+Rationale: [Evidence and reasoning supporting the score]
+Key evidence: [Specific evidence cited with source ratings per D7-002 Section 4.4]</p>
+<p>INTENT / LIKELIHOOD ASSESSMENT
+Score: [1-5]
+Assessment period: [Typically 1 year]
+Rationale: [Evidence and reasoning supporting the score]
+Key evidence: [Specific evidence cited with source ratings]
+For deliberate threats: Known indicators of intent
+For non-deliberate threats: Historical frequency, current conditions</p>
+<p>VULNERABILITY ASSESSMENT
+Score: [1-5]
+Current defenses: [List existing mitigations]
+Defense testing status: [When were defenses last tested? Results?]
+Identified gaps: [Specific vulnerabilities]
+Rationale: [Evidence and reasoning supporting the score]</p>
+<p>RISK CALCULATION
+Risk Score: [Formula result]
+Risk Level: [Low / Moderate / High / Critical]</p>
+<p>ANALYSIS
+[Structured analytical narrative connecting all five components. What does this threat mean for the institution? What is the trajectory -- is the threat increasing, stable, or decreasing?]</p>
+<p>DEVIL'S ADVOCATE (if required)
+[Counter-argument for the assessed risk level]</p>
+<p>KEY ASSUMPTIONS
+[List of assumptions the assessment depends on]</p>
+<p>MONITORING INDICATORS
+[What would signal this threat is increasing or materializing?]
+[Added to monitoring plan per D7-005]</p>
+<p>RECOMMENDATIONS
+[Specific mitigations, monitoring additions, or decisions recommended]</p>
+<p>REVIEW SCHEDULE
+[When this assessment should be revisited]
+```</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D7-06-01:</strong> The Annual Threat Review must be conducted once per year during the annual operations cycle per OPS-001. It may not be deferred. If operational circumstances prevent a full four-week review, a compressed two-week review is acceptable but must be documented as compressed and scheduled for supplemental review within 90 days.</li>
+<li><strong>R-D7-06-02:</strong> Every threat assessment must use the five-component framework (identification, capability, intent, vulnerability, risk). Assessments that skip components are incomplete and must not inform Tier 1-3 decisions per GOV-001.</li>
+<li><strong>R-D7-06-03:</strong> The scoring rubrics in Section 4.1 must be used consistently. Scores must be accompanied by rationale. Scores without rationale are not scores -- they are guesses.</li>
+<li><strong>R-D7-06-04:</strong> Devil's Advocate Analysis per D7-003 Section 4.2 is mandatory for all threats rated Critical. It is also mandatory for any threat whose risk level changes by two or more levels (in either direction) from the previous assessment.</li>
+<li><strong>R-D7-06-05:</strong> The bias checklist per D7-004 Section 4.1 must be completed for every threat assessment product. Threat assessment is identified as a high-bias-risk activity.</li>
+<li><strong>R-D7-06-06:</strong> Vulnerability scores must reflect the tested state of defenses, not the intended or planned state. Defenses that have not been tested within the past year must be scored as if they do not exist, with a note indicating that testing is overdue.</li>
+<li><strong>R-D7-06-07:</strong> The threat register must be maintained as a living document. New threats must be added within 7 days of identification. Retired threats must retain their history. The register must be backed up per D6-002.</li>
+<li><strong>R-D7-06-08:</strong> Ad hoc threat assessments for threats rated Moderate or higher must produce a documented Threat Flash within 48 hours of threat identification. Critical threats require immediate documentation and escalation.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Threat inflation.</strong> Every threat is rated High or Critical. Resources are spread thin trying to mitigate everything. The institution is in a perpetual state of alarm, which leads to both exhaustion and desensitization. Mitigation: the scoring rubrics provide explicit calibration. The devil's advocate requirement for Critical threats forces the analyst to argue against severity. The annual calibration review should assess whether threat ratings correlated with actual outcomes.</p>
+</li>
+<li>
+<p><strong>Threat blindness.</strong> The assessment misses a significant threat category entirely. The annual review becomes a confirmation exercise -- the analyst looks at the threats they already know about and rates them again without genuinely searching for new threats. Mitigation: the Red Team exercise in Phase 2 of the annual review forces adversarial thinking. The threat categories from SEC-001 provide a structured checklist. The brainstorming step must be documented to show what was considered.</p>
+</li>
+<li>
+<p><strong>Vulnerability denial.</strong> The analyst consistently rates vulnerability low because admitting vulnerability is psychologically uncomfortable. The institution believes its defenses are stronger than they are. Mitigation: R-D7-06-06 requires vulnerability scores to reflect tested defenses. If a defense has not been tested, it scores as if absent. This creates a strong incentive to actually test defenses.</p>
+</li>
+<li>
+<p><strong>Assessment staleness.</strong> Threat assessments are produced on schedule but not consulted between reviews. The world changes, the threat landscape shifts, and the institution continues operating on an outdated assessment. Mitigation: the monitoring procedures in D7-005 provide continuous threat indicator tracking. Ad hoc assessments per Section 4.4 allow the register to be updated between annual reviews. Decision-makers must reference the current threat assessment for Tier 2+ decisions per GOV-001.</p>
+</li>
+<li>
+<p><strong>Scoring inconsistency.</strong> The analyst applies the rubrics differently at different times -- rating the same evidence as a 3 one year and a 4 the next, without a change in circumstances. Over time, scores become meaningless. Mitigation: every score must include rationale (R-D7-06-03). The review history in the threat register detail pages allows comparison of rationale across assessments. If a score changes, the rationale must explain what changed.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If threat inflation is detected (calibration review shows most threats were overestimated):</strong> Re-score the current threat register with deliberate attention to the rubric calibration points. For each High or Critical threat, apply devil's advocate analysis arguing for a lower rating. Adjust scores where the evidence supports lower ratings. Document the recalibration exercise. Investigate whether the overestimation stems from a specific bias (availability, overconfidence, or defensive anxiety) and apply the appropriate countermeasure from D7-004.</p>
+</li>
+<li>
+<p><strong>If a threat was missed that should have been identified:</strong> Conduct a post-incident analysis. Determine why the threat was missed: Was the category excluded? Was the brainstorming insufficient? Was the relevant monitoring target not being watched? Address the root cause: add the threat to the register, update the monitoring plan per D7-005, and add the gap to the lessons-learned record. If the miss caused damage, follow D10-003 incident response procedures.</p>
+</li>
+<li>
+<p><strong>If vulnerability denial is suspected (defenses scored low but untested):</strong> Immediately test the defenses for the top five threats by risk score. If testing reveals the defenses are weaker than scored, re-score the affected threats and recalculate risk. Address the highest-priority gaps first. Institute a defense testing schedule aligned with the annual threat review.</p>
+</li>
+<li>
+<p><strong>If scoring has been inconsistent (comparison reveals unexplained score changes):</strong> Conduct a scoring audit. Review the last three years of assessments for each threat. Identify scores that changed without corresponding changes in rationale. Re-score those threats with attention to consistency. Produce a scoring guide -- a document of precedents that records what specific circumstances correspond to specific scores, creating a personal rubric refinement over time.</p>
+</li>
+<li>
+<p><strong>If the Annual Threat Review has been missed entirely:</strong> Treat this as a critical operational lapse. Conduct a compressed review immediately (minimum two weeks). Flag all existing threat scores as "UNREVIEWED -- POTENTIALLY STALE." Do not make Tier 2+ decisions based on stale assessments until the review is complete.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The first annual threat reviews will be the hardest. The analyst has no baseline -- no previous review to compare against, no calibration data, no tested defenses. The first review establishes the baseline. Expect to revise scoring rubrics as the analyst discovers what the scores mean in practice. The threat register will grow rapidly as threats are identified for the first time.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The threat register should be mature. Most threats are known and tracked. The annual review shifts from identification (finding new threats) to reassessment (evaluating changes in known threats). Calibration data from the prediction register (D7-004) should reveal whether threat assessments are systematically biased. Defense testing should be routine. Score comparisons across years should reveal genuine trends, not scoring inconsistency.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The threat landscape will have changed substantially from the institution's founding. New threat categories may have emerged (AI-based threats, new environmental risks, new legal frameworks). The scoring rubrics may need revision to reflect new realities. If succession is approaching, the successor must be trained not just in the procedure but in the judgment calls -- what makes a particular situation a 3 versus a 4, what subtle indicators suggest increasing intent, what untested defense feels solid but has a hidden gap.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The Annual Threat Assessment archive is itself a valuable intelligence resource -- a decades-long record of how the institution's threat landscape evolved. Use it for pattern recognition and long-term trend analysis. The assessment procedure should be stable even as the threats it assesses change completely.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the institution experiences a significant harmful event from a threat that was on the register but underestimated, or from a threat that should have been on the register but was not, this article and its procedures need revision. The post-incident analysis must feed back into the assessment methodology, not just the assessment content.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The risk calculation formula in this article is deliberately simple. More sophisticated risk models exist -- probability trees, Monte Carlo simulations, Bayesian networks. I chose simplicity because a risk model that the analyst cannot execute quickly and consistently is a risk model that will not be used. The formula captures the essential insight: risk is a function of what the threat can do, whether it will act, and how exposed we are. That is enough for an institution of this scale.</p>
+<p>The vulnerability scoring rule (R-D7-06-06) -- that untested defenses score as if they do not exist -- will be the most controversial rule in this article. It will produce uncomfortably high risk scores for threats where the institution has invested in defenses but has not verified them. That discomfort is intentional. It creates pressure to test defenses, which is the entire point. A defense you have not tested is a hope, not a defense. Score accordingly.</p>
+<p>I want to note the tension between Section 3.3 (the over-assessment trap) and the reality of operating an institution that exists because of threat awareness. The institution was built air-gapped because threats to digital sovereignty are real. The temptation will always be to see threats everywhere. The scoring rubrics and the devil's advocate requirement exist to keep threat assessment honest. The institution that sees threats everywhere is as poorly served as the institution that sees threats nowhere.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (institutional mission and assets to protect)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (threat categories, defense in depth)</li>
+<li>OPS-001 -- Operations Philosophy (annual operations cycle, operational tempo)</li>
+<li>GOV-001 -- Authority Model (decision tiers for threat response, Tier 2 escalation for critical threats)</li>
+<li>D6-001 -- Data Philosophy (data classification for threat assessment products)</li>
+<li>D6-002 -- Backup Doctrine (backup of threat register)</li>
+<li>D7-001 -- Intelligence Philosophy (epistemic hierarchy, cognitive defenses, devil's advocate requirement)</li>
+<li>D7-002 -- The Intelligence Cycle (production standards, requirements register)</li>
+<li>D7-003 -- Analytical Frameworks and Methods (ACH, Devil's Advocate, Red Team techniques)</li>
+<li>D7-004 -- Cognitive Bias Countermeasures (bias checklist, calibration tracking)</li>
+<li>D7-005 -- Environmental Monitoring Procedures (monitoring targets providing threat indicators)</li>
+<li>D7-008 -- Intelligence Product Standards (product format requirements)</li>
+<li>D7-010 -- Decision Support Doctrine (presenting threat assessments to the decision function)</li>
+<li>D10-003 -- Incident Response Procedures (response when threats materialize)</li>
+<li>SEC-002 -- Access Control Procedures (physical and system security referenced in vulnerability assessment)</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D18-004 — Format Conversion Pipeline - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li class="active"><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d18-004">
+  <h1>D18-004 &mdash; Format Conversion Pipeline</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D18-004</dd>
+  <dt>Domain</dt>
+  <dd>18 -- Import & Quarantine</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D18-001, D18-003, SEC-001, OPS-001, ETH-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D18-005 (format conversion is a provenance event), D17-007 (sync packages carry content in institutional formats). All content that enters the institution in a non-standard format passes through this pipeline.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution converts imported content from external formats to institutional standard formats. D18-001 established that open formats are preferred (R-D18-06) and that the institution must be able to process content across decades of format evolution. This article provides the operational specification for achieving both goals: a format conversion pipeline that transforms incoming content into formats the institution can store, read, verify, and maintain for fifty years.</p>
+<p>Format conversion is not merely a technical convenience. It is an act of institutional self-preservation. A document stored in a proprietary format depends on the continued existence of the proprietary software that reads it. When that software disappears -- and over fifty years, all software disappears -- the document becomes unreadable. A document converted to an open, well-documented standard format depends only on the continued existence of the standard's specification, which is a document the institution can store alongside the content itself. The conversion pipeline transforms fragile content into durable content.</p>
+<p>This article specifies the conversion procedures for common format families, the quality verification that ensures conversion fidelity, and the format conversion registry that documents the institution's conversion capabilities and their limitations. It is addressed to the operator performing conversions, to the person maintaining the conversion tools, and to the future operator who must decide how to handle a format that did not exist when this article was written.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The format conversion pipeline: its position within the import process and its operational flow.</li>
+<li>Institutional standard formats: the target formats for each content category.</li>
+<li>Conversion procedures for common format families: documents, images, audio, video, databases, and structured data.</li>
+<li>Quality verification after conversion: how to confirm that the converted content faithfully represents the original.</li>
+<li>The format conversion registry: a living document that catalogs the institution's conversion capabilities.</li>
+<li>Handling unconvertible formats: what to do when conversion is not possible or would result in unacceptable quality loss.</li>
+<li>The relationship between format conversion and long-term preservation.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Malware scanning (see D18-003; scanning precedes conversion).</li>
+<li>Provenance tracking (see D18-005; conversion events are recorded in provenance).</li>
+<li>The philosophical justification for format preferences (see D18-001, R-D18-06 and ETH-001, Principle 4).</li>
+<li>Content creation within the institution (institutional content is created in standard formats from the beginning).</li>
+<li>Format specifications themselves (the institution should maintain copies of the relevant format specifications as reference documents).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Format Durability Problem</h3>
+<p>The history of digital formats is a history of obsolescence. WordPerfect files from the 1980s are largely unreadable without specialized recovery tools. Lotus 1-2-3 spreadsheets require emulators. RealMedia video files depend on a player that no longer exists. PageMaker layout files, HyperCard stacks, Flash animations -- each was once ubiquitous, and each is now an archaeological challenge.</p>
+<p>The institution cannot afford this cycle. Content imported today must be readable in 2076. The only way to achieve this is to store content in formats whose specifications are publicly available, whose implementations exist in multiple independent software projects, and whose design prioritizes longevity over feature richness. These are the institutional standard formats.</p>
+<h3>3.2 The Conversion Fidelity Challenge</h3>
+<p>Format conversion is inherently lossy in some cases. A Microsoft Word document contains formatting, comments, revision tracking, embedded fonts, and macros that may not have exact equivalents in the target format. A JPEG image's lossy compression cannot be reversed to recover the original pixel data. A proprietary database format may use data types that have no standard equivalent.</p>
+<p>The conversion pipeline must handle this reality honestly. Some conversions are lossless (or close enough to lossless that the differences are negligible). Some conversions involve measurable quality loss. Some conversions are impossible without unacceptable degradation. For each conversion, the pipeline must document what was preserved, what was lost, and whether the loss is acceptable. The operator makes the final judgment, informed by the pipeline's quality report.</p>
+<h3>3.3 The Dual-Preservation Strategy</h3>
+<p>For content where conversion involves any loss, the institution practices dual preservation: the original file in its original format is preserved alongside the converted file in the standard format. This ensures that if a future operator gains access to better conversion tools (or the original format's reader software), the original content is available for re-conversion. The original file is stored in a clearly marked archive area, tagged as "original format, preserved for potential future conversion." The converted file is the operational copy -- the one the institution uses, indexes, and serves.</p>
+<p>Dual preservation consumes additional storage. This cost is accepted as insurance against conversion loss. The only exception is when the original format has been positively identified as containing executable or active content that poses a security risk (D18-003). In that case, the original may be stripped of active content before archival, with the stripping documented in provenance.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Pipeline Position and Flow</h3>
+<p>The format conversion pipeline operates after malware scanning (D18-003) and before admission to the production system (D18-001, Section 4.1, Stage 3: Validation). The flow is:</p>
+<ol>
+<li>Content arrives from the quarantine scanning stage with a CLEAN designation.</li>
+<li>The content's format is identified (file extension, magic bytes, MIME type analysis).</li>
+<li>If the content is already in an institutional standard format, it bypasses conversion and proceeds to validation.</li>
+<li>If the content is in a non-standard format, the conversion registry is consulted to determine whether a conversion path exists.</li>
+<li>If a conversion path exists, the content is converted. Quality verification is performed.</li>
+<li>If quality verification passes, the converted content proceeds to validation. The original is preserved per the dual-preservation strategy.</li>
+<li>If no conversion path exists, or if quality verification fails, the content is flagged for operator review.</li>
+</ol>
+<h3>4.2 Institutional Standard Formats</h3>
+<p>The institution designates the following standard formats by content category. These choices are governed by four criteria: open specification (publicly documented), multiple implementations (not dependent on a single vendor), proven longevity (has existed for at least ten years), and fitness for purpose (adequate for the content type's requirements).</p>
+<p><strong>Documents -- Text-Primary:</strong>
+- Primary standard: UTF-8 plain text (.txt). For content where formatting is not essential.
+- Secondary standard: PDF/A-2 (.pdf). For content where visual layout, figures, and typographic formatting must be preserved. PDF/A is the archival subset of PDF, designed explicitly for long-term preservation. It prohibits features that impair archivability (embedded JavaScript, external resource dependencies, encryption).
+- Tertiary standard: HTML5 with embedded CSS (.html). For content where hyperlinks, semantic structure, and moderate formatting are needed. All resources must be embedded or co-located; no external references.</p>
+<p><strong>Documents -- Structured:</strong>
+- Primary standard: Markdown with YAML front matter (.md). For structured text documents, technical documentation, and institutional articles.
+- Secondary standard: XML with a documented schema (.xml). For content that requires strict structural validation.</p>
+<p><strong>Images:</strong>
+- Primary standard: PNG (.png). For images where lossless quality is required (diagrams, screenshots, technical illustrations).
+- Secondary standard: JPEG (.jpg) with quality factor documented. For photographic images where some compression loss is acceptable.
+- Tertiary standard: SVG (.svg). For vector graphics.
+- Preservation standard: TIFF (.tiff). For archival-quality images, especially scanned documents.</p>
+<p><strong>Audio:</strong>
+- Primary standard: FLAC (.flac). Lossless audio compression. For audio content where fidelity is important.
+- Secondary standard: Opus (.opus) in Ogg container. For audio content where file size must be minimized with acceptable lossy compression. Opus provides excellent quality-to-size ratio.
+- Preservation standard: WAV (.wav), 16-bit or 24-bit PCM. For archival-quality audio.</p>
+<p><strong>Video:</strong>
+- Primary standard: AV1 in Matroska container (.mkv). Open, royalty-free video codec with excellent compression. For general video content.
+- Secondary standard: H.264/AVC in Matroska container (.mkv). Widely supported, well-understood codec. For video content where AV1 encoding is not feasible.
+- Preservation standard: FFV1 in Matroska container (.mkv). Lossless video compression designed for archival use.</p>
+<p><strong>Databases and Structured Data:</strong>
+- Primary standard: SQLite (.sqlite, .db). Self-contained, serverless, public-domain database format. For structured data that requires query capability.
+- Secondary standard: CSV with a companion schema document (.csv + .schema.json). For tabular data where a full database is unnecessary.
+- Tertiary standard: JSON (.json). For hierarchical structured data.</p>
+<p><strong>Archives:</strong>
+- Standard: TAR with Zstandard compression (.tar.zst). For bundled content. TAR for the archive structure, Zstandard for compression.</p>
+<h3>4.3 Conversion Procedures by Format Family</h3>
+<p><strong>Document Conversion:</strong></p>
+<p>Microsoft Office formats (.docx, .xlsx, .pptx) are converted using LibreOffice in headless command-line mode. LibreOffice is the reference tool because it is open source, cross-platform, and produces acceptable PDF/A output for most documents. The conversion command is run in the quarantine environment. After conversion, the operator performs a visual comparison between the original (opened in the sandbox or viewed as a screenshot) and the converted PDF/A to verify layout fidelity.</p>
+<p>Legacy document formats (.doc, .xls, .ppt, .rtf, .wpd) follow the same process. Conversion quality is generally lower for older formats. The operator must accept higher quality loss or maintain the original for future re-conversion.</p>
+<p>E-book formats (.epub, .mobi) are converted to HTML5 (for reflowable text content) or PDF/A (for fixed-layout content). Conversion tools include Calibre (open source, well-maintained).</p>
+<p><strong>Image Conversion:</strong></p>
+<p>Proprietary image formats (.psd, .ai, .raw camera formats) are converted to TIFF (for preservation) and PNG or JPEG (for operational use). GIMP and ImageMagick are the reference tools. RAW camera formats are converted using dcraw or LibRaw, which are open-source RAW processing libraries. Conversion quality is verified by comparing pixel dimensions, color depth, and a visual spot-check of the converted image against the original.</p>
+<p>WebP and HEIF/HEIC images are converted to PNG (lossless) or JPEG (lossy), depending on the source image characteristics. Lossless sources are converted to PNG. Lossy sources are converted to JPEG with a quality factor at least as high as the estimated source quality.</p>
+<p><strong>Audio Conversion:</strong></p>
+<p>Proprietary or uncommon audio formats (.wma, .aac in proprietary containers, .m4a) are converted to FLAC (lossless) or Opus (lossy). FFmpeg is the reference tool. For lossy-to-lossy conversion (for example, MP3 to Opus), the operator must acknowledge that the conversion introduces additional generational quality loss. The original should be preserved. Quality verification includes: comparing duration (must be identical to the millisecond), checking for encoding artifacts (pops, clicks, dropouts), and verifying that metadata (title, artist, album) is preserved or manually transferred.</p>
+<p><strong>Video Conversion:</strong></p>
+<p>Proprietary or uncommon video formats (.wmv, .avi with proprietary codecs, .flv, .mov with ProRes) are converted to AV1 or H.264 in Matroska containers. FFmpeg is the reference tool. Video conversion is computationally intensive; the quarantine workstation must have adequate processing capacity. Quality verification includes: comparing duration and frame count, checking for visual artifacts (blocking, color shifts, frame drops), verifying audio-video synchronization, and confirming that subtitle tracks (if present) are preserved.</p>
+<p>For archival video, the source is converted to FFV1 lossless in Matroska container. This produces large files but preserves every frame exactly.</p>
+<p><strong>Database and Structured Data Conversion:</strong></p>
+<p>Proprietary database formats (.mdb, .accdb for Microsoft Access; exports from MySQL, PostgreSQL, or other server databases) are imported into SQLite. The conversion verifies: row counts match between source and target, column types are appropriate, and queries against the converted database produce the same results as queries against the source.</p>
+<p>Spreadsheets with data-only content (no formulas, no macros) may be converted to CSV with a companion schema. The schema document records column names, data types, and any encoding notes. Quality verification compares row and column counts, and spot-checks values.</p>
+<h3>4.4 Quality Verification After Conversion</h3>
+<p>Quality verification is mandatory for every conversion. The verification procedure has three levels:</p>
+<p><strong>Level 1: Automated verification.</strong> The conversion tool's exit code is checked (non-zero indicates failure). File size is checked (a converted file that is dramatically smaller or larger than expected may indicate a problem). For text-based formats, character count and word count are compared. For media formats, duration, dimensions, and codec parameters are verified.</p>
+<p><strong>Level 2: Structural verification.</strong> The converted file is opened in the appropriate viewer and its structure is inspected. For documents: are all pages present? Are headings, tables, and images intact? For images: are dimensions correct? Is the color space appropriate? For audio and video: does playback start and end correctly? Is the quality subjectively acceptable?</p>
+<p><strong>Level 3: Content verification.</strong> A sample of the content is compared in detail between the original and the converted version. For a 100-page document, spot-check at least 5 pages (the first, the last, and three randomly selected). For a database, run the same query against both versions and compare results. For media, compare representative segments.</p>
+<p>The quality verification produces a conversion quality report, which is stored alongside the converted content and becomes part of the provenance record (D18-005). The report includes: the original format, the target format, the conversion tool and version, the verification level achieved, any quality losses noted, and the operator's judgment on whether the conversion is acceptable.</p>
+<h3>4.5 The Format Conversion Registry</h3>
+<p>The format conversion registry is a living document maintained by the institution. It catalogs:</p>
+<ul>
+<li>Every source format the institution has encountered.</li>
+<li>The conversion path for each source format (which tool, which settings, which target format).</li>
+<li>The expected quality level for each conversion (lossless, near-lossless, acceptable lossy, significant lossy).</li>
+<li>Known limitations of each conversion (features that are lost, edge cases that fail).</li>
+<li>The date each conversion path was last tested.</li>
+</ul>
+<p>The registry is updated whenever a new format is encountered, whenever a conversion tool is updated, and whenever a conversion procedure is revised. It is stored as an institutional document within Domain 18 and is included in federation sync packages so that all nodes share the same conversion knowledge.</p>
+<p>The registry also maintains a "cannot convert" list: formats for which no acceptable conversion path exists. For these formats, the institution's options are: admit the content in its original format with a note that it may become unreadable (acceptable for low-importance content), seek or develop a conversion tool (for high-importance content), or reject the content.</p>
+<h3>4.6 Handling Unconvertible Formats</h3>
+<p>When content arrives in a format for which no conversion path exists, the operator follows this decision procedure:</p>
+<ol>
+<li>
+<p><strong>Assess importance.</strong> Is this content critical to the institution's mission? If not, consider rejecting it and documenting the rejection reason (R-D18-04: Rejection Must Be Documented).</p>
+</li>
+<li>
+<p><strong>Research alternatives.</strong> Is there an alternative version of the same content in a convertible format? A research paper in a proprietary format may also be available as a PDF. A dataset in a proprietary database may also be available as a CSV export.</p>
+</li>
+<li>
+<p><strong>Investigate conversion tools.</strong> Is there an open-source tool that can read this format? The operator may need to import and install new software (following the standard import pipeline, including malware scanning). Document any new tools in the format conversion registry.</p>
+</li>
+<li>
+<p><strong>Accept with risk notation.</strong> If the content is important enough to admit despite the format risk, store it in its original format with a provenance record that clearly states: the format is not an institutional standard, no conversion was performed, and the content may become unreadable if the format's reader software becomes unavailable. Schedule a periodic review (at least annually) to check whether a conversion path has become available.</p>
+</li>
+<li>
+<p><strong>Extract what can be extracted.</strong> Even when full conversion is impossible, partial extraction may be feasible. Text can often be extracted from proprietary document formats, even when layout is lost. Metadata can often be extracted from media formats. Record what was extracted and what was not.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li>
+<p><strong>R-D18-004-01: Standard Formats Are Required for Operational Content.</strong> All content that enters the institution's operational content store must be in an institutional standard format (Section 4.2) or must have a documented exception approved by the operator with a risk notation in the provenance record.</p>
+</li>
+<li>
+<p><strong>R-D18-004-02: Conversion Quality Must Be Verified.</strong> No converted content may be admitted to the production system without completing at least Level 1 and Level 2 quality verification (Section 4.4). Level 3 verification is required for content classified as high-importance.</p>
+</li>
+<li>
+<p><strong>R-D18-004-03: Originals Are Preserved.</strong> When conversion involves any quality loss, the original file in its original format is preserved alongside the converted version. The original is stored in the designated archival area and tagged with its format, source, and the date of preservation.</p>
+</li>
+<li>
+<p><strong>R-D18-004-04: Conversion Tools Must Be Open Source.</strong> The institution's conversion pipeline must use open-source tools whose source code is available for inspection, modification, and long-term maintenance. Proprietary conversion tools may be used only when no open-source alternative exists, and their use must be documented as a temporary measure in the format conversion registry.</p>
+</li>
+<li>
+<p><strong>R-D18-004-05: The Format Conversion Registry Must Be Maintained.</strong> The registry must be reviewed and updated at least annually during the OPS-001 quarterly review cycle. Conversion paths that have not been tested within two years must be re-tested. New formats encountered since the last review must be added.</p>
+</li>
+<li>
+<p><strong>R-D18-004-06: Lossy Conversion Requires Operator Approval.</strong> Automated conversion may proceed for lossless or near-lossless conversions. Any conversion that involves significant quality loss requires explicit operator approval, documented in the provenance record. The operator must understand what is lost and judge whether the loss is acceptable for this specific content.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Conversion tool obsolescence.</strong> The conversion tool itself becomes unmaintainable or unavailable. LibreOffice, FFmpeg, or GIMP cease development. The institution can no longer perform conversions that it previously handled routinely. Mitigation: the institution should maintain local copies of the conversion tools' source code and build environments. The format conversion registry should note dependencies on specific tools so that obsolescence risks are visible.</p>
+</li>
+<li>
+<p><strong>Silent quality degradation.</strong> A conversion produces output that appears correct on casual inspection but has subtle errors: font substitution that changes character spacing, color profile conversion that shifts hues, audio resampling that introduces artifacts. Mitigation: the three-level quality verification procedure is designed to catch these issues. Level 3 (detailed content comparison) is the defense against silent degradation. It should be performed for all important content, not just for content flagged as risky.</p>
+</li>
+<li>
+<p><strong>Format standard evolution.</strong> The institutional standard format itself evolves. A new version of PDF/A is released. A new lossless audio codec supersedes FLAC. The institution must decide whether to adopt the new standard, which requires re-converting existing content, or maintain the old standard, which may become less well-supported. Mitigation: standard format changes are governance decisions (D17-008 for federated institutions). They should be made deliberately, with a migration plan. Dual preservation means the originals are available for re-conversion to the new standard.</p>
+</li>
+<li>
+<p><strong>Conversion pipeline bottleneck.</strong> A large import -- thousands of files in non-standard formats -- overwhelms the conversion pipeline. The operator faces a backlog that stretches for weeks. Mitigation: the pipeline should support batch conversion for common format families. The operator should triage the import: convert high-priority content first, queue lower-priority content. The OPS-001 complexity budget should account for conversion workload.</p>
+</li>
+<li>
+<p><strong>Format identification failure.</strong> A file's format cannot be identified. The extension is misleading, the magic bytes are ambiguous, and the content resists analysis. Mitigation: files with unidentifiable formats should be treated as unconvertible (Section 4.6) and handled through the unconvertible format decision procedure. They should also be flagged for additional malware scrutiny (D18-003), as format obfuscation is a common malware technique.</p>
+</li>
+<li>
+<p><strong>Cascading conversion loss.</strong> Content is converted through multiple intermediate formats before reaching the institutional standard, with each step introducing additional quality loss. Mitigation: the format conversion registry must specify direct conversion paths from source to target wherever possible. Multi-step conversions should be flagged and avoided unless no single-step path exists. When multi-step conversion is necessary, the original is preserved (dual preservation) and the number of steps is documented.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a conversion is found to have introduced unacceptable quality loss after admission:</strong> Retrieve the original file from the archival area (dual preservation). Re-perform the conversion with different settings or a different tool. If no acceptable conversion is achievable, maintain the original file as the operational copy with a format risk notation, and schedule periodic re-conversion attempts as tools improve.</p>
+</li>
+<li>
+<p><strong>If a conversion tool is no longer available:</strong> Consult the format conversion registry for alternative tools. If no alternative exists, the affected conversion paths are added to the "cannot convert" list. Content in affected formats is admitted in original format with risk notations. The institution should actively seek replacement tools through its import process.</p>
+</li>
+<li>
+<p><strong>If the institutional standard format itself becomes problematic:</strong> Convene a format review through the governance process (D17-008 for federated institutions, GOV-001 for single-node). Evaluate alternative standard formats. If a migration is approved, create a migration plan that includes: re-converting all content from the old standard to the new one, updating the format conversion registry, updating all references in institutional documentation, and preserving backward-reading capability for the old standard during a transition period.</p>
+</li>
+<li>
+<p><strong>If a batch conversion produces inconsistent results:</strong> Halt the batch. Identify which conversions succeeded and which failed or produced quality issues. Process the failures individually, adjusting settings or tools as needed. Do not resume batch processing until the cause of inconsistency is identified.</p>
+</li>
+<li>
+<p><strong>If format identification is consistently failing for a new format family:</strong> Research the format family. Obtain or develop identification rules (magic bytes, header structure). Update the format identification tools. Add the format family to the conversion registry, either with a conversion path or on the "cannot convert" list.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The format conversion pipeline handles a limited set of well-known formats. The conversion registry is small. Most imported content is likely in common formats (PDF, JPEG, MP3, DOCX) for which established conversion paths exist. Focus on establishing the pipeline, calibrating quality verification, and building the registry.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The registry should be comprehensive for the formats the institution has encountered. Conversion tools may need updating. New formats may have emerged that are not yet in the registry. The dual-preservation archive may be growing significantly; assess its storage impact and ensure it is managed sustainably.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Some institutional standard formats may themselves face obsolescence pressure. PDF/A is well-established and likely to endure, but audio and video codecs evolve more rapidly. This is the period when the institution may face its first standard format migration. The governance process for such a migration should be initiated well before the old format becomes problematic.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The format landscape will be unrecognizable compared to 2026. Formats that are ubiquitous today will be historical curiosities. The conversion pipeline's value is not in the specific tools it uses (those will have been replaced many times) but in the principles it embodies: convert to open standards, verify quality, preserve originals, document everything. These principles should guide format decisions long after the specific tools named in this article are forgotten.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The choice of institutional standard formats is the most opinionated decision in this article, and the one most likely to be revisited. PDF/A for documents, PNG and TIFF for images, FLAC for audio, AV1 for video, SQLite for databases -- these are defensible choices in 2026, but technology changes. I have tried to choose formats that optimize for longevity rather than features. PDF/A is not the most capable document format. FLAC is not the most efficient audio codec. SQLite is not the most powerful database. But each is well-documented, widely implemented, and designed (or at least well-suited) for long-term preservation.</p>
+<p>The dual-preservation strategy is insurance against my own fallibility. If I have chosen the wrong standard format, or if the conversion tools have introduced errors I did not detect, the original is still there. A future operator with better tools or better judgment can re-convert from the original. This means the institution stores some content twice, which costs storage space. Storage is cheap. Lost content is priceless.</p>
+<p>FFmpeg deserves special mention. It is the Swiss Army knife of media conversion -- capable of reading and writing virtually every audio and video format ever created. It is open source, it is actively maintained, and it runs everywhere. If a single tool were chosen for all media conversion, FFmpeg would be that tool. Its command-line interface is complex and poorly documented, which is its primary weakness. The format conversion registry should include specific FFmpeg commands for each conversion path, tested and verified, so that the operator does not need to become an FFmpeg expert to perform routine conversions.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D18-001 -- Import &amp; Quarantine Philosophy (R-D18-06: open format preference; import pipeline stages; trust scoring)</li>
+<li>D18-003 -- Malware Scanning for Air-Gapped Systems (scanning precedes conversion; active content handling)</li>
+<li>D18-005 -- Provenance Tracking and Chain of Custody (conversion events as provenance records)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 4: Longevity Over Novelty; Principle 2: Integrity Over Convenience)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (format-based threats; active content restrictions)</li>
+<li>OPS-001 -- Operations Philosophy (complexity budget; quarterly review; operational sustainability)</li>
+<li>D17-007 -- Sync Package Specification (sync packages carry content in institutional formats)</li>
+<li>D17-008 -- Distributed Governance Protocol (format standard changes are governance decisions)</li>
+<li>Domain 19 -- Quality Assurance (conversion quality verification standards)</li>
+<li>Domain 20 -- Institutional Memory (format conversion registry as institutional knowledge)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

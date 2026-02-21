@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-006 — Physical Security Design - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li class="active"><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-006">
+  <h1>SEC-006 &mdash; Physical Security Design</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-006</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security & Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, SEC-002, SEC-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>SEC-007, SEC-008, D4-001. All articles involving site design, hardware placement, or environmental controls.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article specifies the physical security design for the site that houses the holm.chat Documentation Institution. In an air-gapped institution, physical security is the perimeter. There is no network firewall because there is no network. The walls, the locks, the doors, and the environmental controls are the firewall. If physical security fails, every other security control can be bypassed.</p>
+<p>This article addresses the full spectrum of physical security: perimeter design, access control hardware, environmental threat mitigation (fire, flood, intrusion, and temperature), surveillance, tamper detection, and the audit procedures that verify these controls remain effective over time. It is written for the operator who must design, install, maintain, and periodically verify the physical security of a site that must endure for decades.</p>
+<p>Physical security is the domain where the institution most directly confronts the physical world. Algorithms do not rust. Documentation does not flood. But the hardware that stores the institution's data exists in a physical environment that can burn, flood, freeze, shake, or be broken into. This article is the institution's defense against those realities.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Site selection criteria and layout principles.</li>
+<li>Perimeter design: walls, doors, windows, and barriers.</li>
+<li>Access control hardware: locks, keys, and authentication mechanisms.</li>
+<li>Environmental threat mitigation: fire suppression, water protection, temperature and humidity control.</li>
+<li>Tamper detection: seals, sensors, and indicators.</li>
+<li>Surveillance: monitoring capabilities compatible with a single-operator model.</li>
+<li>Physical security audit procedures.</li>
+</ul>
+<p>This article does not cover logical access controls (see SEC-002), cryptographic protections (see SEC-003 and SEC-005), or the air-gap architecture beyond its physical enforcement dimension (see SEC-004). It defines the physical environment; those other articles define the controls that operate within it.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Physical Security Imperative</h3>
+<p>The founding mandate (CON-001) declares that the institution is self-sovereign: it depends on no external entity. The air-gap architecture (SEC-004) eliminates electronic attack vectors. These decisions concentrate the institution's vulnerability surface onto the physical domain. An attacker who wishes to compromise an air-gapped institution must achieve physical access. A natural disaster that threatens an air-gapped institution threatens its hardware directly, with no possibility of cloud failover or remote backup retrieval.</p>
+<p>This concentration of risk onto the physical domain is a deliberate design choice. It trades distributed, hard-to-manage electronic risks for concentrated, manageable physical risks. But the word "manageable" carries obligation: the physical risks must actually be managed. A well-designed physical security posture converts the air gap from a limitation into a strength. A poorly designed one makes the air gap irrelevant, because the physical boundary it depends on does not hold.</p>
+<h3>3.2 Threat Landscape for a Personal Institution</h3>
+<p>The physical threat landscape for a personal institution differs from an enterprise data center. Enterprises face sophisticated adversaries with significant resources. A personal institution is more likely to face:</p>
+<ul>
+<li><strong>Opportunistic theft:</strong> Burglars who target electronics for resale value, not for data.</li>
+<li><strong>Environmental events:</strong> Fire, flooding, severe weather, and power surges that are local, not targeted.</li>
+<li><strong>Accidental damage:</strong> The operator or a household member inadvertently damaging hardware through spills, drops, or mishandling.</li>
+<li><strong>Gradual degradation:</strong> Temperature extremes, humidity, dust, and pests that degrade hardware over years.</li>
+<li><strong>Targeted intrusion:</strong> Less likely but nonzero, especially over a fifty-year horizon as the institution accumulates value.</li>
+</ul>
+<p>The physical security design must be proportionate to these threats. It does not require a bank vault. It requires deliberate, layered protection that addresses each threat category with appropriate controls.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Concentric Perimeter Model</h3>
+<p>Physical security is organized as concentric perimeters, each providing an additional layer of protection:</p>
+<p><strong>Perimeter 1: The Property Boundary.</strong>
+The outermost layer. For a residential site, this is the property line. Controls at this layer include fencing, exterior lighting, visibility from public areas (which deters some attackers and attracts others; assess based on local threat model), and landscaping that does not provide concealment near the building. This layer provides deterrence and detection, not prevention.</p>
+<p><strong>Perimeter 2: The Building Envelope.</strong>
+The building itself. Controls at this layer include reinforced exterior doors, window locks or bars (appropriate to local building codes and aesthetics), deadbolt locks, and door frame reinforcement. This layer prevents casual intrusion and delays determined intrusion.</p>
+<p><strong>Perimeter 3: The Secure Room.</strong>
+The room or area within the building that houses institutional hardware. This is the critical perimeter. Controls at this layer include a solid-core or metal door with a high-security lock, no windows (or windows that are permanently sealed and reinforced), walls that extend fully to the structural ceiling (not merely to a drop ceiling that can be bypassed), and environmental controls. This room is where the air-gap perimeter (SEC-004) is physically enforced.</p>
+<p><strong>Perimeter 4: The Hardware Enclosures.</strong>
+The racks, cabinets, or enclosures that contain institutional hardware. Controls at this layer include lockable server racks or cabinets, tamper-evident seals on hardware cases, and cable management that prevents accidental disconnection.</p>
+<p>Each perimeter should provide independent protection. An attacker who bypasses one perimeter should face a distinct challenge at the next. This is defense in depth applied to physical space.</p>
+<h3>4.2 Access Control Hardware</h3>
+<p><strong>Lock Selection:</strong>
+The secure room should use a high-security lock with the following properties:
+- Pick resistance: rated for a minimum of 10 minutes of skilled attack (look for UL 437 or equivalent certification).
+- Bump resistance: the lock should be resistant to lock bumping attacks.
+- Key control: the key blanks should not be freely available. The lock manufacturer should restrict key blank distribution to authorized dealers.
+- Rekey capability: the lock should be rekeyable without replacement, to support key changes during succession or after a suspected compromise.</p>
+<p><strong>Key Management (Physical):</strong>
+Physical keys are managed with the same discipline as cryptographic keys:
+- A master key is stored in a secure, fire-rated safe at the site.
+- A duplicate key is stored at a geographically separate location, accessible to the designated successor (per the succession protocol in GOV-001).
+- A key log records every key issued, to whom, and when. Key issuance is a logged event.
+- If a key is lost or suspected compromised, the lock is rekeyed within 24 hours.</p>
+<p><strong>Electronic Access Control (Optional):</strong>
+Electronic access control (keypads, card readers, biometric scanners) may be used as a supplementary layer. However, electronic access control must not be the sole access mechanism. Electronic systems fail -- batteries die, circuits corrode, software corrupts. A mechanical lock must always provide a backup access path. Electronic access control's primary value is auditability: it can log entry times and identities automatically, which a mechanical lock cannot.</p>
+<p>If electronic access control is deployed, it must be powered by the institution's UPS, not by external power alone. It must fail secure (locked) rather than fail open. Its audit logs must be integrated into the institution's operational logging.</p>
+<h3>4.3 Environmental Threat Mitigation</h3>
+<p><strong>Fire Protection:</strong>
+- The secure room should contain a fire suppression system appropriate for electronics: clean-agent (gas-based) suppression rather than water sprinklers. If clean-agent suppression is not feasible, a handheld clean-agent fire extinguisher should be immediately accessible within the room.
+- Smoke detection should be installed inside the secure room and in adjacent areas. Smoke detectors should be tested monthly as part of the operational tempo.
+- Fire-resistant storage (a fire-rated safe or fire-resistant cabinet) should house the most critical backup media and physical key duplicates. A one-hour fire rating minimum is recommended.
+- Hardware should be positioned away from electrical panels, water heaters, and other ignition sources.</p>
+<p><strong>Water Protection:</strong>
+- The secure room should not be located below grade (basements flood) if any alternative exists. If below-grade placement is unavoidable, install a sump pump with battery backup and a water sensor that provides audible alarm.
+- Hardware should be elevated at least 15 centimeters (6 inches) above the floor on racks or platforms.
+- No plumbing should run through or above the secure room if the building's layout permits this.
+- A water sensor should be placed at floor level in the secure room. The sensor should produce an audible alarm.</p>
+<p><strong>Temperature and Humidity Control:</strong>
+- The secure room should maintain a temperature between 18-27 degrees Celsius (64-80 degrees Fahrenheit) and relative humidity between 40-60 percent.
+- A temperature and humidity logger should run continuously, with data reviewed during monthly operations.
+- Hardware generates heat. Ensure adequate ventilation or cooling for the thermal load of the installed equipment.
+- Storage media (especially magnetic media and optical discs) are sensitive to humidity extremes. Long-term media storage should be in the most climate-controlled area available.</p>
+<p><strong>Power Protection:</strong>
+- All institutional hardware must be connected through an uninterruptible power supply (UPS) as specified in SEC-004.
+- The UPS should provide sufficient runtime for a graceful shutdown of all systems (minimum 15 minutes recommended).
+- Surge protection must be present on all power connections.
+- If off-grid power is available (solar, generator), automatic or manual transfer capability should exist to maintain power during grid outages.</p>
+<h3>4.4 Tamper Detection</h3>
+<p>Tamper detection provides evidence that an unauthorized person has accessed or modified institutional hardware.</p>
+<p><strong>Tamper-Evident Seals:</strong>
+- All hardware cases should be sealed with serialized tamper-evident seals (tape or stickers that show visible evidence of removal).
+- The serial numbers of all seals should be recorded in the tamper-detection log.
+- Seals should be checked during monthly operations. Any broken or missing seal triggers an investigation.
+- When hardware is legitimately opened for maintenance, the old seal is destroyed, the opening is logged, and a new seal is applied.</p>
+<p><strong>Position Indicators:</strong>
+- Mark the exact position of hardware on racks or shelves with tape or markers. Displacement from the marked position indicates that hardware has been moved.
+- Record the positions photographically during quarterly security reviews.</p>
+<p><strong>Intrusion Indicators:</strong>
+- The secure room door should have a tamper indicator (a simple seal on the door frame, or a more sophisticated sensor) that reveals whether the door has been opened.
+- If the institution is left unattended for extended periods (travel, absence), the tamper indicators become the primary means of detecting unauthorized access during the absence.</p>
+<h3>4.5 Surveillance</h3>
+<p>Surveillance in a single-operator institution must be practical and privacy-respecting:</p>
+<ul>
+<li>If cameras are used, they should monitor the exterior of the building and the approach to the secure room, not the interior of the secure room itself (to prevent surveillance of sensitive data on screens).</li>
+<li>Camera storage should be local (within the air-gapped environment or on dedicated, non-networked storage), not cloud-based.</li>
+<li>Camera systems should not have WiFi or network capability. If network-capable cameras are the only option available, their network interfaces must be physically disabled per SEC-004.</li>
+<li>Motion-activated lighting on the building exterior is a low-cost, high-value deterrent that does not create privacy concerns.</li>
+<li>An audible alarm system (door contacts, glass-break sensors, motion detectors) provides intrusion detection during periods when the operator is absent.</li>
+</ul>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-SEC06-01:</strong> Institutional hardware must be housed in a dedicated secure room that implements at minimum Perimeters 3 and 4 as described in Section 4.1.</li>
+<li><strong>R-SEC06-02:</strong> The secure room must use a high-security lock with pick, bump, and key-control resistance. Mechanical backup access must exist independent of any electronic access control.</li>
+<li><strong>R-SEC06-03:</strong> Fire detection must be present in the secure room. Fire suppression appropriate for electronics must be accessible within the room.</li>
+<li><strong>R-SEC06-04:</strong> Hardware must be elevated above floor level. Water detection must be present at floor level in the secure room.</li>
+<li><strong>R-SEC06-05:</strong> All hardware cases must be sealed with serialized tamper-evident seals. Seal integrity must be checked monthly.</li>
+<li><strong>R-SEC06-06:</strong> Temperature and humidity must be monitored continuously in the secure room. Readings outside the acceptable range trigger an investigation and corrective action within 24 hours.</li>
+<li><strong>R-SEC06-07:</strong> Physical keys must be managed per the key management procedure in Section 4.2, including off-site backup and a key issuance log.</li>
+<li><strong>R-SEC06-08:</strong> Any surveillance system must be non-networked and must store recordings locally. Cameras must not surveil the interiors of rooms where sensitive data is displayed.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Single-perimeter dependence.</strong> The operator relies entirely on one perimeter (typically the building envelope) and neglects the others. When that perimeter fails (a door is left unlocked, a window is broken), there is no backup. Mitigation: the concentric perimeter model requires multiple independent layers.</li>
+<li><strong>Environmental creep.</strong> Conditions in the secure room gradually degrade -- temperature rises because of added hardware, humidity increases because a ventilation path is blocked, dust accumulates because cleaning is deferred. Hardware degrades silently until it fails. Mitigation: continuous monitoring and monthly review of environmental data.</li>
+<li><strong>Tamper-detection theater.</strong> Seals are applied but never checked. Seals degrade from heat or age and can no longer show evidence of tampering. The tamper-detection system exists on paper but detects nothing. Mitigation: monthly seal verification is a mandatory operational task. Replace degraded seals proactively.</li>
+<li><strong>Key compromise.</strong> A physical key is lost, copied, or stolen. The operator does not rekey the lock because it is inconvenient or expensive. An unauthorized person retains access indefinitely. Mitigation: immediate rekeying policy (Section 4.2). The cost of rekeying is small compared to the cost of undetected unauthorized access.</li>
+<li><strong>Complacent surveillance.</strong> Alarm batteries die. Camera storage fills up and stops recording. Motion lights burn out. The security system degrades through neglect. Mitigation: monthly testing of all surveillance and alarm components as part of the operational tempo.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If unauthorized physical access is suspected:</strong> Inspect all tamper-evident seals. Check position indicators. Review any surveillance footage. If evidence of intrusion is found, assume all systems within the breached perimeter may be compromised. Perform integrity checks on all institutional data (hash verification against known-good records). If tampering with hardware is evident, rebuild affected systems from known-good backups stored outside the breached area. Rekey all locks. Replace all tamper seals. Document the incident thoroughly.</li>
+<li><strong>If environmental damage has occurred (fire, flood):</strong> Assess the physical damage before powering on any equipment. For water damage, do not power on wet equipment; allow thorough drying and inspect for corrosion before attempting recovery. For fire damage, assess both direct damage and smoke/soot contamination. Restore from off-site backups if on-site hardware is unrecoverable. Document the event, including what was lost and what was recovered.</li>
+<li><strong>If a physical key has been lost:</strong> Rekey the affected lock within 24 hours. Issue new keys. Update the key log. Inspect tamper-detection indicators for any evidence that the lost key was used before the rekey. If the key loss occurred during a period when the site was unattended, treat as a potential unauthorized access event.</li>
+<li><strong>If environmental monitoring reveals chronic out-of-range conditions:</strong> Identify the cause. Upgrade cooling, ventilation, or dehumidification as needed. If conditions cannot be brought within range, consider relocating hardware to a more suitable area. Chronic out-of-range conditions are not acceptable; they are a slow-motion data loss event.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Establish the physical security baseline. Install the secure room, locks, environmental monitoring, tamper seals, and basic surveillance. The initial implementation need not be perfect; it must be functional and improvable. Document the baseline thoroughly so that improvements can be measured against it.</li>
+<li><strong>Years 5-15:</strong> Refine based on experience. Upgrade components that have proven inadequate. Replace aging environmental sensors. The physical security audit (SEC-008) will identify gaps.</li>
+<li><strong>Years 15-30:</strong> The building itself may change. Renovations, moves, or succession may require the entire physical security design to be re-implemented at a new site. This article's principles remain valid regardless of location. The specific implementation must be adapted.</li>
+<li><strong>Years 30-50+:</strong> Physical security hardware (locks, sensors, cameras) will have been replaced multiple times. The concentric perimeter model and the layered approach should endure. New physical security technologies will emerge; evaluate them against the institution's threat model and adopt what is justified.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Physical security is the most tangible and the most neglected dimension of personal infrastructure security. People will spend hours configuring encryption and minutes choosing a door lock. This is backward. In an air-gapped institution, the door lock is more important than the encryption algorithm, because the door lock is the first line of defense and the encryption is the last. I have written this article to correct that imbalance. The physical security design does not need to be expensive or elaborate. It needs to be deliberate, layered, and maintained. A cheap lock on a solid door, checked monthly, is better than an expensive lock on a hollow door, never checked.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 1: Sovereignty; Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (self-sovereign infrastructure)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (physical threats, Category 1)</li>
+<li>SEC-002 -- Access Control Procedures (physical access as first layer)</li>
+<li>SEC-004 -- Air-Gap Architecture (physical enforcement of the air gap)</li>
+<li>SEC-008 -- Security Audit Framework (physical security audit procedures)</li>
+<li>GOV-001 -- Authority Model (succession protocol and key handover)</li>
+<li>Domain 4 -- Infrastructure &amp; Power (hardware placement and power requirements)</li>
+<li>NIST SP 800-116 -- Guidelines for the Use of PIV Credentials in Facility Access</li>
+<li>Stage 1 Documentation Framework, Domain 3: Security &amp; Integrity</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

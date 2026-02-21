@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D14-003 — Technology Evaluation Framework - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li class="active"><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d14-003">
+  <h1>D14-003 &mdash; Technology Evaluation Framework</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D14-003</dd>
+  <dt>Domain</dt>
+  <dd>14 -- Research & Theory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D14-001, D14-002, D13-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D14-004, D14-005, D14-006. All Domain 13 (Evolution) articles involving technology adoption. All domain articles involving technology selection.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the framework by which this institution evaluates new technologies for potential adoption. It is one of the most consequential research activities the institution conducts, because technology adoption decisions are among the hardest to reverse. A filesystem choice may last decades. A database engine becomes the foundation of years of accumulated data. A hardware platform determines what software can run and what upgrades are possible. These decisions must be made carefully, with a structured process that resists both the excitement of novelty and the inertia of familiarity.</p>
+<p>D14-001 establishes that the institution must avoid both stagnation and reckless adoption. This article operationalizes that balance by providing a repeatable evaluation framework -- a rubric, a process, and a documentation format that ensures every technology decision is made with full awareness of its implications and recorded thoroughly enough that future operators understand why the decision was made.</p>
+<p>The framework is designed for the specific constraints of an air-gapped, off-grid, single-operator institution. The evaluation criteria differ substantially from those used by internet-connected organizations. Uptime SLAs, cloud integration, automatic update mechanisms, and vendor support contracts are irrelevant here. What matters is longevity, maintainability without internet access, air-gap compatibility, documentation quality, and the health of the community that produces the technology -- because that community is the source of future updates, knowledge, and fixes that must be manually transported across the air gap.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The technology evaluation rubric: criteria, weighting, and scoring.
+- The evaluation process: from initial identification through proof-of-concept to adoption decision.
+- Air-gap compatibility assessment: specific tests and requirements.
+- Documentation quality assessment: what constitutes sufficient documentation for an isolated institution.
+- Community health assessment: indicators of project longevity and sustainability.
+- The proof-of-concept procedure: how to test a technology safely before committing to it.
+- The Technology Decision Record (TDR): format and filing requirements.
+- The relationship between technology evaluation and the evolution framework (D13-001).</p>
+<p><strong>Out of scope:</strong>
+- General experimental methodology (D14-002, though technology evaluation uses those methods).
+- Specific technology choices for specific domains (individual domain articles).
+- The procurement process for acquiring technology across the air gap (D11-001, ADM-series).
+- Security assessment of new software (SEC-001, SEC-series, though security is one evaluation criterion).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Technology Adoption Trap</h3>
+<p>Technology adoption in an air-gapped institution presents a double bind. On one side is the danger of stagnation: clinging to known technology until it becomes unsupportable, its community disbands, and its documentation rots. On the other side is the danger of churn: adopting every promising new technology, enduring constant migration, and never achieving the stability that a fifty-year institution requires.</p>
+<p>Both dangers are real. Both have destroyed institutions. The history of computing is littered with organizations that bet on technologies that seemed permanent at the time -- and equally littered with organizations that refused to move until it was too late to move gracefully.</p>
+<p>The evaluation framework exists to navigate between these dangers. It provides a structured basis for the question: should we adopt this technology? And it provides an equally structured basis for the question: should we stay with what we have?</p>
+<h3>3.2 The Air-Gap Filter</h3>
+<p>The air gap is the most powerful filter in the technology evaluation framework. Technologies that require constant internet connectivity are immediately disqualified. Technologies that depend on remote repositories for routine operation are disqualified. Technologies whose update mechanism assumes network access are not disqualified but receive a significant penalty in the evaluation rubric, because every update will require manual intervention to transport across the air gap.</p>
+<p>This filter eliminates a large fraction of modern software. That elimination is a feature, not a bug. The remaining candidates -- software that can be installed from local media, operated without network access, updated through manual package installation, and documented thoroughly enough to troubleshoot without searching the internet -- are inherently more suitable for this institution's constraints.</p>
+<h3>3.3 The Longevity Question</h3>
+<p>The most important evaluation criterion, and the hardest to assess, is longevity. Will this technology still be viable in ten years? Twenty? Will its community still exist? Will its file formats still be readable? Will replacement hardware still run it?</p>
+<p>No one can predict the future with certainty. But there are indicators. Technologies with open-source licenses are more likely to survive than proprietary ones, because the code persists even if the original developer abandons it. Technologies with simple, well-documented file formats are more resilient than those with opaque binary formats. Technologies with large, diverse communities are more likely to survive the loss of any single contributor than those dependent on a single developer.</p>
+<p>The evaluation rubric encodes these indicators. It does not predict the future. It assesses the probability of survival based on observable present characteristics.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Evaluation Rubric</h3>
+<p>Every technology evaluation uses a standardized rubric with six criteria, each scored on a five-point scale (1 = unacceptable, 2 = poor, 3 = adequate, 4 = good, 5 = excellent):</p>
+<p><strong>Criterion 1: Longevity (weight 3x).</strong> How likely is this technology to remain viable over 10-20+ years? Indicators include: age of the project, size and diversity of the contributor community, adoption breadth, license type (open source strongly preferred), governance structure, historical stability, and the existence of a clear succession plan or foundation stewardship. A technology that has been stable for a decade scores higher than one released last year, regardless of feature comparison.</p>
+<p><strong>Criterion 2: Maintainability (weight 3x).</strong> How difficult is it to maintain this technology without internet access and without vendor support? Indicators include: complexity of configuration, clarity of error messages, quality of logging, dependency count and depth, build reproducibility, and the skill level required for routine maintenance. A technology that the operator can fully understand and troubleshoot is more valuable than one that is technically superior but opaque.</p>
+<p><strong>Criterion 3: Air-Gap Compatibility (weight 3x).</strong> Can this technology be installed, operated, updated, and maintained entirely offline? Specific tests include: installation from local media, operation without any network call, update application from locally-stored packages, license validation without phone-home, and documentation availability offline. Any technology that phones home for license validation receives an automatic score of 1.</p>
+<p><strong>Criterion 4: Documentation Quality (weight 2x).</strong> How good is the available documentation, and can it be stored locally? Indicators include: completeness, accuracy, currency, availability in offline-friendly formats (HTML dump, PDF, man pages, plain text), quality of error documentation, availability of architecture documents (not just tutorials), and the presence of troubleshooting guides for common failure modes.</p>
+<p><strong>Criterion 5: Data Sovereignty (weight 2x).</strong> Does the institution retain full control of its data when using this technology? Indicators include: open and documented file/storage formats, availability of export tools, absence of vendor lock-in mechanisms, ability to read data without the original software, and compatibility with the institution's backup and archive strategies.</p>
+<p><strong>Criterion 6: Community Health (weight 1x).</strong> What is the current state of the project's community? Indicators include: contributor activity (commits, releases, bug fixes), responsiveness to bug reports, quality of community discourse, diversity of contributors (not dependent on a single person or company), and the trajectory (growing, stable, or declining).</p>
+<p>The weighted score produces a total out of 70 (maximum). The following thresholds guide -- but do not dictate -- the adoption decision:</p>
+<ul>
+<li><strong>56-70 (Strong Candidate):</strong> Technology meets or exceeds institutional requirements. Proceed to proof-of-concept.</li>
+<li><strong>42-55 (Qualified Candidate):</strong> Technology has notable strengths but also significant gaps. Proceed to proof-of-concept only if the gaps can be mitigated and the alternative is worse.</li>
+<li><strong>28-41 (Weak Candidate):</strong> Technology has fundamental concerns. Do not proceed unless no alternative exists and the need is critical.</li>
+<li><strong>Below 28 (Disqualified):</strong> Technology is unsuitable for this institution.</li>
+</ul>
+<h3>4.2 The Evaluation Process</h3>
+<p>Technology evaluation follows a defined sequence:</p>
+<p><strong>Step 1: Identification.</strong> A technology is identified as a potential candidate, either during a scheduled technology review cycle or in response to a specific institutional need. The identification includes a brief statement of what problem the technology would solve and why current solutions are insufficient.</p>
+<p><strong>Step 2: Preliminary Assessment.</strong> The technology is evaluated against the rubric using publicly available information (documentation, community forums captured during air-gap crossings, published reviews from the institution's reference library). This is a desk evaluation, not a hands-on test. The goal is to determine whether the technology merits the investment of a proof-of-concept.</p>
+<p><strong>Step 3: Proof-of-Concept.</strong> If the preliminary assessment scores 42 or above, a proof-of-concept is conducted. The proof-of-concept is a structured experiment following D14-002 methodology: pre-registered hypothesis, defined success criteria, controlled execution, documented results. The proof-of-concept tests the technology on non-production systems under conditions that approximate production use. Minimum duration: 30 days of active use, or the duration necessary to exercise all major features relevant to the institution's use case, whichever is longer.</p>
+<p><strong>Step 4: Decision.</strong> The proof-of-concept results, the rubric score, and the overall assessment are compiled into a Technology Decision Record (TDR). The adoption decision is made through the appropriate governance tier per GOV-001. The TDR is filed in the research archive regardless of the decision.</p>
+<p><strong>Step 5: Integration or Rejection.</strong> If adopted, the technology is integrated through the evolution framework (D13-001). If rejected, the TDR is filed in the research archive and referenced in the Negative Results Registry (D14-005) if the rejection was based on specific technical failures discovered during the proof-of-concept.</p>
+<h3>4.3 The Technology Decision Record (TDR)</h3>
+<p>Every technology evaluation produces a TDR with the following mandatory fields:</p>
+<ul>
+<li><strong>TDR ID:</strong> Format TDR-YYYY-NNN.</li>
+<li><strong>Date:</strong> Date of final decision.</li>
+<li><strong>Technology evaluated:</strong> Name, version, source.</li>
+<li><strong>Problem statement:</strong> What institutional need prompted the evaluation.</li>
+<li><strong>Current solution:</strong> What the institution currently uses for this need (if anything).</li>
+<li><strong>Rubric scores:</strong> All six criteria with individual scores, justifications, and weighted total.</li>
+<li><strong>Proof-of-concept summary:</strong> Duration, scope, key findings (or "Not conducted" with justification).</li>
+<li><strong>Decision:</strong> Adopt, Reject, or Defer (with conditions for revisiting).</li>
+<li><strong>Rationale:</strong> The reasoning behind the decision, including dissenting considerations.</li>
+<li><strong>Migration plan reference:</strong> If adopted, reference to the migration plan in Domain 13.</li>
+<li><strong>Review date:</strong> When this decision should be revisited (mandatory, even for rejections).</li>
+<li><strong>Related TDRs:</strong> Cross-references to evaluations of competing or complementary technologies.</li>
+</ul>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-TEV-01:</strong> No technology may be adopted for production use without a completed Technology Decision Record. Emergency adoptions (e.g., during disaster recovery) must have a TDR filed within 90 days of adoption.</li>
+<li><strong>R-TEV-02:</strong> The evaluation rubric (Section 4.1) must be applied in full for every formal evaluation. Individual criteria may not be skipped because the evaluator considers them irrelevant. If a criterion is genuinely not applicable, it must be scored and the justification for the score documented.</li>
+<li><strong>R-TEV-03:</strong> Proof-of-concept testing must be conducted on non-production systems unless the nature of the evaluation specifically requires production conditions, and this requirement is documented and approved per GOV-001.</li>
+<li><strong>R-TEV-04:</strong> Technologies with an Air-Gap Compatibility score of 1 may not be adopted under any circumstances. The air gap is non-negotiable per CON-001 and SEC-001.</li>
+<li><strong>R-TEV-05:</strong> All Technology Decision Records must be retained permanently in the research archive, including records for rejected technologies. Rejection records are as valuable as adoption records -- they prevent future operators from re-evaluating technologies that have already been found unsuitable.</li>
+<li><strong>R-TEV-06:</strong> Every adopted technology must have a scheduled review date, no more than five years from adoption, at which the technology is re-evaluated against the current rubric. Technologies may be re-confirmed, scheduled for replacement, or flagged for active migration.</li>
+<li><strong>R-TEV-07:</strong> Technology evaluations must include an exit assessment: how difficult would it be to migrate away from this technology if it proves unsuitable after adoption? Technologies with high exit costs must score correspondingly higher on all other criteria to justify the risk.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Novelty bias.</strong> The evaluator is excited by a new technology and unconsciously inflates rubric scores to justify adoption. Mitigation: the rubric requires written justification for each score. The adversarial review from D14-001 applies to technology evaluations. A second evaluation of the same technology after a 30-day cooling period is recommended for high-impact adoptions.</li>
+<li><strong>Familiarity bias.</strong> The evaluator unconsciously penalizes new technologies to justify staying with current solutions. Mitigation: the rubric must also be applied to the current solution. If the current solution scores lower than the candidate, the burden of justification shifts to explaining why the current solution should be retained.</li>
+<li><strong>Proof-of-concept theater.</strong> The proof-of-concept is conducted as a formality, using unrealistically favorable conditions that do not reflect actual institutional use. Mitigation: the proof-of-concept must follow D14-002 experimental methodology with pre-registered success criteria. The conditions must approximate production use, including failure injection where appropriate.</li>
+<li><strong>Decision record neglect.</strong> Technology decisions are made informally without completing the TDR. Over time, no one remembers why a particular technology was chosen. Mitigation: R-TEV-01 makes the TDR mandatory. No technology is considered officially adopted without one.</li>
+<li><strong>Review date amnesia.</strong> The scheduled review date passes without a review. Technologies that should have been replaced or re-evaluated persist on inertia. Mitigation: review dates are recorded in the institutional scheduling system per D11-001. They are treated as mandatory calendar events.</li>
+<li><strong>Community collapse blindness.</strong> An adopted technology's community deteriorates, but the institution does not notice because it is behind the air gap. Mitigation: the air-gap crossing process (Domain 18) should include a scheduled check of adopted technology communities. Community health is a persistent monitoring obligation, not a one-time assessment.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If technologies have been adopted without TDRs:</strong> Conduct retroactive evaluations. Apply the rubric to all currently adopted technologies. File TDRs for each. Identify any technologies that would not have passed the evaluation and schedule replacement planning for them.</p>
+</li>
+<li>
+<p><strong>If review dates have been missed:</strong> Conduct the reviews immediately. Prioritize technologies that have been in use longest without review. Accept that some reviews will reveal that the institution has been using unsuitable technologies, and begin migration planning where necessary.</p>
+</li>
+<li>
+<p><strong>If a community collapse has been discovered:</strong> Assess the severity. If the technology is still functional but unsupported, begin searching for alternatives immediately. If the technology is actively deteriorating (bugs not fixed, security vulnerabilities unpatched), escalate to a priority evaluation and migration per the evolution framework.</p>
+</li>
+<li>
+<p><strong>If the evaluation process has degraded into formality:</strong> Re-read this article and D14-001. Conduct a genuine, adversarial evaluation of the most recently adopted technology. If the evaluation reveals concerns that were missed, re-evaluate other recent adoptions with the same rigor.</p>
+</li>
+<li>
+<p><strong>If exit costs are discovered to be higher than assessed:</strong> Document the true exit costs. Update the TDR. If the technology must still be replaced, the exit cost assessment informs the migration timeline. Use this experience to improve exit cost assessment in future evaluations.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The framework is being applied to the institution's founding technology stack. These initial evaluations establish the baseline TDR library and calibrate the rubric against real-world experience. Some rubric weights may need adjustment as the institution discovers which criteria are most predictive of actual suitability.</li>
+<li><strong>Years 5-15:</strong> The TDR library grows into a decision history. Patterns become visible: which criteria best predicted success? Which technologies lasted? Which failed unexpectedly? These patterns should inform rubric refinements. Scheduled reviews of adopted technologies begin producing re-evaluation data.</li>
+<li><strong>Years 15-30:</strong> Technology generations have turned over. The institution has experienced at least one major technology migration and can evaluate the framework's effectiveness based on how well it predicted success and failure. The framework itself is a technology that must be evaluated and evolved.</li>
+<li><strong>Years 30-50+:</strong> The TDR library is a multi-decade record of the institution's technology choices. It tells the story of what was tried, what worked, what failed, and why. For a successor operator, it is an invaluable guide to the institution's technological identity and the reasoning behind it.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Every technology decision I make now is a bet on the future. Some of those bets will be wrong. The purpose of the TDR is not to guarantee that every bet wins -- that is impossible. The purpose is to ensure that every bet is made consciously, with documented reasoning, so that the person who has to live with the consequences (whether that is future-me or a successor) knows why the bet was placed and can decide intelligently whether to let it ride or cut losses. The worst technology decision is not the one that turns out to be wrong. It is the one that nobody remembers making, for reasons nobody recorded, that nobody knows how to reverse.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting)</li>
+<li>CON-001 -- The Founding Mandate (air-gap constraint, lifetime operation, self-sovereignty)</li>
+<li>GOV-001 -- Authority Model (decision tiers for technology adoption)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (air-gap requirements, supply chain risk)</li>
+<li>OPS-001 -- Operations Philosophy (sustainability, complexity budget)</li>
+<li>D14-001 -- Research Philosophy (knowledge lifecycle, anti-echo-chamber structures)</li>
+<li>D14-002 -- Experimental Design for Solo Researchers (proof-of-concept methodology)</li>
+<li>D13-001 -- Evolution Philosophy (technology migration, change management)</li>
+<li>D11-001 -- Administration Philosophy (resource allocation, scheduling)</li>
+<li>D14-005 -- Negative Results Registry (documentation of rejected technologies)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

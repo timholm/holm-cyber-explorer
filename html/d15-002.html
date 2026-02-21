@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D15-002 — Safeguards Architecture - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li class="active"><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d15-002">
+  <h1>D15-002 &mdash; Safeguards Architecture</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D15-002</dd>
+  <dt>Domain</dt>
+  <dd>15 -- Ethics & Safeguards</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All articles in Domain 15 that address structural protections. Referenced by all domains for constraint and oversight context.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the safeguards architecture of the holm.chat Documentation Institution -- the structural mechanisms that prevent the institution from harming itself, from betraying its principles, and from concentrating power in ways that undermine its mission.</p>
+<p>ETH-001 defines what the institution values. This article defines the mechanisms that enforce those values when willpower alone is insufficient. The distinction is critical. Values without enforcement mechanisms are aspirations. Values with enforcement mechanisms are architecture.</p>
+<p>This article exists because of a specific insight about human institutions: they do not usually fail because their founders intended harm. They fail because the structures that were supposed to prevent harmful outcomes were inadequate, were bypassed, or were never built in the first place. Good intentions are not safeguards. Good intentions are the motivation for building safeguards. The safeguards themselves must be structural -- embedded in the institution's design, operating automatically or semi-automatically, and resistant to circumvention by any single actor, including the founder.</p>
+<p>This article is particularly important for a single-operator institution, where all power is held by one person and where the traditional checks and balances of larger organizations do not exist. The safeguards described here are not checks against malice. They are checks against the ordinary human failures of fatigue, forgetfulness, rationalization, and the slow drift that transforms a principled institution into a convenient one.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The structural mechanisms that enforce ethical principles in institutional design.
+- Power concentration prevention in a single-operator and small-institution context.
+- Oversight mechanisms that function without creating crippling bureaucracy.
+- Red lines -- absolute prohibitions that cannot be crossed regardless of justification.
+- The whistleblower problem in a small institution.
+- Self-constraint mechanisms: how the operator constrains their own future behavior.
+- Safeguard verification: how to confirm that safeguards are functioning.</p>
+<p><strong>Out of scope:</strong>
+- The ethical principles themselves (ETH-001).
+- Specific red line enumeration (ETH-002).
+- Ethical review of institutional changes (ETH-009).
+- Ethical evolution and amendment (ETH-011).
+- Day-to-day security operations (SEC-001 and Domain 3 articles).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Problem of Self-Governance</h3>
+<p>The holm.chat Documentation Institution faces a governance challenge that most institutions avoid: in a single-operator institution, the person who makes the rules is the same person who follows (or breaks) them. There is no board of directors to override a bad decision. There is no compliance officer to flag a policy violation. There is no whistleblower hotline because the person who would call it is the same person who would answer it.</p>
+<p>This is not an unsolvable problem, but it requires honest acknowledgment. The safeguards architecture described in this article is built on the premise that the operator is human -- capable of rationalization, fatigue, error, and drift -- and that structures must exist to catch what willpower does not.</p>
+<p>The analogy is the circuit breaker in an electrical system. The circuit breaker does not assume that the system designer intended to overload the circuit. It assumes that overloads happen -- through error, through unexpected load, through component failure -- and it cuts the circuit before the overload causes damage. The safeguards in this institution are circuit breakers for governance, ethics, and operations.</p>
+<h3>3.2 Power Concentration in Small Institutions</h3>
+<p>In a large institution, power is distributed by structure. Different people hold different roles. Authority is divided. Oversight is layered. Even in dysfunctional large institutions, the sheer number of participants makes total power concentration difficult (though not impossible).</p>
+<p>In a small institution -- and especially in a single-operator institution -- power concentration is the default state. The operator has total authority over all systems, all data, all decisions, and all documentation. They can modify records, change policies, override procedures, and reshape the institution's identity without anyone's approval.</p>
+<p>This concentration is, in the founding period, both necessary and unavoidable. Someone has to build the institution, and that someone needs the authority to make decisions across all domains. But the concentration must be constrained as the institution matures, and the mechanisms for that constraint must be built into the institution from the beginning, not added as an afterthought.</p>
+<p>The safeguards architecture addresses power concentration not by distributing power (which is not possible with a single operator) but by creating structural constraints on how power is exercised: mandatory waiting periods, required documentation, append-only logs that cannot be modified, and triggers that activate when certain boundaries are approached.</p>
+<h3>3.3 The Whistleblower Problem</h3>
+<p>In a traditional institution, the whistleblower is someone who reports wrongdoing to an authority outside the wrongdoer's control. In a single-operator institution, there is no such authority. The operator cannot whistleblow on themselves in any meaningful sense.</p>
+<p>This is a genuine gap in the safeguards architecture, and this article will not pretend otherwise. The mitigations are partial. They include: documentation that is visible to any future successor (making concealment harder), append-only logs that create an audit trail, regular self-audit procedures that force engagement with the institution's actual state, and -- when the institution grows beyond a single operator -- formal dissent channels.</p>
+<p>But the most important mitigation is cultural, not structural. The institution's culture, as established in these founding documents, must value self-criticism, honest reporting of failures, and the willingness to acknowledge when principles have been violated. This culture is fragile. It depends on the founder modeling it from the beginning. A culture of honest self-assessment cannot be retroactively installed after years of self-deception.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Three Layers of Safeguards</h3>
+<p>The institution's safeguards operate in three layers, from most fundamental to most operational:</p>
+<p><strong>Layer 1: Structural Safeguards.</strong> These are embedded in the institution's design and cannot be bypassed without a visible, documented act. They include:</p>
+<ul>
+<li>
+<p><strong>Append-only logs.</strong> The decision log (GOV-001) and operational logs (OPS-001) are append-only. Entries cannot be modified or deleted. Any attempt to alter them is itself a violation that must be recorded. This creates an indelible audit trail that any future operator or successor can review. The append-only property is enforced through both procedural discipline and, where possible, technical controls (write-once media, cryptographic chaining).</p>
+</li>
+<li>
+<p><strong>Mandatory waiting periods.</strong> GOV-001's waiting periods (90 days for Tier 1, 30 days for Tier 2, 7 days for Tier 3) are structural safeguards against impulsive decision-making. They cannot be shortened except under documented emergency conditions, and the documentation of the emergency is itself subject to review.</p>
+</li>
+<li>
+<p><strong>Separation of temporal authority.</strong> The institution distinguishes between the operator's immediate authority (Tier 4 operational decisions) and their constrained authority (Tier 1-3 decisions that require deliberation, documentation, and cooling-off periods). This is self-imposed separation of powers across time: the present self constrains the future self's ability to act impulsively.</p>
+</li>
+</ul>
+<p><strong>Layer 2: Procedural Safeguards.</strong> These are embedded in the institution's processes and require active circumvention to bypass. They include:</p>
+<ul>
+<li>
+<p><strong>Mandatory documentation.</strong> Every significant decision must be documented with its rationale. Decisions that are not documented are, by definition, ungoverned. The documentation requirement creates a record that can be audited and a process that forces the decision-maker to articulate their reasoning.</p>
+</li>
+<li>
+<p><strong>Regular audits.</strong> The operational tempo (OPS-001) includes quarterly governance health checks and annual comprehensive reviews. These audits are not optional. They force the operator to compare the institution's actual state against its documented principles and to record any discrepancies.</p>
+</li>
+<li>
+<p><strong>Cross-domain review requirements.</strong> Decisions that affect multiple domains cannot be made within a single domain. They must be reviewed against the principles and constraints of all affected domains. This prevents the tunnel vision that comes from optimizing one domain at the expense of others.</p>
+</li>
+</ul>
+<p><strong>Layer 3: Cultural Safeguards.</strong> These are embedded in the institution's norms and depend on the operator's commitment to uphold them. They include:</p>
+<ul>
+<li>
+<p><strong>Commentary as confession.</strong> The Commentary Sections of every article are designed as spaces for honest reflection -- including reflection on failures, doubts, and mistakes. The founding practice of using Commentary Sections for genuine self-assessment sets a cultural norm that subsequent operators are expected to follow.</p>
+</li>
+<li>
+<p><strong>The principle of charitable interpretation for successors.</strong> When a successor finds a decision they disagree with, the norm is to assume the decision was made in good faith with the best information available at the time, and to investigate before overturning. This protects against knee-jerk revision by new operators while still allowing for genuine course correction.</p>
+</li>
+<li>
+<p><strong>The practice of discomfort.</strong> Effective safeguards are uncomfortable. The adversarial review in research (D14-001) is uncomfortable. The annual security audit (SEC-001) is uncomfortable. The quarterly governance health check is uncomfortable. If the safeguards are never uncomfortable, they are not functioning.</p>
+</li>
+</ul>
+<h3>4.2 Red Lines: The Architecture of Absolute Prohibition</h3>
+<p>Red lines are the actions that the institution will never take, regardless of circumstances, justification, or pressure. They are enumerated in ETH-002, but the architecture that enforces them is defined here.</p>
+<p>Red lines are different from rules in a fundamental way: rules can be overridden by sufficient authority. Red lines cannot. There is no governance tier that can authorize a red line violation. There is no emergency clause that suspends a red line. There is no amendment process that is faster than the full Tier 1 process with its 90-day waiting period.</p>
+<p>The architectural enforcement of red lines includes:</p>
+<ul>
+<li>
+<p><strong>Visibility.</strong> Red lines are documented in the most prominent location in the documentation corpus. They are referenced in the onboarding process for any new operator. They are reviewed during every annual comprehensive review.</p>
+</li>
+<li>
+<p><strong>Tripwire detection.</strong> For each red line, the institution defines one or more observable conditions that would indicate the red line is being approached. These tripwires are monitored during regular audits. A tripped tripwire does not necessarily mean a violation has occurred -- it means investigation is required.</p>
+</li>
+<li>
+<p><strong>Accountability trail.</strong> Any action that comes within proximity of a red line must be documented with an explicit explanation of why the action did not cross the line. This documentation is preserved in the decision log and is subject to review by any future operator.</p>
+</li>
+<li>
+<p><strong>No retrospective justification.</strong> A red line violation cannot be justified after the fact. If a red line was crossed, the response is: acknowledge the violation, document it, assess the damage, remediate, and strengthen the safeguard. The response is not: explain why crossing the line was actually acceptable in this case. Red lines that can be justified in retrospect are not red lines; they are guidelines.</p>
+</li>
+</ul>
+<h3>4.3 Oversight Without Bureaucracy</h3>
+<p>The institution must balance two competing needs: meaningful oversight of its own operations, and operational lightness that does not crush a single operator under administrative burden. The solution is oversight that is embedded in the operational rhythm rather than layered on top of it.</p>
+<p><strong>Embedded oversight</strong> means that oversight activities are integrated into the existing operational tempo rather than being separate activities with separate schedules. The daily health check (OPS-001) includes a quick ethical gut-check: is anything about today's activities troubling? The weekly review includes a check against recent decisions: did anything this week deviate from established procedures? The quarterly review includes a governance health assessment. The annual review includes a comprehensive ethical audit.</p>
+<p>This approach works because it makes oversight a habit rather than an event. An annual ethics audit that occurs in isolation is easily gamed or performed perfunctorily. Ethics awareness that is woven into daily operations becomes part of the operator's reflexive behavior.</p>
+<p><strong>Escalation triggers</strong> provide a mechanism for moving from routine oversight to intensive investigation when something seems wrong. The triggers include:</p>
+<ul>
+<li>A decision that cannot be easily classified into the tier system (suggests the decision is more significant than it appears).</li>
+<li>A procedure that has been skipped or deferred more than twice in succession (suggests the procedure is being avoided).</li>
+<li>A discrepancy between records and reality discovered during any audit.</li>
+<li>A gut-level discomfort about an action or decision that persists after reflection.</li>
+</ul>
+<p>When a trigger fires, the response is not punitive. It is investigative. The operator documents the trigger, investigates the cause, and determines whether a structural change is needed. The goal is institutional learning, not institutional punishment.</p>
+<h3>4.4 The Successor as Auditor</h3>
+<p>The most powerful safeguard against long-term institutional drift is the succession event itself. When a new operator assumes responsibility for the institution, they bring fresh eyes, different assumptions, and no personal attachment to the decisions of their predecessor. They will read the decision logs, review the Commentary Sections, and examine the institution's actual state against its documented principles.</p>
+<p>The institution is designed with this eventual audit in mind. The append-only logs provide an unbroken record. The Commentary Sections provide context. The decision rationales provide the reasoning that can be evaluated by a fresh perspective. The red line accountability trail shows how close the institution came to its absolute limits.</p>
+<p>This is why documentation integrity is itself a safeguard. An institution that can document itself honestly is an institution that can be audited honestly. An institution that can be audited honestly is an institution that can be corrected. The path from honest documentation to institutional health is clear and direct.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-SAF-01:</strong> All safeguard mechanisms described in this article are mandatory. They may be refined, extended, or replaced with better mechanisms through the appropriate governance tier (Tier 2 minimum), but the functions they serve must always be fulfilled. The institution may never operate without structural safeguards against power concentration, impulsive decision-making, and red line violation.</li>
+<li><strong>R-SAF-02:</strong> Append-only logs may not be modified, deleted, or retroactively altered. Corrections to log entries must be made as new entries that reference and correct the original. Any technical or procedural mechanism that enables retroactive modification of append-only logs is a safeguard violation.</li>
+<li><strong>R-SAF-03:</strong> Red lines may only be modified through the Tier 1 process defined in GOV-001, with the full 90-day waiting period and no exceptions. Proposed modifications to red lines must be documented in the decision log and the Commentary Section of ETH-002, with full rationale, at the time they are proposed -- not at the time they are ratified.</li>
+<li><strong>R-SAF-04:</strong> The institution must conduct a safeguard health assessment at least annually. This assessment verifies that all three layers of safeguards (structural, procedural, cultural) are functioning. A safeguard that has never been triggered is not necessarily functioning; it may be non-functional or may not be monitoring the right conditions. The assessment must include a test of at least one tripwire mechanism.</li>
+<li><strong>R-SAF-05:</strong> When the institution grows beyond a single operator, formal dissent channels must be established within 90 days. These channels must allow any member of the institution to raise ethical concerns without fear of retaliation, and must include a path to raise concerns about the operator or senior decision-maker themselves.</li>
+<li><strong>R-SAF-06:</strong> No single operator may hold the sole key to any mechanism that could destroy institutional data or documentation. Destructive capabilities must require either multiple keys (in a multi-person institution) or a mandatory waiting period with documented justification (in a single-person institution). The principle is: destruction is never urgent. If it seems urgent, the urgency itself is a red flag.</li>
+<li><strong>R-SAF-07:</strong> Every safeguard mechanism must be documented in plain language, including: what it protects against, how it works, how to verify it is functioning, and what to do if it fails. Safeguards that are not understood are safeguards in name only.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Safeguard erosion.</strong> Safeguards are gradually weakened through small exceptions. Each exception is individually justified. Collectively, they hollow out the safeguard until it no longer functions. Mitigation: exceptions to safeguards must be logged and reviewed during the annual safeguard health assessment. A pattern of exceptions is a finding requiring structural response.</li>
+<li><strong>Safeguard theater.</strong> The institution maintains the appearance of safeguards without the substance. Audits are conducted but do not genuinely challenge. Waiting periods are observed but the deliberation during them is perfunctory. Logs are maintained but never reviewed. Mitigation: the practice of discomfort (Section 4.1). If safeguards are never uncomfortable, they are not functioning.</li>
+<li><strong>Power concentration despite safeguards.</strong> The operator finds ways to exercise unconstrained authority while technically complying with the safeguard mechanisms. This is the "letter versus spirit" problem, and it is the hardest failure mode to prevent in a single-operator institution. Mitigation: the cultural safeguards layer, which depends on the operator's genuine commitment to the institution's principles. The succession audit (Section 4.4) provides eventual accountability, but it may come too late to prevent damage.</li>
+<li><strong>Safeguard proliferation.</strong> The institution accumulates so many safeguard mechanisms that they collectively impose an unsustainable burden. The operator begins to ignore all safeguards because there are too many to follow. Mitigation: the Lightness Principle from D11-001 applies to safeguards as well. Every safeguard must justify its existence in terms of the specific harm it prevents. Safeguards that duplicate each other should be consolidated.</li>
+<li><strong>Whistleblower vacuum.</strong> In a single-operator institution, ethical violations have no reporting path because the violator and the authority are the same person. The institution may drift into unethical territory with no mechanism for correction until a succession event. Mitigation: this failure mode is acknowledged honestly. The mitigations are partial: documentation visibility, append-only logs, regular self-audit, and the cultural practice of honest self-assessment. They are imperfect. The imperfection is documented (per ETH-001, Principle 6).</li>
+<li><strong>Red line reinterpretation.</strong> Rather than formally amending a red line (which requires the full Tier 1 process), the operator reinterprets the red line's meaning to exclude the action they want to take. "The red line says we do not do X, but what I am doing is technically Y, which is different from X." Mitigation: red line interpretations must be documented in the accountability trail (Section 4.2). Reinterpretations that narrow the scope of a red line are treated with the same skepticism as proposed amendments.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If safeguards have eroded:</strong> Conduct a complete safeguard inventory. For each safeguard mechanism in this article, verify: does it still exist? Has it been modified? Has it been circumvented? Has it been tested? For each deficiency found, create a remediation plan with a deadline. Remediation of structural safeguards takes priority over procedural and cultural safeguards.</li>
+<li><strong>If safeguards have become theater:</strong> This is harder to detect than erosion because the forms are still being followed. The diagnostic is discomfort: if no safeguard activity in the past year has caused the operator to hesitate, reconsider, or change course, the safeguards may not be functioning. Redesign the audit process to be more adversarial. Add surprise elements. Change the sequence or timing.</li>
+<li><strong>If power has concentrated beyond safe limits:</strong> In a single-operator institution, this is the normal state during the founding period. The recovery is to accelerate the maturation of structural safeguards: ensure append-only logs are functioning, ensure waiting periods are being observed, and -- if possible -- bring in an external perspective (a trusted advisor, a designated successor) who can provide independent review.</li>
+<li><strong>If a red line has been crossed:</strong> Acknowledge the violation immediately and completely in the decision log. Do not minimize or rationalize. Assess the damage caused by the violation. Remediate the damage to the extent possible. Strengthen the safeguard mechanism that failed to prevent the violation. Record the entire event in the Commentary Section of both this article and ETH-002. If the operator cannot bring themselves to acknowledge the violation, that itself is a finding -- it means the cultural safeguards have failed, and structural safeguards must be strengthened to compensate.</li>
+<li><strong>If the whistleblower vacuum is creating undetected drift:</strong> This is the scenario for which no perfect solution exists. The partial solutions are: increase the frequency of self-audits, make the audit criteria more specific and adversarial, create a sealed letter or document describing the institution's current state (to be compared against reality at a future date), and -- if at all possible -- seek external review from a trusted person. The succession plan (GOV-001) should be accelerated to bring in a fresh perspective sooner rather than later.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The safeguards architecture is new and the operator is its sole executor. The structural safeguards (append-only logs, waiting periods) should be established and tested. The procedural safeguards (audits, reviews) should be integrated into the operational tempo. The cultural safeguards (honest commentary, practice of discomfort) should be modeled by the founder.</li>
+<li><strong>Years 5-15:</strong> The safeguards should be mature and tested by experience. At least one instance of a safeguard catching or preventing a problem should have occurred -- if not, the safeguards may not be calibrated correctly. The focus shifts to maintaining discipline and preventing the erosion that comes with years of no visible threats.</li>
+<li><strong>Years 15-30:</strong> If the institution grows beyond a single operator, formal dissent channels (R-SAF-05) must be established. The power concentration safeguards become more important as the institution's complexity increases and the temptation to bypass procedures grows with familiarity.</li>
+<li><strong>Years 30-50+:</strong> The safeguards architecture has been tested by succession. A new operator has inherited the institution and audited its actual state against its documented principles. The findings from that audit should inform a comprehensive revision of the safeguards architecture, carried out through the Tier 2 process. The safeguards that survived the succession test are validated. Those that did not must be redesigned.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I am writing rules to constrain myself. This is an unusual act, and I want to be honest about its limitations.</p>
+<p>The fundamental problem with self-imposed constraints is that the self that imposes them is the same self that can remove them. I can write that append-only logs must never be altered, but I am the one maintaining the logs. I can write that red lines must never be crossed, but I am the one who defines what "crossed" means in practice. I can write that the waiting periods must be observed, but I am the one counting the days.</p>
+<p>The structural safeguards help. An append-only log on write-once media is genuinely harder to alter than a text file. A waiting period enforced by a calendar notification is genuinely harder to ignore than a resolution made in your own head. But no structural safeguard in a single-operator institution can be made truly tamper-proof against the operator. The operator has root access to everything, including the safeguards themselves.</p>
+<p>What I am relying on, ultimately, is two things. First, the accumulation of documentation. Every decision, every log entry, every commentary note is a witness. Even if I am the only person reading them today, they will be read by someone else eventually -- a successor, an heir, a future maintainer. The documentation makes concealment harder and honesty easier. It creates a bias toward integrity because the cost of documented dishonesty is higher than the cost of documented honesty.</p>
+<p>Second, I am relying on the cultural habit of self-criticism. If I practice honest self-assessment from the beginning -- if I genuinely use the Commentary Sections to record doubts, failures, and concerns -- then that practice becomes a reflex over time. It becomes harder to stop being honest than to continue being honest. The cultural safeguard is fragile in theory but powerful in practice, because habits, once formed, resist change.</p>
+<p>I record this analysis not because I have solved the self-governance problem but because I want future readers to know that the founder was aware of the problem, was honest about its difficulty, and built the best protections available while acknowledging they were imperfect. Perfect is not available. Honest and rigorous is.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (all six principles, especially Principle 2 and Principle 6)</li>
+<li>ETH-002 -- Red Lines: Absolute Prohibitions (the specific red lines enforced by this architecture)</li>
+<li>CON-001 -- The Founding Mandate (institutional mission and boundaries)</li>
+<li>GOV-001 -- Authority Model (decision tiers, waiting periods, succession protocol, append-only decision log)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (operational security threats, the human as the system)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo, audit cycles, sustainability requirement)</li>
+<li>D11-001 -- Administration Philosophy (Lightness Principle, applied to safeguard design)</li>
+<li>D14-001 -- Research Philosophy (adversarial review as a safeguard structure)</li>
+<li>Stage 1 Documentation Framework, Domain 15: Ethics &amp; Safeguards (article list, dependencies, writing schedule)</li>
+<li>ETH-003 through ETH-015 (subsequent articles implementing and elaborating this architecture)</li>
+</ul>
+<hr />
+<hr />
+<p><em>End of Stage 2 Domain Philosophy Articles -- Batch 3</em></p>
+<p><strong>Document Total:</strong> 5 articles
+<strong>Domains Covered:</strong> 11 (Administration), 12 (Disaster Recovery), 13 (Evolution &amp; Adaptation), 14 (Research &amp; Theory), 15 (Ethics &amp; Safeguards)
+<strong>Combined Estimated Word Count:</strong> ~14,500 words
+<strong>Status:</strong> All five articles ratified as of 2026-02-16.
+<strong>Next Stage:</strong> Subsequent domain-specific articles (ADM-002+, DR-002+, EVL-002+, RES-002+, ETH-003+) derive their philosophical foundation from these five documents.</p>
+</section>
+</article>
+</main>
+</body>
+</html>

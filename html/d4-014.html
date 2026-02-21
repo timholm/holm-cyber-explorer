@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D4-014 — Physical Infrastructure Evolution Path - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li class="active"><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d4-014">
+  <h1>D4-014 &mdash; Physical Infrastructure Evolution Path</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D4-014</dd>
+  <dt>Domain</dt>
+  <dd>4 -- Infrastructure &amp; Power</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D4-001, D4-007, D4-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>None (long-term planning article; informs all future infrastructure decisions)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the framework for planning and executing major infrastructure transitions over the institution's fifty-year horizon. While other Domain 4 articles address the current infrastructure and its maintenance, this article addresses the future: how the institution transitions from one generation of hardware to the next, from one power architecture to a better one, from one physical site to another, and from current technologies to their successors that do not yet exist.</p>
+
+<p>Infrastructure evolution is inevitable. No hardware lasts fifty years. No power technology remains optimal for five decades. No physical site is guaranteed to remain suitable indefinitely. The question is not whether the institution's infrastructure will change, but whether those changes will be planned and deliberate or forced and chaotic. This article ensures they are planned.</p>
+
+<p>The article operates at a different timescale than the other Domain 4 articles. Where D4-011 thinks in days and months, and D4-004 thinks in years, this article thinks in decades. It does not prescribe specific actions to be taken at specific times. Instead, it establishes the principles, triggers, and processes by which major infrastructure transitions are identified, planned, and executed.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The categories of major infrastructure transition: hardware generation change, power system overhaul, site migration, and technology paradigm shift.</li>
+<li>Transition triggers: the conditions that indicate a major transition is needed.</li>
+<li>The transition planning process: how a transition is evaluated, planned, tested, and executed.</li>
+<li>Risk management during transitions: maintaining institutional continuity while infrastructure is changing.</li>
+<li>The five-year infrastructure review: the periodic assessment that feeds into evolution planning.</li>
+<li>Principles for evaluating future technologies that do not yet exist.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>Routine hardware replacement within the same generation (see D4-004).</li>
+<li>Incremental infrastructure improvements (adding a drive, upgrading a cable) that do not constitute a major transition.</li>
+<li>Governance decisions regarding resource allocation for transitions (see GOV-001).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<p>The history of computing infrastructure is a history of transitions. Mainframes gave way to minicomputers, which gave way to microcomputers, which gave way to commodity servers. Tape storage gave way to magnetic disk, which is giving way to solid-state storage. Lead-acid batteries are being displaced by lithium-ion, which may eventually be displaced by solid-state batteries or other technologies. Each transition offered improvements in capability, cost, or reliability -- and each transition posed risks to organizations that depended on the preceding technology.</p>
+
+<p>Organizations that navigate transitions successfully share common traits: they monitor the technology landscape continuously, they evaluate new technologies against their specific needs rather than following industry trends uncritically, they plan transitions well in advance, they execute transitions incrementally rather than all at once, and they maintain fallback options throughout the transition period.</p>
+
+<p>Organizations that fail at transitions also share common traits: they ignore the technology landscape until a crisis forces a transition, they adopt new technologies without adequate evaluation, they attempt wholesale replacements without incremental validation, and they abandon their old infrastructure before the new infrastructure is proven.</p>
+
+<p>This article codifies the successful approach for the institution. The institution does not chase technology trends. It does not adopt new hardware because it is new. It monitors, evaluates, plans, tests, transitions incrementally, and maintains fallbacks. This is slower than the industry norm. It is also safer, which is what matters for a fifty-year institution.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>14.1 Categories of Major Transition</h3>
+
+<p><strong>Hardware generation change:</strong> The computing hardware platform (processor architecture, motherboard standards, memory type) changes to a new generation. This occurs roughly every seven to fifteen years as current-generation hardware becomes unavailable and its replacements use different interfaces, form factors, or architectures. Example: transitioning from DDR4 to DDR5 memory, or from SATA to NVMe-only storage.</p>
+
+<p><strong>Power system overhaul:</strong> The power generation, storage, or distribution system is significantly redesigned. This may be triggered by: battery technology improvements that justify replacing the entire battery bank; solar panel degradation requiring panel replacement with a newer, more efficient generation; power demand growth that exceeds the current system's capacity; or regulatory changes affecting power equipment. Expected frequency: every ten to twenty years.</p>
+
+<p><strong>Site migration:</strong> The institution moves to a different physical location. This is the most disruptive transition and is triggered only by: the current site becoming unsuitable (structural failure, flood risk, security compromise, operator relocation); a significantly better site becoming available; or the institution's growth exceeding the current site's capacity. Expected frequency: perhaps once or twice in fifty years, or never.</p>
+
+<p><strong>Technology paradigm shift:</strong> A fundamental change in the technology landscape that affects the institution's core assumptions. Examples that may occur within the fifty-year horizon: the obsolescence of magnetic storage; the transition from silicon-based to alternative computing substrates; the standardization of new network technologies that make Ethernet obsolete; the emergence of storage technologies with fundamentally different longevity or reliability characteristics. These are inherently unpredictable.</p>
+
+<h3>14.2 Transition Triggers</h3>
+
+<p>A major transition is triggered when any of the following conditions is met:</p>
+
+<ul>
+<li><strong>Availability trigger:</strong> Critical hardware components can no longer be procured from any source, even as used or refurbished units. The spare parts inventory (D4-012) cannot be replenished. The institution is consuming its last reserves of a component type with no replacement available.</li>
+<li><strong>Capability trigger:</strong> The current infrastructure cannot perform a function required by the institution, and incremental upgrades cannot bridge the gap. Example: the institution's storage needs exceed the capacity of any available drive compatible with the current server architecture.</li>
+<li><strong>Reliability trigger:</strong> The current infrastructure's failure rate has increased to the point where maintenance and repair consume an unsustainable portion of the operator's time, or where the risk of data loss from hardware failure has become unacceptably high.</li>
+<li><strong>Site trigger:</strong> The physical site's risk profile has changed significantly (new flood risk, structural deterioration, security environment change) as identified during the annual site assessment (D4-011).</li>
+<li><strong>Opportunity trigger:</strong> A new technology has matured sufficiently that transitioning to it would provide substantial benefits in reliability, longevity, or maintainability without introducing new risks. This trigger requires careful evaluation to avoid adopting immature technology.</li>
+</ul>
+
+<h3>14.3 The Transition Planning Process</h3>
+
+<p>When a transition trigger is identified, the following process is followed:</p>
+
+<ol>
+<li><strong>Assessment (1-3 months).</strong> The operator documents: the trigger and its urgency; the current state of the infrastructure being transitioned; the available alternatives; and a preliminary evaluation of each alternative against D4-007 hardware selection criteria. The assessment is reviewed by any available advisors or co-operators.</li>
+<li><strong>Planning (1-6 months).</strong> The operator develops a detailed transition plan including: the target state (what the infrastructure will look like after the transition); the migration sequence (which components are transitioned in what order); the testing plan (how each stage is validated before proceeding to the next); the fallback plan (how to revert to the previous state at each stage if the transition fails); the timeline; and the resource requirements (cost, time, tools).</li>
+<li><strong>Testing (1-3 months).</strong> Before any production infrastructure is modified, the new hardware or technology is tested in a non-critical role. If possible, a parallel system is constructed using the new technology and operated alongside the production system. Data integrity is verified on the new system. Performance is validated. Compatibility with existing software (Domain 5) is confirmed.</li>
+<li><strong>Incremental transition (1-12 months, depending on scope).</strong> The transition is executed in stages, with each stage validated before the next begins. At no point during the transition is the institution without a functional, verified system. The old infrastructure is not decommissioned until the new infrastructure has been operating successfully for a defined validation period (minimum 30 days for hardware transitions; minimum 90 days for site migrations).</li>
+<li><strong>Validation and documentation (1 month).</strong> After the transition is complete and the validation period has passed: the new infrastructure is documented per D4-013; the old infrastructure is decommissioned per D4-010; all Domain 4 articles affected by the transition are updated; and a transition retrospective is recorded in the decision log and in the Founder Commentary sections of the relevant articles.</li>
+</ol>
+
+<h3>14.4 The Five-Year Infrastructure Review</h3>
+
+<p>Every five years, the entire Domain 4 is reviewed with the question: "If we were starting fresh today with what we know now, what would we do differently?" This review is not a trigger for immediate action. It is a planning exercise that identifies emerging transition needs, evaluates the current infrastructure's remaining useful life, and updates the institution's long-term infrastructure roadmap.</p>
+
+<p>The five-year review covers:</p>
+<ul>
+<li>The health and remaining useful life of all major infrastructure components.</li>
+<li>Changes in the technology landscape since the last review.</li>
+<li>Changes in the institution's needs (growth in storage, changes in operational requirements).</li>
+<li>Changes in the physical site's risk profile.</li>
+<li>The adequacy of the spare parts inventory for the next five years.</li>
+<li>Any transition triggers that are approaching but not yet activated.</li>
+</ul>
+
+<p>The review produces a five-year infrastructure outlook document that is stored in the institutional records and referenced during annual reviews and procurement decisions.</p>
+
+<h3>14.5 Principles for Evaluating Future Technologies</h3>
+
+<p>When evaluating technologies that are new, emerging, or not yet widely deployed:</p>
+
+<ul>
+<li><strong>Maturity over novelty.</strong> The institution does not adopt version 1.0 of any technology. It waits until a technology has demonstrated reliability in production environments over multiple years. The minimum maturity threshold is three years of widespread production use.</li>
+<li><strong>Compatibility over optimization.</strong> New technology that integrates with existing infrastructure is preferred over technology that requires a wholesale replacement. Incremental adoptability reduces transition risk.</li>
+<li><strong>Reversibility over commitment.</strong> Transitions that can be reversed (fallback to previous technology) are preferred over one-way transitions. The institution should never be in a position where a failed transition leaves it without a functional system.</li>
+<li><strong>Standards over proprietary.</strong> New technologies built on open standards are preferred over proprietary alternatives, even if the proprietary option offers superior performance. Open standards provide the multi-source availability that the institution requires (R-D4-11).</li>
+<li><strong>Demonstrated longevity over projected longevity.</strong> A technology that has proven its longevity over a decade is more trustworthy than a technology projected to last a decade based on manufacturer claims. Manufacturers are optimistic. Physics is not.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D4-80: Five-Year Review Is Mandatory.</strong> The five-year infrastructure review is conducted on schedule. It may not be deferred. The review does not require any immediate action, but it must be performed and documented.</li>
+<li><strong>R-D4-81: No Big Bang Transitions.</strong> Major infrastructure transitions are executed incrementally, with validation at each stage and the ability to fall back at each stage. Wholesale, all-at-once replacements are prohibited for any infrastructure that contains or serves institutional data.</li>
+<li><strong>R-D4-82: Parallel Operation Before Cutover.</strong> For any transition involving data storage or computing hardware, the new system must operate in parallel with the old system for a minimum validation period (30 days for hardware, 90 days for site migration) before the old system is decommissioned.</li>
+<li><strong>R-D4-83: Transition Documentation.</strong> Every major transition is documented with: the trigger, the plan, the execution log, the validation results, and the retrospective. This documentation is retained permanently as institutional knowledge for future transitions.</li>
+<li><strong>R-D4-84: Three-Year Maturity Minimum.</strong> No technology is adopted for a critical institutional role until it has been in widespread production use for at least three years. Exceptions require a formal risk assessment and approval at the highest governance tier.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Transition avoidance.</strong> The operator defers transitions indefinitely because the current infrastructure "still works," even as failure rates climb, spare parts dwindle, and the technology gap widens. When a transition is finally forced by a crisis, it is rushed, unplanned, and risky. Mitigation: the five-year review provides regular opportunities to confront the need for transitions. The transition triggers are objective criteria, not subjective judgments.</li>
+<li><strong>Premature adoption.</strong> The operator adopts a new technology before it has matured, attracted by its theoretical advantages. The technology proves unreliable in practice, causing more disruption than the old infrastructure it replaced. Mitigation: R-D4-84 imposes a three-year maturity minimum. The evaluation principles in Section 14.5 prioritize demonstrated reliability over projected performance.</li>
+<li><strong>Transition failure.</strong> The new infrastructure does not perform as expected. Data is corrupted during migration. Compatibility issues emerge that were not caught during testing. Mitigation: R-D4-81 and R-D4-82 ensure that the old infrastructure remains operational throughout the transition. At every stage, the operator can fall back to the previous state. The testing phase (Section 14.3, step 3) catches most issues before they affect production data.</li>
+<li><strong>Scope creep during transition.</strong> A hardware generation change expands into a simultaneous power system overhaul, network redesign, and software upgrade. The combined scope overwhelms the operator and increases the risk of errors. Mitigation: transitions are planned with a defined scope. If multiple transitions are needed, they are sequenced -- one transition at a time, with a stabilization period between each.</li>
+<li><strong>Knowledge loss during transition.</strong> The operator who understands the old infrastructure retires or becomes unavailable before the transition is complete, leaving the successor to manage a half-old, half-new infrastructure they do not fully understand. Mitigation: transition documentation (R-D4-83) captures the design of both old and new systems. D4-013 ensures both are documented to standalone comprehensibility standards.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If a transition fails during execution:</strong> Halt the transition at the current stage. Assess the nature of the failure. If the failure is in the new infrastructure, revert to the old infrastructure (this is possible because R-D4-82 requires parallel operation). Diagnose the cause of the failure. If it can be addressed, revise the plan and restart from the failed stage. If it cannot be addressed, abandon the transition, decommission the new hardware, and document the lessons learned.</li>
+<li><strong>If a forced transition occurs (crisis-driven, without planning):</strong> Prioritize data preservation above all else. Use D4-009 degradation procedures to maintain the most critical systems while the transition is being executed. Complete the transition as quickly as safety allows, then immediately begin a retrospective and documentation process. The forced transition should be followed by a comprehensive review of why the five-year review and transition triggers failed to anticipate the crisis.</li>
+<li><strong>If the five-year review identifies an imminent transition need:</strong> Initiate the transition planning process (Section 14.3) immediately, with an accelerated timeline. Allocate the operator's time primarily to transition planning until the plan is complete. If the trigger is an availability concern (spare parts running out), execute an immediate stockpiling order for remaining available components to extend the current infrastructure's life while the transition is planned.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> No major transitions are expected. The initial infrastructure is being established and refined. The first five-year review occurs at the end of this period and establishes the baseline for all future comparisons. This review will likely identify minor improvements but no major transitions.</li>
+<li><strong>Years 5-15:</strong> The first hardware generation transition is likely during this period. The founding-era drives, servers, and possibly batteries will reach end-of-life. This transition will be the institution's first test of the processes in this article. The lessons learned will be invaluable for refining the transition planning process.</li>
+<li><strong>Years 15-30:</strong> Multiple transitions may overlap: second-generation hardware reaching end-of-life, power system overhaul, possible site considerations. The institution's experience with transitions is now substantial. The five-year review may begin to identify technology paradigm shifts on the horizon (new storage technologies, new computing architectures).</li>
+<li><strong>Years 30-50:</strong> The institution has navigated several major transitions. The infrastructure bears no resemblance to its founding configuration. The principles in this article -- plan before acting, transition incrementally, validate before committing, document everything -- have been tested and refined by decades of practice. The institution's ability to evolve its infrastructure deliberately and safely is itself a core institutional capability, perhaps as important as any individual technology choice.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong></p>
+
+<p>This is the most speculative article in Domain 4, and deliberately so. I cannot predict what hardware will be available in 2046 or what power technology will dominate in 2066. I can predict that transitions will be necessary, and I can establish the discipline by which they are managed.</p>
+
+<p>The temptation with long-horizon planning is to predict the future in detail: "In 2040, we will transition to quantum storage; in 2055, we will migrate to a solid-state battery system." This is fiction masquerading as planning. The future is not knowable in that specificity. What is knowable is the process: monitor, evaluate, plan, test, transition, validate. This process is technology-independent. It works for SATA-to-NVMe as well as it would work for NVMe-to-whatever-comes-next.</p>
+
+<p>The other temptation is to ignore the future entirely: "We will deal with it when we get there." This is the path to crisis-driven transitions, which are the most dangerous kind. The five-year review exists specifically to prevent this. It forces the operator to look up from the daily maintenance and ask: where is this infrastructure headed? What is coming? What should we be preparing for?</p>
+
+<p>To my successors: the specific technologies in this article's examples will be historical curiosities by the time you read this. The principles will still apply. Plan your transitions. Test your new systems. Keep the old ones running until the new ones are proven. And document everything, so that the person after you can learn from your experience as you are learning from mine.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D4-001 -- Infrastructure Philosophy (foundational principles that persist through transitions)</li>
+<li>D4-004 -- Network Hardware Lifecycle Management (routine lifecycle management within a generation)</li>
+<li>D4-007 -- Hardware Selection Criteria (evaluation criteria for new hardware generations)</li>
+<li>D4-009 -- Graceful Degradation (continuity procedures during transitions)</li>
+<li>D4-010 -- Hardware Decommissioning (end-of-life process for replaced infrastructure)</li>
+<li>D4-011 -- Maintenance Schedules (annual site assessment and five-year review integration)</li>
+<li>D4-012 -- Spare Parts and Inventory Management (inventory overhaul during transitions)</li>
+<li>D4-013 -- Infrastructure Documentation Standards (documentation requirements for transitions)</li>
+<li>GOV-001 -- Authority Model (governance tier for major infrastructure decisions)</li>
+<li>Domain 13 -- Evolution &amp; Adaptation (institutional evolution principles)</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

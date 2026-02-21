@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D13-008 — Data Format Migration and Preservation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li class="active"><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d13-008">
+  <h1>D13-008 &mdash; Data Format Migration and Preservation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D13-008</dd>
+  <dt>Title</dt>
+  <dd>Data Format Migration and Preservation</dd>
+  <dt>Domain</dt>
+  <dd>13 -- Evolution &amp; Adaptation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, D13-001, D13-002, D13-006, D13-007, D6-001, D6-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D13-009, D13-013. Referenced by any article involving data storage, archival, or format decisions.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how data is migrated from one format to another without loss of content, structure, or meaning. Data outlives every other component of the institution. Hardware is replaced every five to ten years. Software is replaced every three to seven years. But data -- the actual records, documents, configurations, and institutional knowledge -- must survive for the entire lifetime of the institution. The format in which data is stored is the vessel that carries it through time, and when that vessel becomes fragile, the data must be transferred to a new vessel without spilling a drop.</p>
+
+<p>D13-001 R-EVL-04 mandates that all data must be stored in formats that can be read without the originating software. D13-002 Section 4.4 provides the operational procedure for format conversions. This article goes deeper: it addresses how to assess format obsolescence risk before it becomes acute, how to select canonical formats that maximize longevity, how to verify that a conversion preserved everything that matters, and how to maintain a format genealogy that traces the history of every data set through its format transformations.</p>
+
+<p>Data format migration is the highest-risk category of evolution activity because it touches the institution's irreplaceable asset: its data. A failed hardware swap can be retried with another piece of hardware. A failed software migration can be rolled back. A failed data format conversion that goes undetected can corrupt data permanently. This article establishes the safeguards that prevent that outcome.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- Format obsolescence risk assessment: how to determine when a format is approaching end of viability.
+- Canonical format selection criteria: how to choose formats that maximize longevity and interoperability.
+- The format conversion pipeline: the step-by-step process for converting data between formats.
+- Conversion verification methods: how to confirm that converted data is equivalent to the original.
+- The format genealogy record: tracking the history of format transformations for each data set.
+- The format watch list: monitoring formats in use for signs of approaching obsolescence.
+- Round-trip conversion testing as a verification technique.</p>
+
+<p><strong>Out of scope:</strong>
+- Specific format recommendations (these change with the technology landscape).
+- Generic data backup procedures (D6-002).
+- Documentation format migration (D13-009 handles documentation-specific concerns).
+- Data integrity verification for non-migration purposes (D6-001).</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Format Mortality Problem</h3>
+<p>Data formats die. Not suddenly, like hardware, but gradually, like languages. First, the primary authoring tool stops being developed. Then, alternative tools stop supporting the format. Then, the specification becomes hard to find. Then, the only readers left are specialized archival tools that may or may not handle every feature of the format. Eventually, the format is effectively dead: the data it contains is theoretically accessible but practically unreachable without extraordinary effort.</p>
+
+<p>The institution cannot afford to let its data follow this trajectory. Format mortality must be anticipated and preempted. Data must be migrated to living formats while the dying format can still be read reliably, not after reading it has become a forensic exercise.</p>
+
+<h3>3.2 The Fidelity Challenge</h3>
+<p>Not all format conversions are lossless. When a rich format is converted to a simpler one, information may be lost. When a structured format is converted to a flat one, relationships may be broken. When metadata-rich formats are converted to metadata-poor formats, context disappears. The fidelity challenge is to understand, before conversion, exactly what will be preserved and what will not -- and to ensure that what is lost is either unimportant or preserved through alternative means.</p>
+
+<h3>3.3 The Canonical Format Principle</h3>
+<p>Rather than maintaining data in whatever format it was originally created in, the institution designates canonical formats for each data category. Canonical formats are selected for durability, openness, and self-description. All data is stored in or converted to canonical formats as soon as practicable after acquisition. This reduces the institution's format surface area -- the number of distinct formats it must support -- and concentrates preservation effort on a manageable set of well-understood formats.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Format Obsolescence Risk Assessment</h3>
+<p>Every format in active use is assessed for obsolescence risk on an annual basis during the institutional review (OPS-001). The assessment uses five indicators:</p>
+
+<table>
+<thead>
+<tr><th>Indicator</th><th>Low Risk</th><th>Medium Risk</th><th>High Risk</th></tr>
+</thead>
+<tbody>
+<tr><td>Specification availability</td><td>Open standard, freely available</td><td>Published but maintained by single entity</td><td>Proprietary, undocumented, or no longer published</td></tr>
+<tr><td>Tool support</td><td>Multiple active tools read/write format</td><td>Few tools, declining community</td><td>Single tool or no actively maintained tools</td></tr>
+<tr><td>Community adoption</td><td>Widely used, active community</td><td>Niche use, stable community</td><td>Declining use, shrinking community</td></tr>
+<tr><td>Institutional dependency</td><td>Used for Tier 3 data only</td><td>Used for Tier 2 data</td><td>Used for Tier 1 data</td></tr>
+<tr><td>Conversion path availability</td><td>Well-documented conversion to alternatives</td><td>Conversion possible but complex</td><td>No known reliable conversion path</td></tr>
+</tbody>
+</table>
+
+<p>Formats scoring high risk on any two indicators, or high risk on institutional dependency alone, are placed on the format watch list and a migration plan is initiated.</p>
+
+<h3>4.2 Canonical Format Selection Criteria</h3>
+<p>When selecting a canonical format for a data category, the following criteria apply in order of priority:</p>
+
+<ol>
+<li><strong>Openness.</strong> The format specification must be publicly available and not encumbered by patents, licenses, or proprietary restrictions that could limit future use.</li>
+<li><strong>Self-description.</strong> The format must carry enough metadata within itself that a reader unfamiliar with the institution can determine what the data represents. Formats that depend on external schemas or context are less durable than self-describing formats.</li>
+<li><strong>Simplicity.</strong> Simpler formats are more durable because they are easier to implement, easier to verify, and less likely to have edge cases that cause problems. Between two formats that meet other criteria equally, prefer the simpler one.</li>
+<li><strong>Tool independence.</strong> The format must be readable by multiple independent tools. A format that can only be read by one software package is a single point of failure.</li>
+<li><strong>Human readability.</strong> Preferred but not required. Formats that can be read by a human with a text editor (plain text, CSV, HTML, XML) are more durable than binary formats because they can be partially recovered even without specialized tools.</li>
+<li><strong>Structural fidelity.</strong> The format must be capable of representing the data's structure, relationships, and metadata without loss. A format that meets all other criteria but cannot represent the data faithfully is unsuitable.</li>
+</ol>
+
+<h3>4.3 The Format Conversion Pipeline</h3>
+<p>Every format conversion follows this pipeline:</p>
+
+<p><strong>Stage 1: Pre-conversion inventory.</strong> Generate a complete manifest of all files to be converted: file paths, sizes, checksums, and format-specific metadata. Record the total count. This manifest is the baseline against which conversion success is measured.</p>
+
+<p><strong>Stage 2: Conversion tool validation.</strong> Select the conversion tool. Test it on a representative sample (minimum 5% of files or 50 files, whichever is greater). Verify output against the original using the verification methods in Section 4.4. If the tool fails validation, select an alternative or investigate the failures before proceeding.</p>
+
+<p><strong>Stage 3: Full conversion.</strong> Convert all files. For each file, record: source path, destination path, source checksum, destination checksum, conversion status (success, warning, failure), and any conversion notes. Produce a conversion log.</p>
+
+<p><strong>Stage 4: Verification.</strong> Verify the converted files using at least two of the methods in Section 4.4. Record verification results in the conversion log.</p>
+
+<p><strong>Stage 5: Retention and archival.</strong> Retain the original files for the stabilization period defined in D13-002 (90 days for Tier 1 data, 30 days for Tier 2, 7 days for Tier 3). After stabilization, archive the originals -- do not delete them. Originals are retained as permanent archival copies per D13-001 R-EVL-07.</p>
+
+<h3>4.4 Conversion Verification Methods</h3>
+<p>At least two of the following methods must be used for every conversion:</p>
+
+<ul>
+<li><strong>Content comparison.</strong> Compare the text content of the source and destination files. For text-based formats, this can be automated with diff tools. For binary formats, extract content to text and compare.</li>
+<li><strong>Structural validation.</strong> Verify that the converted file is a valid instance of the target format. Use format-specific validation tools where available.</li>
+<li><strong>Round-trip conversion.</strong> Convert the data from format A to format B, then back from format B to format A. Compare the round-tripped file with the original. Differences indicate potential fidelity loss.</li>
+<li><strong>Visual or functional inspection.</strong> Open the converted file in a tool that reads the target format and verify that it appears and functions correctly. This catches semantic errors that automated tools may miss.</li>
+<li><strong>Metadata comparison.</strong> Verify that metadata (creation date, author, title, tags, relationships) has been preserved in the conversion.</li>
+</ul>
+
+<h3>4.5 The Format Genealogy Record</h3>
+<p>For each data set, the institution maintains a format genealogy record that tracks every format transformation the data has undergone. The record includes: original format, each intermediate format, current format, dates of each transformation, tools used for each transformation, and verification results for each transformation. The genealogy record is stored alongside the data it describes and is itself stored in a canonical format (plain text).</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-DFM-01:</strong> All institutional data must be stored in canonical formats or have a documented, tested conversion path to a canonical format. Data in non-canonical formats must be converted within 12 months of acquisition per D13-001 R-EVL-04.</li>
+<li><strong>R-DFM-02:</strong> Format obsolescence risk assessment must be conducted annually for every format in active use. Formats at high risk must have an active migration plan within 6 months of the assessment.</li>
+<li><strong>R-DFM-03:</strong> Every format conversion must follow the conversion pipeline (Section 4.3) and must use at least two verification methods (Section 4.4). Conversions that fail verification must not overwrite or replace the original files.</li>
+<li><strong>R-DFM-04:</strong> Original files must be retained as permanent archival copies after conversion. No original data may be deleted after format migration. This is an absolute rule with no exceptions for Tier 1 data and a Tier 2 exception process for Tier 2 and Tier 3 data.</li>
+<li><strong>R-DFM-05:</strong> The format genealogy record must be maintained for every data set that has undergone format conversion. The record must be stored alongside the data and must be updated with each conversion.</li>
+<li><strong>R-DFM-06:</strong> Canonical format selection must be reviewed every 5 years or when a format's obsolescence risk assessment changes from low to medium risk, whichever comes first.</li>
+<li><strong>R-DFM-07:</strong> Conversion tools are Tier 2 data artifacts. They must be preserved in the institutional archive alongside their documentation. They must be tested annually to verify they still function correctly.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Silent conversion error.</strong> The conversion tool produces output that appears valid but contains subtle errors -- truncated fields, lost metadata, reformatted content, broken references. The error is not detected during verification and is discovered only later when the data is actually used. Mitigation: using multiple verification methods (R-DFM-03) reduces the chance that all methods miss the same error. Round-trip conversion is particularly effective at detecting subtle errors.</li>
+
+<li><strong>Format watch list neglect.</strong> The annual format review is performed perfunctorily or skipped. A format that is approaching obsolescence is not placed on the watch list. By the time the obsolescence is recognized, reliable conversion tools are no longer available. Mitigation: R-DFM-02 mandates annual assessment. The format watch list review is a checklist item in the annual institutional review (OPS-001).</li>
+
+<li><strong>Canonical format failure.</strong> A format designated as canonical proves less durable than expected. The format itself begins to show signs of obsolescence. Mitigation: R-DFM-06 mandates periodic reassessment of canonical formats. The canonical format selection criteria (Section 4.2) favor formats with the broadest possible support base, reducing the likelihood of this failure.</li>
+
+<li><strong>Conversion tool dependency.</strong> The institution relies on a single conversion tool that becomes unavailable. No alternative tool can perform the conversion. Mitigation: R-DFM-07 preserves conversion tools in the archive. Tool independence is a canonical format selection criterion (Section 4.2 item 4), reducing the likelihood that only one tool can perform a given conversion.</li>
+
+<li><strong>Genealogy record loss.</strong> The format genealogy record for a data set is lost or not maintained. The operator cannot determine the provenance of the data or the transformations it has undergone. Mitigation: R-DFM-05 mandates genealogy record maintenance. Storing the record alongside the data ensures that the record and the data travel together through all institutional operations.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If a silent conversion error is discovered:</strong> Retrieve the original files from the permanent archive. Re-execute the conversion with a corrected tool or procedure. Verify the new conversion rigorously. If the original files are not available, assess the extent of the error and determine whether the data can be recovered from the corrupted conversion. Document the error and update conversion procedures to prevent recurrence.</li>
+
+<li><strong>If a format has become obsolete without a migration plan:</strong> Assess whether any conversion tools still exist, even experimental or unmaintained ones. If tools exist, test them immediately and begin conversion of all data in the obsolete format. If no tools exist, investigate whether the format specification is available and whether a conversion tool can be developed locally. Prioritize Tier 1 data for recovery. Document the failure and its causes.</li>
+
+<li><strong>If a canonical format is failing:</strong> Begin an emergency canonical format selection process. Identify the best available replacement. Initiate conversion of all data from the failing canonical format to the new one. This is a high-priority evolution activity that should override non-critical work.</li>
+
+<li><strong>If the genealogy record for a data set is missing:</strong> Reconstruct what can be reconstructed from conversion logs, file metadata, and institutional records. Mark the reconstructed record as "RECONSTRUCTED -- original genealogy not maintained." Going forward, maintain the genealogy record rigorously for this data set.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The institution's data formats are current and well-supported. Use this period to establish canonical formats, perform the first format risk assessments, and build the genealogy records. Most data will be in its original format. The first conversions may be pre-emptive -- converting data from proprietary formats to canonical open formats as a hygiene measure.</li>
+
+<li><strong>Years 5-15:</strong> The first format obsolescence events are detected. Some formats chosen at founding are showing signs of decline. The conversion pipeline is tested in earnest. The genealogy records begin to accumulate transformation histories. Lessons from the first conversions inform refinements to the verification methods.</li>
+
+<li><strong>Years 15-30:</strong> Multiple format generations have been navigated. Some data has been converted twice -- from its original format to the first canonical format, then to a revised canonical format when the first one aged. The genealogy records are substantive documents that trace each data set's journey through format changes. The format watch list is a critical early-warning system that has prevented multiple crises.</li>
+
+<li><strong>Years 30-50+:</strong> Data format preservation is a mature practice. The institution's data has survived multiple format paradigm shifts. The genealogy records are among the most valuable institutional artifacts, documenting not just what the data is but how it has been carried through decades of technological change. The principle that data outlives formats has been proven repeatedly by experience.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Data formats feel permanent when they are new. I cannot imagine a world where UTF-8 text files or HTML documents are unreadable. But I also know that someone in 1990 could not imagine a world where WordStar documents or Lotus 1-2-3 spreadsheets were unreadable, and yet that world arrived. The canonical format principle is my hedge against this inevitability: by concentrating institutional data into a small number of well-chosen formats, I reduce the surface area that needs protection. And by maintaining genealogy records, I ensure that even if a format does become unreadable, the history of what it was and how it was transformed is never lost. The most important safeguard in this article is the permanent retention of originals after conversion. It is storage-expensive but invaluable. If a conversion turns out to be flawed, the original is the only path back. Deleting originals after conversion is saving pennies and risking the library.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D13-001 -- Evolution Philosophy (R-EVL-04 open format mandate, R-EVL-07 no decommissioning as sole data repository, data sovereignty principle)</li>
+<li>D13-002 -- Technology Migration Playbook (Section 4.4 format conversion procedures, stabilization periods)</li>
+<li>D13-006 -- Version Management and Compatibility Policy (format version tracking, compatibility windows)</li>
+<li>D13-007 -- Change Impact Assessment Methodology (impact assessment for format changes)</li>
+<li>D6-001 -- Data Classification and Tiering (Tier 1/2/3 data classification drives retention rules)</li>
+<li>D6-002 -- Backup Doctrine (backup as conversion safety net)</li>
+<li>D20-001 -- Institutional Memory Philosophy (permanent records, anti-revisionism)</li>
+<li>OPS-001 -- Operations Philosophy (annual review includes format risk assessment)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (lifetime data preservation requirement)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

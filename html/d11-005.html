@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D11-005 — Scheduling and Operational Cadence - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li class="active"><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="D11-005">
+  <h1>D11-005 &mdash; Scheduling and Operational Cadence</h1>
+
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D11-005</dd>
+  <dt>Domain</dt>
+  <dd>11 &mdash; Administration</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Draft</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+<p>This article defines the master scheduling framework for the holm.chat Documentation Institution. It establishes how all recurring activities &mdash; maintenance windows, review cycles, procurement events, rotation schedules, audit periods, and ceremonial or reflective practices &mdash; are coordinated across time. In a single-operator institution, scheduling is not about coordinating multiple people. It is about coordinating the operator's finite attention and energy across the many competing demands of institutional stewardship.</p>
+<p>An institution without a schedule operates on impulse and crisis. Maintenance happens when something breaks. Reviews happen when guilt accumulates. Procurement happens when something runs out. This reactive pattern is unsustainable over decades because it guarantees that urgent tasks permanently crowd out important but non-urgent tasks like documentation review, infrastructure inspection, and long-term planning. The schedule exists to protect important activities from being perpetually displaced by urgent ones.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+<p><strong>In scope:</strong></p>
+<ul>
+  <li>The master calendar: a unified view of all scheduled institutional activities.</li>
+  <li>Cadence definitions: daily, weekly, monthly, quarterly, annual, and multi-year rhythms.</li>
+  <li>Maintenance window scheduling and coordination across domains.</li>
+  <li>Review cycle scheduling for documentation, budgets, security, and administration.</li>
+  <li>Seasonal adjustments for energy-constrained or weather-affected operations.</li>
+  <li>Scheduling conflict resolution when multiple activities compete for the same time window.</li>
+  <li>The concept of operational tempo and its relationship to institutional sustainability.</li>
+  <li>Ceremony and reflection scheduling: periodic activities designed to maintain institutional awareness and purpose.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+  <li>Daily operational routines (OPS-001).</li>
+  <li>Specific maintenance procedures for individual systems (respective domain articles).</li>
+  <li>Personnel scheduling for multi-person scenarios (D11-006).</li>
+  <li>Emergency response scheduling (Domain 12).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+<h3>The Tyranny of the Urgent</h3>
+<p>In institutional management literature, the distinction between "urgent" and "important" is well-established. Urgent tasks demand immediate attention: a failed drive, a depleted consumable, a security alert. Important tasks build long-term institutional health: reviewing documentation for accuracy, planning technology migrations, inspecting physical infrastructure for wear. The tragedy of unscheduled operations is that urgent tasks always win. There is always something more immediately pressing than reviewing the three-year procurement forecast or inspecting cable runs for degradation.</p>
+<p>Scheduling is the institutional mechanism for ensuring that important tasks receive dedicated time regardless of what urgent demands exist. When documentation review is on the calendar, it happens &mdash; not because nothing urgent is happening, but because the schedule grants it protected time. This is not rigidity; it is discipline. The schedule can be adjusted when genuine emergencies arise, but the default is adherence, not flexibility.</p>
+
+<h3>Seasonal and Environmental Rhythms</h3>
+<p>The off-grid nature of this institution introduces a scheduling factor that most organizations never consider: seasonal energy availability. Solar production varies dramatically across seasons in most latitudes. Winter months may provide less than half the energy of summer months. This means that energy-intensive operations &mdash; full system checks, large data migrations, intensive computation &mdash; must be scheduled during periods of energy abundance. Winter is the time for documentation work, review, and planning &mdash; activities that require human attention but modest electrical power.</p>
+<p>Temperature and humidity also affect scheduling. Electronics generate heat and are sensitive to humidity. In hot climates, midday may not be appropriate for sustained high-load operations. In cold climates, some maintenance activities require conditions above freezing. The master schedule must account for these environmental realities.</p>
+
+<h3>The Rhythm of Institutional Life</h3>
+<p>Beyond practical scheduling, there is value in establishing a rhythm to institutional operations. Religions, militaries, and long-lived organizations of every kind have discovered that regular rhythms &mdash; daily routines, weekly cycles, seasonal ceremonies &mdash; create a sense of continuity and purpose that sustains commitment over decades. An institution that feels like an endless flat plain of undifferentiated days will erode its operator's motivation. An institution with recognizable seasons, milestones, and ceremonies provides a sense of progression and accomplishment.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+<h3>Cadence Hierarchy</h3>
+<p>The institution's scheduling operates on six nested cadences:</p>
+<ol>
+  <li><strong>Daily:</strong> Basic operational activities. System health checks, log review, environmental monitoring. These are covered by OPS-001 and are not managed by the master calendar. The master calendar assumes the daily cadence is operating normally.</li>
+  <li><strong>Weekly:</strong> Incremental maintenance and administrative tasks. Backup verification, consumable inventory spot-checks, brief documentation review sessions. Weekly tasks should be assigned to specific days to create predictable rhythm.</li>
+  <li><strong>Monthly:</strong> Substantive maintenance and review. Full system inspections, budget tracking updates, consumable reorder assessments, physical plant inspection. Monthly tasks should be assigned to specific weeks within the month (e.g., "first Monday" or "third week").</li>
+  <li><strong>Quarterly:</strong> Strategic activities. Budget review (D11-003), procurement window (D11-004), documentation review cycle, security audit, and cross-domain coordination review. Quarterly activities are the backbone of the institutional calendar.</li>
+  <li><strong>Annual:</strong> Major planning and assessment. Annual budget creation, full asset registry audit (D11-002), strategic forecast update, personnel and succession review (D11-006), administrative self-audit (D11-013). The annual cycle culminates in a planning period for the year ahead.</li>
+  <li><strong>Multi-Year:</strong> Long-horizon activities. Technology migration planning (3-5 year cycle), infrastructure refresh assessment (5-10 year cycle), institutional charter review (10-year cycle), and full documentation corpus review (5-year cycle). These activities are rare but consequential, and they require dedicated time well in advance.</li>
+</ol>
+
+<h3>The Master Calendar</h3>
+<p>The master calendar is a single document that displays all scheduled activities across all cadences. It is the authoritative source for what is supposed to happen when. The calendar exists in both a full-year view (showing quarterly and annual activities) and a monthly detail view (showing weekly and monthly activities for the current period).</p>
+<p>The master calendar is maintained by administration but is informed by all domains. Each domain is responsible for communicating its scheduling needs to administration. Administration is responsible for resolving conflicts, ensuring adequate spacing between resource-intensive activities, and maintaining the calendar as a current, accurate document.</p>
+<p>The calendar is stored in a format compliant with R-ADM-05: plain text, no proprietary dependencies. A simple table format with columns for date, activity, domain, estimated duration, resource requirements, and status (scheduled, completed, deferred, cancelled) is sufficient.</p>
+
+<h3>Seasonal Adjustments</h3>
+<p>The master calendar includes seasonal adjustment rules that modify the scheduling of certain activities based on environmental conditions:</p>
+<ul>
+  <li><strong>High-energy season (typically summer):</strong> Schedule energy-intensive operations: full system checks, data integrity scans, large migrations, hardware burn-in testing. This is also the best time for physical infrastructure work that requires outdoor activity (antenna maintenance, solar panel cleaning, cable inspection).</li>
+  <li><strong>Low-energy season (typically winter):</strong> Prioritize low-power activities: documentation review and writing, planning sessions, record reconciliation, training exercises. Reduce non-essential system loads. Defer elective maintenance that can wait for better conditions.</li>
+  <li><strong>Transition seasons (spring and autumn):</strong> Procurement windows are ideally timed for transition seasons, when travel conditions are moderate and the operator is not under seasonal energy pressure. Spring is a natural time for the annual planning cycle; autumn for the year-end review and next-year budget creation.</li>
+</ul>
+
+<h3>Scheduling Conflict Resolution</h3>
+<p>When two or more activities compete for the same time window, conflicts are resolved by priority:</p>
+<ol>
+  <li>Safety-critical maintenance (any domain) takes precedence over all other activities.</li>
+  <li>Security-related activities (Domain 3) take precedence over non-security activities.</li>
+  <li>Activities with external dependencies or deadlines (procurement windows, vendor appointments) take precedence over internally-scheduled activities that can be rescheduled.</li>
+  <li>Activities deferred from a previous cycle take precedence over newly-scheduled activities.</li>
+  <li>When all else is equal, the activity with the longer time since last completion takes precedence.</li>
+</ol>
+</section>
+
+<section>
+<h2>Rules and Constraints</h2>
+<ul>
+  <li><strong>R-SCH-01:</strong> A master calendar must exist and be current at all times. An institution operating without a master calendar is in administrative emergency.</li>
+  <li><strong>R-SCH-02:</strong> All scheduled activities must include an estimated duration and resource requirements. This enables conflict detection and prevents overcommitment.</li>
+  <li><strong>R-SCH-03:</strong> No more than one resource-intensive activity may be scheduled in any single week, unless the operator has explicitly confirmed capacity for both. Resource-intensive is defined as requiring more than four hours of focused work or requiring significant energy expenditure.</li>
+  <li><strong>R-SCH-04:</strong> Deferred activities must be rescheduled within the same quarter. If an activity is deferred across two consecutive quarters, it escalates to a mandatory activity in the third quarter and cannot be deferred again without a Tier 2 governance decision.</li>
+  <li><strong>R-SCH-05:</strong> The master calendar must include at least one day per month designated as unscheduled buffer time. This buffer absorbs urgent tasks without displacing scheduled important tasks. If the buffer is consistently consumed, the overall schedule is too tight and must be relaxed.</li>
+  <li><strong>R-SCH-06:</strong> Seasonal adjustment rules must be reviewed annually and updated if energy production patterns, climate conditions, or operational requirements have changed.</li>
+  <li><strong>R-SCH-07:</strong> The master calendar must be reconciled against actual activity at the end of each quarter. Completed activities are marked. Deferred activities are rescheduled. Patterns of consistent deferral are investigated as potential signs of overcommitment or operational drift.</li>
+  <li><strong>R-SCH-08:</strong> The schedule must include rest periods. Sustained high-intensity operations without recovery periods lead to operator burnout, which is the single most dangerous failure mode in a single-operator institution. At least one week per quarter should be designated as reduced-operations time.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+<ul>
+  <li><strong>Schedule rigidity.</strong> The calendar becomes a rigid obligation that the operator follows mechanically even when conditions have changed. A maintenance window is executed during a power shortage because "it's on the schedule." Mitigation: the schedule is a tool, not a mandate. Deferral is explicitly permitted (with the constraints of R-SCH-04). Seasonal adjustments (Section: System Model) provide structured flexibility.</li>
+  <li><strong>Chronic deferral.</strong> Important-but-not-urgent activities are perpetually postponed because something more urgent always arises. The quarterly documentation review has been deferred for three consecutive quarters. Mitigation: R-SCH-04's escalation rule. Buffer time (R-SCH-05) absorbs urgencies without displacing scheduled activities.</li>
+  <li><strong>Calendar abandonment.</strong> The operator stops maintaining the calendar because it feels bureaucratic or because actual operations have diverged too far from the plan. Without the calendar, operations revert to crisis-driven improvisation. Mitigation: quarterly reconciliation (R-SCH-07) keeps the calendar aligned with reality. The calendar should be simple enough that maintenance is measured in minutes, not hours.</li>
+  <li><strong>Overcommitment.</strong> The calendar is packed with so many activities that there is no time for unplanned work, rest, or the actual daily operations of the institution. The operator is constantly behind schedule, which creates stress and errors. Mitigation: R-SCH-03 limits resource-intensive activities per week. R-SCH-05 requires buffer time. R-SCH-08 mandates rest periods. The Lightness Principle from D11-001 applies to scheduling as much as to any other administrative process.</li>
+  <li><strong>Seasonal mismatch.</strong> Energy-intensive activities are scheduled during low-energy seasons because the calendar does not account for seasonal variation. Systems are stressed, batteries are depleted, and reliability suffers. Mitigation: seasonal adjustment rules are a mandatory feature of the master calendar.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+<ol>
+  <li><strong>If the calendar has been abandoned:</strong> Do not try to reconstruct the full calendar at once. Start with the quarterly cadence: identify what must happen this quarter (budget review, procurement window, any overdue maintenance). Schedule those items. Then add the monthly cadence for the current month. Then the weekly cadence for the current week. Build the calendar back from the present forward, not from the beginning.</li>
+  <li><strong>If chronic deferral has accumulated:</strong> List all deferred activities. Classify them: still necessary, no longer relevant, or replaced by other activities. For those still necessary, triage by criticality. Schedule the top three for immediate execution. Distribute the remainder across the next two quarters. Investigate why deferral became chronic: is the schedule overcommitted? Is the operator avoiding certain tasks? Address the root cause.</li>
+  <li><strong>If the schedule is overcommitted:</strong> Conduct a Lightness Principle review of all scheduled activities. For each activity, ask: what happens if this is done less frequently? What happens if it is simplified? What happens if it is eliminated? Reduce the schedule until the operator can complete scheduled activities with at least 25% of scheduled time remaining as buffer. Underscheduling is always preferable to overscheduling.</li>
+  <li><strong>If seasonal mismatch is causing problems:</strong> Review actual energy production data (or environmental conditions) against the calendar's seasonal assumptions. Adjust the seasonal rules to match reality. Move energy-intensive activities to months with verified surplus capacity. Accept that some activities may only be feasible during certain seasons and plan accordingly.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+<ul>
+  <li><strong>Years 0-3:</strong> The master calendar is new and probably too detailed or too sparse. The correct cadence for each activity is unknown and will be discovered through experience. Expect significant revisions during the first three annual reviews. The key discipline is to maintain the calendar even when it feels imprecise.</li>
+  <li><strong>Years 3-10:</strong> The calendar is calibrated against real experience. Seasonal patterns are well-understood. The operator knows how long each activity actually takes (as opposed to how long it was estimated to take). The calendar becomes a reliable planning tool rather than a rough guide.</li>
+  <li><strong>Years 10-25:</strong> The operational rhythms of the institution are well-established. The calendar changes incrementally rather than structurally. New activities may be added as the institution evolves, and obsolete activities removed. Multi-year cadence activities (infrastructure refresh, technology migration) begin to cycle through.</li>
+  <li><strong>Years 25-50+:</strong> The institution has developed a deep operational rhythm that spans seasons and years. The calendar is a mature document that has been refined over decades. It reflects hard-won knowledge about what must be done, when, and how often. For successor operators, the calendar is one of the most valuable documents in the entire institution &mdash; it tells them not just what exists, but what must be done to keep it running.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 &mdash; Founding Entry:</strong>
+I am not a scheduled person by temperament. I work in bursts of intense focus followed by periods of recovery. Imposing a calendar on this pattern feels unnatural. But I have learned, through repeated experience, that my burst-and-recover pattern leads to neglect of steady-state tasks. The drives that need monthly SMART checks do not care about my creative rhythms. The documentation that needs quarterly review does not wait for inspiration. The schedule is not a constraint on my work style. It is a complement to it: the steady heartbeat underneath the irregular bursts. I suspect I will resist the calendar periodically and then rediscover its value each time something important falls through the cracks. This commentary is a message to my future self: the calendar works. Follow it.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+<ul>
+  <li>D11-001 &mdash; Administration Philosophy (Lightness Principle, coordination function of administration)</li>
+  <li>D11-002 &mdash; Asset Inventory and Tracking (asset lifecycle dates feeding the maintenance calendar)</li>
+  <li>D11-003 &mdash; Budget and Resource Accounting Framework (quarterly budget review cycle)</li>
+  <li>D11-004 &mdash; Procurement Procedures (procurement calendar and procurement windows)</li>
+  <li>D11-006 &mdash; Personnel Administration (personnel availability and succession scheduling)</li>
+  <li>D11-008 &mdash; Reporting Structures (reporting calendar and review cycle scheduling)</li>
+  <li>D11-013 &mdash; Administrative Self-Audit (audit scheduling within the master calendar)</li>
+  <li>OPS-001 &mdash; Operations Philosophy (daily operational tempo, sustainability requirements)</li>
+  <li>Domain 3 &mdash; Security (security audit scheduling)</li>
+  <li>Domain 4 &mdash; Infrastructure and Power (energy production data for seasonal adjustments)</li>
+  <li>Domain 12 &mdash; Disaster Recovery (DR drill scheduling)</li>
+</ul>
+</section>
+
+</article>
+</main>
+</body>
+</html>

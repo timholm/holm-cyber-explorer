@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOV-005 — Emergency Governance Protocols - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li class="active"><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="gov-005">
+  <h1>GOV-005 &mdash; Emergency Governance Protocols</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>GOV-005</dd>
+  <dt>Domain</dt>
+  <dd>2 -- Governance & Authority</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, GOV-003, GOV-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>GOV-006, GOV-007. Referenced by all articles involving crisis response, emergency procedures, or temporary authority modifications.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines what happens when normal governance breaks down. Normal governance, as defined in GOV-001, relies on deliberation, waiting periods, documentation, and careful tier classification. These mechanisms are designed for a stable institution operating under non-crisis conditions. They are not designed for emergencies.</p>
+<p>An emergency, in institutional terms, is any situation where the delay imposed by normal governance would cause irreversible harm to the institution's data, systems, or continuity. A hard drive that is actively failing does not wait for a 30-day deliberation period. A security breach does not pause while the operator classifies it by tier. A natural disaster does not respect the documentation-first principle.</p>
+<p>The purpose of this article is to define a set of emergency governance protocols that allow the operator to act quickly while preserving the institution's accountability, integrity, and legitimacy. Emergency governance is not the suspension of governance. It is a different mode of governance, one that prioritizes action over deliberation while still requiring honesty, documentation, and eventual review.</p>
+<p>The most dangerous moment for any institution is the transition from normal operations to crisis response. In that moment, the temptation to abandon all rules is strongest, and the consequences of abandoning rules are most severe. This article provides a structured alternative to abandonment: a defined set of emergency powers, with defined limits, defined durations, and defined review requirements.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition of an institutional emergency and the criteria for declaring one.</li>
+<li>Emergency authority: what expanded powers the operator gains during an emergency.</li>
+<li>Automatic sunset provisions that terminate emergency powers without requiring affirmative action.</li>
+<li>Communication protocols during emergencies (relevant for multi-stakeholder scenarios and for the operator's own clarity).</li>
+<li>Post-emergency review and governance restoration.</li>
+<li>The relationship between emergency governance and the succession protocols in GOV-004.</li>
+</ul>
+<p>This article does not cover specific technical emergency procedures (those belong in Domain 3 for security emergencies, Domain 4 for infrastructure emergencies, and Domain 12 for disaster recovery). It covers the governance framework within which those technical procedures operate.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>The history of institutions is littered with emergencies that became permanent. A government declares emergency powers to address a crisis, and the powers outlive the crisis by decades. An organization suspends its normal approval process "just until the emergency passes," and the process never resumes. Emergency governance is one of the most dangerous tools in institutional design because it is simultaneously necessary and corrosive.</p>
+<p>It is necessary because real emergencies require rapid action. An institution that cannot respond quickly to a genuine crisis will not survive that crisis. It is corrosive because emergency conditions create a psychological state -- urgency, fear, tunnel vision -- that makes institutional discipline feel like an impediment rather than a safeguard. Every emergency is an invitation to dismantle the governance structures that feel inconvenient, and every dismantling leaves the institution weaker for the next emergency.</p>
+<p>For a single-operator institution, the danger is amplified. There is no board to restrain an operator who declares an emergency unnecessarily. There is no committee to review whether emergency powers are being used appropriately. The only restraint is the operator's own discipline, informed by the procedures in this document.</p>
+<p>This article is therefore designed with a strong bias toward restraint. Emergency powers are narrow, time-limited, and automatically expire. The burden of proof lies with extending an emergency, not with ending one. The post-emergency review is mandatory, not optional. These design choices are deliberate. They exist because the author of these procedures is also the person who will be tempted to abuse them.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Emergency Classification</h3>
+<p>Emergencies are classified by severity and domain:</p>
+<p><strong>Severity Level 1: Critical -- Imminent Data Loss or Security Breach.</strong>
+Active, ongoing harm to institutional data integrity or security. Examples: a storage device is actively failing with no current backup, a security perimeter has been breached, a fire or flood is threatening hardware.</p>
+<p>Governance implications: All waiting periods are suspended. The operator may take any action necessary to protect data and systems, including actions that would normally require Tier 1 or Tier 2 authorization. All actions must be logged, but the logging may be abbreviated during the active emergency and expanded during the post-emergency review.</p>
+<p>Automatic sunset: 72 hours from declaration. If the emergency persists beyond 72 hours, it must be re-declared with updated justification.</p>
+<p><strong>Severity Level 2: Urgent -- Probable Harm Within Days.</strong>
+A condition that will cause institutional harm if not addressed within days, but is not causing active harm at the moment of declaration. Examples: a SMART warning indicating imminent drive failure, discovery of a significant configuration error that puts data at risk, environmental conditions (temperature, humidity) that are degrading hardware.</p>
+<p>Governance implications: Tier 2 waiting periods are reduced from 30 days to 7 days. Tier 3 waiting periods are eliminated. Tier 1 waiting periods remain at 90 days (constitutional decisions are not accelerated by Level 2 emergencies). Documentation must be maintained in real time.</p>
+<p>Automatic sunset: 30 days from declaration. If the emergency persists beyond 30 days, it must be re-declared or downgraded to normal governance.</p>
+<p><strong>Severity Level 3: Elevated -- Increased Risk Requiring Heightened Vigilance.</strong>
+A condition that increases the probability of institutional harm but does not constitute an imminent threat. Examples: a significant security vulnerability discovered in installed software, a backup verification that reveals minor inconsistencies, an approaching storm season with above-average severity predictions.</p>
+<p>Governance implications: No waiting period modifications. The operator should increase the frequency of relevant monitoring (daily checks become twice-daily, weekly maintenance is prioritized). All decisions should include an explicit assessment of whether the elevated risk affects the decision.</p>
+<p>Automatic sunset: 90 days from declaration. If the condition persists, it should be formally incorporated into the threat model (SEC-001) or operational procedures (OPS-001) rather than remaining in emergency status indefinitely.</p>
+<h3>4.2 Emergency Declaration Protocol</h3>
+<p>Declaring an emergency is itself a governance act. It must follow a procedure, even if that procedure is abbreviated:</p>
+<ol>
+<li>
+<p><strong>Identify the threat.</strong> What is the specific condition that constitutes an emergency? Be precise. "Something seems wrong" is not a declaration. "SMART data indicates drive sda is in pre-failure state with 23 reallocated sectors and increasing error rate" is a declaration.</p>
+</li>
+<li>
+<p><strong>Classify the severity.</strong> Using the definitions in Section 4.1, assign a severity level. If in doubt, assign the higher level. It is better to over-respond and scale down than to under-respond and lose data.</p>
+</li>
+<li>
+<p><strong>Record the declaration.</strong> Write an entry in the decision log: "EMERGENCY DECLARED -- Level [X] -- [brief description of threat] -- [date and time]." This entry is the formal beginning of the emergency governance period.</p>
+</li>
+<li>
+<p><strong>Identify the response plan.</strong> Before acting, identify the technical response plan from the relevant domain's emergency procedures (Domain 3, Domain 4, Domain 12, etc.). If no pre-existing plan applies, draft an ad hoc plan and record it before executing.</p>
+</li>
+<li>
+<p><strong>Execute the response.</strong> Take the necessary actions. Log each significant action with timestamps.</p>
+</li>
+<li>
+<p><strong>Monitor and reassess.</strong> As the response progresses, reassess the severity level. Upgrade or downgrade as conditions change. Record each reassessment.</p>
+</li>
+</ol>
+<h3>4.3 Emergency Authority Boundaries</h3>
+<p>Even during a declared emergency, certain boundaries remain absolute:</p>
+<ul>
+<li><strong>The air gap may not be breached</strong> except under Level 1 conditions where data loss is imminent and the only available backup or recovery resource requires a temporary, controlled network connection. Any air-gap breach must be documented in detail and reported in the post-emergency review. The breach must be reversed immediately upon completion of the emergency action.</li>
+<li><strong>ETH-001 remains in effect.</strong> Emergency conditions do not suspend the ethical foundation. If an emergency action would violate an ethical principle, the principle prevails. The operator must find an alternative response that is both effective and ethical.</li>
+<li><strong>The decision log remains append-only.</strong> Emergency conditions never justify modifying or deleting historical records.</li>
+<li><strong>Succession provisions are not suspended.</strong> If the operator becomes incapacitated during an emergency, the succession protocols in GOV-004 activate. Emergency governance does not create a situation where the institution has no governance at all.</li>
+</ul>
+<h3>4.4 Communication Protocols During Emergencies</h3>
+<p>In a single-operator institution, communication protocols may seem irrelevant. They are not. Communication during an emergency serves three functions:</p>
+<p><strong>Communication with self:</strong> The operator should maintain a running log of their mental state, decisions, and reasoning during the emergency. This log serves the post-emergency review and also serves as a check against tunnel vision. Writing down "I am about to do X because I believe Y" forces a moment of reflection between impulse and action.</p>
+<p><strong>Communication with designated successor (if applicable):</strong> If a successor has been designated and is reachable, they should be notified of any Level 1 or Level 2 emergency. Not for authorization (the current operator retains full authority) but for awareness. If the operator becomes incapacitated during the emergency, the successor needs to know the situation they are inheriting.</p>
+<p><strong>Communication with advisory contacts (if applicable):</strong> If the operator has any trusted technical contacts who could provide guidance, a Level 1 emergency is an appropriate time to consult them. This consultation does not compromise the air gap if it is conducted verbally or through physically separate systems. The institution's internal data should not be shared, but the general nature of the technical problem may be discussed.</p>
+<h3>4.5 Automatic Sunset and Emergency Termination</h3>
+<p>Emergency governance terminates automatically at the sunset time defined by the severity level, unless explicitly re-declared. This is the most important safeguard in this article. It means that emergency powers cannot persist through inaction. They require affirmative renewal.</p>
+<p>When an emergency terminates (either by sunset or by explicit termination):</p>
+<ol>
+<li>The operator records the termination in the decision log: "EMERGENCY TERMINATED -- Level [X] -- [original threat description] -- [date and time of termination] -- [brief outcome: resolved, mitigated, or incorporated into normal operations]."</li>
+<li>All actions taken under emergency authority are reviewed within 7 days (see Section 4.6).</li>
+<li>Any suspended waiting periods resume from where they were paused, not from the beginning.</li>
+<li>Any temporary measures implemented during the emergency are evaluated for permanent adoption through normal governance or rollback.</li>
+</ol>
+<h3>4.6 Post-Emergency Governance Review</h3>
+<p>Within 7 days of emergency termination, the operator must conduct a post-emergency governance review. This review is mandatory for Level 1 and Level 2 emergencies and recommended for Level 3 emergencies.</p>
+<p>The review addresses:</p>
+<ul>
+<li><strong>What happened?</strong> A factual account of the emergency, the response, and the outcome.</li>
+<li><strong>Was the declaration appropriate?</strong> In retrospect, was the severity level correctly assigned? Was an emergency declaration warranted at all?</li>
+<li><strong>Were emergency powers used appropriately?</strong> Did the operator stay within the boundaries defined in Section 4.3? Were actions proportionate to the threat?</li>
+<li><strong>What governance was bypassed?</strong> Which waiting periods were shortened or suspended? Which decisions were made without normal deliberation? Were these bypasses justified by the circumstances?</li>
+<li><strong>What should change?</strong> Does the threat model (SEC-001) need updating? Do emergency procedures in relevant domains need revision? Do the emergency governance protocols themselves need amendment?</li>
+<li><strong>Governance restoration confirmation.</strong> An explicit statement that normal governance has been fully restored and all emergency provisions have been terminated.</li>
+</ul>
+<p>The review is recorded in the decision log and, if it reveals significant institutional lessons, in the Commentary Section of this article and any other affected articles.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-GOV-05-01:</strong> An emergency may only be declared when delay would cause irreversible or significant harm to institutional data, systems, or continuity. Inconvenience, frustration, or impatience do not constitute emergencies.</li>
+<li><strong>R-GOV-05-02:</strong> Emergency declarations must include a specific threat description, a severity level, and a response plan. Declarations without these elements are invalid.</li>
+<li><strong>R-GOV-05-03:</strong> Emergency authority sunsets automatically at the times specified in Section 4.1. Re-declaration requires fresh justification; the previous declaration may not be simply extended.</li>
+<li><strong>R-GOV-05-04:</strong> The post-emergency governance review is mandatory for Level 1 and Level 2 emergencies and must be completed within 7 days of emergency termination.</li>
+<li><strong>R-GOV-05-05:</strong> No emergency declaration may suspend ETH-001, the append-only nature of the decision log, or the succession provisions in GOV-004.</li>
+<li><strong>R-GOV-05-06:</strong> If more than three Level 1 or Level 2 emergencies are declared within a twelve-month period, a Tier 2 architectural review must be initiated to determine whether the institution's design is systematically inadequate.</li>
+<li><strong>R-GOV-05-07:</strong> The emergency governance protocols must be reviewed during the annual operations cycle (OPS-001) and tested through at least one simulated emergency per year.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Emergency normalization.</strong> Emergencies are declared so frequently that emergency governance becomes the default mode. Waiting periods are permanently suspended in practice, even though each individual declaration is technically justified. Mitigation: R-GOV-05-06, which triggers an architectural review after three emergencies in twelve months.</li>
+<li><strong>Emergency avoidance.</strong> The operator is so reluctant to declare an emergency that they attempt to resolve genuinely urgent situations through normal governance, resulting in preventable data loss or system damage. Mitigation: the severity levels are designed to be clear and actionable. When in doubt, declare; the post-emergency review will assess whether the declaration was appropriate.</li>
+<li><strong>Sunset override.</strong> The operator extends an emergency indefinitely by re-declaring it every time it sunsets, without genuinely reassessing whether emergency governance is still warranted. Mitigation: each re-declaration requires fresh justification and is subject to the post-emergency review cycle.</li>
+<li><strong>Post-emergency amnesia.</strong> The emergency passes, the system is saved, and the operator moves on without conducting the governance review. The lessons of the emergency are lost. Mitigation: R-GOV-05-04 makes the review mandatory, and the quarterly governance health check (GOV-007) will flag missing reviews.</li>
+<li><strong>Scope creep during emergencies.</strong> The operator uses emergency authority to make changes that are not related to the emergency itself. A Level 1 data emergency becomes an excuse to reorganize the entire storage architecture. Mitigation: the post-emergency review explicitly asks whether actions were proportionate to the threat. Emergency authority is bounded by the specific threat that triggered the declaration.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If emergency governance has been normalized:</strong> Declare a return to normal governance as a Tier 3 decision. Review all decisions made under emergency authority in the past twelve months. For each, assess whether it would have been approved through normal governance. For decisions that would not have been approved, initiate a formal review to confirm or reverse them.</li>
+<li><strong>If an emergency was mishandled:</strong> Conduct the post-emergency review with particular attention to what went wrong. If institutional harm occurred due to the mishandling, document the harm, the cause, and the corrective actions. If the emergency governance protocols themselves contributed to the mishandling, propose amendments through normal Tier 3 governance.</li>
+<li><strong>If post-emergency reviews have been skipped:</strong> Conduct retroactive reviews for all unreviewed emergencies. These reviews will necessarily be less detailed than timely reviews, but the exercise of retroactive assessment still provides institutional value. Going forward, schedule the review as a calendar item at the moment of emergency declaration, so it is not forgotten.</li>
+<li><strong>If emergency powers were used beyond their scope:</strong> Treat the excess as a governance violation. Document it in the decision log. Assess the impact of the out-of-scope actions. Reverse what can be reversed. For what cannot be reversed, document the situation and the lessons learned. Add an entry to the Commentary Section of this article.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The emergency protocols are untested. The first real emergency will be the first test. Simulated emergencies during the annual operations cycle should cover at least one Level 1 and one Level 2 scenario. The protocols will likely need refinement based on these simulations.</li>
+<li><strong>Years 5-15:</strong> Several real emergencies will likely have occurred. The Commentary Section should contain lessons learned from each. The severity levels and sunset periods should be evaluated for whether they are well-calibrated.</li>
+<li><strong>Years 15-30:</strong> The protocols should be mature. Hardware transitions (which are pseudo-emergencies with long lead times) will test the Level 2 provisions. Succession planning may introduce new emergency scenarios (what happens if succession is forced by a health emergency?).</li>
+<li><strong>Years 30-50+:</strong> The emergency governance protocols should be one of the most well-tested parts of the governance framework, with decades of experience reflected in the Commentary Section and decision log. New operators will benefit from the accumulated wisdom of past emergencies.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I have never declared an institutional emergency, because the institution was founded today. But I have lived through personal technology emergencies -- the failed drive, the corrupted filesystem, the moment of pure adrenaline when you realize that the backup you assumed was there is not there. In those moments, the thing I most needed was not technical skill (though that helped). It was structure. A list of steps. A procedure that told me what to do first, what to do second, and what not to do at all.</p>
+<p>This article is that structure, generalized to institutional scale. The automatic sunsets are the feature I am most uncertain about -- 72 hours for a Level 1 emergency may be too short for some scenarios and too long for others. But the principle of automatic termination is more important than the specific duration. Emergency powers that require affirmative action to continue are fundamentally different from emergency powers that require affirmative action to end. The former decay naturally. The latter persist indefinitely. I chose decay.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (ethical boundaries that remain in effect during emergencies)</li>
+<li>CON-001 -- The Founding Mandate (the institutional mission that emergency response serves)</li>
+<li>GOV-001 -- Authority Model (the normal governance framework that emergency governance modifies)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (the threat categories that generate emergencies)</li>
+<li>GOV-003 -- Dispute Resolution Procedures (disputes that may arise from emergency decisions)</li>
+<li>GOV-004 -- Succession Planning and Execution (succession during emergencies)</li>
+<li>GOV-007 -- Institutional Health Assessment (quarterly review of emergency patterns)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo during and after emergencies)</li>
+<li>Domain 3 -- Security &amp; Integrity (security emergency technical procedures)</li>
+<li>Domain 4 -- Infrastructure &amp; Power (infrastructure emergency technical procedures)</li>
+<li>Domain 12 -- Disaster Recovery (disaster recovery technical procedures)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

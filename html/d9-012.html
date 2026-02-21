@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D9-012 — Training Effectiveness Evaluation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li class="active"><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d9-012">
+  <h1>D9-012 &mdash; Training Effectiveness Evaluation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D9-012</dd>
+  <dt>Domain</dt>
+  <dd>9 -- Education &amp; Training</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D9-001, D9-003, D9-004, D9-009, D9-011</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D9-003 (effectiveness feedback revises curriculum), D9-009 (effectiveness data triggers material revision), D19-002 (quality audit includes training effectiveness metrics)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes how the holm.chat Documentation Institution measures whether its training actually works. Training that does not produce competence is worse than no training at all, because it creates a false sense of preparedness. The institution may believe that its members are trained, that its documentation is educational, that its curricula are complete -- and it may be wrong on all counts. Without a systematic method for evaluating effectiveness, the institution has no way to detect these failures until a real crisis exposes them.</p>
+<p>Training effectiveness evaluation is the feedback loop that closes the education system's cycle. D9-003 designs the curriculum. D9-009 defines the materials. D9-004 assesses the learner. This article assesses the system itself: did the curriculum teach what it was supposed to? Did the materials support learning? Did the assessments accurately measure competence? Did the trained person actually perform better in operational conditions?</p>
+<p>The evaluation framework defined here operates at three levels: immediate (did the learner achieve the stated learning objectives?), operational (does the learner perform competently in real operational conditions?), and systemic (does the institution's overall competence level meet its requirements?). Each level provides different data and serves different purposes. Together, they give the institution a comprehensive picture of whether its education investment is producing returns.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The three-level evaluation framework: immediate, operational, and systemic evaluation.</li>
+<li>Data collection methods for each evaluation level.</li>
+<li>Feedback loops: how evaluation data triggers curriculum revision, material updates, and assessment redesign.</li>
+<li>The evaluation cadence: when and how often evaluations are conducted.</li>
+<li>Curriculum revision triggers: specific conditions that require the education system to be updated.</li>
+<li>The evaluation archive: how evaluation data is preserved for longitudinal analysis.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The design of specific assessments (see D9-004).</li>
+<li>The design of specific curricula (see D9-003).</li>
+<li>The quality standards for training materials (see D9-009).</li>
+<li>The general documentation quality audit process (see D19-002), though training effectiveness metrics feed into that process.</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Evaluation Problem in Small Institutions</h3>
+<p>Large organizations evaluate training effectiveness through statistical methods: pre- and post-training assessments across large populations, performance metrics tracked over time, control groups and experimental designs. A small institution cannot use these methods. When the "population" is one to five people, statistical significance is meaningless. When training events occur infrequently, longitudinal tracking is difficult. When the trainer and the evaluator may be the same person, objectivity is constrained.</p>
+<p>The evaluation framework in this article is designed for small-institution reality. It relies on qualitative data more than quantitative data. It uses the learner's own experience as a primary data source. It treats every training event as a unique case study rather than a data point in a statistical sample. This approach sacrifices the precision of large-scale evaluation but retains the essential function: identifying what works, what does not, and what needs to change.</p>
+
+<h3>3.2 The Three Evaluation Levels</h3>
+<p>The framework adapts a simplified version of established training evaluation models to the institution's context:</p>
+<ul>
+<li><strong>Level 1 -- Immediate Evaluation:</strong> Did the learner achieve the stated learning objectives? This is measured during or immediately after training, using the assessment methods defined in D9-004. It answers the question: does the learner know what the training intended to teach?</li>
+<li><strong>Level 2 -- Operational Evaluation:</strong> Does the learner perform competently in real operational conditions? This is measured weeks or months after training, by observing actual performance or reviewing operational logs. It answers the question: does the training translate into real-world competence?</li>
+<li><strong>Level 3 -- Systemic Evaluation:</strong> Does the institution's overall competence meet its requirements? This is measured through the cross-training matrix (D9-008), the gap analysis, and the institution's operational performance. It answers the question: is the education system producing the institutional competence the institution needs?</li>
+</ul>
+
+<h3>3.3 The Revision Trigger Concept</h3>
+<p>Evaluation data is only useful if it leads to action. This article defines specific conditions -- revision triggers -- that require the education system to be updated. A revision trigger is not a suggestion; it is a mandate. When a trigger fires, the relevant curriculum, material, or assessment must be reviewed and revised. The triggers are designed to catch both acute failures (a specific training event that failed to produce competence) and chronic weaknesses (patterns of underperformance that suggest systemic problems).</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Level 1: Immediate Evaluation</h3>
+<p>Immediate evaluation occurs during or within seven days of a training event. It collects two types of data:</p>
+<p><strong>Assessment results.</strong> Did the learner pass the assessments defined in D9-004? Which specific objectives were met and which were not? Assessment failures are categorized: was the failure due to insufficient study, unclear materials, an assessment that does not match the material, or a genuine competency gap?</p>
+<p><strong>Learner feedback.</strong> The learner provides structured feedback on the training experience:</p>
+<ul>
+<li>Which materials were most helpful? Why?</li>
+<li>Which materials were confusing or insufficient? What was missing?</li>
+<li>Was the estimated duration accurate?</li>
+<li>Were the prerequisites correct and sufficient?</li>
+<li>What would the learner change about the training?</li>
+</ul>
+<p>This feedback is collected using a standard feedback form (a plain-text template maintained as part of the training material registry). In self-directed mode, the learner self-administers the form. In guided mode, the mentor and learner complete it together.</p>
+
+<h3>4.2 Level 2: Operational Evaluation</h3>
+<p>Operational evaluation occurs thirty to ninety days after training completion. It assesses whether the training produced lasting competence that transfers to real operational conditions. Methods include:</p>
+<p><strong>Performance observation.</strong> In guided mode, the mentor or another experienced operator observes the trained person performing the functions they were trained on. Observation focuses on: Does the person follow the correct procedures? Do they consult documentation when appropriate? Do they recognize when conditions deviate from normal? Can they handle minor variations without assistance?</p>
+<p><strong>Operational log review.</strong> The trained person's operational log entries are reviewed for quality and completeness. Entries should show correct execution, appropriate documentation, and sound judgment. Patterns of error or hesitation indicate areas where the training was insufficient.</p>
+<p><strong>Incident analysis.</strong> If any operational incidents occurred during the evaluation period, the trained person's response is reviewed. Did they diagnose correctly? Did they follow the appropriate recovery procedure? Did they escalate when appropriate? Incident responses are the most revealing test of training effectiveness, because they require application of knowledge under pressure.</p>
+<p><strong>Self-assessment.</strong> The trained person rates their own confidence and competence for each function they were trained on. Self-assessment is compared against the observer's assessment and the operational log data. Significant discrepancies (high self-assessment with poor performance, or low self-assessment with good performance) are noted and investigated.</p>
+
+<h3>4.3 Level 3: Systemic Evaluation</h3>
+<p>Systemic evaluation occurs annually, aligned with the cross-training audit (D9-008). It assesses the institution's overall educational health. Indicators include:</p>
+<ul>
+<li><strong>Cross-training matrix coverage.</strong> What percentage of Tier A functions have the required minimum coverage? What is the trend -- improving, stable, or declining?</li>
+<li><strong>Assessment pass rates.</strong> What percentage of assessments are passed on the first attempt? Persistently low pass rates suggest systemic training problems.</li>
+<li><strong>Time to competence.</strong> How long does it take new members to reach Stage 3 competence? Is this time decreasing (suggesting improving materials and methods) or increasing (suggesting growing complexity or declining training quality)?</li>
+<li><strong>Operational error rates.</strong> Are trained personnel making errors that the training should have prevented? Recurring errors suggest training gaps.</li>
+<li><strong>Documentation gap frequency.</strong> How often do learners discover documentation gaps during onboarding or training? A declining frequency suggests improving documentation quality. A persistent frequency suggests that documentation maintenance is not keeping pace with system changes.</li>
+</ul>
+
+<h3>4.4 Revision Triggers</h3>
+<p>The following conditions mandate a review and potential revision of the relevant education components:</p>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Component to Review</th>
+<th>Deadline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A learner fails the same assessment objective twice</td>
+<td>The specific training material and assessment for that objective</td>
+<td>Within 14 days</td>
+</tr>
+<tr>
+<td>Two different learners report confusion on the same material</td>
+<td>The specific training material</td>
+<td>Within 30 days</td>
+</tr>
+<tr>
+<td>Operational evaluation reveals competence gap the assessment missed</td>
+<td>The assessment method for the affected function</td>
+<td>Within 30 days</td>
+</tr>
+<tr>
+<td>A system or procedure changes</td>
+<td>All training materials referencing the changed system/procedure</td>
+<td>Within 30 days of the change</td>
+</tr>
+<tr>
+<td>Cross-training coverage for a Tier A function drops below minimum</td>
+<td>Training schedule and curriculum for the affected function</td>
+<td>Immediate (D9-008 gap remediation)</td>
+</tr>
+<tr>
+<td>Annual systemic evaluation shows declining trends</td>
+<td>The relevant curriculum, materials, and assessment methods</td>
+<td>Within 60 days</td>
+</tr>
+<tr>
+<td>Onboarding debrief identifies structural problems in the sequence</td>
+<td>The onboarding sequence (D9-011)</td>
+<td>Before the next onboarding begins</td>
+</tr>
+</tbody>
+</table>
+
+<h3>4.5 The Evaluation Archive</h3>
+<p>All evaluation data is preserved in the evaluation archive: a structured collection of feedback forms, assessment results, operational evaluation reports, and systemic evaluation summaries. The archive is organized chronologically and cross-referenced by the training material, curriculum, and function evaluated. It is stored as Tier 2 data per D6-001 (important but not existential).</p>
+<p>The archive's primary value is longitudinal analysis. A single evaluation data point may not be conclusive. But patterns over time -- the same material consistently receiving negative feedback, the same function consistently producing assessment failures, the same documentation gap being rediscovered by successive learners -- are highly diagnostic. The archive makes these patterns visible.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D9-12-01:</strong> Every training event must produce at least a Level 1 (immediate) evaluation. There is no training without evaluation. Training without evaluation is unverified -- the institution does not know whether it worked.</li>
+<li><strong>R-D9-12-02:</strong> Level 2 (operational) evaluation must be conducted for all Tier A and Tier B function training. It may be omitted for Tier C functions when operational observation is impractical, but the omission must be recorded.</li>
+<li><strong>R-D9-12-03:</strong> Level 3 (systemic) evaluation must be conducted annually, aligned with the cross-training audit. The systemic evaluation report is a Tier 2 governance document recorded in the decision log.</li>
+<li><strong>R-D9-12-04:</strong> Revision triggers are mandatory. When a trigger fires, the review must occur within the specified deadline. The review may conclude that no revision is needed (if the trigger was caused by factors outside the education system's control), but the review itself is required.</li>
+<li><strong>R-D9-12-05:</strong> Learner feedback is collected anonymously when the institution has more than two members. In a two-person institution, anonymity is impossible; instead, the feedback process emphasizes that honest critical feedback is valued and will not result in negative consequences. The goal is accurate data, not comfortable data.</li>
+<li><strong>R-D9-12-06:</strong> The evaluation archive must be maintained and accessible. Evaluation data that is collected but never reviewed is waste. The annual systemic evaluation must include a review of the archive for patterns.</li>
+<li><strong>R-D9-12-07:</strong> Evaluation must assess the education system, not punish the learner. A failed assessment reflects a potential flaw in the training, the materials, or the assessment itself, not necessarily a deficiency in the learner. The first response to a failure is to investigate the system, not to blame the person.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Evaluation without action.</strong> Data is collected but never analyzed. Feedback forms accumulate in the archive. Revision triggers fire but reviews are deferred. The evaluation system exists on paper but does not function as a feedback loop. Mitigation: R-D9-12-04 makes revision triggers mandatory with deadlines. R-D9-12-03 requires annual systemic evaluation. The evaluation itself is an operational activity scheduled in the tempo (OPS-001).</p>
+</li>
+<li>
+<p><strong>The courtesy feedback problem.</strong> Learners provide positive feedback to avoid conflict or because they do not want to criticize someone who trained them. The feedback data is uniformly positive and therefore useless. Mitigation: R-D9-12-05 emphasizes honest feedback. The feedback form includes specific questions about confusion points and suggestions for improvement, making it harder to give only positive responses. Operational evaluation (Level 2) provides an independent check on feedback accuracy.</p>
+</li>
+<li>
+<p><strong>Over-evaluation.</strong> The evaluation process becomes so burdensome that it consumes time that should be spent on training itself. Every training event triggers extensive paperwork. The tail wags the dog. Mitigation: the evaluation framework is deliberately lightweight. Level 1 is a single feedback form. Level 2 is observation and log review that can be integrated into normal operational oversight. Level 3 is an annual exercise. The cost is proportional to the value.</p>
+</li>
+<li>
+<p><strong>Misattribution of failure.</strong> A learner fails an assessment, and the failure is attributed to the learner when the actual cause is poor training materials. Or: a learner passes an assessment, and the training is credited when the learner's prior experience is the actual cause. Mitigation: R-D9-12-07 requires investigating the system before blaming the learner. Level 2 operational evaluation provides a reality check on Level 1 assessment results. Patterns across multiple learners are more diagnostic than individual cases.</p>
+</li>
+<li>
+<p><strong>The solo-operator evaluation gap.</strong> When there is only one person, there is no one to evaluate the training, no one to provide feedback, and no one to observe operational performance. The evaluation system has no inputs. Mitigation: the solo operator uses the self-assessment component of Level 2 and the systemic indicators of Level 3 (documentation gap frequency, self-assessed competence across functions). The temporal distance method (D9-009 Commentary) -- returning to a procedure after a gap and noting difficulties -- provides a form of self-evaluation.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a revision trigger fires and the review reveals a curriculum deficiency:</strong> The specific curriculum module is revised per D9-003 methodology. Affected training materials are updated per D9-009. Affected assessments are revised per D9-004. Learners who completed the deficient curriculum are notified and offered supplemental training for the identified gap. The revision is recorded in the evaluation archive.</p>
+</li>
+<li>
+<p><strong>If systemic evaluation reveals a declining trend:</strong> Conduct a root cause analysis. Common causes: documentation is not keeping pace with system changes (triggering material accuracy decay), cross-training time is being squeezed out by operational demands (triggering the priority inversion from D9-008), or the assessment methods are not validly measuring competence (triggering assessment theater from D9-001). Address the root cause, not the symptom. Record the analysis and remediation plan in the decision log.</p>
+</li>
+<li>
+<p><strong>If the evaluation archive is lost:</strong> Rebuild what can be reconstructed from operational logs, assessment records, and decision log entries. Accept that historical evaluation data may be permanently lost. Implement the archive's backup procedures per D6-001 to prevent recurrence. Begin collecting new data immediately.</p>
+</li>
+<li>
+<p><strong>If evaluation reveals that the self-teaching requirement (D9-001, R-D9-01) is not being met for a specific function:</strong> This is a critical finding. The affected function's training materials are flagged for immediate revision. A solo-learner review (D9-009, R-D9-09-04) is conducted. The materials are revised and re-tested until the self-teaching requirement is met. This takes priority over new material development because the self-teaching requirement is the institution's last line of defense.</p>
+</li>
+<li>
+<p><strong>If evaluation consistently produces no actionable findings:</strong> The evaluation methodology itself may be flawed. Review the evaluation questions: are they specific enough? Review the collection process: is honest feedback being suppressed? Review the analysis: is the data being examined with sufficient rigor? An evaluation system that never finds problems is either evaluating a perfect education system (unlikely) or failing to detect problems (more likely).</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The evaluation system has minimal data. There have been no real training events to evaluate. The primary activity is establishing the infrastructure: the feedback form template, the evaluation archive structure, and the revision trigger checklist. The founding operator can conduct a form of Level 1 evaluation on their own documentation by re-reading it after time gaps and noting where comprehension falters. Level 3 systemic evaluation is essentially a solo self-assessment: does the documentation meet the self-teaching standard?</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The first real training events produce the first real evaluation data. This data will be revelatory. Expect to discover that the training materials have significant gaps, that the assessments do not accurately predict operational performance, and that the feedback form needs revision. Each of these discoveries is a success of the evaluation system, not a failure -- the system is doing its job by surfacing problems.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The evaluation archive should contain enough data for longitudinal analysis. Patterns should be visible: which materials consistently need revision, which functions are hardest to train, which assessment methods are most predictive of operational competence. The education system should be measurably improving as revision triggers drive iterative refinement.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The evaluation archive is an institutional treasure. It documents decades of educational experience: what worked, what did not, how the institution's educational needs evolved. The archive informs not just current training decisions but the institution's understanding of its own learning process. The evaluation framework itself should have been revised multiple times based on accumulated experience, becoming more efficient and more diagnostic over time.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Evaluating training effectiveness when you are the only person, the only trainer, and the only student is an exercise in honest self-assessment. The temptation is to say "I understand all of this, so the documentation must be fine." But I understand it because I built it, not because the documentation taught it to me. The documentation has not taught anyone anything yet. It has only recorded what I already know.</p>
+<p>The real evaluation begins when someone else tries to learn from what I have written. Until then, the best I can do is the temporal distance method: wait, forget, and try to relearn from the documentation. Every time I return to a procedure I wrote months ago and find a step that no longer makes sense to me, I have found a gap. Those gaps are the most valuable data I have right now.</p>
+<p>The revision trigger table is the part of this article I expect to use most. It converts evaluation data into mandatory action. Without it, feedback would be advisory -- good to know, but easy to defer. With it, certain findings require a response within a deadline. That mandatory quality is what makes the evaluation system a real feedback loop rather than a suggestion box.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D9-001 -- Education Philosophy: Reproducing Institutional Competence (self-teaching requirement, competence stages)</li>
+<li>D9-003 -- Role-Specific Curriculum Design (curriculum is revised based on effectiveness data)</li>
+<li>D9-004 -- Skill Assessment &amp; Certification Standards (assessment methods and results are evaluated)</li>
+<li>D9-008 -- Cross-Training Requirements (cross-training matrix feeds systemic evaluation)</li>
+<li>D9-009 -- Training Material Standards (materials are revised based on effectiveness data)</li>
+<li>D9-011 -- New Member Onboarding Sequence (onboarding debrief feeds evaluation data)</li>
+<li>D6-001 -- Data Philosophy (evaluation archive storage tier)</li>
+<li>D19-002 -- Documentation Quality Audit Procedures (quality audit includes training effectiveness metrics)</li>
+<li>OPS-001 -- Operations Philosophy (evaluation is an operational activity in the tempo)</li>
+<li>GOV-001 -- Authority Model (systemic evaluation reported as governance event)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

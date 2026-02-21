@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D12-009 — Facility Loss and Relocation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li class="active"><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d12-009">
+  <h1>D12-009 &mdash; Facility Loss and Relocation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D12-009</dd>
+  <dt>Domain</dt>
+  <dd>12 -- Disaster Recovery</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D12-001, D12-003, D12-004, D12-005, SEC-002, CON-001, D11-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D12-002 (drill Scenario 3: complete site loss), D12-012 (cascade failures from facility events).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines what happens when the physical site housing the institution is destroyed, severely damaged, or rendered uninhabitable. Fire, flood, earthquake, structural failure, or forced relocation -- any event that makes the primary facility unavailable for an extended period. This is among the most severe failure scenarios the institution faces because it potentially destroys all on-site hardware, all on-site backups (Location A), and all on-site documentation.</p>
+<p>The institution's survival in this scenario depends entirely on what was stored off-site: Location B backups, Location C backups, the rebuild kit, and any printed documentation cached at remote locations. This article defines the procedures for assessing a facility loss, salvaging what can be salvaged, relocating to a new site, and rebuilding the institution at the new location.</p>
+<p>This article also addresses the less dramatic but operationally complex scenario of planned relocation: the operator decides to move the institution to a new location for non-emergency reasons. While not a disaster, a planned move involves many of the same risks (equipment transport damage, data integrity during move, establishing new security zones) and benefits from the same procedural discipline.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong></p>
+<ul>
+<li>Emergency response in the first hours after facility loss or damage.</li>
+<li>Salvage assessment: determining what survived and what is recoverable.</li>
+<li>New site selection criteria and minimum facility requirements.</li>
+<li>Relocation logistics: transporting surviving assets, equipment procurement.</li>
+<li>Rebuilding the institution at a new site (references D12-003 for technical rebuild).</li>
+<li>Re-establishing security zones at the new location.</li>
+<li>Planned relocation procedures.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+<li>System rebuild procedures (D12-003 -- this article handles the facility; D12-003 handles the system).</li>
+<li>Insurance, legal, or financial aspects of facility loss (outside the documentation institution's scope).</li>
+<li>Environmental controls design (D4-001, subsequent Domain 4 articles).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Probability and Preparedness</h3>
+<p>D12-004 rates fire as Possible over fifty years, flood as Possible, and forced relocation as Possible. These are low-probability but high-impact events. The institution's preparation for facility loss rests on the off-site backup strategy (D12-005 Location C), the rebuild kit (D12-003), and this article's relocation procedures.</p>
+
+<h3>3.2 The Emotional Dimension</h3>
+<p>Facility loss is one of the most emotionally difficult disaster scenarios. The operator may have lost not just the institution's hardware but their home, their personal belongings, and their sense of security. The procedures in this article are written with awareness that the operator executing them may be in a state of shock, grief, or severe stress. Steps are explicit, sequential, and do not require complex decision-making under pressure.</p>
+
+<h3>3.3 The Salvage Temptation</h3>
+<p>After a partial facility loss (fire that damages one room, flood that affects the ground floor), the operator will be tempted to salvage hardware and resume operations at the damaged site. This temptation must be resisted until a proper assessment is completed. Water-damaged electronics may appear functional but fail days later from corrosion. Smoke-damaged equipment may have soot contamination on circuit boards. Heat-exposed storage media may have suffered data corruption that is not immediately apparent. The salvage assessment in this article provides a structured method for determining what can safely be reused.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Emergency Response (First 24 Hours)</h3>
+<ol>
+<li><strong>Ensure personal safety.</strong> No data, hardware, or documentation is worth risking life or health. Evacuate if necessary. Do not re-enter a damaged structure until it has been declared safe.</li>
+<li><strong>If the event is ongoing (fire, flood), do not attempt to save hardware.</strong> The off-site backups exist precisely for this scenario.</li>
+<li><strong>If the event has concluded and the site is safe to enter:</strong>
+  <ul>
+  <li>Assess structural integrity. Do not enter a structurally compromised building.</li>
+  <li>Photograph the damage before touching anything (documentation for the post-incident review and for any insurance claims).</li>
+  <li>Identify any hardware that may be salvageable (equipment not directly exposed to fire, water, or structural damage).</li>
+  <li>If possible, retrieve the Location A backup media (even if potentially damaged -- it can be assessed later).</li>
+  <li>Do NOT power on any equipment that has been exposed to water, smoke, extreme heat, or debris.</li>
+  </ul>
+</li>
+<li><strong>Confirm off-site assets are secure.</strong> Verify that Location B and Location C are unaffected. Verify that the rebuild kit at Zone 3 is intact.</li>
+<li><strong>Document the event.</strong> Write a preliminary incident record while details are fresh: what happened, when, what is damaged, what is confirmed intact, what is uncertain.</li>
+</ol>
+
+<h3>4.2 Salvage Assessment (Days 1-7)</h3>
+<table>
+<thead>
+<tr><th>Equipment Type</th><th>Exposure</th><th>Assessment</th></tr>
+</thead>
+<tbody>
+<tr><td>Any hardware</td><td>Direct fire</td><td>Destroyed. Do not attempt to use.</td></tr>
+<tr><td>Any hardware</td><td>Submerged in water</td><td>Likely destroyed. Do not power on. Data recovery from storage media may be possible by a specialist, but do not depend on it.</td></tr>
+<tr><td>Storage drives</td><td>Smoke/soot but no direct fire or water</td><td>Potentially salvageable. Do not power on at the damaged site. Transport to clean environment. Connect to a known-good system and attempt to read. Verify all data against checksums.</td></tr>
+<tr><td>Sealed external backup media</td><td>Heat but no direct fire</td><td>Potentially salvageable. Test readability in a clean environment. Verify checksums. If any files fail verification, treat the media as unreliable.</td></tr>
+<tr><td>Electronics (PSU, motherboard, etc.)</td><td>Smoke/soot</td><td>Unreliable. Soot is conductive and corrosive. Replace rather than risk intermittent failures.</td></tr>
+<tr><td>Printed documentation</td><td>Smoke but readable</td><td>Usable. Photograph or scan before handling extensively (some fire-damaged paper becomes fragile).</td></tr>
+</tbody>
+</table>
+<p>The default assumption for any equipment exposed to a facility disaster is: unreliable until proven otherwise. When in doubt, replace.</p>
+
+<h3>4.3 New Site Selection</h3>
+<p>The new site must meet the minimum facility requirements defined in CON-001 and SEC-002:</p>
+<ul>
+<li><strong>Physical security:</strong> Ability to establish at least Zone 1 (secure room or cabinet with controlled access).</li>
+<li><strong>Power:</strong> Stable electrical supply sufficient for the institution's hardware. Ability to install UPS protection. If CON-001 specifies off-grid capability, the site must support the institution's power generation equipment.</li>
+<li><strong>Environmental:</strong> Temperature and humidity within acceptable ranges for electronic equipment (18-24C, 30-60% relative humidity). Protection from direct water exposure.</li>
+<li><strong>Separation from off-site backup:</strong> The new site should not be in the same risk zone as the Location C backup. If the new site is near Location C, Location C must be moved to maintain geographic separation.</li>
+</ul>
+
+<h3>4.4 Relocation and Rebuild</h3>
+<ol>
+<li><strong>Retrieve the rebuild kit from Zone 3</strong> (Location C backup, encryption keys, printed documentation, installation media).</li>
+<li><strong>Procure replacement hardware</strong> per D12-003 Phase 1.</li>
+<li><strong>Execute the system rebuild</strong> per D12-003 Phases 2-6.</li>
+<li><strong>Establish security zones</strong> at the new site per SEC-002. At minimum, establish Zone 1 for the operational hardware and Zone 2 for local backup storage.</li>
+<li><strong>Re-establish the backup system.</strong> Create new Location A and Location B backup locations at the new site. Create first backups immediately after rebuild verification.</li>
+<li><strong>Designate a new Location C</strong> if the previous Location C is now too close to the new site.</li>
+<li><strong>Update all documentation</strong> to reflect the new site: asset registry, security zone descriptions, facility references.</li>
+</ol>
+
+<h3>4.5 Planned Relocation</h3>
+<p>For non-emergency moves:</p>
+<ol>
+<li><strong>Before the move:</strong> Create fresh backups at all three locations. Verify all backups. Update the rebuild kit. This ensures that if the move causes equipment damage, recovery is possible from known-good backups.</li>
+<li><strong>During the move:</strong> Power down all systems cleanly. Package hardware with appropriate protection (anti-static bags, padding, temperature protection). Transport storage media separately from the systems, if possible, to avoid single-event loss. Do not leave hardware in a vehicle exposed to temperature extremes.</li>
+<li><strong>After the move:</strong> Set up and power on systems. Run full integrity checks (D6-003) on all storage. Compare checksums against pre-move baselines. If any discrepancies are found, restore from the pre-move backup. Establish security zones at the new site. Update documentation.</li>
+</ol>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D12-09-01:</strong> Personal safety takes absolute priority over institutional assets during any facility emergency. No recovery procedure in this article may be executed if it places the operator at risk of injury.</li>
+<li><strong>R-D12-09-02:</strong> Equipment exposed to fire, water, or extreme conditions must not be powered on until assessed per Section 4.2.</li>
+<li><strong>R-D12-09-03:</strong> The rebuild kit (D12-003) must be maintained at Zone 3 at all times. It is the institution's survival seed during facility loss.</li>
+<li><strong>R-D12-09-04:</strong> After any facility relocation (emergency or planned), full integrity verification (D6-003) must be completed before the institution resumes normal operations.</li>
+<li><strong>R-D12-09-05:</strong> The new site must meet the minimum facility requirements in Section 4.3 before the institution is declared operational at the new location.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Off-site backup also destroyed.</strong> A regional disaster (earthquake, wildfire) destroys both the primary site and Location B. Mitigation: Location C is at sufficient geographic distance per D12-005 R-D12-05-02.</li>
+<li><strong>Salvage of damaged equipment introduces latent failures.</strong> The operator reuses smoke-damaged hardware that fails weeks later. Mitigation: Section 4.2 salvage assessment defaults to replacement. Smoke-exposed electronics are classified as unreliable.</li>
+<li><strong>Emotional state impairs decision-making.</strong> The operator, traumatized by facility loss, makes hasty decisions about relocation or salvage. Mitigation: the emergency response procedure (Section 4.1) defers all major decisions for at least 24 hours. The rebuild procedure (D12-003) provides structured steps that do not require creative problem-solving.</li>
+<li><strong>New site inadequate.</strong> Urgency leads the operator to select a site that does not meet minimum requirements, creating new vulnerabilities. Mitigation: Section 4.3 defines minimum requirements. R-D12-09-05 requires these requirements to be met before declaring operational status.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If the rebuild kit at Zone 3 is also damaged or lost:</strong> This is the worst case short of total institutional destruction. Locate any surviving backup from any location. If Location B survives, use it. If any individual backup media from any location survives, use it. If no backup media survives, the institution has suffered total data loss and must be reconstructed from human memory and any surviving printed materials per D12-003 recovery procedure 1.</li>
+<li><strong>If replacement hardware cannot be procured quickly:</strong> Assess whether any personal computing equipment can serve as a temporary platform. The institution's procedures are designed to run on any Unix-like system. A borrowed laptop with encrypted storage can serve as a temporary host while permanent hardware is procured.</li>
+<li><strong>If the operator cannot access the damaged site to assess salvage:</strong> Write off all on-site assets. Proceed directly to rebuild from off-site materials. Do not delay the rebuild waiting for site access.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Establish the off-site backup locations and rebuild kit. Conduct D12-002 Scenario 3 (complete site loss) at least once to test the relocation concept on paper.</li>
+<li><strong>Years 5-15:</strong> If the institution has not relocated, the primary risk is complacency about facility threats. Continue to drill Scenario 3 regularly. If a planned relocation occurs, use it as a real-world test of these procedures.</li>
+<li><strong>Years 15-30:</strong> The operator's life circumstances may necessitate relocation. This article becomes directly relevant. Treat any planned move as an opportunity to validate the procedures and update them.</li>
+<li><strong>Years 30-50+:</strong> Over this time span, at least one relocation is likely (planned or unplanned). The post-incident review from the first relocation provides the best revision material for these procedures.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+This article was difficult to write because it asks me to contemplate losing my home -- which is also the institution's home. The institutional data is protected by off-site backups. My personal possessions are not within the scope of this document, but the emotional reality of facility loss goes beyond data recovery.</p>
+<p>I included Section 3.2 (The Emotional Dimension) because every disaster recovery manual I have read treats facility loss as a purely logistical problem. It is not. The person executing these procedures may have just lost everything they own. The procedures must be usable by that person in that state: clear, sequential, and demanding no judgment calls in the first 24 hours.</p>
+<p>The salvage temptation (Section 3.3) comes from experience watching people pull water-damaged computers out of flooded basements and plug them in "to see if they still work." Sometimes they do, briefly. Then they fail catastrophically, often taking data with them that could have been recovered from the undamaged drives by a careful technician. The first rule after facility loss is: do not make it worse.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D12-001 -- Disaster Recovery Philosophy (graceful degradation, rebuild mindset)</li>
+<li>D12-003 -- System Rebuild Procedures (technical rebuild at new site)</li>
+<li>D12-004 -- Failure Taxonomy (Category 5: Facility Failures)</li>
+<li>D12-005 -- Backup Strategy (three-location architecture, geographic separation)</li>
+<li>D12-002 -- Disaster Recovery Drill Framework (Scenario 3: complete site loss)</li>
+<li>D12-012 -- Cascade Failure Analysis (facility failures cascading to hardware and data)</li>
+<li>SEC-002 -- Access Control Procedures (security zones at new site)</li>
+<li>CON-001 -- The Founding Mandate (facility requirements, off-grid capability)</li>
+<li>D11-001 -- Administration Philosophy (procurement for replacement equipment)</li>
+<li>D6-003 -- Data Integrity Verification (post-relocation integrity checks)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 6: honest accounting of losses)</li>
+</ul>
+<hr>
+<hr>
+</section>
+</article>
+</main>
+</body>
+</html>

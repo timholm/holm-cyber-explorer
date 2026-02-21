@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D12-006 — Backup Verification and Integrity Testing - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li class="active"><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d12-006">
+  <h1>D12-006 &mdash; Backup Verification and Integrity Testing</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D12-006</dd>
+  <dt>Domain</dt>
+  <dd>12 -- Disaster Recovery</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D12-001, D12-005, D6-002, D6-003, SEC-003</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D12-002 (drill scenarios test verification), D12-003 (rebuild depends on verified backups), D12-008 (corruption recovery depends on known-good backups).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution proves that its backups are actually restorable. D12-005 defines what is backed up, where, and how often. This article ensures that those backups are not merely present but functional -- that they can be decrypted, decompressed, extracted, and used to recover the data they claim to contain.</p>
+<p>D12-001 stated the principle bluntly: a backup that has not been tested is not a backup. It is a hope. This article converts that principle into specific, scheduled, repeatable verification procedures. It covers four layers of verification: media readability (can the storage medium be physically read), archive integrity (is the backup file structurally intact), content verification (does the backup contain the expected files with the expected checksums), and restoration testing (can the data actually be restored to a working state).</p>
+<p>Verification is not optional. It is not something to do when there is spare time. It is a scheduled maintenance activity with the same non-negotiable status as the backups themselves. A backup system without verification is a system that discovers its failures at the worst possible moment: when the backup is needed for a real recovery.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong></p>
+<ul>
+<li>Four-layer verification model: media, archive, content, and restoration.</li>
+<li>Verification schedules for each backup location and data tier.</li>
+<li>Bit-rot detection and media degradation monitoring.</li>
+<li>Test-restore drill procedures (coordinated with D12-002).</li>
+<li>Verification logging and reporting.</li>
+<li>Failure response procedures when verification reveals problems.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+<li>Backup creation procedures (D6-002).</li>
+<li>Backup strategy and architecture (D12-005).</li>
+<li>Primary data integrity verification (D6-003; this article verifies backup copies).</li>
+<li>Full disaster recovery drills (D12-002; this article provides the verification component that drills test).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Four Layers of Backup Failure</h3>
+<p>A backup can fail at any of four layers, and each layer requires its own verification method. A backup that passes one layer may fail at another. Comprehensive verification requires testing all four.</p>
+<p><strong>Layer 1: Media failure.</strong> The physical storage medium is unreadable. The drive does not spin up. The USB device is not recognized. The optical disc has surface damage. This is the most obvious failure and the easiest to detect, but it is also the most final: if the media cannot be read, the data on it is inaccessible.</p>
+<p><strong>Layer 2: Archive corruption.</strong> The media is readable, but the backup archive file is structurally damaged. The tarball is truncated. The compression stream is corrupted. The encrypted container has a damaged header. The data is physically present on the media but the logical structure that makes it usable is broken.</p>
+<p><strong>Layer 3: Content corruption.</strong> The archive is structurally intact and can be extracted, but the files inside have been corrupted. Checksums do not match. File contents have been altered by bit rot, write errors, or encryption defects. The file names are correct and the file sizes look right, but the actual data is wrong.</p>
+<p><strong>Layer 4: Restoration failure.</strong> The data is intact, but the restoration procedure fails. Configuration files reference hardware that does not exist. Service definitions assume software that is not installed. Database dumps cannot be imported because the schema has changed. The data is good but the procedures for using it are not.</p>
+
+<h3>3.2 The Cost of Undetected Failure</h3>
+<p>Each backup cycle, the institution's recovery capability is either confirmed or silently degraded. Without verification, degradation accumulates undetected. The operator believes the backup system is healthy because no errors have been reported. But absence of error is not presence of correctness. The media may be degrading. The archives may be subtly corrupted. The procedures may have drifted out of sync with the current system. Verification is the mechanism that converts silent degradation into visible, actionable findings.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Layer 1: Media Readability Verification</h3>
+<p>Media readability is verified by reading every sector of the backup medium and confirming that the device reports no errors.</p>
+<p><strong>For hard drives and SSDs:</strong></p>
+<ul>
+<li>Run SMART health diagnostics: <code>smartctl -a /dev/[device]</code></li>
+<li>Check for reallocated sectors, pending sectors, and uncorrectable errors.</li>
+<li>Perform a full surface read: <code>dd if=/dev/[device] of=/dev/null bs=1M status=progress</code></li>
+</ul>
+<p><strong>For removable USB media:</strong></p>
+<ul>
+<li>Connect the device and verify it is recognized by the operating system.</li>
+<li>Mount the device and perform a full directory listing to confirm accessibility.</li>
+<li>Check for I/O errors in the kernel log: <code>dmesg | grep -i error</code></li>
+</ul>
+<p><strong>Schedule:</strong> Location A -- monthly. Location B -- quarterly. Location C -- annually (during the annual operations cycle, or whenever the media is accessed for refresh).</p>
+
+<h3>4.2 Layer 2: Archive Integrity Verification</h3>
+<p>Archive integrity is verified by testing the archive structure without full extraction.</p>
+<ul>
+<li>For compressed tar archives: <code>tar -tzf /path/to/backup.tar.gz > /dev/null</code></li>
+<li>For encrypted containers: attempt to open the container with the correct key and verify the decryption completes without error.</li>
+<li>For LUKS-encrypted volumes: <code>cryptsetup open --test-passphrase /dev/[device]</code></li>
+</ul>
+<p><strong>Schedule:</strong> Every time a backup is created (automated as part of the backup script). Additionally, monthly for Location A, quarterly for Location B, annually for Location C.</p>
+
+<h3>4.3 Layer 3: Content Checksum Verification</h3>
+<p>Content verification compares the actual file contents against recorded checksums.</p>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>Extract the backup to a temporary location (or mount it read-only).</li>
+<li>Locate the checksum manifest created during backup (per D6-002, every backup includes a SHA-256 manifest).</li>
+<li>Verify: <code>cd /tmp/backup-verify && sha256sum -c manifest.sha256</code></li>
+<li>Record any failures. Any checksum mismatch indicates corruption.</li>
+<li>Clean up the temporary extraction.</li>
+</ol>
+<p><strong>Schedule:</strong> Location A -- monthly (spot-check: verify 10% of files selected randomly, plus all files over 100MB). Location B -- quarterly (full verification of all Tier 1 files). Location C -- annually (full verification of all files).</p>
+
+<h3>4.4 Layer 4: Restoration Testing</h3>
+<p>Restoration testing is the ultimate verification: actually restoring data from the backup to a test target and confirming that it is usable.</p>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>Select a test target (spare drive, test partition, or temporary directory on a non-production volume).</li>
+<li>Follow the restoration procedure defined in D6-002 Section 4.4 exactly as written.</li>
+<li>After restoration, verify:
+  <ul>
+  <li>All expected files are present.</li>
+  <li>File permissions are correct.</li>
+  <li>Critical files are readable and contain expected content (open and inspect at least five files manually).</li>
+  <li>If database dumps are included, import them into a test database instance and verify data accessibility.</li>
+  </ul>
+</li>
+<li>Record the results in the verification log.</li>
+<li>Clean up the test target.</li>
+</ol>
+<p><strong>Schedule:</strong> Monthly for Tier 1 data from Location A. Quarterly for Tier 1 data from Location B. Annually for a full restore test from Location C (this annual test is coordinated with D12-002's annual full recovery drill). At least one full restore from Location C per year is mandatory per D12-001 R-DR-02.</p>
+
+<h3>4.5 Verification Logging</h3>
+<p>Every verification produces a log entry:</p>
+<pre>
+BACKUP VERIFICATION LOG
+
+Date:           [date]
+Location:       [A / B / C]
+Backup Date:    [date of the backup being verified]
+Data Tier:      [1 / 2 / 3 / all]
+
+Layer 1 (Media):     [PASS / FAIL / SKIP] -- [notes]
+Layer 2 (Archive):   [PASS / FAIL / SKIP] -- [notes]
+Layer 3 (Content):   [PASS / FAIL / SKIP] -- [notes]
+Layer 4 (Restore):   [PASS / FAIL / SKIP] -- [notes]
+
+Findings:       [any issues discovered]
+Action Required: [any corrective actions needed]
+Operator:       [identifier]
+</pre>
+<p>Verification logs are Tier 2 documents per D6-001 and are stored in the operational records.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D12-06-01:</strong> Backup verification must be conducted on the schedule defined in Section 4. Missed verifications must be rescheduled within 14 days.</li>
+<li><strong>R-D12-06-02:</strong> Every backup at every location must pass at least Layer 1 and Layer 2 verification annually. Layer 3 verification must be completed at least annually for all locations. Layer 4 (restoration) must be completed at least annually for Location C.</li>
+<li><strong>R-D12-06-03:</strong> Any verification failure at Layer 1 or Layer 2 triggers immediate corrective action: the affected backup must be replaced from primary data or from a verified backup at another location within 48 hours.</li>
+<li><strong>R-D12-06-04:</strong> Any verification failure at Layer 3 triggers investigation: determine the scope of corruption, identify the cause, and assess whether the corruption has propagated to other backup generations or locations.</li>
+<li><strong>R-D12-06-05:</strong> Verification logs must be maintained and reviewed during the quarterly operations cycle. Patterns of recurring verification issues must be escalated to a Tier 2 governance decision.</li>
+<li><strong>R-D12-06-06:</strong> The verification procedures themselves must be reviewed annually to ensure they remain compatible with current backup formats and media types.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Verification complacency.</strong> Backups pass verification for years. The operator begins to treat verification as a formality, skipping steps or accepting partial results. The one time a backup is actually corrupted, the abbreviated verification misses it. Mitigation: the four-layer model provides structured rigor. The quarterly drill cycle tests actual restoration.</li>
+<li><strong>Verification-induced damage.</strong> The verification process itself damages the backup media (excessive read cycles on aging media, accidental writes to read-only media). Mitigation: verification uses read-only operations. Media is mounted read-only when possible. SMART monitoring detects increasing read errors before they become critical.</li>
+<li><strong>Verification scope creep.</strong> Verification takes progressively longer as data volume grows, eventually consuming more time than the operator can allocate. Verifications are skipped or abbreviated. Mitigation: the spot-check approach for Location A (10% of files) keeps routine verification tractable. Full verification is reserved for quarterly and annual cycles.</li>
+<li><strong>False confidence from partial verification.</strong> Layer 1 and Layer 2 pass, and the operator assumes the backup is good without testing Layers 3 and 4. But Layer 3 and 4 failures are the most common in practice. Mitigation: the verification schedule mandates all four layers on a defined cadence.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If Layer 1 fails (media unreadable):</strong> The backup on this media is lost. Assess whether other copies of the same data exist at other locations. Create a replacement backup immediately from primary data or from a verified backup at another location. Investigate the cause of media failure. If the failure is age-related, advance the media refresh schedule for all media of the same type and age.</li>
+<li><strong>If Layer 2 fails (archive corrupted):</strong> Attempt partial extraction to recover what can be recovered. Create a replacement backup from primary data. Investigate: was the corruption present at creation time (backup script error) or did it develop after creation (media degradation, bit rot)? Address the root cause.</li>
+<li><strong>If Layer 3 fails (content checksum mismatch):</strong> Identify the affected files. Determine whether the corruption is in the backup or in the primary data (compare against another backup generation). If the backup is corrupted, replace it. If the primary data is corrupted, initiate D12-008 data corruption recovery.</li>
+<li><strong>If Layer 4 fails (restoration fails):</strong> The data may be intact but the restoration procedure is outdated. Update the restoration procedure to match the current system. Test the updated procedure. Document the discrepancy.</li>
+<li><strong>If verification has lapsed for more than 6 months:</strong> Conduct an emergency verification of all locations at all layers. Prioritize Location C (the rebuild safety net). Document any gaps discovered. Resume the normal schedule.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Verification procedures are established and refined. Early verifications will reveal procedural gaps: checksums not generated during backup, archive formats that are difficult to verify non-destructively, media that degrades faster than expected. Use these findings to improve both the verification procedures and the backup procedures.</li>
+<li><strong>Years 5-15:</strong> Verification is routine. The verification log accumulates a history of media health, allowing the operator to identify degradation trends and proactively replace media before failure.</li>
+<li><strong>Years 15-30:</strong> Media technology transitions require updating verification procedures. New media types may require different tools and techniques. The verification log history helps predict which media types are most reliable under the institution's storage conditions.</li>
+<li><strong>Years 30-50+:</strong> The verification discipline, not the specific procedures, is the lasting contribution of this article. The tools and media will change. The principle -- verify everything, trust nothing, test regularly -- will not.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I have a horror of the discovery that a backup is corrupted at the moment I need it most. I have seen this happen in professional environments: a team confidently initiates disaster recovery, retrieves the backup tape, and discovers that the last successful backup was from three months ago because verification was "someone else's job" and no one was doing it.</p>
+<p>In a one-person institution, verification is always my job. There is no one else to blame and no one else to catch the failure. This article is my hedge against my own future complacency -- the version of me who, five years from now, is tempted to skip the monthly verification because "it always passes anyway."</p>
+<p>The four-layer model exists because I once saw a backup pass archive integrity testing with flying colors -- the tarball was structurally perfect -- while containing files that were entirely corrupted at the byte level. The archive was intact. The data inside it was garbage. Layer 2 passed. Layer 3 would have caught it. But Layer 3 was never run. That lesson cost someone else their data. I intend for it to save mine.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D12-001 -- Disaster Recovery Philosophy (a backup not tested is not a backup)</li>
+<li>D12-005 -- Backup Strategy and Data Protection (the strategy this article verifies)</li>
+<li>D12-002 -- Disaster Recovery Drill Framework (drills that test restoration)</li>
+<li>D12-003 -- System Rebuild Procedures (rebuild depends on verified backups)</li>
+<li>D12-008 -- Data Corruption and Integrity Failure Recovery (response to content verification failures)</li>
+<li>D6-002 -- Backup Doctrine (backup creation procedures, checksum manifests)</li>
+<li>D6-003 -- Data Integrity Verification (primary data integrity, complementary to backup verification)</li>
+<li>SEC-003 -- Cryptographic Key Management (encryption verification for backup containers)</li>
+<li>D10-002 -- Daily Operations Checklist (verification scheduling)</li>
+</ul>
+<hr>
+<hr>
+</section>
+</article>
+</main>
+</body>
+</html>

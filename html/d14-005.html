@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D14-005 — Negative Results Registry - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li class="active"><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d14-005">
+  <h1>D14-005 &mdash; Negative Results Registry</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D14-005</dd>
+  <dt>Domain</dt>
+  <dd>14 -- Research & Theory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, D14-001, D14-002, D14-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D14-003, D14-006. All Domain 14 articles that initiate new investigations. Referenced by all domains where prior failures are relevant to current work.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the Negative Results Registry -- the institution's formal record of what has been tried and failed, what has been hypothesized and disproven, and what has been evaluated and rejected. It establishes why this registry exists, how it is structured, how entries are created, and how the registry is used to prevent the institution from repeating known failures.</p>
+<p>The concept is simple and the resistance to it is powerful. Human beings do not naturally document failure. Failure feels like wasted effort, and documenting it feels like memorializing the waste. The instinct is to move on, to try the next thing, to focus on what works rather than what does not. This instinct, in a single-operator institution with no external peer community, is catastrophic over time. It guarantees that failures are repeated, that rejected approaches are revisited without memory of the prior rejection, and that the institution spends its finite research resources rediscovering things it already knows do not work.</p>
+<p>D14-001 established the principle (R-RES-02) that negative results must be documented with the same rigor as positive results. This article operationalizes that principle into a specific system.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The philosophical and practical justification for maintaining a negative results registry.
+- The negative results entry format: mandatory fields, optional fields, completion criteria.
+- Types of negative results: experimental failures, disproven hypotheses, rejected technologies, abandoned approaches.
+- The registry search protocol: how to consult the registry before starting new work.
+- Integration with the knowledge taxonomy (D14-004) and the experiment log format (D14-002).
+- The registry maintenance process: review, consolidation, and cross-referencing.</p>
+<p><strong>Out of scope:</strong>
+- General experimental methodology (D14-002).
+- General knowledge classification (D14-004).
+- Technology evaluation procedures (D14-003, though rejected technology evaluations feed this registry).
+- Operational incident reports (Domain 10, though operational failures may generate negative result entries).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Cost of Forgetting Failure</h3>
+<p>In the broader scientific community, the problem of unreported negative results -- sometimes called the "file drawer problem" -- is well recognized. Journals preferentially publish positive results. Researchers preferentially submit positive results. The result is a systematic distortion of the knowledge base: the published record suggests that interventions work more often than they actually do, because the failures are sitting in file drawers, unreported.</p>
+<p>In a single-operator institution, the file drawer is the operator's memory, and memory is the least reliable file drawer of all. The operator runs an experiment. It fails. The operator moves on. Three years later, the operator -- or worse, a successor -- faces the same question, runs the same experiment, and discovers the same failure. The time, energy, and materials spent on the second attempt are pure waste, waste that a one-line entry in a registry would have prevented.</p>
+<p>The cost of forgetting failure compounds. Each unreported negative result is a trap waiting for a future researcher. In an institution that operates for decades, the cumulative waste of repeated failures can dwarf the cost of maintaining the registry by orders of magnitude.</p>
+<h3>3.2 The Stigma of Negative Results</h3>
+<p>The most powerful obstacle to maintaining a negative results registry is not logistical -- it is psychological. Recording a failure feels like admitting defeat. The experiment log for a failed experiment is, the instinct whispers, a monument to wasted effort. This instinct must be confronted directly.</p>
+<p>A failed experiment is not wasted effort. It is knowledge. It tells you that a particular approach, under particular conditions, does not produce the expected result. That knowledge has concrete value: it narrows the search space for future work, it prevents resource expenditure on known dead ends, and it sometimes reveals unexpected insights about why something does not work that illuminate how other things do work.</p>
+<p>Furthermore, per ETH-001 Principle 6, the institution must honestly account for its limitations. A research archive that contains only successes is not honest. It presents a distorted picture of the institution's knowledge by omitting the attempts that did not succeed. The negative results registry is, in this sense, an ethical obligation, not just a practical tool.</p>
+<h3>3.3 The Predecessor Problem</h3>
+<p>Perhaps the most important justification for the negative results registry is the predecessor problem: the situation where a successor operator, unfamiliar with the institution's research history, embarks on a line of investigation that their predecessor already pursued and abandoned. Without a negative results registry, the successor has no way to know this. The predecessor's failures exist only in the predecessor's memory, which is no longer available.</p>
+<p>The registry is, in this context, a letter from the past to the future: "I tried this. Here is what happened. Here is why I stopped. If you want to try it again, at least you know where I got stuck."</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Types of Negative Results</h3>
+<p>The registry accommodates four types of negative results:</p>
+<p><strong>Type 1: Experimental Failures.</strong> An experiment was conducted per D14-002, and the hypothesis was disproven. The experiment produced a clear negative result. This is the cleanest type of negative result and the easiest to document, because the experiment log already contains most of the necessary information.</p>
+<p><strong>Type 2: Inconclusive Investigations.</strong> An investigation was conducted but produced no clear result -- the evidence was insufficient, the methodology was flawed, or external factors prevented completion. Inconclusive results are negative results in the sense that they did not achieve their objective, even if they did not disprove the hypothesis. They are recorded because they contain valuable information about methodology limitations and environmental constraints.</p>
+<p><strong>Type 3: Technology Rejections.</strong> A technology was evaluated per D14-003 and rejected. The Technology Decision Record (TDR) documents the evaluation. The registry entry cross-references the TDR and captures the specific reasons for rejection in a form that is quickly searchable.</p>
+<p><strong>Type 4: Abandoned Approaches.</strong> A line of inquiry or an operational approach was pursued for a period, found to be unproductive or impractical, and abandoned. This type is the most subjective and the hardest to document because the abandonment often happened gradually rather than at a clear decision point. It is also the type most prone to omission, and therefore the type where the registry adds the most value.</p>
+<h3>4.2 The Negative Results Entry Format</h3>
+<p>Each registry entry contains the following mandatory fields:</p>
+<ul>
+<li><strong>NR ID:</strong> Format NR-YYYY-NNN (year and sequential number).</li>
+<li><strong>Date:</strong> Date the entry was filed.</li>
+<li><strong>Type:</strong> One of the four types defined in Section 4.1.</li>
+<li><strong>Title:</strong> A concise, descriptive title. The title should be findable: a future researcher scanning the registry for relevant prior work should be able to identify relevance from the title alone.</li>
+<li><strong>Summary:</strong> A one-paragraph summary of what was attempted, what was expected, and what actually happened.</li>
+<li><strong>Methodology reference:</strong> Reference to the experiment log (D14-002), TDR (D14-003), or other documentation of the investigation.</li>
+<li><strong>Root cause analysis:</strong> Why did this fail? What was the mechanism of failure? This is the most valuable field in the entry because it allows future researchers to determine whether the failure was inherent (the approach is fundamentally flawed) or conditional (the approach might work under different conditions).</li>
+<li><strong>Conditions and constraints:</strong> Under what specific conditions was this attempted? Hardware, software versions, environmental conditions, and any other contextual factors. A failure under specific conditions does not necessarily mean failure under all conditions.</li>
+<li><strong>Residual value:</strong> Did the failed investigation produce any useful knowledge, even though it did not achieve its primary objective? Unexpected observations, methodology insights, and incidental discoveries are documented here.</li>
+<li><strong>Recommendations for future work:</strong> Should this approach be revisited? Under what changed conditions might it succeed? Or is the failure fundamental enough that the approach should be considered permanently closed? This field is the predecessor's advice to the future.</li>
+<li><strong>Knowledge registry cross-reference:</strong> The D14-004 Knowledge ID for the corresponding negative knowledge entry.</li>
+<li><strong>Related entries:</strong> Cross-references to other negative results entries on similar topics.</li>
+</ul>
+<h3>4.3 The Registry Search Protocol</h3>
+<p>Before beginning any new formal investigation (D14-002) or technology evaluation (D14-003), the researcher must search the negative results registry for relevant prior work. This is a mandatory step, not a suggested one. The search protocol is:</p>
+<p><strong>Step 1: Keyword search.</strong> Search the registry titles and summaries for terms related to the planned investigation.</p>
+<p><strong>Step 2: Category search.</strong> Search by knowledge category (D14-004) for entries in the same domain as the planned investigation.</p>
+<p><strong>Step 3: Relationship search.</strong> Check the knowledge registry (D14-004) for knowledge items related to the planned investigation and follow any links to negative results entries.</p>
+<p><strong>Step 4: Document the search.</strong> Record the search in the pre-registration document (D14-002, Section 4.1, Phase 2). List all relevant negative results entries found and explain how the planned investigation differs from or builds upon the prior work. If no relevant entries are found, record that the search was conducted and found nothing.</p>
+<p>The search documentation serves two purposes: it ensures the search was actually done (not just claimed), and it provides the researcher with relevant context before the investigation begins.</p>
+<h3>4.4 Registry Maintenance</h3>
+<p>The registry requires periodic maintenance to remain useful:</p>
+<p><strong>Annual consolidation.</strong> Once per year, review the registry for entries that can be consolidated. If five separate experiments have all failed to achieve the same objective for the same reason, a single consolidated entry may be clearer than five individual ones. The individual entries are retained but linked to the consolidation.</p>
+<p><strong>Cross-reference verification.</strong> During the annual review, verify that all cross-references (to experiment logs, TDRs, knowledge registry entries, and other negative results entries) are still valid. Update broken references.</p>
+<p><strong>Relevance review.</strong> Some negative results become irrelevant over time -- the technology they evaluated no longer exists, the hardware they tested has been retired, the conditions they operated under no longer apply. These entries are not deleted (per D14-004, R-KCT-04, nothing is deleted) but may be marked as "historically relevant only" to help current researchers focus on entries that are still operationally pertinent.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-NRR-01:</strong> Every formal experiment (D14-002) that fails to confirm its hypothesis must have a negative results entry filed within 30 days of the experiment's completion. This is a restatement and operationalization of D14-001, R-RES-02.</li>
+<li><strong>R-NRR-02:</strong> Every technology evaluation (D14-003) that results in a rejection must have a negative results entry filed within 30 days of the TDR being finalized.</li>
+<li><strong>R-NRR-03:</strong> The registry search protocol (Section 4.3) is mandatory before any new formal investigation or technology evaluation begins. The search must be documented in the pre-registration document.</li>
+<li><strong>R-NRR-04:</strong> Negative results entries must not be deleted, modified retrospectively, or made less visible. They are append-only records. If subsequent work reveals that a negative result was incorrect (the approach actually works under conditions not tested), a new positive-result entry is created and the negative result entry is updated with a forward reference, but the original entry remains.</li>
+<li><strong>R-NRR-05:</strong> The root cause analysis field (Section 4.2) is mandatory. "It did not work" is not a root cause. The entry must explain, to the extent determinable, why it did not work. If the root cause is unknown, the entry must state that explicitly and identify what further investigation would be needed to determine it.</li>
+<li><strong>R-NRR-06:</strong> The registry must be stored in plain text format, searchable without specialized tools, and compliant with the 50-year continuity rules. The registry must be usable by a future operator with nothing more than a text editor and the human ability to read.</li>
+<li><strong>R-NRR-07:</strong> Negative results must be entered in the knowledge registry (D14-004) under Category 6 (Negative Knowledge) with the appropriate confidence level. The negative results registry and the knowledge registry are complementary, not redundant -- the knowledge registry provides classification and relationships; the negative results registry provides detailed documentation.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Registry neglect.</strong> Negative results are not entered in the registry because the operator considers them unimportant or because the 30-day deadline passes without action. Over time, the registry becomes sparse and unreliable. Mitigation: R-NRR-01 and R-NRR-02 make filing mandatory. The annual classification audit (D14-004, R-KCT-05) cross-checks experiment logs against registry entries to identify missing entries.</li>
+<li><strong>Shallow root cause analysis.</strong> Entries are filed but the root cause analysis is superficial -- "it did not work" or "performance was insufficient." These entries are nearly useless for preventing repeated failures because they do not explain why the failure occurred. Mitigation: R-NRR-05 requires substantive root cause analysis. The annual review should flag entries with inadequate root cause analysis for revision.</li>
+<li><strong>Search protocol bypass.</strong> The researcher begins a new investigation without searching the registry, either because they consider it unnecessary or because they forgot. The investigation may repeat prior work. Mitigation: R-NRR-03 makes the search mandatory and requires documentation in the pre-registration. A pre-registration that does not include registry search documentation is incomplete.</li>
+<li><strong>Registry bloat.</strong> Over decades, the registry becomes so large that searching it is impractical. Mitigation: the annual consolidation process (Section 4.4). The relevance review marks obsolete entries. The category structure of D14-004 provides filtering. If the registry exceeds a manageable size, an index by topic should be created.</li>
+<li><strong>False closure.</strong> An approach is recorded as a negative result and future researchers avoid it, even though changed conditions (new hardware, new software, new techniques) might make it viable. Mitigation: the "Recommendations for future work" field (Section 4.2) explicitly addresses this. Entries should distinguish between fundamental failures and conditional failures. The conditions field records what was true when the failure occurred, allowing future researchers to assess whether those conditions still apply.</li>
+<li><strong>Psychological avoidance.</strong> The operator simply does not want to document failures because it feels demoralizing. Mitigation: cultural reinforcement through the Commentary Section and through institutional norms established in D14-001. Negative results documentation is framed as an act of service to the future, not as self-flagellation.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If the registry has been neglected:</strong> Conduct a registry reconstruction sprint. Review all experiment logs (D14-002) and Technology Decision Records (D14-003) from the neglected period. Identify all negative results that should have been entered. Create entries for each, using the available documentation. Accept that some entries will be incomplete due to faded memory or insufficient records -- incomplete entries are better than no entries.</p>
+</li>
+<li>
+<p><strong>If root cause analyses are shallow:</strong> Review all entries flagged as having insufficient root cause analysis. For recent entries, re-examine the evidence and attempt a deeper analysis. For older entries where re-analysis is not possible, annotate the entry with "Root cause analysis limited by available evidence as of [date]" and document what further investigation would be needed.</p>
+</li>
+<li>
+<p><strong>If the search protocol has been routinely bypassed:</strong> Conduct a retroactive search for all investigations initiated without registry searches. Check whether any of those investigations repeated prior failures. If so, document the duplication and the cost. Use the concrete examples to reinforce the value of the search protocol. Going forward, treat the search documentation as a gating requirement for pre-registration approval.</p>
+</li>
+<li>
+<p><strong>If the registry has become bloated and unsearchable:</strong> Create a topic index. Group entries by subject area, technology domain, and failure type. Mark entries whose conditions no longer apply as "historically relevant only." Consider creating a "top 20" list of the most important negative results that every researcher should be aware of.</p>
+</li>
+<li>
+<p><strong>If negative results documentation has been psychologically avoided:</strong> Acknowledge the avoidance honestly in the Commentary Section. Commit to entering the next three negative results within one week of occurrence. Build momentum. The hardest part is starting.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The registry is small. Most entries are from technology evaluations and initial system configuration experiments. The registry search protocol may feel unnecessary because the operator remembers all the failures. Follow it anyway -- the habit matters more than the current utility.</li>
+<li><strong>Years 5-15:</strong> The registry begins to earn its keep. The operator encounters a question they investigated before but had forgotten. The registry reminds them. This is the moment the registry transitions from a discipline to a tool. The accumulation of entries starts revealing patterns -- certain categories of approach that consistently fail, certain conditions that consistently cause problems.</li>
+<li><strong>Years 15-30:</strong> If succession occurs, the registry is one of the most valuable resources the predecessor can leave. The successor, facing an institution they did not build, needs to know not just what works but what has been tried and does not work. Without the registry, the successor will spend years rediscovering the predecessor's failures.</li>
+<li><strong>Years 30-50+:</strong> The registry is a multi-decade record of institutional learning from failure. It contains wisdom that no single person remembers -- the accumulated knowledge of what does not work, why, and under what conditions. It is, in a sense, the institution's immune memory: the record of every pathogen it has encountered and defeated.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I am going to fail at things. I am going to try configurations that do not work, evaluate technologies that turn out to be unsuitable, run experiments that disprove my hypotheses, and pursue lines of inquiry that lead nowhere. This is not pessimism. It is realism. The question is not whether I will fail but whether my failures will be wasted.</p>
+<p>If I record them -- honestly, with root cause analysis, with context, with recommendations -- then my failures are converted from waste into knowledge. They become the institution's scar tissue: not pretty, but tougher than what was there before.</p>
+<p>The hardest entries to write will be the ones about things I really wanted to work. The backup strategy I was proud of but that failed under load. The technology I evangelized but that turned out to be unsuitable. The approach I invested weeks in before discovering it was fundamentally flawed. Those entries will sting. I will write them anyway. The person who needs to read them -- whether that is future-me or a successor -- deserves the truth, not a curated highlight reel.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (knowledge preservation, institutional continuity)</li>
+<li>D14-001 -- Research Philosophy (R-RES-02: negative result documentation, Section 4.2: negative result preservation)</li>
+<li>D14-002 -- Experimental Design for Solo Researchers (experiment log format, pre-registration)</li>
+<li>D14-003 -- Technology Evaluation Framework (Technology Decision Records, rejected technology documentation)</li>
+<li>D14-004 -- Knowledge Classification and Taxonomy (Category 6: Negative Knowledge, confidence levels)</li>
+<li>D14-006 -- Multi-Generational Research Continuity (negative results as succession resource)</li>
+<li>META-00-ART-001 -- Stage 1 Meta-Framework (50-year continuity rules)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

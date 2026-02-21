@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D13-005 — Paradigm Shift Response Protocol - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li class="active"><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d13-005">
+  <h1>D13-005 &mdash; Paradigm Shift Response Protocol</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D13-005</dd>
+  <dt>Domain</dt>
+  <dd>13 -- Evolution & Adaptation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, SEC-001, D13-001, D13-002, D13-003, D13-004, D20-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All Domain 13 articles. Referenced by all domains when a fundamental technology assumption is challenged.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the institutional response when a fundamental technology assumption changes. Not a routine upgrade. Not a version bump. A paradigm shift -- a change in the underlying model of how a technology domain works. The transition from magnetic to solid-state storage. The transition from symmetric to post-quantum cryptography. The emergence of a computing model that renders current architectures obsolete. The discovery that a storage medium previously considered durable is not.</p>
+<p>D13-001 Section 4.4 acknowledges that paradigm shifts cannot be predicted but can be designed for. This article provides the response protocol for when such a shift is detected. It defines how to assess whether a change constitutes a genuine paradigm shift, how to analyze its impact across all twenty institutional domains, how to make the decision about whether and when to respond, and how to document the entire process in a paradigm shift decision record that becomes part of the institution's permanent memory.</p>
+<p>This is the most consequential protocol in Domain 13. A hardware generation transition affects specific components. A software sunset affects specific applications. A paradigm shift potentially affects everything. The response must be proportional to the stakes -- thorough, deliberate, and documented with extraordinary care.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- Definition and identification of paradigm shifts versus incremental changes.
+- The paradigm shift assessment framework: how to determine if a shift is real, relevant, and urgent.
+- The 20-domain impact analysis: how to trace the implications of a paradigm shift across the entire institution.
+- The paradigm shift decision record: format, content, and storage.
+- Response strategies: absorb, adapt, defer, or reject.
+- Timeline and urgency classification for paradigm shift responses.
+- The relationship between paradigm shifts and the conservatism imperative.</p>
+<p><strong>Out of scope:</strong>
+- Specific paradigm shifts (by definition, they cannot be enumerated in advance).
+- Routine technology transitions (see D13-003, D13-004).
+- Disaster recovery from a paradigm shift that causes immediate operational failure (see D12-001).
+- Research evaluation of emerging technologies that may or may not represent paradigm shifts (see D14-002).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 What Constitutes a Paradigm Shift</h3>
+<p>The term "paradigm shift" is overused in technology marketing. Every new product claims to be paradigm-shifting. This institution requires a precise definition to distinguish genuine paradigm shifts from marketing noise.</p>
+<p>A paradigm shift, for the purposes of this protocol, is a change that invalidates a foundational assumption on which one or more critical systems depend. The key word is "foundational." A foundational assumption is not "we use Product X" -- that is a specific choice. A foundational assumption is something like "magnetic storage media are the most cost-effective durable storage medium" or "RSA-2048 provides adequate encryption for our threat model" or "silicon-based processors will continue to be available and affordable." When such an assumption is invalidated -- not by a vendor's marketing department but by demonstrated reality -- the institution faces a paradigm shift.</p>
+<p>The distinction matters because the response protocol is expensive in time and attention. Invoking it for routine changes would create fatigue and dilute its effectiveness. It is reserved for changes that are genuinely foundational.</p>
+<h3>3.2 Historical Examples of Paradigm Shifts</h3>
+<p>The transition from spinning disk to solid-state storage invalidated assumptions about performance, failure modes, and data recovery. The transition from DES to AES invalidated encryption adequacy assumptions. Each historical paradigm shift shares common characteristics: gradual at first, then rapid; initially dismissed by incumbents; eventually unavoidable; requiring comprehensive rethinking of dependent systems. The response protocol must account for all of these characteristics.</p>
+<h3>3.3 Paradigm Shifts and the Air Gap</h3>
+<p>The air gap insulates the institution from immediate disruption but delays awareness. By the time the operator learns of a shift through scheduled external interactions, it may be well advanced. The institution may have less response time than it thinks. The protocol accounts for this by distinguishing between the detection date and the estimated date the shift began in the broader landscape.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Paradigm Shift Assessment Framework</h3>
+<p>When a potential paradigm shift is detected -- through technology scouting (D13-003), through external information import (Domain 18), through observation of hardware or software failures, or through any other channel -- the assessment framework is invoked. The framework has four stages:</p>
+<p><strong>Stage 1: Classification.</strong> Does this change invalidate a foundational assumption (Section 3.1)? If no, standard evolution procedures apply. If yes or uncertain, proceed to Stage 2.</p>
+<p><strong>Stage 2: Validation.</strong> Is the shift demonstrated in production environments, or only speculative? Validation requires evidence, not enthusiasm. An announced but undemonstrated shift is monitored, not acted upon. Record it and schedule re-evaluation.</p>
+<p><strong>Stage 3: Relevance.</strong> Does this shift affect this institution? A paradigm shift in cloud computing is irrelevant to an air-gapped institution. A shift in storage media is profoundly relevant. Assess which foundational assumptions are affected and how directly.</p>
+<p><strong>Stage 4: Urgency.</strong> How much time to respond? Depends on the pace of the shift, current stockpiles, and dependency depth. Classified as:</p>
+<ul>
+<li><strong>Critical (0-12 months):</strong> The current paradigm is failing or will become unsupportable within 12 months. Immediate response required.</li>
+<li><strong>Urgent (1-3 years):</strong> The current paradigm is viable today but degrading. Response should begin promptly.</li>
+<li><strong>Strategic (3-10 years):</strong> The shift is real but the current paradigm remains viable for the medium term. Response should be planned but need not be rushed.</li>
+<li><strong>Monitoring (10+ years):</strong> The shift is validated and relevant but distant. Monitor and reassess periodically.</li>
+</ul>
+<h3>4.2 The 20-Domain Impact Analysis</h3>
+<p>When a shift passes all four assessment stages, a comprehensive impact analysis is conducted across all twenty domains. This is the most labor-intensive part of the protocol and must not be abbreviated -- a missed dependency becomes a crisis.</p>
+<p><strong>For each of the 20 domains, answer:</strong>
+1. Does this domain depend on the affected foundational assumption? (Yes / No / Partially)
+2. If yes or partially: what specific systems, procedures, or data within this domain are affected?
+3. What is the severity of the impact? (Critical -- domain cannot function; Major -- domain is significantly degraded; Minor -- domain is slightly affected; None -- no impact.)
+4. What is the adaptation path? (What changes would this domain need to make to accommodate the new paradigm?)
+5. What is the estimated effort for adaptation? (Rough order of magnitude: hours, days, weeks, months.)
+6. What are the dependencies? (Does this domain's adaptation depend on another domain's adaptation completing first?)</p>
+<p>The analysis produces a complete map of the shift's institutional footprint, driving the response strategy.</p>
+<h3>4.3 Response Strategies</h3>
+<p><strong>Absorb.</strong> The shift is accommodated within the existing framework with modifications. Preferred when most domains are unaffected or only minorly affected.</p>
+<p><strong>Adapt.</strong> Significant changes to one or more domains, but core architecture and principles are preserved. A coordinated program of hardware transitions, software sunsets, and data migrations. The most common response to genuine paradigm shifts.</p>
+<p><strong>Defer.</strong> Real and relevant, but the current paradigm remains viable and early adaptation costs outweigh benefits. Not denial -- a deliberate decision to monitor and respond when urgency changes. Requires a documented re-evaluation schedule.</p>
+<p><strong>Reject.</strong> The institution deliberately declines to adopt the new paradigm. Rare, requiring extraordinary justification -- appropriate only when the new paradigm is fundamentally incompatible with institutional principles. Documented as a Tier 1 decision.</p>
+<h3>4.4 The Paradigm Shift Decision Record</h3>
+<p>Every invocation of this protocol produces a paradigm shift decision record (PSDR). The PSDR is a Tier 1 permanent record under D20-001. It contains:</p>
+<ul>
+<li><strong>Shift identification:</strong> What paradigm shift was detected? When was it detected? What is the estimated date the shift began in the broader technology landscape?</li>
+<li><strong>Assessment results:</strong> Classification, validation, relevance, and urgency findings with supporting evidence.</li>
+<li><strong>Impact analysis:</strong> The complete 20-domain impact analysis.</li>
+<li><strong>Response strategy selected:</strong> Which of the four strategies was chosen and why.</li>
+<li><strong>Implementation plan:</strong> If the response is absorb or adapt, the specific activities planned, their timeline, and their dependencies.</li>
+<li><strong>Re-evaluation schedule:</strong> If the response is defer, when the shift will be reassessed.</li>
+<li><strong>Rejection rationale:</strong> If the response is reject, the full rationale and the conditions under which the rejection would be reconsidered.</li>
+<li><strong>Decision authority:</strong> Who made the decision and under what GOV-001 tier.</li>
+<li><strong>Cross-references:</strong> Links to all related decision log entries, timeline entries, and evolution activities.</li>
+</ul>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-PSR-01:</strong> The paradigm shift assessment framework (Section 4.1) must be invoked whenever a potential paradigm shift is detected. Detection may occur through any channel -- technology scouting, external information import, operational observation, or successor report.</li>
+<li><strong>R-PSR-02:</strong> The 20-domain impact analysis (Section 4.2) must be completed in full before a response strategy is selected. Partial analysis may inform preliminary planning but may not be the basis for a final response decision.</li>
+<li><strong>R-PSR-03:</strong> Paradigm shift decision records are Tier 1 permanent records. They may not be modified, deleted, or abbreviated after creation. Corrections and updates are made by appending addenda.</li>
+<li><strong>R-PSR-04:</strong> A response strategy of "reject" is a Tier 1 decision under GOV-001 requiring the full 90-day deliberation period unless the urgency classification is Critical, in which case the deliberation period may be reduced to 30 days with documented justification.</li>
+<li><strong>R-PSR-05:</strong> A response strategy of "defer" must include a documented re-evaluation schedule with a maximum interval of 12 months between re-evaluations.</li>
+<li><strong>R-PSR-06:</strong> The annual paradigm shift readiness assessment required by R-EVL-06 (D13-001) must reference this protocol and must evaluate whether any detected shifts require invocation of the full assessment framework.</li>
+<li><strong>R-PSR-07:</strong> All paradigm shift response activities must be recorded in the institutional timeline (D20-003) and cross-referenced with the PSDR.</li>
+<li><strong>R-PSR-08:</strong> When multiple paradigm shifts are detected simultaneously or in close succession, each receives its own PSDR, but the impact analyses must account for interactions between shifts. Compound paradigm shifts are more dangerous than individual ones.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Paradigm blindness.</strong> The institution fails to detect a paradigm shift because technology scouting is inadequate or because the operator dismisses early signals. The shift advances until the institution is forced into emergency response. Mitigation: R-EVL-06 mandates annual paradigm shift readiness assessment. Technology scouting (D13-003) includes explicit attention to foundational assumption changes.</p>
+</li>
+<li>
+<p><strong>False alarm fatigue.</strong> The protocol is invoked too frequently for changes that are not genuine paradigm shifts. The operator develops skepticism toward the protocol and eventually ignores genuine shifts. Mitigation: Stage 1 (Classification) includes the foundational assumption test specifically to filter out incremental changes. The protocol should be invoked rarely -- a few times per decade at most.</p>
+</li>
+<li>
+<p><strong>Analysis paralysis.</strong> The 20-domain impact analysis is so thorough and time-consuming that it delays response past the point of effective action. Mitigation: the urgency classification (Section 4.1, Stage 4) sets a response timeline. Critical-urgency shifts may require the impact analysis to be conducted in parallel with preliminary response actions.</p>
+</li>
+<li>
+<p><strong>Compound shift overwhelm.</strong> Multiple paradigm shifts occur simultaneously, each individually manageable but collectively overwhelming. Mitigation: R-PSR-08 requires compound analysis. When compound shifts are detected, the institution may need to prioritize by urgency and address shifts sequentially rather than in parallel.</p>
+</li>
+<li>
+<p><strong>Defer drift.</strong> A "defer" decision is never revisited. The re-evaluation schedule is not followed. The deferred shift advances unchecked. Mitigation: R-PSR-05 mandates a maximum 12-month re-evaluation interval. The annual review (OPS-001) includes paradigm shift re-evaluation as a checklist item.</p>
+</li>
+<li>
+<p><strong>Rejection regret.</strong> A "reject" decision proves wrong -- the old paradigm becomes unsupportable faster than anticipated, and the institution has not prepared an adaptation path. Mitigation: rejection decisions include conditions for reconsideration. The annual paradigm shift readiness assessment evaluates whether rejection conditions have changed.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a paradigm shift was detected too late:</strong> Assess the current situation honestly. Determine urgency based on how much operational life the current paradigm has remaining. If the urgency is Critical, invoke emergency procedures: conduct an abbreviated impact analysis focused on the most affected domains, select a response strategy, and begin implementation immediately. Complete the full 20-domain analysis in parallel. Document the late detection and its causes in the PSDR and in the lessons learned framework (D20-004).</p>
+</li>
+<li>
+<p><strong>If the impact analysis was incomplete and a missed impact has caused problems:</strong> Treat the problem as an operational issue in the affected domain. Stabilize operations first. Then complete the missing section of the impact analysis, update the PSDR, and adjust the response strategy if needed.</p>
+</li>
+<li>
+<p><strong>If a "defer" decision has drifted without re-evaluation:</strong> Immediately conduct the overdue re-evaluation. If the shift has advanced, reclassify the urgency. If the urgency has increased, escalate the response accordingly. Document the re-evaluation gap and implement procedural safeguards to prevent recurrence.</p>
+</li>
+<li>
+<p><strong>If a "reject" decision is proving unsound:</strong> Re-open the PSDR. Conduct a new assessment with current evidence. If the rejection is no longer justified, select a new response strategy. The original rejection and the reasons for reversing it are both preserved in the record -- the PSDR is append-only.</p>
+</li>
+<li>
+<p><strong>If compound shifts are overwhelming institutional capacity:</strong> Triage by urgency and impact. Address Critical shifts first. For lower-urgency shifts, explicitly defer with documented rationale and re-evaluation schedules. Accept that some response timelines will be longer than ideal and document this acceptance as a risk.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Paradigm shifts are unlikely to affect the institution this early -- the founding technology is current. Use this period to establish the scouting and assessment habits that will detect shifts when they come. Practice the assessment framework on hypothetical scenarios: "What would we do if solid-state storage became unreliable? What would we do if our encryption algorithm were broken?"</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The first genuine paradigm shift may be detected. It is likely to be in a fast-moving domain like storage or computing. The full protocol is exercised for the first time. Expect the 20-domain impact analysis to be more difficult than anticipated and to take longer than planned. The PSDR produced from this first exercise will be the template for all future PSDRs.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Multiple paradigm shifts have been navigated. The institution has a library of PSDRs that document how past shifts were handled. These records are invaluable -- they show what worked, what did not, and how long various responses actually took versus how long they were projected to take. The protocol itself may need revision based on accumulated experience.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> Paradigm shift response is a mature institutional capability. The operator can draw on decades of PSDRs for precedent and guidance. The institution has survived shifts that the founders could not have predicted, and the documentation of how it survived them is among its most valuable assets.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I wrote this article knowing that I cannot predict what paradigm shifts will challenge this institution. I do not know what will replace current storage technologies. I do not know what will happen to current encryption standards. I do not know whether computing will fundamentally change in ways that make my current architecture obsolete. What I do know is that something will change, fundamentally, within the lifetime of this institution. Probably more than once. The value of this protocol is not in predicting the shift but in having a disciplined response framework ready when the shift arrives. The 20-domain impact analysis is deliberately exhaustive -- because the cost of missing an impact is far higher than the cost of checking domains that turn out to be unaffected. I would rather spend an afternoon confirming that sixteen domains are unaffected than skip the analysis and discover six months later that a domain I did not check has silently broken.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D13-001 -- Evolution Philosophy (conservatism imperative, stagnation trap, Evolution Decision Framework, Section 4.4 designing for the unpredictable, R-EVL-06 annual paradigm shift assessment)</li>
+<li>D13-003 -- Hardware Generation Planning (technology scouting process, supply chain awareness)</li>
+<li>D13-004 -- Software Sunset Procedures (sunset procedures triggered by paradigm shifts)</li>
+<li>D20-001 -- Institutional Memory Philosophy (Tier 1 permanent records, anti-revisionism)</li>
+<li>D14-001 -- Research Philosophy (knowledge validation, confidence levels)</li>
+<li>GOV-001 -- Authority Model (decision tiers, 90-day deliberation period for Tier 1 decisions)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (cryptographic paradigm shifts, threat evolution)</li>
+<li>OPS-001 -- Operations Philosophy (annual review, operational tempo)</li>
+<li>CON-001 -- The Founding Mandate (4-layer model, air-gap constraint)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 4: Longevity Over Novelty; Principle 6: Honest Accounting of Limitations)</li>
+<li>D20-003 -- Timeline Construction and Maintenance (recording paradigm shift events)</li>
+<li>D20-004 -- Lessons Learned Framework (capturing paradigm shift response lessons)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

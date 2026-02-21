@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D10-007 — Duty Structures &amp; Workload Management - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li class="active"><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d10-007">
+  <h1>D10-007 &mdash; Duty Structures &amp; Workload Management</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D10-007</dd>
+  <dt>Domain</dt>
+  <dd>10 -- User Operations</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>OPS-001, D10-002, D10-003, D10-004, D9-008</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D10-010 (degraded operations redefine workload), D10-012 (operator health), D10-014 (handoff procedures).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how operational work is structured, distributed, and bounded within the holm.chat Documentation Institution. It addresses the fundamental question of workload management: how much work is there, who does it, when do they do it, and what happens when there is more work than the available personnel can sustain?</p>
+
+<p>For a single-operator institution, this article might seem unnecessary. There is one person. All the work belongs to them. But this perspective misses the critical function of workload management: it is not about distributing work among people. It is about distributing work across time. A single operator who attempts to do everything at once will burn out. A single operator who structures their work into defined duty periods, with clear boundaries between operational time and personal time, can sustain the institution indefinitely.</p>
+
+<p>This article also prepares for the future. The institution may not always be a single-operator enterprise. If a second person joins, or if the institution grows to require part-time assistance, the duty structures defined here provide the scaffolding for that transition. The article scales from one person to a small team without requiring fundamental redesign.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The concept of duty periods and their role in sustainable operations.</li>
+<li>Solo-operator duty structures: how one person organizes their institutional work.</li>
+<li>Multi-operator duty structures: how work is distributed when more than one person is involved.</li>
+<li>Workload limits and mandatory rest requirements.</li>
+<li>Task prioritization under overload conditions.</li>
+<li>The relationship between duty structures and the operational tempo (OPS-001, D10-003).</li>
+<li>On-call and availability expectations.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The specific daily checklist (see D10-002).</li>
+<li>The specific maintenance schedule (see D10-004).</li>
+<li>Degraded operations when personnel are reduced (see D10-010).</li>
+<li>Operator health and well-being (see D10-012).</li>
+<li>Handoff procedures between operators (see D10-014).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Myth of Always-On</h3>
+<p>A common failure mode for solo-operated institutions is the absence of boundaries. The operator feels perpetually responsible. They check on systems at midnight. They interrupt personal time to investigate alerts. They never fully disengage from the institution because there is no one to hand off to. This is unsustainable. It leads to burnout, resentment, and eventually abandonment.</p>
+
+<p>The solution is to define duty periods: explicit times when the operator is on duty and responsible for the institution, and explicit times when they are off duty and the institution must survive on its own. This requires two things: a clear schedule, and systems designed to survive unattended between duty periods. Both are within the institution's control.</p>
+
+<h3>3.2 Designing for Absence</h3>
+<p>The institution must be designed so that no single duty period is indispensable. If the operator misses a daily check, the institution must survive until the next check. If the operator is unavailable for a week, the institution must survive a week without intervention. This is not a hypothetical requirement. Illness, travel, personal emergencies, and simple exhaustion will all cause missed duty periods. The duty structure must accommodate these absences gracefully.</p>
+
+<p>The design principle is: the institution's tolerance for operator absence is a direct measure of its resilience. An institution that requires daily human intervention to survive is fragile. An institution that can survive a week unattended is moderately resilient. An institution that can survive a month unattended is robust. The duty structures in this article are designed to push the institution toward robustness.</p>
+
+<h3>3.3 From Solo to Team</h3>
+<p>Most long-lived institutions eventually involve more than one person. This may happen through succession (one person replaces another), augmentation (a second person joins), or delegation (specific duties are assigned to others). The duty structures must accommodate all three transitions. The key insight is that multi-person duty structures are not fundamentally different from solo structures; they are the same structures with the work distributed across more people and the handoff procedures (D10-014) activated.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Duty Periods</h3>
+<p>The institution defines the following duty periods, aligned with the operational tempo in OPS-001:</p>
+
+<table>
+<thead>
+<tr><th>Duty Period</th><th>Frequency</th><th>Duration</th><th>Activities</th></tr>
+</thead>
+<tbody>
+<tr><td>Daily Duty</td><td>Every day</td><td>15-30 minutes</td><td>D10-002 daily cycle: health check, scheduled work, logging</td></tr>
+<tr><td>Weekly Duty</td><td>One designated day per week</td><td>1-2 hours</td><td>OPS-001 weekly operations: log review, scheduled maintenance, documentation</td></tr>
+<tr><td>Monthly Duty</td><td>One designated day per month</td><td>Half day</td><td>OPS-001 monthly operations: backup testing, hardware assessment, threat review</td></tr>
+<tr><td>Quarterly Duty</td><td>One designated day per quarter</td><td>Full day</td><td>OPS-001 quarterly operations: documentation review, complexity audit, governance check</td></tr>
+<tr><td>Annual Duty</td><td>Designated period each year</td><td>2-3 days</td><td>OPS-001 annual operations: full audit, strategic planning, succession review</td></tr>
+</tbody>
+</table>
+
+<p>Between duty periods, the operator is off duty. The institution operates on its automated systems and the resilience built into its architecture. The operator is not expected to monitor, check, or intervene between duty periods unless an automated alert indicates an urgent issue.</p>
+
+<h3>4.2 Solo-Operator Duty Rules</h3>
+<p>For a single operator, the following rules govern duty structure:</p>
+
+<p><strong>Rule 1: Define a consistent daily window.</strong> The daily duty period should occur at approximately the same time each day. Consistency builds habit, and habit sustains discipline when motivation is low. The specific time is the operator's choice; the consistency is mandatory.</p>
+
+<p><strong>Rule 2: Protect off-duty time.</strong> Between duty periods, the institution does not require the operator's attention. The operator should not "just quickly check" on systems outside their duty period unless an automated alert has fired. Casual checking erodes the boundary between duty and rest and leads to the always-on failure mode described in Section 3.1.</p>
+
+<p><strong>Rule 3: Planned absences are normal.</strong> The operator will take vacations, have sick days, attend to personal matters. These are not operational failures. They are anticipated conditions that the institution is designed to survive. Before a planned absence of more than three days, conduct the pre-absence checklist (Section 4.4).</p>
+
+<p><strong>Rule 4: Unplanned absences are survivable.</strong> If the operator cannot perform a duty period due to unexpected circumstances, the institution survives until the next duty period. The return-from-absence procedure (Section 4.5) addresses any accumulated issues.</p>
+
+<p><strong>Rule 5: Workload must fit within the allocated time.</strong> If daily duty consistently exceeds 30 minutes, the workload has exceeded the allocation and must be reduced per OPS-001. This is not a suggestion. It is a constraint that protects sustainability.</p>
+
+<h3>4.3 Multi-Operator Duty Rules</h3>
+<p>When the institution has more than one operator, the following additional rules apply:</p>
+
+<p><strong>Duty roster.</strong> A rotation schedule defines which operator is responsible for each duty period. The roster is maintained as a living document and published at least one week in advance.</p>
+
+<p><strong>Competency requirements.</strong> No duty period may be assigned to an operator who has not been certified competent for the activities in that period per D9-008 (cross-training). An operator who is competent for daily duty may not be competent for quarterly operations.</p>
+
+<p><strong>Handoff requirements.</strong> When duty transfers from one operator to another, a handoff is performed per D10-014. At minimum, the outgoing operator communicates: current system status, any open incidents, any pending follow-up items, and anything unusual observed during their duty period.</p>
+
+<p><strong>Coverage requirements.</strong> Every duty period must have a designated operator. Unassigned duty periods are operational gaps. If coverage cannot be filled, the institution enters degraded operations per D10-010 for the uncovered periods.</p>
+
+<h3>4.4 Pre-Absence Checklist</h3>
+<p>Before a planned absence of more than three days, the operator performs:</p>
+<ol>
+<li>Complete all overdue maintenance tasks or reschedule them with documented justification.</li>
+<li>Verify that all automated monitoring and alerting systems are functioning.</li>
+<li>Verify that the most recent backup is current and verified.</li>
+<li>Run a full health check (not just the daily abbreviated version).</li>
+<li>Record the expected absence dates and contact information in the operational log.</li>
+<li>If another operator is covering, perform a handoff per D10-014.</li>
+</ol>
+
+<h3>4.5 Return-from-Absence Procedure</h3>
+<p>Upon returning from any absence longer than one duty period:</p>
+<ol>
+<li>Review all automated alerts and monitoring output from the absence period.</li>
+<li>Review all system logs for errors, warnings, or anomalies.</li>
+<li>Perform a full health check.</li>
+<li>Verify backup integrity for the absence period.</li>
+<li>Record the return and any findings in the operational log.</li>
+<li>If the covering operator maintained the log, review their entries and acknowledge handback.</li>
+</ol>
+
+<h3>4.6 Overload Triage</h3>
+<p>When the workload exceeds the available time, tasks are triaged by the following priority order:</p>
+<ol>
+<li><strong>Active incidents:</strong> Incident response per D10-003 takes priority over all other work.</li>
+<li><strong>Data integrity:</strong> Backup verification and integrity checks are the most critical routine tasks.</li>
+<li><strong>Security:</strong> Access control and security monitoring cannot be deferred.</li>
+<li><strong>Hardware health:</strong> Physical system monitoring prevents catastrophic failures.</li>
+<li><strong>Documentation:</strong> Documentation updates are important but can be deferred by days without immediate risk.</li>
+<li><strong>Development and improvement:</strong> New features, optimizations, and enhancements are deferred first.</li>
+</ol>
+<p>If routine operational work cannot be completed within the allocated time even after deferring development and improvement, the institution has exceeded its complexity budget per OPS-001 Section 4.3, and simplification is required.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D10D-01:</strong> Every duty period defined in Section 4.1 must have a designated responsible operator. Unassigned duty periods are not acceptable.</li>
+<li><strong>R-D10D-02:</strong> Workload at each duty period must fit within the time allocation defined by OPS-001. Chronic overruns require workload reduction or time reallocation, not heroic effort.</li>
+<li><strong>R-D10D-03:</strong> Off-duty time is protected. The operator is not expected to respond to non-urgent matters outside duty periods. Only automated alerts for S1 or S2 severity conditions may interrupt off-duty time.</li>
+<li><strong>R-D10D-04:</strong> Planned absences of more than three days require the pre-absence checklist in Section 4.4.</li>
+<li><strong>R-D10D-05:</strong> Returns from absence require the return procedure in Section 4.5.</li>
+<li><strong>R-D10D-06:</strong> Multi-operator duty rosters must be published at least one week in advance and must assign only competent operators per D9-008.</li>
+<li><strong>R-D10D-07:</strong> Overload triage follows the priority order in Section 4.6. The operator may not deviate from the priority order based on personal preference. Data integrity and security always outrank documentation and development.</li>
+<li><strong>R-D10D-08:</strong> The institution must be designed to tolerate at least seven consecutive days of operator absence without catastrophic degradation. If any system requires human intervention more frequently than weekly, that system requires redesign or automation.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Boundary erosion.</strong> The operator gradually loses the distinction between duty and off-duty time. Checks happen at random times. Maintenance is done whenever the operator thinks of it. The operational tempo dissolves into a continuous, low-level hum of institutional awareness that never fully turns off. Mitigation: R-D10D-03 protects off-duty time. The daily duty window must be a defined, bounded period.</p></li>
+<li><p><strong>Guilt-driven overwork.</strong> The operator feels guilty about off-duty time because the institution "needs" attention. They work extra hours, skip personal commitments, and increasingly identify with the institution rather than with their own life. Mitigation: D10-012 (operator health) addresses this directly. The institution is designed to survive off-duty periods. Using that design is not neglect; it is trust in the architecture.</p></li>
+<li><p><strong>Absence avoidance.</strong> The operator never takes extended time away from the institution because they fear what will happen in their absence. This prevents testing the institution's resilience and eventually causes burnout. Mitigation: R-D10D-08 requires that the institution tolerate seven days of absence. This tolerance must be tested periodically. Taking time off is a resilience test.</p></li>
+<li><p><strong>Overload normalization.</strong> Daily duty consistently exceeds 30 minutes, but the operator adapts rather than addressing the root cause. The excess becomes the new normal. Sustainability erodes gradually. Mitigation: R-D10D-02 makes overrun a trigger for workload reduction. The operational log should record actual time spent; chronic overruns are visible in the log and addressed during quarterly review.</p></li>
+<li><p><strong>Handoff failure (multi-operator).</strong> Duty transfers occur without proper handoff. The incoming operator is unaware of open issues, pending tasks, or recent anomalies. Problems fall between the cracks. Mitigation: R-D10D-06 and D10-014 handoff requirements. No duty transfer without a handoff, even a brief one.</p></li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If boundary erosion has occurred:</strong> Re-establish the daily duty window. Choose a specific time. Commit to performing daily operations only during that window for the next 30 days. Install mechanisms that prevent casual access outside the duty window (log off systems, close monitoring dashboards, silence non-emergency alerts).</p></li>
+<li><p><strong>If guilt-driven overwork is detected:</strong> Review D10-012 (operator health). Reduce to the minimum operational tempo: daily checks only, 15 minutes maximum. Maintain this reduced tempo for at least two weeks. The institution is designed to survive on daily checks alone. Prove this to yourself by doing it.</p></li>
+<li><p><strong>If absence avoidance has become entrenched:</strong> Schedule a deliberate absence of three to five days. Perform the pre-absence checklist. Leave. Upon return, perform the return procedure. Document what happened during the absence. Use the findings to improve the institution's unattended resilience.</p></li>
+<li><p><strong>If overload has become normalized:</strong> During the next quarterly review, audit the time spent on each duty period for the past quarter. Identify the tasks that cause the most overrun. Apply the triage priority from Section 4.6. Defer, simplify, or automate the lowest-priority tasks until workload fits within allocation.</p></li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> The solo-operator duty structure is being established. The operator is discovering which daily time works best, how long duty periods actually take versus the allocation, and how the institution performs during absences. Expect adjustments to the duty window timing and the workload distribution across duty tiers.</p></li>
+<li><p><strong>Years 5-15:</strong> The duty structure should be settled and habitual. The operator should be taking regular extended absences with confidence. The return-from-absence procedure should be well-practiced. If a second operator has been introduced, the multi-operator structures should be in use.</p></li>
+<li><p><strong>Years 15-30:</strong> Succession planning becomes critical. The duty structures must be documented well enough that a new operator can adopt them without the founder's guidance. The multi-operator provisions may be activated for the first time during a succession transition.</p></li>
+<li><p><strong>Years 30-50+:</strong> The institution may have transitioned through multiple operators. The duty structures defined here should be recognizable but adapted to the current operator's circumstances. The core principles -- bounded duty periods, protected off-duty time, absence tolerance, workload sustainability -- should be unchanged.</p></li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The hardest rule in this article is Rule 2: protect off-duty time. I know this because I have already violated it repeatedly during the institution's founding period. I check on systems at odd hours. I think about operational issues during personal time. I am writing documentation on weekends. This is acceptable during founding, when the institution is being built and everything is new. It is not acceptable as a permanent operating mode.</p>
+
+<p>I have written this article partly as a boundary-setting exercise for myself. After the founding period concludes, the duty structure becomes binding. Daily operations happen in the daily window. Weekly operations happen on the weekly day. Between those times, I trust the architecture and the automation and I do something else with my life.</p>
+
+<p>The seven-day absence tolerance requirement (R-D10D-08) is ambitious for day one. It is a design target. Every system decision I make should push toward that target: automated monitoring, automated alerting, graceful degradation, and enough redundancy that seven days of inattention cannot cause irreversible harm. If I build the institution correctly, a week away should be unremarkable.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>OPS-001 -- Operations Philosophy (operational tempo, sustainability requirement, complexity budget)</li>
+<li>D10-002 -- Daily Operations Doctrine (daily cycle structure and duration)</li>
+<li>D10-003 -- Incident Response Procedures (incident priority in overload triage)</li>
+<li>D10-004 -- Routine Maintenance Schedules (maintenance workload input to duty planning)</li>
+<li>D10-010 -- Degraded Operations Doctrine (operations under reduced personnel)</li>
+<li>D10-012 -- Operator Health &amp; Sustainability (burnout prevention, workload limits)</li>
+<li>D10-014 -- Operational Handoff Procedures (duty transfer between operators)</li>
+<li>D9-008 -- Cross-Training Standards (competency requirements for duty assignment)</li>
+<li>GOV-001 -- Authority Model (governance tier for workload policy changes)</li>
+</ul>
+
+</section>
+</article>
+</main>
+</body>
+</html>

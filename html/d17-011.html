@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-011 — Capacity Planning Over Decades - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li class="active"><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-011">
+  <h1>D17-011 &mdash; Capacity Planning Over Decades</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-011</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling &amp; Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-010 (Resource Allocation Framework), D17-009 (Topology Models), D17-002 (Node Identity)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D17-015 (Federation Health Monitoring). Referenced by D4-series (Infrastructure hardware lifecycle), OPS-001 (operational sustainability).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the methods and disciplines for planning the institution's capacity needs over multi-decade horizons. While D17-010 addresses current-state resource allocation, this article addresses the question that a fifty-year institution must confront: what will we need in five years, in fifteen years, in thirty years? And how do we prepare for those needs when the technology landscape, the available hardware, and the people operating the institution will all have changed?</p>
+
+<p>Capacity planning for an air-gapped, off-grid institution differs fundamentally from capacity planning in a connected, cloud-backed environment. There is no elastic scaling. There is no on-demand procurement. Hardware must be acquired in advance, transported physically, and maintained without vendor support. Storage media degrades. Power systems age. Operators retire or depart. Every capacity expansion is a physical project, not a configuration change. This article provides the framework for anticipating these needs and acting on them before scarcity forces reactive decisions.</p>
+
+<p>This article is addressed to node operators, federation coordinators, and whoever holds responsibility for the institution's long-term material survival. It is also addressed to the future operators who will inherit the institution's infrastructure and must understand the planning assumptions that shaped it.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Growth forecasting: methods for projecting storage, compute, power, and human-attention needs.</li>
+<li>Hardware replacement cycles: expected lifespans of storage media, compute hardware, and power systems.</li>
+<li>Storage expansion planning: how to anticipate and execute storage capacity increases.</li>
+<li>Degradation curves: how hardware performance declines over time and how to plan for it.</li>
+<li>Technology transition planning: how to prepare for hardware platform changes that are inevitable over decades.</li>
+<li>Succession capacity: ensuring the institution has enough human capacity to survive operator turnover.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>Current-state resource allocation (see D17-010).</li>
+<li>Specific hardware specifications or procurement procedures (see Infrastructure Domains).</li>
+<li>Data migration procedures during hardware transitions (see D5-series).</li>
+<li>Federation health metrics (see D17-015), though capacity data feeds those metrics.</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Fallacy of Linear Extrapolation</h3>
+<p>The simplest form of capacity planning is linear extrapolation: measure current growth, draw a straight line, and plan accordingly. For short horizons (one to three years), this works tolerably well. For decades, it is misleading. Growth rates change. Content acquisition patterns shift. Federation membership fluctuates. Technology transitions create step-function changes in both capacity and demand. A capacity plan that assumes the next twenty years will look like the last two is a plan that will be wrong.</p>
+
+<p>The capacity planning framework in this article uses scenario-based planning rather than single-point extrapolation. Instead of predicting what will happen, it defines what might happen and prepares for a range of outcomes. This is less precise but far more robust across the timescales this institution must survive.</p>
+
+<h3>3.2 Hardware Mortality</h3>
+<p>Every piece of hardware in the institution will die. Hard drives have a mean time between failures (MTBF) measured in years, not decades. Solid-state drives have write endurance limits. Batteries lose capacity with every charge cycle. Solar panels degrade. Circuit boards corrode. Even in ideal conditions, no hardware platform lasts fifty years. The institution must plan for complete hardware replacement -- not once, but multiple times across its lifespan.</p>
+
+<p>The challenge is not just replacing hardware but replacing it in an air-gapped environment. There is no overnight delivery. There is no vendor support contract. Hardware procurement may require months of lead time, physical transport to the node's location, and manual installation by the operator. Capacity planning must account for procurement lead times, not just the moment when replacement is needed.</p>
+
+<h3>3.3 The Human Factor in Long-Term Planning</h3>
+<p>Hardware can be planned for with engineering models. Human capacity cannot. An operator who is available and motivated today may be unavailable or unwilling in five years. A federation that depends on a single skilled operator at each node has as many single points of failure as it has nodes. Capacity planning must include human succession as a first-class concern -- ensuring that the knowledge and willingness to operate the institution survive the departure of any individual.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Capacity Planning Cycle</h3>
+<p>Capacity planning operates on a rolling five-year cycle with annual updates. The cycle consists of four phases:</p>
+
+<p><strong>Phase 1: Measurement (Annual).</strong> Each node measures its current resource consumption across all five categories (compute, storage, power, human attention, materials). Measurements are compared against the previous year's measurements to determine growth rates. These measurements are recorded in the capacity planning ledger.</p>
+
+<p><strong>Phase 2: Scenario Development (Every Five Years).</strong> Using the accumulated measurement data, each node develops three capacity scenarios:</p>
+<ul>
+<li><strong>Baseline scenario:</strong> Current growth patterns continue. No major changes in federation membership, content acquisition rate, or technology platform.</li>
+<li><strong>Growth scenario:</strong> The institution expands significantly. New nodes join the federation. Content acquisition increases. New use cases emerge that increase compute and storage demand.</li>
+<li><strong>Contraction scenario:</strong> The institution contracts. Nodes withdraw. Content acquisition slows. Resources become scarcer (economic hardship, supply chain disruption, operator attrition).</li>
+</ul>
+
+<p><strong>Phase 3: Gap Analysis (Every Five Years).</strong> For each scenario, the node identifies the gaps between projected demand and current capacity. When will storage run out under the baseline scenario? When does compute become insufficient under the growth scenario? When does the last battery reach end-of-life? Gap analysis identifies the action deadlines -- the points at which procurement, replacement, or expansion must be complete to avoid disruption.</p>
+
+<p><strong>Phase 4: Action Planning (Every Five Years, Updated Annually).</strong> For each identified gap, the node creates an action plan: what needs to be procured or replaced, when, at what cost, with what lead time, and who is responsible. Action plans are shared with the federation during governance sync so that coordinated procurement (bulk purchasing, shared transport) is possible.</p>
+
+<h3>4.2 Hardware Replacement Schedule</h3>
+<p>The following table provides baseline replacement intervals for common hardware categories. These are conservative estimates; actual lifespan depends on usage patterns, environmental conditions, and maintenance quality.</p>
+
+<table>
+<tr><th>Hardware Category</th><th>Expected Lifespan</th><th>Procurement Lead Time</th><th>Replacement Trigger</th></tr>
+<tr><td>Hard disk drives (HDD)</td><td>5-7 years</td><td>3-12 months</td><td>SMART warnings, age, sector errors exceeding threshold</td></tr>
+<tr><td>Solid-state drives (SSD)</td><td>7-10 years</td><td>3-12 months</td><td>Write endurance approaching limit, age, error rate increase</td></tr>
+<tr><td>Compute hardware (SBC, laptop)</td><td>7-12 years</td><td>3-18 months</td><td>Performance insufficient for workload, component failure, no replacement parts</td></tr>
+<tr><td>Lead-acid batteries</td><td>3-5 years</td><td>1-6 months</td><td>Capacity below 60% of rated, age, swelling or leakage</td></tr>
+<tr><td>Lithium batteries</td><td>5-10 years</td><td>3-12 months</td><td>Capacity below 70% of rated, cycle count, age</td></tr>
+<tr><td>Solar panels</td><td>20-30 years</td><td>6-24 months</td><td>Output below 80% of rated, physical damage</td></tr>
+<tr><td>USB flash drives (transport media)</td><td>3-5 years active use</td><td>1-3 months</td><td>Write errors, physical wear, age</td></tr>
+<tr><td>External HDDs (transport media)</td><td>3-7 years active use</td><td>3-6 months</td><td>SMART warnings, drop damage, connector wear</td></tr>
+</table>
+
+<h3>4.3 Storage Growth Projection</h3>
+<p>Storage is the resource most amenable to quantitative forecasting because it grows monotonically (the institution rarely deletes content). The projection model is:</p>
+
+<pre>
+STORAGE PROJECTION
+==================
+Current archive size:          _____ GB
+Annual content growth (last 3 years average): _____ GB/year
+Federation sync overhead (% of content):     _____ %
+Institutional memory growth:    _____ GB/year
+Quarantine and staging buffer:  _____ GB (fixed)
+
+Projected storage need (Year Y) =
+  Current size
+  + (Annual content growth * Y)
+  + (Annual content growth * Y * Federation sync overhead %)
+  + (Institutional memory growth * Y)
+  + Quarantine buffer
+
+Current storage capacity:       _____ GB
+Projected exhaustion year:      _____
+Action deadline (exhaustion - procurement lead time): _____
+</pre>
+
+<p>This projection should be updated annually with actual growth data. The three-year rolling average dampens anomalous years (a large batch import, an unusually quiet year) while remaining responsive to genuine trend changes.</p>
+
+<h3>4.4 Technology Transition Planning</h3>
+<p>Over fifty years, the institution will undergo multiple technology transitions. Hard drives will be replaced by newer storage technologies. Compute architectures will change. Power systems will evolve. Each transition carries risk: data must be migrated, software must be adapted, and operators must learn new systems.</p>
+
+<p>The capacity plan must include a technology watch function: monitoring the current hardware platform for signs of approaching obsolescence (declining availability of replacement parts, end of manufacturer support, emergence of clearly superior alternatives). When a technology transition is anticipated, the capacity plan must include:</p>
+<ul>
+<li>A migration timeline: how long the transition will take from start to completion.</li>
+<li>A parallel operation period: how long the old and new platforms must run simultaneously.</li>
+<li>A resource budget for the transition: the compute, storage, power, and human-attention cost of migration.</li>
+<li>A fallback plan: what happens if the new technology proves unsuitable or if the migration encounters problems.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D17-011-01: Five-Year Capacity Plan Is Mandatory.</strong> Every federated node MUST maintain a five-year capacity plan, updated annually. The plan must cover all five resource categories. A node without a capacity plan is operating without a future.</p></li>
+
+<li><p><strong>R-D17-011-02: Replacement Before Failure.</strong> Hardware MUST be replaced before it fails, not after. The replacement schedule in Section 4.2 defines the expected lifespans. Operators MUST initiate procurement when hardware reaches 75% of its expected lifespan. Running hardware to failure is not acceptable in an institution that cannot tolerate data loss or extended downtime.</p></li>
+
+<li><p><strong>R-D17-011-03: Scenario Planning, Not Point Estimates.</strong> Capacity projections MUST use the three-scenario model (baseline, growth, contraction) described in Section 4.1. Single-point estimates give false confidence. The capacity plan must be prepared for at least the growth and contraction scenarios, not just the baseline.</p></li>
+
+<li><p><strong>R-D17-011-04: Technology Transition Requires a Plan.</strong> No technology transition may be undertaken without a documented migration plan that includes a timeline, a parallel operation period, a resource budget, and a fallback plan. Ad hoc technology transitions are a leading cause of data loss in long-lived institutions.</p></li>
+
+<li><p><strong>R-D17-011-05: Human Succession Must Be in the Capacity Plan.</strong> Every capacity plan MUST include a section on human succession: who can operate the node if the current operator is unavailable? Who is being trained? What is the estimated readiness timeline? A node with no succession plan has a human capacity horizon equal to the current operator's tenure.</p></li>
+
+<li><p><strong>R-D17-011-06: Procurement Lead Time Must Be Realistic.</strong> Procurement lead times in the capacity plan MUST reflect the actual logistics of acquiring hardware for an air-gapped, potentially remote location. Lead times of "order online and receive in two days" are not realistic for off-grid nodes. Lead times of six to eighteen months are common and should be the planning default unless demonstrated otherwise.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Capacity surprise.</strong> A resource is exhausted before anyone noticed it was running low. Storage fills up. A critical drive fails past its expected lifespan without a replacement on hand. The power system cannot sustain the load of a new compute platform. Likelihood: high without regular capacity reviews. Severity: high -- can cause node downtime or data loss. Detection: annual capacity measurement against projection.</p></li>
+
+<li><p><strong>Procurement failure.</strong> The required replacement hardware is no longer manufactured, is unavailable in the needed quantity, or cannot be transported to the node's location. The capacity plan assumed procurement would succeed; it did not. Likelihood: medium over decades, as hardware platforms are discontinued. Severity: high if no alternative is available. Detection: technology watch function; procurement initiated early enough to allow for alternatives.</p></li>
+
+<li><p><strong>Planning horizon too short.</strong> The capacity plan focuses on the next one to two years and neglects longer horizons. The five-year projection is maintained perfunctorily. The twenty-year outlook is absent. A slow-developing constraint (gradual storage exhaustion, solar panel degradation, operator aging) is not detected until it becomes urgent. Likelihood: medium. Severity: medium to high depending on the constraint. Detection: the five-year review cycle; cross-checking the plan against actual twenty-year scenarios.</p></li>
+
+<li><p><strong>Technology transition failure.</strong> A planned hardware migration goes wrong. Data is corrupted during migration. The new platform has unexpected incompatibilities. The fallback plan is inadequate or untested. Likelihood: low to medium per transition, but near-certain over multiple transitions across fifty years. Severity: potentially catastrophic if data is lost. Detection: thorough testing during the parallel operation period; fallback plan includes tested rollback procedures.</p></li>
+
+<li><p><strong>Human capacity cliff.</strong> All experienced operators depart within a short period. Successors are undertrained or unavailable. The institution has hardware capacity but lacks the human knowledge to operate it. Likelihood: medium, especially in small communities. Severity: critical. Detection: succession section of the capacity plan; training readiness assessments.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If a capacity surprise occurs (resource exhaustion):</strong> Implement immediate triage: identify the lowest-priority content or function consuming the exhausted resource and reduce or suspend it. For storage exhaustion, identify and archive or remove quarantine staging data, expired logs, and redundant sync package copies. Initiate emergency procurement for additional capacity. Record the incident and update the capacity plan to prevent recurrence.</p></li>
+
+<li><p><strong>If procurement fails:</strong> Identify alternative hardware that can serve the same function, even at reduced performance. Consult the federation for nodes that may have surplus hardware available for loan or transfer. If no alternative exists, implement resource rationing: reduce content acquisition, reduce sync frequency, reduce the scope of the institution's operations until procurement succeeds. Document the procurement failure in institutional memory for supply chain planning.</p></li>
+
+<li><p><strong>If a technology transition fails:</strong> Execute the fallback plan: revert to the previous platform. Investigate the cause of failure. Do not reattempt the transition until the cause is understood and addressed. If the fallback plan is also inadequate, the node enters degraded operation on whatever combination of old and new hardware is functional. Request federation support for troubleshooting through governance sync.</p></li>
+
+<li><p><strong>If a human capacity cliff is approaching:</strong> Declare a succession emergency. All non-essential institutional activities are suspended in favor of training and knowledge transfer. The departing operator's highest priority is documentation: writing down everything they know that is not already documented. The federation assists by providing review and feedback on the documentation. If no local successor is available, the federation should consider whether the node's content should be migrated to another node before the operator departs.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> The first capacity plan is largely speculative. Growth patterns are not yet established. Hardware lifespans are theoretical. Use this period to establish measurement discipline -- recording actual resource consumption quarterly so that future projections have real data to build on. The first five-year plan will be mostly assumptions; the second will be much better.</p></li>
+
+<li><p><strong>Years 5-15:</strong> Growth patterns emerge from accumulated data. The first hardware replacement cycle occurs. The first technology watch alerts are triggered. This is the period when capacity planning transitions from academic exercise to operational necessity. The capacity plan should be validated against actual outcomes, and its accuracy should improve with each cycle.</p></li>
+
+<li><p><strong>Years 15-30:</strong> The institution has survived at least one complete hardware replacement and possibly one technology transition. The capacity plan reflects real experience with procurement logistics, migration challenges, and the gap between planned and actual outcomes. The plan's value is proven. The risk shifts to complacency: the plan has been reliable, so it receives less attention.</p></li>
+
+<li><p><strong>Years 30-50+:</strong> Multiple hardware generations have come and gone. The institution's capacity planning history -- stored in institutional memory -- is itself a valuable resource. Future operators can study past plans, see where they were accurate and where they missed, and learn from decades of accumulated experience. The capacity plan should reference this history explicitly, not just project from current data.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I cannot predict what storage technology will exist in 2056. I cannot predict what compute platforms will be available. I cannot predict whether the supply chains that exist today will exist in thirty years. The capacity planning framework acknowledges this uncertainty explicitly by using scenario-based planning rather than deterministic projection.</p>
+
+<p>What I can predict with high confidence is that every piece of hardware in the institution today will need to be replaced within fifteen years. And the replacement will need to be replaced within another fifteen years. The institution must be designed to survive these transitions, not to avoid them. An institution that depends on any specific hardware platform is an institution with a finite lifespan equal to that platform's availability.</p>
+
+<p>The human succession section of the capacity plan is, in my judgment, more important than the hardware section. Hardware can be procured, transported, and installed by anyone with appropriate documentation and moderate technical skill. The knowledge of how to operate the institution -- its quirks, its priorities, its social context -- cannot be procured. It must be cultivated, documented, and transferred. The capacity plan must treat human knowledge with the same seriousness as storage capacity.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D17-010 -- Resource Allocation Framework (current-state resource accounting; resource taxonomy)</li>
+<li>D17-009 -- Topology Models (topology influences capacity needs; hub nodes bear higher load)</li>
+<li>D17-002 -- Node Identity &amp; Lifecycle (node commissioning requirements; decommissioning triggers)</li>
+<li>D17-001 -- Federation Philosophy (sustainability principle; long-term institutional survival)</li>
+<li>D17-015 -- Federation Health Monitoring (capacity metrics feed health indicators)</li>
+<li>D17-008 -- Distributed Governance Protocol (coordinated procurement through governance sync)</li>
+<li>D4-series -- Infrastructure &amp; Power (hardware specifications; power system design; storage architecture)</li>
+<li>D5-series -- Platform &amp; Core Systems (data migration procedures; platform abstraction)</li>
+<li>OPS-001 -- Operations Philosophy (sustainability requirement; quarterly review cycle)</li>
+<li>Domain 20 -- Institutional Memory (capacity plan history; procurement records; technology transition logs)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

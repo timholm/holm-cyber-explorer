@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D7-009 — Environmental Monitoring: Signals &amp; Indicators - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li class="active"><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d7-009">
+  <h1>D7-009 &mdash; Environmental Monitoring: Signals &amp; Indicators</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D7-009</dd>
+  <dt>Domain</dt>
+  <dd>7 -- Intelligence & Analysis</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D7-001, D7-002, D7-003, D7-006, D7-007, D7-008, D8-001, ETH-001, CON-001, SEC-001, OPS-001, D4-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D7-006, D7-007, D7-010, D10-002, D10-003. All articles that rely on continuous environmental awareness.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines what the institution monitors, how it monitors, and how monitoring data feeds the broader intelligence function. Environmental monitoring is the continuous, systematic observation of conditions relevant to the institution's survival, mission, and operational health. It is the persistent collection activity that runs between the formal intelligence cycles, catching developments that would otherwise escape notice until they became crises.</p>
+
+<p>The intelligence cycle in D7-002 is episodic -- it responds to requirements, produces products, and delivers them. Environmental monitoring is continuous -- it watches, records, and alerts. Together they form the institution's sensory system: the cycle processes what has been noticed, and monitoring ensures that things are noticed in the first place.</p>
+
+<p>For an air-gapped institution, environmental monitoring is both more important and more constrained than for a connected one. More important because the institution has no passive information intake -- there is no news feed, no automatic update, no ambient awareness of the external world. Every piece of external information must be deliberately sought. More constrained because the air gap limits what can be monitored and how frequently. This article defines a monitoring framework that works within these constraints, prioritizing the signals that matter most and establishing indicator systems that maximize the information extracted from the limited observations available.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The monitoring framework: what the institution monitors, organized by monitoring domain.</li>
+<li>The indicator system: how raw observations are structured into indicators that signal meaningful change.</li>
+<li>Monitoring schedules: how frequently each monitoring domain is observed.</li>
+<li>Alert thresholds: what triggers escalation from routine monitoring to active intelligence response.</li>
+<li>The monitoring log: the record of all observations and the basis for trend analysis.</li>
+<li>Integration with threat assessment (D7-006), opportunity recognition (D7-007), and the intelligence cycle (D7-002).</li>
+<li>The role of automated monitoring agents where applicable (D8).</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophical basis for monitoring (see D7-001, structured curiosity and signal versus noise).</li>
+<li>Specific collection methods for external information (see D7-003).</li>
+<li>The analysis performed on monitoring data once escalated (see D7-004).</li>
+<li>The design and implementation of automated agents (see D8).</li>
+<li>Infrastructure monitoring specific to power, network, or hardware (see D4-001 and related Domain 4 articles, though these are referenced as monitoring domains).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Sentinel Function</h3>
+<p>In military intelligence, the distinction is drawn between "directed collection" (looking for specific things) and "area surveillance" (watching everything in a space for anything unusual). Environmental monitoring serves the surveillance function for this institution. It is not looking for a specific development -- the intelligence cycle handles that. It is watching for anything that might matter, including things the institution did not know to look for.</p>
+
+<p>This is the hardest function to sustain over time. Directed collection has a clear purpose and a measurable result. Surveillance is open-ended, often uneventful, and easy to neglect when nothing seems to be happening. The most dangerous monitoring failure is the one that occurs because nothing has gone wrong for a long time and the operator concludes, consciously or unconsciously, that nothing will. The monitoring schedule in this article exists to prevent that complacency.</p>
+
+<h3>3.2 Internal Versus External Monitoring</h3>
+<p>The institution monitors two distinct environments: internal (the institution's own systems, resources, and processes) and external (the world outside the air gap). These environments have different characteristics:</p>
+
+<p>Internal monitoring is direct and continuous. The institution has full access to its own systems and can observe them at whatever frequency it chooses, subject to operational capacity. Internal monitoring produces high-confidence data because the institution controls the measurement instruments and can verify observations directly.</p>
+
+<p>External monitoring is indirect and episodic. The institution accesses external information only through import cycles per SEC-001 and D7-003. External monitoring produces lower-confidence data because the information is delayed, curated, and potentially incomplete. External indicators must be designed to extract maximum insight from these constrained observations.</p>
+
+<h3>3.3 Indicators and Baselines</h3>
+<p>An indicator is a specific, observable measurement that signals a change in conditions relevant to the institution. An indicator without a baseline is meaningless -- knowing that a server's temperature is 42 degrees Celsius tells you nothing unless you know that it normally runs at 38 degrees. Baselines must be established through initial observation periods before indicators can be interpreted meaningfully.</p>
+
+<p>Indicators come in two types: direct indicators measure the thing you care about (drive health status directly indicates storage reliability); indirect indicators measure something correlated with the thing you care about (manufacturer announcements about end-of-life for a product line indirectly indicate future supply availability). Indirect indicators are more common for external monitoring because the institution cannot directly observe most external conditions.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Monitoring Domains</h3>
+<p>The institution's monitoring is organized into six domains, each with its own indicators, baselines, schedules, and alert thresholds.</p>
+
+<p><strong>Domain A: System Health.</strong> What is monitored: hardware status (drive health, CPU temperature, memory usage, fan speeds, power supply status); software status (service uptime, error logs, backup completion, data integrity checks); storage capacity (used, available, growth rate); network health (internal network only; connection status, latency, error rates). Schedule: continuous where automated (D8 agents); daily manual check where not automated. Baseline: established during the first 30 days of operation and updated annually. Alert threshold: any reading that deviates by more than 20% from baseline, or any binary failure (drive failure, service crash, backup failure).</p>
+
+<p><strong>Domain B: Resource Levels.</strong> What is monitored: storage media inventory (blank drives, tapes, or other media); replacement parts inventory; consumables (cleaning supplies, cables, connectors); financial reserves allocated for institutional operations; energy supply status (battery reserves, generator fuel if applicable, solar capacity if applicable). Schedule: monthly inventory for physical items; quarterly for financial. Baseline: initial inventory at institution founding. Alert threshold: any resource dropping below 6-month reserve (the institution's minimum reserve per OPS-001); any resource consumption rate that would exhaust reserves within 12 months at current pace.</p>
+
+<p><strong>Domain C: Physical Environment.</strong> What is monitored: temperature and humidity in equipment areas; water intrusion indicators; structural condition of the physical facility; perimeter condition (locks, seals, physical security measures); air quality where relevant to equipment longevity; pest indicators (rodent or insect activity that could damage cabling or equipment). Schedule: daily visual inspection; continuous where sensors are deployed. Baseline: initial readings at facility setup. Alert threshold: temperature or humidity outside equipment tolerance ranges; any water intrusion; any structural degradation; any compromised physical security measure.</p>
+
+<p><strong>Domain D: External Technology Landscape.</strong> What is monitored: status of critical technologies the institution depends on (operating system, encryption libraries, file system standards, storage media standards); security advisories for software the institution uses; technology lifecycle announcements (end-of-life, deprecated standards, emerging replacements); availability and pricing of critical hardware components. Schedule: each import cycle (per D7-003 collection doctrine). Baseline: technology state at institution founding. Alert threshold: end-of-life announcement for any critical technology; security vulnerability in any software the institution uses; price increase exceeding 50% for any critical hardware; disappearance of any critical hardware from the market.</p>
+
+<p><strong>Domain E: External Threat Environment.</strong> What is monitored: legal and regulatory developments affecting data storage, encryption, or privacy; geopolitical developments affecting the institution's physical location; natural disaster risk changes (flood maps, seismic activity, climate trends); crime and vandalism trends in the local area; developments in cyber-threat landscape relevant to air-gapped systems. Schedule: each import cycle. Baseline: threat environment at institution founding, documented in the first Annual Threat Assessment per D7-006. Alert threshold: any development that would change a threat assessment score by 2 or more points on the D7-006 rubrics.</p>
+
+<p><strong>Domain F: Institutional Health.</strong> What is monitored: operator well-being (self-assessed; burnout indicators, motivation, cognitive sharpness); documentation currency (percentage of articles past their review date); intelligence function performance (product output rate, calibration tracking results); succession readiness (is a successor identified, trained, and available?); institutional mission alignment (is the institution still serving its stated purpose?). Schedule: quarterly self-assessment. Baseline: initial assessment at institution founding. Alert threshold: operator self-assessing below functional threshold per OPS-001; more than 25% of articles past review date; no successor identified for more than 5 years; intelligence calibration showing systematic bias.</p>
+
+<h3>4.2 The Indicator Register</h3>
+<p>The indicator register is the master document listing all active indicators, their baselines, current values, trends, and alert status. Format:</p>
+
+<table>
+<thead>
+<tr><th>Indicator ID</th><th>Domain</th><th>Description</th><th>Baseline</th><th>Current Value</th><th>Trend</th><th>Alert?</th><th>Last Measured</th></tr>
+</thead>
+<tbody>
+<tr><td>IND-[Domain]-[NNN]</td><td>[A-F]</td><td>[What is measured]</td><td>[Baseline value]</td><td>[Current value]</td><td>[Rising/Stable/Falling]</td><td>[Yes/No]</td><td>[Date]</td></tr>
+</tbody>
+</table>
+
+<p>The register also tracks indicator history over time, enabling trend analysis. For each indicator, the last 12 measurements (or the last year of measurements, whichever is more) are retained in the register, with full history archived per D6-001.</p>
+
+<h3>4.3 Alert Escalation</h3>
+<p>When an indicator crosses its alert threshold, the following escalation procedure is triggered:</p>
+
+<ol>
+<li><strong>Verify the reading.</strong> Before escalating, confirm the observation is accurate. Re-measure if possible. False alarms waste analytical capacity and erode confidence in the monitoring system.</li>
+<li><strong>Log the alert.</strong> Record the indicator, the reading, the threshold crossed, and the date in the monitoring log.</li>
+<li><strong>Assess urgency.</strong> Does this require immediate response (equipment failure, security breach) or analytical response (trend change, emerging threat indicator)? Immediate response follows D10-003 incident response procedures. Analytical response enters the intelligence cycle per D7-002.</li>
+<li><strong>Produce an Intelligence Flash (IF) per D7-008</strong> if the alert indicates a development that decision-makers need immediate awareness of.</li>
+<li><strong>Update the relevant register.</strong> If the alert feeds a threat assessment, update the threat register per D7-006. If it feeds an opportunity assessment, update the opportunity register per D7-007.</li>
+<li><strong>Adjust monitoring frequency</strong> if needed. An indicator in alert status may warrant more frequent observation until the situation stabilizes.</li>
+</ol>
+
+<h3>4.4 Trend Analysis</h3>
+<p>Individual indicator readings are useful for alert detection. Patterns across indicators and over time are useful for strategic understanding. The analyst must periodically (at least quarterly) review monitoring data for trends that no single indicator captures:</p>
+
+<ul>
+<li><strong>Convergent trends:</strong> Multiple indicators moving in the same direction simultaneously. Example: rising equipment temperature, increasing drive error rates, and declining backup success rates together suggest a systemic infrastructure problem that no single indicator would reveal on its own.</li>
+<li><strong>Divergent trends:</strong> An indicator moving contrary to expectation. Example: resource consumption increasing while operational activity is decreasing, suggesting an efficiency problem or an undetected process.</li>
+<li><strong>Long-term drift:</strong> Slow, steady change in an indicator that never crosses the alert threshold but cumulatively represents a significant shift. Example: gradual decline in storage media quality over years, where each individual measurement is within tolerance but the trend is toward the alert threshold.</li>
+</ul>
+
+<p>Trend analysis results are documented in the periodic Intelligence Update (IU) per D7-008 and feed into the annual threat and opportunity reviews.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D7-09-01:</strong> All six monitoring domains must have active indicators. No domain may be left unmonitored. If an indicator cannot be measured due to technical or resource constraints, the gap must be documented in the indicator register and reported in the next Intelligence Update.</li>
+<li><strong>R-D7-09-02:</strong> Monitoring schedules defined in Section 4.1 are minimum frequencies. The analyst may monitor more frequently but may not reduce frequency below the minimum without a Tier 2 decision per GOV-001 documenting the justification and the accepted risk.</li>
+<li><strong>R-D7-09-03:</strong> Every indicator must have a documented baseline. Indicators without baselines must be flagged as "UNCALIBRATED" until a baseline period (minimum 30 days for internal indicators, minimum 3 import cycles for external indicators) is completed.</li>
+<li><strong>R-D7-09-04:</strong> Alerts must be verified before escalation per Section 4.3 Step 1. However, verification must not introduce dangerous delay. If the alert indicates an imminent threat to the institution's critical systems, escalate immediately and verify concurrently.</li>
+<li><strong>R-D7-09-05:</strong> The monitoring log must be maintained as a continuous record. Entries must not be deleted or modified after recording. Corrections are made by adding a new entry referencing the error. The log is archived per D6-001.</li>
+<li><strong>R-D7-09-06:</strong> Trend analysis must be performed at least quarterly. The results must be documented in an Intelligence Update (IU) per D7-008.</li>
+<li><strong>R-D7-09-07:</strong> The indicator register must be reviewed annually as part of the Annual Threat Review (D7-006) and Annual Opportunity Review (D7-007). Indicators that are no longer relevant must be retired. New indicators must be added when new threats or opportunities are identified.</li>
+<li><strong>R-D7-09-08:</strong> Where automated monitoring agents are deployed per D8, the agent's alert configuration must match the thresholds defined in the indicator register. Any discrepancy between the agent's thresholds and the register is a configuration error that must be corrected immediately.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Monitoring fatigue.</strong> The analyst loses discipline in performing routine observations because nothing changes week after week. Observations become cursory or are skipped entirely. The monitoring log shows entries becoming briefer and less detailed over time. Mitigation: automation per D8 handles the most repetitive observations. For manual observations, the monitoring schedule is non-negotiable per R-D7-09-02. The quarterly self-assessment in Domain F should include monitoring discipline as a check.</p>
+</li>
+<li>
+<p><strong>Alert desensitization.</strong> Too many alerts are triggered, most of which are false or trivial, and the analyst begins ignoring them. The genuine alert is lost in the noise. Mitigation: alert thresholds must be calibrated to the institution's actual conditions, not to theoretical ideals. If more than 20% of alerts prove to be false alarms in a quarter, the thresholds for those indicators must be recalibrated.</p>
+</li>
+<li>
+<p><strong>Indicator fixation.</strong> The analyst monitors what is measured rather than what matters. Indicators that are easy to measure receive attention; conditions that are harder to measure are ignored, even if they are more important. Mitigation: the six monitoring domains ensure broad coverage. The annual indicator review per R-D7-09-07 should ask: "What conditions are not covered by current indicators?" as a deliberate anti-fixation exercise.</p>
+</li>
+<li>
+<p><strong>Baseline drift without recalibration.</strong> The baseline was established years ago and is no longer representative. The indicator consistently reads "above baseline" but this is the new normal, not an alert condition. Or the indicator reads "normal" but conditions have actually degraded gradually. Mitigation: baselines must be reviewed annually. If the operating environment has changed fundamentally (new equipment, different facility, changed climate), baselines must be re-established.</p>
+</li>
+<li>
+<p><strong>External monitoring gaps.</strong> The air gap constrains external monitoring to import cycles, and the import cycles do not capture developments that matter. Critical external changes occur between imports and are not detected. Mitigation: the intelligence requirements register per D7-002 must specify what external information is needed. Import cycle planning per D7-003 must allocate capacity to monitoring requirements, not just to directed collection requirements.</p>
+</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If monitoring fatigue is detected (log entries have become cursory or sporadic):</strong> Acknowledge the problem -- monitoring fatigue is natural, not a character failure. Review the monitoring schedule for excessive burden. Consider whether additional automation per D8 can absorb routine observations. Reset by performing one thorough, complete monitoring cycle across all domains and documenting the results in detail. Use this as the new quality standard for subsequent entries.</p>
+</li>
+<li>
+<p><strong>If alert desensitization has occurred and a genuine alert was missed:</strong> Conduct a post-incident review per D7-012. Recalibrate alert thresholds to reduce false alarm rate. Consider implementing tiered alerts (advisory, warning, critical) to enable the analyst to triage more effectively. Document the miss and the corrective action.</p>
+</li>
+<li>
+<p><strong>If a significant development was missed because external monitoring was insufficient:</strong> Review the import cycle allocation per D7-003. Determine whether the gap was due to incorrect prioritization (the information was available but not sought), insufficient import capacity (there was not enough bandwidth to collect everything needed), or analytical failure (the information was imported but its significance was not recognized). Address the specific root cause.</p>
+</li>
+<li>
+<p><strong>If baselines are stale and indicator readings no longer reflect actual conditions:</strong> Conduct a baseline reset. For each monitoring domain, re-establish baselines using current conditions. Document the reset, including the reasons the previous baselines were no longer valid. Note that this creates a discontinuity in the trend data; the pre-reset and post-reset data must be analyzed separately.</p>
+</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The initial monitoring setup will be manual-heavy and time-consuming. Baselines are being established. The analyst is learning what normal looks like for this specific institution in this specific environment. Expect frequent threshold adjustments as the monitoring system calibrates to reality. Automation per D8 should be introduced progressively, starting with the most repetitive observations (system health metrics) and expanding as the automation framework matures.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The monitoring system should be well-calibrated. Most internal monitoring should be automated with manual oversight. External monitoring indicators should be refined based on experience -- which external signals have historically correlated with actual developments, and which have been noise? The monitoring log now spans years, enabling meaningful trend analysis. Long-term drift patterns should be emerging in the data.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The monitoring archive is a substantial dataset. Multi-year trends are visible. The analyst can identify cyclical patterns (seasonal environmental variations, periodic resource needs) and secular trends (gradual equipment degradation, evolving external threat patterns). If succession is approaching, the successor must understand not just the monitoring procedures but the patterns -- what is normal for this institution across years, not just across weeks.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The monitoring archive spans decades. It is one of the institution's most valuable analytical resources. Climate trends, technology lifecycle patterns, and infrastructure aging trajectories all become visible at this timescale. The monitoring framework should be stable even as specific indicators evolve -- some will be retired as their subjects become irrelevant, and new ones will be added as new conditions emerge.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the institution experiences a surprise -- a significant development that the monitoring system did not detect -- this article needs revision. Every surprise should prompt the question: "Could we have monitored for this, and if so, why did we not?" Not every surprise can be anticipated, but the monitoring system should be improved by every one that occurs.</p>
+</li>
+</ul>
+</section>
+
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Domain F -- Institutional Health -- is the monitoring domain that will be hardest to maintain honestly. It requires the operator to assess their own well-being, their own cognitive sharpness, and whether the institution is still serving its purpose. These are exactly the questions a fatigued, isolated operator is least likely to answer honestly.</p>
+
+<p>I included it because the institution's greatest vulnerability is the operator themselves. Every other monitoring domain watches systems, resources, and environments. Domain F watches the person. If the operator is burning out, if they have lost motivation, if they are no longer thinking clearly, every other monitoring domain is compromised because the observer is compromised. This is the single-analyst problem in its most direct form.</p>
+
+<p>The practical challenge is implementation. How do you measure your own cognitive sharpness? I do not have a fully satisfactory answer. The quarterly self-assessment is a start -- it forces the question to be asked on a schedule, which is better than never asking it. The calibration tracking per D7-011 provides an indirect measure: if the analyst's assessments are becoming less accurate over time, that is an objective indicator that something has changed. But self-monitoring will always be imperfect. This is one of many reasons why succession planning per GOV-001 is not optional: the institution must not depend indefinitely on a single person whose self-monitoring capacity is inherently limited.</p>
+</section>
+
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (honest self-assessment obligation)</li>
+<li>CON-001 -- The Founding Mandate (institutional mission as the standard for monitoring priorities)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (physical security monitoring, air-gap constraints)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo, resource reserves, annual cycle)</li>
+<li>GOV-001 -- Authority Model (Tier 2 decisions for monitoring frequency changes, succession planning)</li>
+<li>D4-001 -- Infrastructure Overview (infrastructure monitoring coordination)</li>
+<li>D6-001 -- Data Philosophy (archival of monitoring logs and indicator data)</li>
+<li>D7-001 -- Intelligence Philosophy (structured curiosity, signal versus noise, epistemic hierarchy)</li>
+<li>D7-002 -- The Intelligence Cycle (integration of monitoring with the intelligence cycle)</li>
+<li>D7-003 -- Collection Doctrine (external information collection for monitoring)</li>
+<li>D7-004 -- Analytical Frameworks and Methods (trend analysis techniques)</li>
+<li>D7-006 -- Threat Assessment Procedures (threat indicators and threat register)</li>
+<li>D7-007 -- Opportunity Recognition Framework (opportunity indicators and register)</li>
+<li>D7-008 -- Intelligence Product Standards (Intelligence Flash and Intelligence Update formats)</li>
+<li>D7-010 -- Decision Support Doctrine (presenting monitoring findings to decision function)</li>
+<li>D7-012 -- Intelligence Failure: Detection, Response, Learning (post-incident analysis of monitoring failures)</li>
+<li>D8-001 -- Automation Philosophy (automated monitoring agents)</li>
+<li>D10-003 -- Incident Response Procedures (response when monitoring detects imminent threats)</li>
+<li>Stage 1 Documentation Framework, Domain 7: Intelligence &amp; Analysis</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

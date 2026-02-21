@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D13-012 — Legacy System Coexistence and Bridge Strategies - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li class="active"><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d13-012">
+  <h1>D13-012 &mdash; Legacy System Coexistence and Bridge Strategies</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D13-012</dd>
+  <dt>Title</dt>
+  <dd>Legacy System Coexistence and Bridge Strategies</dd>
+  <dt>Domain</dt>
+  <dd>13 -- Evolution &amp; Adaptation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, D13-001, D13-002, D13-006, D13-007, D13-010</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D13-004, D13-013. Referenced by any article involving system transitions.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how old and new systems coexist during transition periods, and how bridge layers, adapters, and dual-operation strategies are designed, deployed, managed, and retired. D13-001 Section 4.3 establishes the legacy coexistence principle: coexistence is temporary, the old system remains authoritative until the new system is verified, bridge layers are disposable, and decommissioning is a first-class activity. This article operationalizes those principles into specific procedures.</p>
+
+<p>Every technology transition in the institution creates a period of overlap where two generations of a system run simultaneously. During this period, the institution's complexity temporarily increases: two systems perform related functions, data may exist in two formats, procedures must account for both systems, and the operator's attention is divided. This period is both necessary (for safety) and dangerous (for complexity). Managing it well is the difference between a smooth transition and a permanent mess.</p>
+
+<p>The worst outcome of a transition is not a failed migration -- that can be rolled back. The worst outcome is a coexistence arrangement that was meant to be temporary becoming permanent. Permanent coexistence means permanent complexity, permanent maintenance burden, and permanent fragility. This article's primary mission is to prevent that outcome by imposing structure, deadlines, and accountability on every coexistence arrangement.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- Coexistence arrangement types: parallel operation, shadow operation, phased migration, and hot standby.
+- Bridge layer design: adapters, translators, and synchronization mechanisms.
+- The coexistence agreement: a documented commitment to temporary coexistence with a defined end date.
+- Data consistency during coexistence: how to maintain a single source of truth when two systems exist.
+- Coexistence duration limits and extension procedures.
+- Bridge layer retirement: how to remove temporary infrastructure after transition completes.
+- Coexistence complexity monitoring.</p>
+
+<p><strong>Out of scope:</strong>
+- Migration procedures themselves (D13-002).
+- Post-migration verification (D13-013).
+- Software sunset after coexistence ends (D13-004).
+- Hardware rollback procedures (D13-003).</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Coexistence Paradox</h3>
+<p>Coexistence is both the safest way to manage a transition and the most dangerous state to remain in. It is safe because the old system provides a fallback if the new system fails. It is dangerous because running two systems simultaneously is more complex and more fragile than running either one alone. The paradox is resolved by time limits: coexistence provides safety during the transition window, and the time limit prevents it from becoming permanent.</p>
+
+<h3>3.2 The Bridge Layer Trap</h3>
+<p>Bridge layers -- adapters, translators, and synchronization scripts that allow old and new systems to interoperate -- are necessary during coexistence but are inherently fragile. They are written quickly, for a specific transition, and they depend intimately on the behavior of both systems. They are the most likely component to break when either system is updated. They are also the most likely component to become permanent, because removing them means completing the transition, which is the hard part. The bridge layer trap is when a "temporary" bridge becomes permanent infrastructure that nobody dares remove because nobody fully understands what it does.</p>
+
+<h3>3.3 Data Consistency as the Primary Risk</h3>
+<p>During coexistence, data may be read from or written to either the old or the new system. If both systems hold copies of the same data, inconsistency is inevitable unless explicit synchronization mechanisms are in place. The D13-001 legacy coexistence principle resolves this by designating the old system as authoritative until the new system is verified. But this designation must be operationally enforced, not just stated -- procedures must ensure that data flows from the authoritative system to the secondary system, not the reverse.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Coexistence Arrangement Types</h3>
+
+<p><strong>Parallel operation.</strong> Both systems are fully operational. The old system is authoritative. The new system receives copies of all inputs and produces outputs that are compared against the old system's outputs but are not used for production purposes. This is the safest arrangement because the new system is tested against real workloads without bearing production responsibility. It is also the most resource-intensive.</p>
+
+<p><strong>Shadow operation.</strong> The old system is fully operational. The new system runs alongside it but handles no input directly. Instead, it monitors the old system's behavior and verifies that it could produce equivalent results. Lighter weight than parallel operation but provides less testing coverage.</p>
+
+<p><strong>Phased migration.</strong> Workloads are divided between old and new systems by category, by priority, or by time. Some workloads move to the new system while others remain on the old system. The two systems share responsibility. This is the most common arrangement for large transitions. It requires clear rules about which system handles which workload and how data flows between them.</p>
+
+<p><strong>Hot standby.</strong> The new system is configured and ready but inactive. It activates only if the old system fails. This is the lightest-weight coexistence arrangement and is appropriate when the new system has been thoroughly tested and the primary risk is old system failure rather than new system inadequacy.</p>
+
+<h3>4.2 The Coexistence Agreement</h3>
+<p>Every coexistence arrangement is governed by a coexistence agreement -- a documented commitment that specifies:</p>
+
+<ul>
+<li><strong>Arrangement type:</strong> Which of the four types (Section 4.1) is being used.</li>
+<li><strong>Authoritative system:</strong> Which system is the system of record for each data category.</li>
+<li><strong>Start date:</strong> When coexistence begins.</li>
+<li><strong>Planned end date:</strong> When coexistence is scheduled to end. This date must be explicit and specific.</li>
+<li><strong>Maximum end date:</strong> The hard deadline beyond which the coexistence arrangement must be resolved (either by completing the transition or by rolling back). Per D13-001 R-EVL-03, this may not exceed 24 months without Tier 2 review.</li>
+<li><strong>Success criteria:</strong> What conditions must be met for the new system to be declared authoritative and the old system to be scheduled for sunset.</li>
+<li><strong>Failure criteria:</strong> What conditions trigger rollback to the old system.</li>
+<li><strong>Bridge layers:</strong> What adapters, translators, or synchronization mechanisms are deployed and their specifications.</li>
+<li><strong>Data flow direction:</strong> How data moves between the two systems and which direction is authoritative.</li>
+<li><strong>Monitoring plan:</strong> How the coexistence arrangement is monitored for problems.</li>
+</ul>
+
+<h3>4.3 Bridge Layer Design Principles</h3>
+<p>Bridge layers, when required, must adhere to these design principles:</p>
+
+<p><strong>Transparency.</strong> A bridge layer must not modify data as it passes through. It translates format or interface, but the semantic content must be identical on both sides. If translation requires semantic change, this must be documented and approved.</p>
+
+<p><strong>Failure visibility.</strong> When a bridge layer fails, the failure must be visible and loud. Silent failures in bridge layers are the primary mechanism by which data consistency is lost during coexistence. Bridge layers must include health checks that report their status and alert on failure.</p>
+
+<p><strong>Disposability.</strong> A bridge layer must be designed for removal. It must not create dependencies that outlive the coexistence period. Other components must not depend on the bridge layer's presence for normal operation. When the bridge is removed, the remaining system must function without it.</p>
+
+<p><strong>Simplicity.</strong> Bridge layers must be as simple as possible. Complex bridge layers are fragile bridge layers. If a bridge layer requires complex logic, that is a signal that the systems it connects may be too incompatible for coexistence and a different transition strategy should be considered.</p>
+
+<h3>4.4 Data Consistency Procedures</h3>
+<p>During coexistence, data consistency is maintained by the following rules:</p>
+
+<ol>
+<li>There is exactly one authoritative system for each data category at any given time. The authoritative system is specified in the coexistence agreement.</li>
+<li>Data is written to the authoritative system first. The secondary system receives a copy, either in real time (for critical data) or in batch (for non-critical data).</li>
+<li>If a discrepancy is detected between the authoritative and secondary systems, the authoritative system's data is correct. The secondary system is resynced from the authoritative system.</li>
+<li>Authority transfer -- changing which system is authoritative -- is a formal event documented in the coexistence agreement and the operational log. It is not done casually.</li>
+</ol>
+
+<h3>4.5 Coexistence Duration Management</h3>
+<p>Coexistence arrangements are monitored against their planned end dates. The following escalation procedure applies:</p>
+
+<ul>
+<li>At 50% of the planned duration: status review. Is the transition on track? Are success criteria being met?</li>
+<li>At 75% of the planned duration: readiness assessment. Can the transition be completed by the planned end date? If not, an extension request must be prepared.</li>
+<li>At the planned end date: decision point. Either the transition is complete (new system is authoritative, old system is scheduled for sunset) or an extension is granted with a new end date and documented justification.</li>
+<li>At the maximum end date (24 months per R-EVL-03): mandatory resolution. The coexistence must end, either by completing the transition or by rolling back. Extension beyond 24 months requires Tier 2 approval with extraordinary justification.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-LSC-01:</strong> Every coexistence arrangement must have a documented coexistence agreement (Section 4.2) before it begins. The agreement must include explicit planned and maximum end dates.</li>
+<li><strong>R-LSC-02:</strong> Bridge layers must adhere to the design principles in Section 4.3. Bridge layers that modify data semantics require Tier 2 approval.</li>
+<li><strong>R-LSC-03:</strong> Data consistency during coexistence must follow the procedures in Section 4.4. There must be exactly one authoritative system for each data category at all times.</li>
+<li><strong>R-LSC-04:</strong> Coexistence arrangements may not exceed 24 months without Tier 2 review per D13-001 R-EVL-03. Extensions beyond 24 months are exceptional and must be justified by documented, specific circumstances.</li>
+<li><strong>R-LSC-05:</strong> Bridge layers must be removed within 30 days of coexistence ending. Bridge layers that remain after this period are classified as unauthorized permanent infrastructure and must be addressed as technical debt.</li>
+<li><strong>R-LSC-06:</strong> The coexistence agreement must be reviewed at the milestones defined in Section 4.5 (50%, 75%, and planned end date). Reviews must be documented.</li>
+<li><strong>R-LSC-07:</strong> Authority transfer events must be documented in the coexistence agreement and the operational log with the date, the data categories affected, and the justification.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Permanent coexistence.</strong> The planned end date passes, extensions are granted repeatedly, and the coexistence becomes the status quo. Two systems run indefinitely, consuming double the resources and maintenance attention. Mitigation: R-LSC-04 imposes the 24-month hard limit. The escalation procedure in Section 4.5 creates decision points that prevent indefinite drift.</li>
+
+<li><strong>Bridge layer permanence.</strong> The bridge layer outlives the coexistence period and becomes permanent infrastructure. Other components begin depending on it. Removing it becomes difficult. Mitigation: R-LSC-05 mandates bridge removal within 30 days. The disposability design principle (Section 4.3) ensures bridges are designed for removal.</li>
+
+<li><strong>Data inconsistency.</strong> The authoritative and secondary systems diverge without detection. Data is lost or corrupted. Mitigation: the data consistency procedures (Section 4.4) enforce one-directional data flow. Bridge layer health checks detect synchronization failures.</li>
+
+<li><strong>Premature authority transfer.</strong> The new system is declared authoritative before it has been adequately verified. Problems emerge and the old system (now secondary) has diverged from the new system. Rollback is complicated. Mitigation: authority transfer is a formal event requiring documented verification that success criteria have been met.</li>
+
+<li><strong>Coexistence complexity overload.</strong> The coexistence arrangement itself becomes too complex for the operator to manage. Monitoring, synchronization, and dual maintenance consume all available operational capacity. Mitigation: R-ARC-05 (from D13-010) applies during coexistence. If the operator's capacity is exceeded, the coexistence arrangement must be simplified or the transition must be accelerated or rolled back.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If coexistence has become permanent:</strong> Audit all active coexistence arrangements. For each one: determine whether the transition can be completed within 6 months. If yes, create a completion plan with a firm deadline. If no, determine whether rollback to the old system is preferable to continued coexistence. In either case, the coexistence must end -- the question is whether it ends by completing the transition or by rolling back.</li>
+
+<li><strong>If a bridge layer has become permanent:</strong> Map all dependencies on the bridge layer. Determine what would break if the bridge were removed. For each dependency, create a remediation plan that eliminates the dependency. Execute the remediations. Remove the bridge. If dependencies cannot be eliminated, the bridge must be promoted to a proper, documented, maintained component -- it is no longer "temporary" and must be treated accordingly.</li>
+
+<li><strong>If data inconsistency is discovered:</strong> Determine which system holds the correct data (the authoritative system per the coexistence agreement). Resync the secondary system from the authoritative system. Investigate the cause of the inconsistency: did the bridge layer fail? Was the data flow direction violated? Was there an unauthorized write to the secondary system? Fix the cause.</li>
+
+<li><strong>If a premature authority transfer has caused problems:</strong> Transfer authority back to the old system. Resync the old system from the most recent known-good state. Investigate what verification was missing that would have caught the problems. Do not reattempt authority transfer until the verification gaps are addressed.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Coexistence arrangements are rare because the institution is young and transitions are few. Use any early coexistence periods (such as testing new tools alongside existing ones) to practice the coexistence agreement and bridge layer procedures. Build the habit of setting end dates and honoring them.</li>
+
+<li><strong>Years 5-15:</strong> The first significant coexistence periods occur as hardware generations and software versions are replaced. The coexistence agreement template is tested in earnest. Bridge layer design principles are validated or revised based on practical experience. The 24-month limit may be tested for the first time.</li>
+
+<li><strong>Years 15-30:</strong> Multiple coexistence periods have been managed. The institution has a library of completed coexistence agreements that document how past transitions were managed. Patterns emerge: certain types of transitions are more prone to permanent coexistence than others. These patterns inform future transition planning.</li>
+
+<li><strong>Years 30-50+:</strong> Coexistence management is a routine institutional skill. The operator knows from experience how long different types of transitions actually take, what bridge layer designs are most effective, and what warning signs indicate a coexistence arrangement is at risk of becoming permanent. This experience is documented in the coexistence agreement archive for future operators.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The permanent coexistence failure mode haunts me because I have seen it in every organization I have worked with. Temporary solutions become permanent because removing them is harder than maintaining them. The bridge that was built for a three-month transition is still running five years later because nobody remembers exactly what it does and nobody wants to be the one who breaks something by removing it. The 24-month hard limit and the 30-day bridge removal deadline are my guardrails against this trap. They are deliberately aggressive because the cost of aggressive deadlines (occasionally needing to extend with justification) is far lower than the cost of lax deadlines (permanent complexity accumulation). Every permanent coexistence arrangement is a small failure of institutional discipline, and enough small failures become a big one.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D13-001 -- Evolution Philosophy (Section 4.3 legacy coexistence principle, R-EVL-03 coexistence duration limits)</li>
+<li>D13-002 -- Technology Migration Playbook (Phase 7 stabilization and decommissioning)</li>
+<li>D13-004 -- Software Sunset Procedures (sunset after coexistence ends)</li>
+<li>D13-006 -- Version Management and Compatibility Policy (version compatibility during coexistence)</li>
+<li>D13-007 -- Change Impact Assessment Methodology (impact of coexistence arrangements)</li>
+<li>D13-010 -- Institutional Architecture and Design Principles (complexity budget, modularity during coexistence)</li>
+<li>D13-013 -- Post-Migration Verification and Stabilization (verification criteria for ending coexistence)</li>
+<li>GOV-001 -- Authority Model (Tier 2 approval for extended coexistence)</li>
+<li>OPS-001 -- Operations Philosophy (operational capacity constraints during coexistence)</li>
+<li>D20-003 -- Timeline Construction and Maintenance (recording coexistence events)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

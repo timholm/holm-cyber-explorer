@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D5-001 — Platform Philosophy and Architectural Principles - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li class="active"><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d5-001">
+  <h1>D5-001 &mdash; Platform Philosophy and Architectural Principles</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D5-001</dd>
+  <dt>Domain</dt>
+  <dd>5 -- Platform &amp; Core Systems</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>CON-001, ETH-001, C-002, C-005, C-010, I-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All Domain 5 articles (D5-002 through D5-006 and all future P-series articles). Referenced by Domain 3 (security implementation), Domain 4 (hardware-software contract), Domain 6 (data architecture).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes the philosophical foundation and architectural principles that govern every platform decision the institution will make over its operational lifetime. It is the root document of Domain 5. Every article in this domain -- from operating system maintenance to configuration management to network architecture -- derives its authority and its constraints from the principles stated here. When a future operator faces a platform decision that is not explicitly covered by a more specific article, this document provides the reasoning framework for making that decision well.</p>
+
+<p>The purpose is not to prescribe specific technologies. Technologies change. The operating system selected today will not be the operating system running in fifty years. The storage format chosen at founding will be migrated, perhaps multiple times. The hardware abstraction layer designed for current hardware will be redesigned for hardware that does not yet exist. What does not change is the reasoning that guides those selections. This article captures that reasoning.</p>
+
+<p>There is a deeper purpose as well. An institution that operates in an air-gapped environment, with finite resources and a multi-generational time horizon, cannot afford the luxury of following industry trends. It cannot adopt a technology because it is popular, discard a technology because it is old, or add complexity because a vendor recommends it. Every platform decision is a commitment that the institution must maintain, understand, and eventually migrate away from. The principles in this article ensure that those commitments are made deliberately, with full awareness of their long-term costs.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The core philosophical principles that guide all platform decisions.</li>
+<li>The architectural constraints that derive from the institution's operational context: air-gapped, finite resources, multi-generational time horizon.</li>
+<li>The decision framework for evaluating platform technologies: what to adopt, what to reject, and how to reason about the tradeoff.</li>
+<li>The relationship between mechanism and policy, and why the platform must separate them.</li>
+<li>The definition of what constitutes the "platform" layer versus the infrastructure layer below it and the application layer above it.</li>
+<li>The principles governing platform documentation, replaceability, and knowledge transfer.</li>
+</ul>
+<p>This article does NOT cover:</p>
+<ul>
+<li>Specific technology selections (see D5-002 for OS maintenance, D5-003 for core services, D5-004 for network architecture).</li>
+<li>The philosophy of technology in the abstract (see C-010 in Domain 1). This article translates that abstract philosophy into concrete platform constraints.</li>
+<li>Governance procedures for approving platform changes (see GOV-001 in Domain 2). This article defines what constitutes a good platform decision; governance defines who may authorize it.</li>
+<li>Security requirements (see Domain 3). This article accepts Domain 3's requirements as constraints and defines how the platform layer implements them.</li>
+<li>Physical infrastructure (see Domain 4). This article defines the contract between software and hardware but does not specify hardware.</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>The history of computing is littered with platforms that were built without articulated principles. The decisions seemed obvious at the time: use the popular framework, follow the vendor's reference architecture, adopt the tool the team already knows. These decisions are not wrong in isolation. They are wrong when they accumulate without a unifying philosophy, because the result is a system that no single person understands, that cannot be maintained without the original builders, and that resists change because no one knows which parts are load-bearing and which are vestigial.</p>
+
+<p>The institution faces constraints that most organizations do not. First, it operates behind an air gap, which means that every piece of software must be deliberately acquired, verified, and transported across a physical boundary. There is no <code>apt update</code> that reaches the internet. There is no cloud service to offload complexity to. Every dependency the platform takes on is a dependency the institution must maintain internally, forever, or until it deliberately migrates away. Second, the institution operates on a fifty-year time horizon. Decisions made today will constrain operators who have not yet been born. A technology selected now must either last for decades or be replaceable without catastrophic disruption. Third, the institution has finite human resources. There is no operations team of hundreds. The platform must be simple enough that a small number of people -- potentially as few as one -- can understand, maintain, and rebuild it.</p>
+
+<h3>3.1 The Burden of Every Dependency</h3>
+<p>In an internet-connected environment, dependencies are cheap to acquire and easy to ignore. A package manager resolves them automatically. A cloud provider abstracts them away. The true cost of a dependency -- its maintenance burden, its security surface, its upgrade path, its eventual obsolescence -- is hidden behind layers of automation. In an air-gapped environment, every one of those costs is visible and personal. If a library has a security vulnerability, the operator must learn about it through manual intelligence gathering, acquire the patch through the air gap, test it in isolation, and deploy it. If a tool depends on a framework that depends on a runtime that depends on a compiler, the operator must maintain the entire chain. The principle "minimize dependencies" is not aesthetic preference. It is survival arithmetic.</p>
+
+<h3>3.2 Boring Technology and the Innovation Budget</h3>
+<p>The concept of a limited "innovation budget" comes from operational experience across the industry: every organization has a finite capacity for absorbing new, unproven, or poorly-understood technology. Exceed that capacity and the system becomes fragile, because failures occur in components that no one fully understands. For the institution, this budget is smaller than for most organizations, because the air gap makes it harder to get help, harder to find documentation, and harder to apply patches when things go wrong. The institution must therefore spend its innovation budget with extreme deliberation, allocating it only where boring, well-understood alternatives are genuinely inadequate.</p>
+
+<h3>3.3 Historical Precedent</h3>
+<p>Institutions that have survived for centuries -- archives, libraries, religious orders, certain universities -- share a common trait in their relationship with technology. They adopt slowly, they adopt conservatively, and they maintain the capacity to operate without any particular technology. The Bodleian Library at Oxford did not rush to adopt every new cataloging system. It adopted systems it could maintain with its own staff, on its own terms, for its own purposes. When it did adopt, it adopted thoroughly: training staff, documenting procedures, planning for the eventual replacement. The institution modeled in this documentation follows the same pattern, applied to digital infrastructure.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Seven Architectural Principles</h3>
+<p>All platform decisions within the institution are governed by seven principles. These principles are ordered by priority: when two principles conflict, the higher-numbered principle yields to the lower-numbered one.</p>
+
+<p><strong>Principle 1: Understand Every Layer.</strong> No component shall be deployed that the institution's operators cannot explain, configure, troubleshoot, and replace. This does not mean that every operator must understand every component at every moment. It means that the institutional knowledge base -- the combination of documented procedures, training materials, and living expertise -- must be sufficient to fully understand every deployed component. If a component is so complex that no one in the institution can explain its behavior under failure conditions, it must not be deployed, regardless of its other merits. The test is: "If this component behaves unexpectedly at 3 AM, can the on-duty operator diagnose the problem using only institutional resources?" If the answer is no, the component fails Principle 1.</p>
+
+<p><strong>Principle 2: Prefer Boring Technology.</strong> When selecting among alternatives that meet the institution's requirements, prefer the alternative that is oldest, most widely deployed, most thoroughly documented, and most boring. "Boring" is a term of art: it means technology whose failure modes are well-known, whose edge cases have been discovered and documented by others, and whose operational characteristics are predictable. New technology is exciting precisely because its failure modes are unknown. The institution cannot afford unknown failure modes. A boring choice that requires slightly more manual work is preferable to an exciting choice that works effortlessly until it fails in a way no one anticipated.</p>
+
+<p><strong>Principle 3: Minimize the Stack.</strong> Every layer in the technology stack is a layer that must be understood, maintained, secured, and eventually replaced. The institution must deploy the minimum number of layers necessary to meet its requirements. If a requirement can be met with the operating system's built-in tools, do not add a framework. If a framework is necessary, do not add an orchestration layer on top of it. If an orchestration layer is necessary, question whether the underlying requirement is correctly understood. The question is always: "Can we remove this layer without losing essential functionality?" If the answer is yes, remove it.</p>
+
+<p><strong>Principle 4: Design for Replacement.</strong> Every component selected today will be replaced eventually. The question is not whether, but when and at what cost. Therefore, every component must be deployed in a way that allows its replacement without requiring the simultaneous replacement of every other component. This means: clean interfaces between components, documented data formats that are independent of any single tool, configuration that is externalized rather than embedded, and the avoidance of vendor-specific lock-in wherever feasible. The test is: "If we needed to replace this component next year, what else would break?" If the answer is "everything," the architecture is wrong.</p>
+
+<p><strong>Principle 5: Separate Mechanism from Policy.</strong> Mechanism is how something works. Policy is the decision about how it should be used. The platform provides mechanisms; governance, security, and operational articles define policies. For example, the filesystem is a mechanism for storing data. The decision about who may access which data is a policy defined in Domain 3. The authentication system is a mechanism. The decision about password complexity requirements is a policy. When mechanism and policy are entangled -- when the technology itself embeds decisions that should be made by humans -- the institution loses the ability to change its mind without changing its technology. The platform must provide flexible mechanisms that policy can be applied to, not opinionated tools that enforce a single policy.</p>
+
+<p><strong>Principle 6: Fail Predictably.</strong> Every component will fail. The institution's architectural requirement is not that components never fail, but that when they fail, they fail in ways that are predictable, observable, and recoverable. A component that fails silently -- continuing to appear operational while producing incorrect results -- is more dangerous than a component that fails loudly by crashing. A component that fails in a way that corrupts data is more dangerous than one that fails by refusing to operate. Design choices must favor loud, clean, data-preserving failure modes. Where possible, components should fail closed: denying access rather than granting it, refusing to operate rather than operating incorrectly.</p>
+
+<p><strong>Principle 7: Document as You Build.</strong> Documentation is not a post-deployment activity. It is a deployment prerequisite. No component is considered deployed until its documentation is complete. Documentation includes: what the component does, why it was selected over alternatives, how it is configured, how to verify its correct operation, what its known failure modes are, and how to replace it. This principle exists because the person who deploys a component today is very likely not the person who will maintain it in ten years. The deployer's undocumented knowledge is an institutional liability. It becomes a single point of failure the moment the deployer is unavailable.</p>
+
+<h3>4.2 The Platform Layer Definition</h3>
+<p>The "platform" is the software layer that sits between Domain 4's physical infrastructure and any application-layer concerns. It provides the following core services:</p>
+<ul>
+<li><strong>Compute:</strong> The ability to run programs. Provided by the operating system kernel, system libraries, and essential runtimes.</li>
+<li><strong>Storage:</strong> The ability to persist data. Provided by filesystems, with optional database systems for structured data.</li>
+<li><strong>Identity:</strong> The ability to authenticate users and services and to authorize their actions. Provided by the operating system's user model, supplemented by any additional authentication infrastructure.</li>
+<li><strong>Time:</strong> A reliable source of time, synchronized across all systems. Critical for logging, for cryptographic operations, and for any temporal reasoning about events.</li>
+<li><strong>Networking:</strong> The ability for systems to communicate with each other within the air-gapped environment. Provided by the operating system's network stack and internal network services (DNS, DHCP or static configuration).</li>
+<li><strong>Logging:</strong> The ability to record events for operational awareness and audit. Provided by the operating system's logging infrastructure and any supplemental log aggregation.</li>
+<li><strong>Scheduling:</strong> The ability to run tasks at specified times or intervals. Provided by the operating system's cron or equivalent facility.</li>
+</ul>
+<p>Everything else -- the institution's data archives, its knowledge management tools, its search capabilities, its user-facing interfaces -- is application-layer, built on top of the platform. The platform's job is to provide these seven services reliably and simply so that the application layer can focus on its own concerns.</p>
+
+<h3>4.3 The Hardware Abstraction Contract</h3>
+<p>The platform must insulate the application layer from the specifics of the underlying hardware. When Domain 4 replaces a server, upgrades a disk array, or changes a network switch, the platform layer absorbs the change. Application-layer configurations, data formats, and workflows must not need to change when hardware changes. This is the contract between Domain 4 and Domain 5: Domain 4 provides hardware that meets specified performance and reliability requirements, and Domain 5 provides a stable software interface that the application layer can depend on.</p>
+<p>The abstraction is not unlimited. The platform cannot hide the fundamental constraints of the hardware -- if storage capacity is finite, the platform cannot pretend it is infinite. If a machine has failed, the platform cannot pretend it is running. The abstraction operates at the level of interface, not of physics. The application layer addresses storage by paths, not by disk serial numbers. It addresses computation by service names, not by machine hostnames. It addresses identity by user accounts, not by which terminal someone is sitting at.</p>
+
+<h3>4.4 The Technology Evaluation Framework</h3>
+<p>When a new technology must be evaluated for potential adoption, the following framework applies. Each criterion must be explicitly addressed in the evaluation document.</p>
+<ol>
+<li><strong>Necessity:</strong> Does the institution actually need this? Can the requirement be met by something already deployed? The burden of proof falls on the new technology.</li>
+<li><strong>Comprehensibility:</strong> Can the institution's operators understand this technology deeply enough to troubleshoot it without external help? Is the source code available and readable? Is the documentation complete?</li>
+<li><strong>Maturity:</strong> How long has this technology existed? How widely is it deployed? How many of its failure modes have been discovered and documented? A technology less than five years old carries a maturity risk.</li>
+<li><strong>Dependency footprint:</strong> What does this technology depend on? What is the total transitive dependency count? Each dependency is a maintenance burden. A technology with three dependencies is preferable to one with three hundred.</li>
+<li><strong>Air-gap compatibility:</strong> Can this technology be installed, configured, updated, and operated without any network connectivity to the outside world? Does it phone home? Does it require license activation? Does it expect access to cloud services?</li>
+<li><strong>Replaceability:</strong> If we adopt this technology and later need to replace it, what is the cost? Are its data formats open and documented? Does it use standard protocols? Can its function be replicated by an alternative?</li>
+<li><strong>Long-term viability:</strong> Is this technology likely to be maintained for at least ten years? Is it backed by a community, a foundation, or a company with a track record of long-term support? What happens if maintenance ceases?</li>
+</ol>
+<p>A technology that fails any of the first five criteria is rejected. A technology that fails criterion six or seven may be adopted with a mandatory migration plan documented at the time of adoption.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D5-001-01:</strong> No platform component shall be deployed unless the institution possesses sufficient knowledge to install, configure, operate, troubleshoot, and replace it without external assistance. This includes access to source code or comprehensive technical documentation that can be stored within the air gap.</li>
+<li><strong>R-D5-001-02:</strong> All platform technology selections shall be documented with an explicit evaluation against the Technology Evaluation Framework (Section 4.4). The evaluation document must be completed before deployment and must be maintained as long as the technology is in use.</li>
+<li><strong>R-D5-001-03:</strong> The platform shall consist of the minimum number of components necessary to provide the seven core services defined in Section 4.2. Any proposed addition to the platform must demonstrate that its function cannot be performed by existing components.</li>
+<li><strong>R-D5-001-04:</strong> No platform component shall store data in a format that cannot be read by at least one other tool available to the institution. Single-tool data lock-in is prohibited.</li>
+<li><strong>R-D5-001-05:</strong> All platform components shall fail closed: denying access or refusing operation rather than granting access or operating with corrupted state. Exceptions require explicit documentation and approval per GOV-001.</li>
+<li><strong>R-D5-001-06:</strong> No platform component is considered deployed until its documentation is complete as specified in Principle 7 (Section 4.1). A component in production without complete documentation is a compliance violation.</li>
+<li><strong>R-D5-001-07:</strong> Platform architecture decisions that affect the institution's ability to migrate away from a technology -- those that create lock-in -- require Tier 1 governance approval per GOV-001.</li>
+<li><strong>R-D5-001-08:</strong> The platform shall maintain a current, complete inventory of all deployed components, their versions, their dependencies, and their evaluation documents. This inventory shall be reviewed quarterly.</li>
+<li><strong>R-D5-001-09:</strong> When two platform approaches offer equivalent functionality, the approach with fewer dependencies, fewer lines of configuration, and fewer failure modes shall be preferred, even if the alternative offers additional convenience features.</li>
+<li><strong>R-D5-001-10:</strong> The seven architectural principles defined in Section 4.1 are binding on all Domain 5 articles. No Domain 5 article may adopt a practice that contradicts these principles without an explicit, documented exception approved through Tier 1 governance.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Principle erosion.</strong> Over time, operators make small exceptions to the principles: a component deployed without full documentation because it was urgent, a dependency added because it was convenient, a technology adopted without a formal evaluation because the operator was already familiar with it. Each exception is minor. The cumulative effect is a platform that no longer reflects its stated principles. Mitigation: the quarterly inventory review (R-D5-001-08) and the annual platform review defined in Section 5.7 of the Domain 5 framework document. Each review must explicitly compare actual practice against stated principles.</li>
+<li><strong>Competence concentration.</strong> Despite Principle 1, institutional knowledge about a component concentrates in a single person -- the one who deployed it. When that person is unavailable, the institution cannot maintain the component. Mitigation: R-D5-001-06 (documentation completeness) and the reproducibility test in the Domain 5 review process (Section 5.6, step 5). Additionally, cross-training requirements should ensure that at least two people can maintain any critical component.</li>
+<li><strong>Abstraction leakage.</strong> The hardware abstraction layer (Section 4.3) breaks down. Application-layer configurations begin to reference specific hardware. Data paths include machine hostnames instead of logical names. When hardware changes, the application layer must be reconfigured. Mitigation: periodic audits of application-layer configurations for hardware-specific references. Any such reference is a defect to be corrected.</li>
+<li><strong>Stack creep.</strong> The platform accumulates layers despite Principle 3. A monitoring tool is added, then a dashboard for the monitoring tool, then a database for the dashboard, then a backup system for the database. Each addition was justified individually, but the cumulative stack is now six layers deep where one would have sufficed. Mitigation: every proposed addition must demonstrate that its function cannot be performed by existing components (R-D5-001-03). The quarterly review must assess whether any deployed component has become redundant.</li>
+<li><strong>Replacement paralysis.</strong> A component needs to be replaced, but despite Principle 4, the replacement cost is prohibitive because the component has become entangled with everything else. Data is stored in a proprietary format. Configurations reference component-specific features. The institution is locked in. Mitigation: R-D5-001-04 (no single-tool data lock-in) and R-D5-001-07 (governance approval for lock-in decisions). Additionally, the five-year migration assessment (Section 5.7 of the Domain 5 framework) must evaluate whether any component has become unreplaceable.</li>
+<li><strong>Documentation decay.</strong> Documentation was complete at deployment but has not been updated as the component evolved. The documentation now describes a system that no longer exists. An operator following the documentation would produce incorrect results. Mitigation: the post-change documentation update requirement (Section 5.7 of the Domain 5 framework: all affected articles must be updated within 7 days of any platform change) and the monthly configuration drift check.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>If principles have eroded and the platform no longer reflects its stated architecture:</strong></p>
+<ol>
+<li>Conduct a full platform audit. Document every deployed component, its dependencies, its documentation status, and whether it was formally evaluated per the Technology Evaluation Framework.</li>
+<li>Identify components that violate one or more principles. Classify each violation by severity: does it create a security risk, a maintenance burden, a knowledge gap, or a lock-in risk?</li>
+<li>For each violation, determine whether the component can be brought into compliance (by completing documentation, reducing dependencies, or creating migration plans) or whether it must be replaced.</li>
+<li>Produce a remediation plan with priorities. Security risks and knowledge gaps take precedence over maintenance burden and lock-in risk.</li>
+<li>Execute the remediation plan incrementally. Do not attempt to bring the entire platform into compliance simultaneously. Remediate one component at a time, verifying stability after each change.</li>
+</ol>
+
+<p><strong>If competence concentration has occurred and a critical operator is unavailable:</strong></p>
+<ol>
+<li>Identify all components for which the unavailable operator was the primary or sole knowledge holder. The component inventory (R-D5-001-08) and documentation registry should make this discoverable.</li>
+<li>For each affected component, locate its documentation. If documentation is complete per R-D5-001-06, follow it. If documentation is incomplete, escalate to the governance process per GOV-001.</li>
+<li>Prioritize: focus on components that are actively failing or that require immediate maintenance. Defer comprehensive knowledge reconstruction for stable components.</li>
+<li>Once the immediate situation is resolved, update the cross-training plan to eliminate the single point of knowledge failure. Document any gaps discovered during the incident.</li>
+</ol>
+
+<p><strong>If the platform must be rebuilt from documentation alone:</strong></p>
+<ol>
+<li>This scenario -- a complete platform rebuild by someone who was not the original builder -- is the ultimate test of Principle 7. Begin with this article to understand the governing philosophy.</li>
+<li>Proceed to D5-002 for OS installation and maintenance procedures, then D5-003 for core service configuration, D5-004 for network architecture, D5-005 for monitoring, and D5-006 for configuration management.</li>
+<li>Follow each article sequentially. If any article's instructions are insufficient to reproduce the described configuration, document the gap. That gap is a documentation defect that must be corrected once the rebuild is complete.</li>
+<li>After the rebuild, conduct a full verification pass: compare the rebuilt platform against the documented baselines in each article. Any discrepancy is either a documentation error or a rebuild error; determine which and correct it.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> The principles are new and untested. The founding team builds the initial platform with these principles in mind, but the principles themselves will be refined through practice. Expect to discover tensions between principles -- for instance, between minimizing the stack (Principle 3) and providing adequate monitoring (a core service). Document these tensions and their resolutions. The Technology Evaluation Framework will be used for the first time; its criteria may need adjustment based on experience. The most important activity during this period is building the habit of principled decision-making, not achieving a perfect platform.</li>
+<li><strong>Years 2-5:</strong> The platform stabilizes. The initial technology selections have been validated or found wanting. The first replacements may be necessary -- not because the technology has failed, but because operational experience has revealed that a simpler alternative exists. This is healthy and expected. The quarterly inventory review becomes routine. Documentation should be comprehensive by the end of this period. The technology evaluation framework should have been applied to enough decisions that its criteria are well-calibrated.</li>
+<li><strong>Years 5-15:</strong> The first major technology transitions will occur. Operating systems reach end-of-life. Hardware generations change. Data formats that seemed adequate at founding show their limitations. The principles in this article guide these transitions: evaluate replacements rigorously, prefer boring alternatives, design the replacement for its own eventual replacement. This period tests Principle 4 (Design for Replacement) most severely. If the initial platform was well-designed, replacements will be tractable. If it was not, this is when the cost of lock-in becomes apparent.</li>
+<li><strong>Years 15-30:</strong> Generational knowledge transfer is now the primary challenge. The founding operators may no longer be active. Successors are maintaining a platform they did not build, using documentation they did not write. The quality of that documentation -- the rigor with which Principle 7 was applied -- determines whether the platform remains understood or becomes an inherited mystery. This period tests whether the institution genuinely internalized the principle of understanding every layer, or merely documented it without practice.</li>
+<li><strong>Years 30-50+:</strong> The platform may bear little resemblance to the founding configuration. The operating system, the storage technology, the network infrastructure, and perhaps the hardware itself may all have been replaced. What should remain unchanged are the principles: understand every layer, prefer boring technology, minimize the stack, design for replacement, separate mechanism from policy, fail predictably, document as you build. If a successor reads this article in 2076 and finds these principles still governing platform decisions, this article has succeeded. If these principles have been superseded by better ones, arrived at through deliberate institutional reasoning and documented with equal rigor, this article has also succeeded. The only failure is if the principles were forgotten -- if decisions are being made without a governing philosophy, by habit rather than by reason.</li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The hardest principle to follow is Principle 2: Prefer Boring Technology. It is hard because every operator is, at some level, a technologist who is drawn to interesting tools. The new database is faster. The new filesystem has better features. The new monitoring system has a beautiful interface. These are real advantages, and it takes discipline to weigh them against the equally real disadvantage of novelty: unknown failure modes, thin documentation, small user communities, and the risk that the project will be abandoned in five years.</p>
+
+<p>I have made this mistake myself, more than once. I have deployed technologies because they were interesting, only to discover their limitations under pressure, in production, at the worst possible time. The principles in this article are not theoretical. They are scar tissue from operational experience, codified so that future operators can learn from those scars rather than accumulating their own.</p>
+
+<p>The second-hardest principle is Principle 3: Minimize the Stack. The temptation is always to add one more layer. The monitoring system needs a dashboard. The dashboard needs a database. The database needs its own backup. Each addition seems small. But each addition is also a new thing to understand, a new thing to maintain, a new thing that can fail at 3 AM. The discipline is in asking, every time, "Can we achieve this with what we already have?" Often the answer is yes, and the solution is less elegant but more survivable.</p>
+
+<p>A note on Principle 1: Understand Every Layer. This does not mean paranoia about external software. It means that the institution should not deploy software that functions as a black box. Open-source software with readable source code and active documentation satisfies this principle, even if no one in the institution has read every line of code. The requirement is that the institution <em>can</em> understand the software if it needs to, not that it has memorized it. The source code must be available within the air gap. The documentation must be local. The knowledge must be attainable, even if it is not yet fully attained.</p>
+
+<p>Finally: these principles will sometimes conflict with each other. Principle 2 (boring technology) may suggest using an old tool, while Principle 4 (design for replacement) suggests that the old tool is so entangled that replacing it would be catastrophic. When principles conflict, think. The ordering is a guide, not an algorithm. The point of having principles is to force you to articulate your reasoning, not to relieve you of the obligation to reason.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>CON-001 -- The Founding Mandate (establishes the air-gap requirement and institutional sovereignty that constrain all platform decisions)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience underpins the preference for understood simplicity over convenient complexity)</li>
+<li>C-002 -- Institutional Principles (the general principles from which these platform-specific principles derive)</li>
+<li>C-005 -- Knowledge Preservation Theory (the requirement that knowledge be preservable over decades informs data format decisions and documentation requirements)</li>
+<li>C-010 -- Technology Philosophy (the abstract philosophy of technology that this article translates into concrete platform constraints)</li>
+<li>I-001 -- Infrastructure Philosophy (Domain 4's foundational principles, which this article must be compatible with; together they define the hardware-software contract)</li>
+<li>GOV-001 -- Governance Structure and Authority (defines who may authorize the platform decisions this article constrains)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (the security requirements that the platform must implement)</li>
+<li>D5-002 -- Operating System Maintenance Procedures (applies these principles to the specific domain of OS maintenance)</li>
+<li>D5-003 -- Core Service Configuration and Hardening (applies these principles to core service deployment and hardening)</li>
+<li>D5-004 -- Network Architecture and Segmentation (applies these principles to internal network design)</li>
+<li>D5-005 -- System Monitoring and Alerting (applies Principle 6: Fail Predictably through observable monitoring)</li>
+<li>D5-006 -- Configuration Management Without Internet (applies Principle 7: Document as You Build to the specific challenge of configuration reproducibility)</li>
+</ul>
+
+</section>
+</article>
+</main>
+</body>
+</html>

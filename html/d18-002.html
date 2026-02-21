@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D18-002 — Content Import Pipeline - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li class="active"><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d18-002">
+  <h1>D18-002 &mdash; Content Import Pipeline</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D18-002</dd>
+  <dt>Domain</dt>
+  <dd>18 -- Import & Quarantine</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D18-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D19-002 (quality audit of imported content), D20-002 (provenance records in decision log), D17-002 (federation sync package handling).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the complete, step-by-step procedure for importing external content into the holm.chat Documentation Institution. It takes the philosophy established in D18-001 -- the immune system analogy, the four-stage pipeline, the trust scoring model -- and turns it into a procedure that the operator can execute every time a piece of external media arrives at the institution's boundary.</p>
+<p>This procedure is designed to be followed exactly. Not because deviation is forbidden, but because every step exists for a documented reason, and skipping a step means accepting a risk that the pipeline was designed to mitigate. If you believe a step is unnecessary for a particular import, you may still have good reason to skip it -- but you must document that decision and the reasoning behind it in the import log.</p>
+<p>This article is written for the operator who is standing at their workstation with a USB drive in hand, wondering: "What do I do with this?" The answer is: follow this procedure.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Physical media handling: inspection, labeling, and chain-of-custody documentation.</li>
+<li>Quarantine environment setup and operation.</li>
+<li>Malware scanning procedures for an air-gapped environment.</li>
+<li>Format validation checks and conversion requirements.</li>
+<li>Provenance documentation: recording where content came from and how it arrived.</li>
+<li>Trust scoring worksheets: the practical application of D18-001's trust model.</li>
+<li>The approval workflow: who decides, how, and what gets recorded.</li>
+<li>Post-import verification and the transition from quarantine to production.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophy of import and quarantine (see D18-001).</li>
+<li>Federation sync package processing (see D17-002, which extends this pipeline with federation-specific checks).</li>
+<li>Format conversion specifications for specific file types (see D18-ART-005).</li>
+<li>The quarantine system's own maintenance and rebuild procedures (see D18-ART-003).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>D18-001 establishes that the import process is the institution's immune system -- it must be sophisticated enough to admit what is beneficial and reject what is harmful. This article is the immune system's operating manual.</p>
+<p>The critical constraint is the air gap. In a connected environment, malware scanning relies on regularly updated signature databases, real-time threat intelligence feeds, and cloud-based analysis. In an air-gapped environment, the operator has none of these. The scanning tools have signatures that were current the last time they were manually updated. The threat intelligence is whatever the operator has imported through this same pipeline. This means the import procedure must compensate for limited scanning capability with additional layers: format restriction, behavioral analysis, structural validation, and human judgment.</p>
+<p>The second critical constraint is that every import is a conscious, deliberate act. Nothing enters the institution passively. This is both a strength (no drive-by downloads, no background synchronization) and a responsibility (every piece of content that enters the institution entered because a human being carried it across the air gap and executed this procedure). The import log is therefore not just a technical record. It is a record of deliberate human decisions, each of which accepted responsibility for what was admitted.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Physical Import Station</h3>
+<p>The import station is a dedicated workspace where all import processing occurs. It consists of:</p>
+<p><strong>The quarantine machine.</strong> A physically separate computer that is never connected to any institutional production system. It has its own storage, its own operating system, and its own set of scanning and analysis tools. It shares no network, no cable, no wireless connection with any production system. The quarantine machine is expendable -- if it is compromised by malicious content, it can be rebuilt from a known-good image without affecting the institution.</p>
+<p><strong>The transfer medium.</strong> A set of dedicated USB drives or external storage devices used exclusively for transferring approved content from the quarantine machine to the production systems. These transfer media are never used for any other purpose. They are never connected to non-institutional systems. They are stored in a designated location when not in use.</p>
+<p><strong>The physical workspace.</strong> A clean, well-lit area where incoming media can be inspected before it is connected to anything. This workspace includes: a logbook (physical or digital, but on the quarantine machine) for recording import events, the trust scoring worksheet templates, and the provenance documentation forms.</p>
+<h3>4.2 The Pipeline Stages</h3>
+<p>The import pipeline has seven stages, each building on the previous:</p>
+<p><strong>Stage 1: Physical Reception and Inspection.</strong>
+<strong>Stage 2: Provenance Documentation.</strong>
+<strong>Stage 3: Quarantine Mount and Inventory.</strong>
+<strong>Stage 4: Malware Scanning.</strong>
+<strong>Stage 5: Format Validation.</strong>
+<strong>Stage 6: Trust Scoring.</strong>
+<strong>Stage 7: Approval, Transfer, and Post-Import Verification.</strong></p>
+<p>Each stage produces a documented output. If any stage fails, the pipeline halts and the content does not advance. The operator may choose to reject the content outright or to address the failure and re-enter the pipeline at the failed stage.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<h3>5.1 Stage 1: Physical Reception and Inspection</h3>
+<p><strong>Step 1.1:</strong> Receive the incoming medium. Do not connect it to any system yet. Place it on the physical workspace.</p>
+<p><strong>Step 1.2:</strong> Inspect the medium visually. Check for:
+- Physical damage (cracked casing, bent connector, water damage, corrosion).
+- Signs of tampering (broken seals, mismatched labels, evidence of re-soldering on circuit boards for external drives).
+- Labeling (is the medium labeled? Does the label match what you expected to receive?).</p>
+<p><strong>Step 1.3:</strong> Record the physical inspection in the import logbook:
+- Date and time of receipt.
+- Description of the medium (type, brand, capacity, serial number if visible).
+- Physical condition assessment (good, damaged, suspect).
+- Source: who or what provided this medium.
+- Expected contents: what you believe is on it, if known.</p>
+<p><strong>Step 1.4:</strong> If the medium is physically damaged or shows signs of tampering, stop. Document the finding. Decide whether to proceed with elevated caution or to reject the medium outright. Record the decision and reasoning.</p>
+<h3>5.2 Stage 2: Provenance Documentation</h3>
+<p>Before the medium touches any system, document its provenance. Fill out the Provenance Record:</p>
+<ul>
+<li><strong>Import ID:</strong> Sequential identifier (format: IMP-YYYY-NNN, where YYYY is the year and NNN is the sequential number).</li>
+<li><strong>Date of import initiation:</strong> Today's date.</li>
+<li><strong>Medium description:</strong> From Step 1.3.</li>
+<li><strong>Source of the content:</strong> The original creator or publisher of the content. Be as specific as possible. "Downloaded from the official PostgreSQL website" is good. "From the internet" is not.</li>
+<li><strong>Source URL or reference:</strong> The specific URL, ISBN, DOI, catalog number, or other identifier for the content at its source.</li>
+<li><strong>Carrier description:</strong> How the content traveled from its source to the institution. "Downloaded by the operator to a personal laptop on 2026-02-10, transferred to this USB drive on 2026-02-14, carried to the institution on 2026-02-16" is a good carrier description. "Found this on a drive" is not.</li>
+<li><strong>Chain of custody:</strong> List every person and system that handled this content between its source and this institution. Include dates.</li>
+<li><strong>Operator identity:</strong> Your name or identifier.</li>
+<li><strong>Purpose of import:</strong> Why are you bringing this content into the institution? What need does it serve? Reference the institutional mission (CON-001) if applicable.</li>
+</ul>
+<h3>5.3 Stage 3: Quarantine Mount and Inventory</h3>
+<p><strong>Step 3.1:</strong> Power on the quarantine machine. Verify it is in a known-good state (boot checksum matches the expected value, or rebuild from the known-good image if uncertain).</p>
+<p><strong>Step 3.2:</strong> Connect the incoming medium to the quarantine machine. Mount it read-only. This is critical -- read-only mounting prevents any write operation that could be triggered by autorun mechanisms or filesystem-level exploits.</p>
+<p>Command example (Linux): <code>mount -o ro,noexec,nosuid,nodev /dev/sdX1 /mnt/quarantine_intake</code></p>
+<p>The <code>noexec</code> flag prevents execution of binaries from the mounted medium. The <code>nosuid</code> flag prevents setuid escalation. The <code>nodev</code> flag prevents device file interpretation.</p>
+<p><strong>Step 3.3:</strong> Generate a complete inventory of the medium's contents:
+- List all files with their paths, sizes, and modification dates.
+- Calculate checksums (SHA-256 minimum) for every file.
+- Record the total number of files and total data volume.
+- Note any unexpected content (files you did not expect, hidden files, system files, executables).</p>
+<p><strong>Step 3.4:</strong> Compare the inventory against the expected contents documented in the provenance record. If there are significant discrepancies, document them. Decide whether to proceed or reject.</p>
+<p><strong>Step 3.5:</strong> Copy all files from the incoming medium to the quarantine machine's local storage (into the quarantine workspace, not into any production area). Verify the copy by comparing checksums. Once verified, unmount and physically disconnect the incoming medium. Set it aside. All further work happens on the local copy.</p>
+<h3>5.4 Stage 4: Malware Scanning</h3>
+<p><strong>Step 4.1:</strong> Run the institution's locally installed antivirus scanner against all files in the quarantine workspace. Note: the scanner's signature database is only as current as the last manual update. Record the scanner name, version, and signature date in the import log.</p>
+<p><strong>Step 4.2:</strong> Run a second scanning tool if available (defense in depth). Different scanners catch different threats. If only one scanner is available, document this limitation.</p>
+<p><strong>Step 4.3:</strong> For any executable files, scripts, or active content (macros, embedded scripts in documents), perform additional analysis:
+- Examine scripts and executables with a hex viewer or disassembler if the operator has the skill.
+- Check file headers to verify that the file type matches its extension (a .pdf that is actually an executable is a red flag).
+- For documents with macros (Office files, LibreOffice files), extract and review the macro code.</p>
+<p><strong>Step 4.4:</strong> Record all scan results in the import log:
+- Scanner(s) used and their versions.
+- Number of files scanned.
+- Any detections (malware, suspicious content, potentially unwanted programs).
+- Disposition of detections (quarantined, deleted, false positive determination).</p>
+<p><strong>Step 4.5:</strong> If malware is detected, stop. Do not transfer any content from this import batch to production. Document the finding. Assess whether the malware was targeted or incidental. Rebuild the quarantine machine from its known-good image. The incoming medium should be physically marked as compromised and stored separately or destroyed. Record the incident in the security log per SEC-001.</p>
+<h3>5.5 Stage 5: Format Validation</h3>
+<p><strong>Step 5.1:</strong> For each file, verify that its format is acceptable for institutional storage. The institution maintains a list of accepted formats (defined in D18-ART-005). The general hierarchy of trust, per D18-001:</p>
+<ul>
+<li><strong>Tier A (Preferred):</strong> Plain text (UTF-8), PDF/A, PNG, JPEG, SVG, CSV, JSON, XML with published schema, Markdown, ODF (OpenDocument Format).</li>
+<li><strong>Tier B (Accepted with notation):</strong> Standard PDF, HTML, EPUB, FLAC, WAV, TIFF, SQLite databases.</li>
+<li><strong>Tier C (Accepted with conversion required):</strong> Proprietary document formats (DOCX, XLSX, PPTX) -- must be converted to Tier A or B equivalents before admission to production. Originals may be retained in an archive area.</li>
+<li><strong>Tier D (Rejected by default):</strong> Executable binaries, installer packages, compressed archives containing executables, DRM-protected files, formats with no open specification. Tier D content may be admitted only with a Tier 3 governance decision (per GOV-001) documenting the justification.</li>
+</ul>
+<p><strong>Step 5.2:</strong> For each file, validate the internal structure:
+- Open the file in an appropriate viewer on the quarantine machine. Does it render correctly?
+- For structured formats (XML, JSON, CSV), validate against the schema or check for well-formedness.
+- For documents, check that the content is readable and complete (not truncated, not corrupted).</p>
+<p><strong>Step 5.3:</strong> For Tier C content, perform format conversion on the quarantine machine. Verify the conversion by comparing the output against the original (visual inspection for documents, data comparison for spreadsheets). Record the conversion tool, version, and any conversion issues.</p>
+<p><strong>Step 5.4:</strong> Record the format validation results in the import log:
+- For each file: format identified, tier classification, validation result (pass/fail), conversion performed (if any).</p>
+<h3>5.6 Stage 6: Trust Scoring</h3>
+<p>Complete the Trust Scoring Worksheet for this import. The worksheet operationalizes D18-001's four-dimensional trust model:</p>
+<p><strong>Source Trust (1-5 scale):</strong>
+- 5: Known, verified institutional or academic source with an established track record.
+- 4: Known source with generally reliable reputation but not personally verified.
+- 3: Source is identifiable but reputation is unknown or mixed.
+- 2: Source is vaguely identified ("from a forum," "shared by a colleague").
+- 1: Source is unknown or anonymous.</p>
+<p><strong>Carrier Trust (1-5 scale):</strong>
+- 5: Content acquired directly from the original source by the operator, with verified integrity (checksums published by the source match).
+- 4: Content acquired from a reputable mirror or secondary source, with chain of custody fully documented.
+- 3: Content passed through one or two intermediaries with partial documentation.
+- 2: Content passed through multiple intermediaries or chain of custody is poorly documented.
+- 1: Chain of custody is unknown or the content was found on a medium of uncertain origin.</p>
+<p><strong>Format Trust (1-5 scale):</strong>
+- 5: Tier A format. Open specification, well-understood, no active content capability.
+- 4: Tier B format. Open or well-documented, minimal active content risk.
+- 3: Tier C format before conversion (proprietary but convertible).
+- 2: Complex format with active content capability (macros, scripts) that has been reviewed.
+- 1: Opaque, proprietary, or executable format.</p>
+<p><strong>Content Trust (1-5 scale):</strong>
+- 5: Content is internally consistent, verifiable against independent sources, and well-structured.
+- 4: Content appears consistent and well-structured but has not been independently verified.
+- 3: Content is plausible but contains some inconsistencies or gaps.
+- 2: Content has significant quality concerns (poor structure, unverifiable claims, obvious errors).
+- 1: Content is unverifiable, contradictory, or of dubious quality.</p>
+<p><strong>Aggregate Trust Score:</strong> Sum the four dimensions. Maximum 20, minimum 4.</p>
+<ul>
+<li><strong>16-20:</strong> High trust. Standard validation is sufficient. Proceed to approval.</li>
+<li><strong>11-15:</strong> Moderate trust. Review the weakest dimension. If the weakness can be mitigated (e.g., converting from Tier C to Tier A format), mitigate it and rescore. If not, proceed with the moderate score noted in the import record.</li>
+<li><strong>6-10:</strong> Low trust. Requires enhanced review. The operator must write a specific justification for admitting this content, referencing the institutional need it serves. Consider whether the content can be obtained from a higher-trust source.</li>
+<li><strong>4-5:</strong> Very low trust. Rejected by default. Admission requires a Tier 3 governance decision with documented justification.</li>
+</ul>
+<h3>5.7 Stage 7: Approval, Transfer, and Post-Import Verification</h3>
+<p><strong>Step 7.1: Approval decision.</strong> Review the complete import record: physical inspection, provenance, inventory, scan results, format validation, and trust score. Make the admission decision:</p>
+<ul>
+<li><strong>Approve:</strong> Content meets all requirements and the trust score supports admission.</li>
+<li><strong>Approve with conditions:</strong> Content is admitted but with metadata flags (e.g., "unverified source," "format conversion performed," "low trust score -- use with caution").</li>
+<li><strong>Defer:</strong> Content requires additional review or a governance decision before admission.</li>
+<li><strong>Reject:</strong> Content fails one or more pipeline stages and cannot be remediated.</li>
+</ul>
+<p>Record the decision, the reasoning, and any conditions in the import log. Sign and date the entry.</p>
+<p><strong>Step 7.2: Transfer to production.</strong> For approved content only:
+- Copy the approved files from the quarantine workspace to the dedicated transfer medium (the clean USB drive reserved for quarantine-to-production transfers).
+- Calculate checksums of the files on the transfer medium.
+- Disconnect the transfer medium from the quarantine machine.
+- Connect the transfer medium to the production system.
+- Copy the files to the appropriate location in the institutional file structure.
+- Verify the copy by comparing checksums against those calculated in the quarantine workspace.
+- Disconnect and return the transfer medium to its storage location.</p>
+<p><strong>Step 7.3: Post-import verification.</strong> On the production system:
+- Open each imported file and verify it renders correctly.
+- Verify that the file is in the expected location within the institutional directory structure.
+- Update the institutional catalog with the new content, including all provenance metadata.
+- Create or update the relevant index entries so the content is discoverable.</p>
+<p><strong>Step 7.4: Close the import record.</strong> In the import log, record:
+- Final disposition (approved, approved with conditions, rejected, deferred).
+- Date and time of completion.
+- Location of admitted content in the institutional file structure.
+- Any notes for future reference.</p>
+<p><strong>Step 7.5: Clean the quarantine workspace.</strong> Delete all files from the quarantine workspace. If any malware was detected during this import, rebuild the quarantine machine from its known-good image instead of simply deleting files.</p>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Quarantine bypass.</strong> The operator connects the incoming medium directly to a production system, skipping quarantine entirely. This is the most serious failure mode because it defeats the entire pipeline. Mitigation: physical separation. The production systems should not have available USB ports during normal operation (disabled in BIOS/UEFI or physically blocked). The quarantine machine should be the only system with accessible external media ports.</p>
+</li>
+<li>
+<p><strong>Stale malware signatures.</strong> The quarantine machine's scanning tools have not been updated in months or years. They cannot detect recent threats. Mitigation: schedule regular updates of scanning signatures as part of the import pipeline itself (scanning tool updates are themselves imports and must go through the pipeline). Document the signature date in every import record so future reviewers know the limitation.</p>
+</li>
+<li>
+<p><strong>Trust score inflation.</strong> The operator consistently scores content higher than warranted because they want to streamline the import process. Mitigation: the quarterly documentation quality audit (D19-002) includes a review of recent trust scores for consistency and calibration.</p>
+</li>
+<li>
+<p><strong>Provenance fabrication.</strong> The operator records provenance that is more detailed or certain than the actual chain of custody warrants. Mitigation: ETH-001 Principle 6 (Honest Accounting of Limitations). It is better to record "provenance uncertain" than to fabricate a confident-sounding provenance that is untrue.</p>
+</li>
+<li>
+<p><strong>Format validation theater.</strong> The operator checks the format validation box without actually opening and inspecting the files. Mitigation: the import log requires specific entries (file opened, rendering verified, structure validated) that are difficult to fabricate without actually doing the work. The quarterly audit reviews import logs for signs of perfunctory entries.</p>
+</li>
+<li>
+<p><strong>Transfer medium contamination.</strong> The dedicated transfer medium is used for a non-approved purpose and becomes contaminated. Mitigation: the transfer medium is physically labeled and stored separately. Its use is restricted to approved quarantine-to-production transfers only. If its integrity is ever in doubt, it is reformatted or replaced.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If content was admitted that should have been rejected:</strong> Identify all files admitted from the compromised import. Quarantine them on the production system (move to an isolated directory, remove from indexes, flag in the catalog). Assess whether the content has caused any damage (data corruption, configuration changes). If damage is suspected, follow the incident response procedure in D10-003. Trace the pipeline failure -- which stage should have caught the problem? Revise that stage's procedures to prevent recurrence. Document the incident.</p>
+</li>
+<li>
+<p><strong>If the quarantine machine is compromised:</strong> Do not use the quarantine machine for any further imports. Rebuild it from the known-good image. Review the import that caused the compromise to understand the attack vector. Update scanning tools and procedures to address the vulnerability. Document the incident in the security log.</p>
+</li>
+<li>
+<p><strong>If provenance records are found to be inaccurate:</strong> Identify all content associated with the inaccurate provenance. Re-evaluate the trust scores for that content using corrected information. If the corrected provenance significantly reduces the trust score, consider re-validating or removing the content. Correct the provenance record by appending a correction entry (do not modify the original; add a new entry referencing it).</p>
+</li>
+<li>
+<p><strong>If the import log has gaps:</strong> Reconstruct what can be reconstructed from the institutional catalog (which should contain provenance metadata for all admitted content). Create RECONSTRUCTED entries in the import log for any imports that can be identified but were not properly logged. Resume rigorous logging immediately.</p>
+</li>
+<li>
+<p><strong>If a large volume of content needs emergency import:</strong> Do not shortcut the pipeline. Instead, allocate additional time. Process imports in batches, completing the full pipeline for each batch before starting the next. If the volume is truly overwhelming, prioritize by institutional need and process the highest-priority content first. Document the emergency import decision in the governance log as a Tier 3 decision.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The import pipeline is being exercised for the first time. Expect it to feel slow. This is intentional -- thoroughness now prevents contamination later. Keep detailed notes on which steps take the longest, which steps catch the most issues, and which steps feel unnecessary. Use these notes to refine the pipeline during annual review. Do not remove steps based on the absence of problems; the absence of problems may be the steps working.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The pipeline should be well-practiced. The operator can execute it from memory but should still follow the documented procedure to guard against drift. The trust scoring calibration should be validated against years of import history. Scanning tools should have been updated multiple times. Consider whether additional format tiers need to be defined for content types that did not exist in 2026.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Hardware and media types will have changed. USB drives may be obsolete. The pipeline steps remain valid but the physical implementation may need significant updates. The principles -- quarantine isolation, provenance documentation, trust scoring, format validation -- survive technology transitions. The implementations do not.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> A successor may be operating the pipeline. The import log, stretching back decades, is itself a valuable institutional resource -- a record of everything the institution has ever admitted from the outside world, and the reasoning behind each admission. Protect this log with the same care as the decision log.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The first time I executed this pipeline, it took nearly two hours for a single USB drive containing six PDF files. This will feel absurd to anyone accustomed to drag-and-drop file management. It felt absurd to me. But I also caught a mismatched file extension -- a file labeled .pdf that was actually a .html file with embedded JavaScript. In a connected environment, this would be a minor curiosity. In an air-gapped institution, it is exactly the kind of thing the pipeline is designed to catch. Two hours well spent.</p>
+<p>The trust scoring worksheet felt subjective the first few times. It will become less subjective as the operator accumulates calibration experience -- a feel for what a "3" really means versus a "4." The first year's trust scores should be reviewed during the annual audit to check for consistency and to recalibrate if needed. Treat the first year as calibration, not as permanent judgment.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D18-001 -- Import &amp; Quarantine Philosophy (the principles this procedure implements)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (Section 5.4: institutional boundaries)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (supply chain threats; quarantine requirements; R-SEC-03)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle; operational tempo)</li>
+<li>GOV-001 -- Authority Model (Tier 3 decisions for exceptional imports)</li>
+<li>D18-ART-003 -- Quarantine System Maintenance (rebuilding the quarantine machine)</li>
+<li>D18-ART-005 -- Format Conversion Specifications</li>
+<li>D19-002 -- Documentation Quality Audit Procedures (audit of import records)</li>
+<li>D20-002 -- Decision Log Operations (recording import decisions)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

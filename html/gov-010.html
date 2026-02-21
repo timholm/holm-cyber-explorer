@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOV-010 — The Veto and Override Framework - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li class="active"><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="gov-010">
+  <h1>GOV-010 &mdash; The Veto and Override Framework</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>GOV-010</dd>
+  <dt>Domain</dt>
+  <dd>2 -- Governance & Authority</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, GOV-003, GOV-008</dd>
+  <dt>Depended Upon By</dt>
+  <dd>GOV-012. Referenced by any article involving contested decisions or authority limits.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines when and how decisions can be blocked (vetoed) or forced through over objection (overridden). GOV-008 defines how decisions are made under normal conditions. GOV-003 defines how disputes are resolved. This article addresses the gap between those two: the mechanisms by which a decision that has followed the proper process can still be stopped, and the mechanisms by which a decision that has been blocked can still be forced through.</p>
+<p>Vetoes and overrides are the most powerful governance instruments in any institution. A veto can halt a decision that a majority supports. An override can implement a decision that a minority opposes. Both are necessary. Without vetoes, the institution has no protection against decisions that are popular but harmful. Without overrides, the institution has no protection against paralysis caused by a single objector blocking necessary action.</p>
+<p>For a single-operator institution, these concepts may seem abstract. Who vetoes the only decision-maker? The answer is: the institution's own documentation. If a proposed decision conflicts with ETH-001 or CON-001, those documents function as a veto. If the operator's reluctance to act is causing institutional harm, the documented obligations and procedures function as an override of the operator's inertia. The veto and override framework formalizes these dynamics.</p>
+<p>When the institution eventually has multiple members, this article becomes directly operational rather than metaphorical. The structures defined here are designed to scale from one person to several without fundamental redesign. What changes is who exercises the veto and override powers, not how those powers are structured.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition and mechanics of the veto: what it is, who may exercise it, under what conditions, and with what consequences.</li>
+<li>The definition and mechanics of the override: what it is, who may exercise it, under what conditions, and with what safeguards.</li>
+<li>The distinction between constitutional vetoes (blocking decisions that conflict with root documents) and procedural vetoes (blocking decisions that have not followed proper process).</li>
+<li>The escalation path when a veto is contested.</li>
+<li>Safeguards against abuse of both veto and override powers.</li>
+<li>The absolute limits: categories of decisions where vetoes cannot be overridden and categories where overrides cannot be blocked.</li>
+</ul>
+<p>This article does not cover the general dispute resolution process (GOV-003), emergency governance modifications (GOV-005), or the amendment of governance structures (GOV-012). It covers the specific mechanisms of blocking and forcing decisions within the established governance framework.</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<p>The history of governance is, in many ways, the history of vetoes and overrides. The Roman tribunes could veto any action of the Senate. The American president can veto legislation, and the Congress can override that veto with a supermajority. The United Nations Security Council's permanent members each hold an absolute veto. Every governance system that has endured has had to answer the same question: how do you balance the need for action with the need for restraint?</p>
+<p>The answer always involves trade-offs. An easy veto makes the institution cautious but potentially paralyzed. An easy override makes the institution decisive but potentially reckless. The calibration of these instruments -- how hard it is to block, how hard it is to force -- defines the character of the institution as much as its stated principles do.</p>
+<p>For this institution, the calibration leans toward restraint. The institution's primary asset is its data, and the primary threat to data is hasty, poorly-considered action. It is therefore better to err on the side of not acting than on the side of acting unwisely. This principle is reflected in the veto and override thresholds defined below: vetoes are relatively easy to exercise, and overrides are relatively difficult. This asymmetry is a feature, not a deficiency.</p>
+<p>The one exception to this restraint-bias is emergency governance. When delay would cause irreversible harm, the override threshold drops significantly. GOV-005 defines the conditions under which this exception activates. Outside those conditions, restraint prevails.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Veto</h3>
+<p>A veto is the formal blocking of a proposed decision. It halts the decision process and prevents implementation until the veto is resolved. There are two types:</p>
+
+<p><strong>Constitutional Veto.</strong> A decision is blocked because it conflicts with a root document (ETH-001, CON-001, GOV-001). A constitutional veto may be exercised by any member at any time, including after a decision has already been approved through the normal process. If the conflict is genuine, the constitutional veto is absolute: the decision cannot proceed until it is modified to eliminate the conflict, or until the root document itself is amended through the Existential Decision process (GOV-008).</p>
+<p>In a single-operator institution, the constitutional veto is exercised by the operator against their own proposal when they recognize (or are forced to recognize through the alignment check in the decision template) that the proposal conflicts with institutional principles. The decision log should record: "CONSTITUTIONAL VETO -- Decision [ID] blocked due to conflict with [root document], specifically [section or principle]."</p>
+
+<p><strong>Procedural Veto.</strong> A decision is blocked because it has not followed the required process. The waiting period was not observed. The template was not completed. The required reviews were not conducted. The consensus threshold was not met. A procedural veto halts the decision until the procedure is properly followed. It does not block the substance of the decision, only its premature implementation.</p>
+<p>In a single-operator institution, the procedural veto is exercised during the governance health check (GOV-007) or during the waiting period reviews. If the operator catches themselves preparing to implement a decision that has not completed its process, that recognition constitutes a procedural veto. The decision must be returned to the appropriate stage.</p>
+
+<h3>4.2 The Override</h3>
+<p>An override is the forcing of a decision over objection. It implements a decision despite a veto or despite the lack of required consensus. Overrides are powerful and dangerous, and they are therefore subject to stringent requirements.</p>
+
+<p><strong>Procedural Override.</strong> A procedural veto may be overridden when the veto itself is inappropriate -- when the procedure was in fact followed, or when the procedural requirement does not apply to the decision in question. To override a procedural veto, the overriding party must document why the veto is inappropriate, citing the specific governance rules that support their position. In a multi-member institution, a procedural override requires a two-thirds majority.</p>
+
+<p><strong>Substantive Override.</strong> A substantive objection to a decision (not a constitutional conflict, but a disagreement about whether the decision is wise) may be overridden under the following conditions:</p>
+<ul>
+<li>For Routine and Significant decisions: a simple majority may override a substantive objection, provided the objection has been documented and addressed in the decision record.</li>
+<li>For Critical decisions: a two-thirds majority may override a substantive objection, provided the objection has been fully deliberated through the dispute resolution process (GOV-003) and the override is recorded with a detailed justification.</li>
+<li>For Existential decisions: substantive objections may not be overridden. Existential decisions require unanimity. If unanimity cannot be achieved, the decision does not proceed. Period.</li>
+</ul>
+
+<p><strong>Constitutional Override.</strong> A constitutional veto may not be overridden. If a decision genuinely conflicts with a root document, the decision must be modified or the root document must be amended. There is no mechanism for forcing a decision that violates the institution's foundational principles. This is the hardest line in the governance framework.</p>
+
+<h3>4.3 The Founder's Veto</h3>
+<p>During the founder's lifetime and active involvement with the institution, the founder retains a special veto power over Tier 1 (Constitutional) decisions only. This veto is not based on authority -- it is based on knowledge. The founder understands the original intent behind the root documents in a way that no written document can fully convey. This understanding has governance value.</p>
+<p>The founder's veto is subject to the following constraints:</p>
+<ul>
+<li>It applies only to Tier 1 decisions that amend root documents.</li>
+<li>It must be exercised with a written explanation of why the amendment would compromise the institution's original intent.</li>
+<li>It expires when the founder is no longer actively involved with the institution (through retirement, incapacity, or death).</li>
+<li>It may be overridden by unanimous agreement of all other members plus a 180-day waiting period. This threshold is intentionally high, because overriding the founder's veto is itself an institutional event of the first order.</li>
+</ul>
+
+<h3>4.4 The Self-Veto</h3>
+<p>In a single-operator institution, the most common and most valuable form of veto is the self-veto: the operator recognizing that their own proposed decision should not proceed. The governance framework is designed to create conditions where self-vetoes happen naturally:</p>
+<ul>
+<li>The waiting periods create space for second thoughts.</li>
+<li>The decision templates force the operator to articulate alternatives and assess reversibility, which may reveal problems.</li>
+<li>The alignment check forces the operator to confront potential conflicts with institutional principles.</li>
+<li>The Commentary Sections of relevant articles may contain warnings from past operators that apply to the current decision.</li>
+</ul>
+<p>A self-veto is recorded in the decision log with the same formality as any other veto. It is not a sign of indecisiveness; it is a sign of governance functioning as intended.</p>
+
+<h3>4.5 Veto Resolution</h3>
+<p>When a veto is exercised, the decision process enters a resolution phase:</p>
+<ol>
+<li><strong>The veto is documented.</strong> The vetoing party records the veto, its type (constitutional or procedural), and its specific basis.</li>
+<li><strong>The proposer responds.</strong> Within 14 days, the decision's proposer must either modify the decision to address the veto, withdraw the decision, or contest the veto.</li>
+<li><strong>If contested:</strong> The dispute resolution process (GOV-003) is invoked. The dispute is framed as: "Was the veto appropriately exercised?" If GOV-003 determines that the veto was appropriate, the proposer must modify or withdraw. If GOV-003 determines that the veto was inappropriate, the veto is lifted and the decision may proceed.</li>
+<li><strong>If unresolved after GOV-003:</strong> For non-constitutional vetoes, the override mechanisms in Section 4.2 are available. For constitutional vetoes, the only path forward is modifying the decision or amending the root document through the Existential Decision process.</li>
+</ol>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-GOV-10-01:</strong> Constitutional vetoes are absolute. No mechanism exists or may be created to override a genuine conflict between a decision and a root document. The only paths through a constitutional veto are modifying the decision or amending the root document.</li>
+<li><strong>R-GOV-10-02:</strong> Existential decisions may not be overridden over substantive objection. Unanimity is required. This rule may not itself be overridden or amended except through the Existential Decision process.</li>
+<li><strong>R-GOV-10-03:</strong> Every veto must include a specific, articulable basis. "I object" is not a veto. "I object because this decision conflicts with ETH-001 Section 3.2" is a veto. Vetoes without specific basis are invalid.</li>
+<li><strong>R-GOV-10-04:</strong> Every override must include a documented justification and must have been preceded by the dispute resolution process (GOV-003) unless the veto is clearly procedurally invalid.</li>
+<li><strong>R-GOV-10-05:</strong> The founder's veto expires upon the founder's permanent departure from active institutional involvement. It does not transfer to successors. It is a recognition of unique knowledge, not a perpetual privilege.</li>
+<li><strong>R-GOV-10-06:</strong> Abuse of veto power -- defined as exercising vetoes without genuine constitutional or procedural basis, for the purpose of blocking institutional action -- is grounds for a dispute resolution proceeding (GOV-003) that may result in temporary suspension of the abuser's veto privileges for non-constitutional matters.</li>
+<li><strong>R-GOV-10-07:</strong> All vetoes and overrides must be recorded in the decision log with full documentation. A veto or override that is not documented did not happen.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Veto paralysis.</strong> In a multi-member institution, one or more members use vetoes to block all significant action. The institution cannot move forward. Mitigation: the requirement for specific basis (R-GOV-10-03) and the abuse provisions (R-GOV-10-06). Vetoes must be grounded in principle, not in obstinacy.</li>
+<li><strong>Override tyranny.</strong> A majority uses its override power to consistently force decisions over minority objections, eroding trust and institutional cohesion. Mitigation: the escalating thresholds (simple majority for Significant, two-thirds for Critical, unanimity for Existential) ensure that overrides become harder as the stakes increase. The mandatory documentation and dispute resolution process create friction that discourages casual overrides.</li>
+<li><strong>Constitutional inflation.</strong> Members frame every objection as a constitutional veto to access the absolute protection of R-GOV-10-01, even when the conflict with root documents is tenuous. Mitigation: the dispute resolution process (GOV-003) can assess whether a claimed constitutional conflict is genuine. Repeatedly invoking spurious constitutional vetoes may be treated as veto abuse under R-GOV-10-06.</li>
+<li><strong>Self-veto failure.</strong> In a single-operator institution, the operator consistently fails to exercise self-vetoes, either because they do not engage genuinely with the alignment checks or because they rationalize away conflicts. Mitigation: the governance health check (GOV-007) should include an assessment of recent decisions for unrecognized constitutional conflicts. The waiting period reviews are designed to catch what the initial assessment missed.</li>
+<li><strong>Founder's veto persistence.</strong> The founder continues to exercise the founder's veto after they have effectively withdrawn from active involvement, using it as a tool for remote control rather than as a contribution of unique knowledge. Mitigation: R-GOV-10-05 defines an expiration condition. The institution may need to formally recognize that the founder's active involvement has ended, which is itself a Significant decision.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If vetoes have been ignored:</strong> Review all decisions that were implemented despite a documented veto. For each, assess whether the veto was valid. If valid, the decision should be reversed or re-processed through proper governance. If invalid, document why the veto was inappropriate but also document why the proper resolution process (GOV-003) was not followed.</li>
+<li><strong>If overrides have been used without proper process:</strong> Review all override actions. For each that lacked the required dispute resolution step, initiate a retroactive review through GOV-003. The decision may stand if the review confirms it, but the procedural violation must be acknowledged and corrected.</li>
+<li><strong>If veto paralysis has occurred:</strong> Invoke GOV-003 for the pattern of vetoes, not just individual instances. If the pattern constitutes veto abuse, the dispute resolution process may recommend temporary suspension of non-constitutional veto privileges for the abusing party.</li>
+<li><strong>If the distinction between constitutional and procedural vetoes has been blurred:</strong> Conduct a training review of GOV-010 for all members. Establish clear examples of each veto type. Add these examples to the Commentary Section for future reference.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The veto and override framework is primarily exercised as self-vetoes by the single operator. The framework should be tested through deliberate scenario exercises: "Would I veto this decision? On what grounds? Could it be overridden?" These exercises build the governance muscles that will be needed when the institution has multiple members.</li>
+<li><strong>Years 5-15:</strong> If the institution gains additional members, the framework becomes directly operational. The thresholds and procedures should be reviewed in light of the actual membership size. A two-person institution has different dynamics than a five-person institution, and the override thresholds may need adjustment.</li>
+<li><strong>Years 15-30:</strong> The institution should have experienced at least one real veto and possibly one real override. The Commentary Section should contain the lessons learned. The thresholds should be evaluated: are they set correctly? Do vetoes happen too often or too rarely? Are overrides achievable when genuinely needed?</li>
+<li><strong>Years 30-50+:</strong> The framework should be mature and well-tested. The precedents established by past vetoes and overrides become part of the institution's governance culture. New members learn not just the rules but the history of how they have been applied. The Commentary Section becomes a repository of governance wisdom accumulated over decades.</li>
+</ul>
+</section>
+
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I debated whether the founder's veto was appropriate. It feels uncomfortably close to giving myself a permanent privilege. But I decided to include it, with strict constraints, because there is a real information asymmetry: the person who wrote the root documents understands their intent in ways that the text alone cannot convey. Nuances, compromises, the reasons behind specific word choices -- these live in the founder's memory, not in the documents. That memory has governance value, and it deserves a mechanism for expressing itself.</p>
+<p>But I also made the founder's veto explicitly temporary. It expires when I leave. It does not transfer. This institution is not meant to be governed by a founder's ghost. Once the founder is gone, the documents must stand on their own. If they are unclear, they should be clarified. If they are wrong, they should be amended. The founder's veto buys time for the living founder to contribute their understanding. It does not preserve that understanding beyond the founder's ability to articulate it.</p>
+</section>
+
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (the ultimate basis for constitutional vetoes)</li>
+<li>CON-001 -- The Founding Mandate (a root document whose principles may trigger vetoes)</li>
+<li>GOV-001 -- Authority Model (authority tiers that determine override thresholds)</li>
+<li>GOV-003 -- Dispute Resolution Procedures (invoked when vetoes are contested)</li>
+<li>GOV-005 -- Emergency Governance Protocols (modified thresholds during emergencies)</li>
+<li>GOV-007 -- Institutional Health Assessment (detection of veto abuse patterns)</li>
+<li>GOV-008 -- Decision-Making Frameworks (decision categories that determine veto and override rules)</li>
+<li>GOV-012 -- Governance Amendment Process (the process for amending governance structures, including veto and override rules)</li>
+<li>Domain 2 Framework -- Governance &amp; Authority (domain map and article relationships)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

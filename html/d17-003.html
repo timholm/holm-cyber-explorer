@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-003 — Air-Gapped Synchronization Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li class="active"><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-003">
+  <h1>D17-003 &mdash; Air-Gapped Synchronization Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-003</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling & Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-001, D17-002, SEC-001, OPS-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D17-004 (conflict resolution depends on sync), D17-005 (trust verification occurs during sync), D17-006 (withdrawal requires final sync).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the complete procedure for synchronizing data between federated nodes without any network connection. It is the circulatory system of the federation -- the process by which knowledge, decisions, and institutional memory flow between sovereign nodes via physical media.</p>
+<p>Synchronization is the federation's most frequent and most vulnerable operation. Every sync is a border crossing. Every sync package is a diplomatic pouch: sealed by the sender, transported through uncontrolled space, and opened by the receiver under controlled conditions. The integrity of the federation depends on the integrity of this process. A single corrupted sync that goes undetected can propagate bad data across the entire federation. A single intercepted sync package can expose institutional knowledge to unauthorized parties.</p>
+<p>This article provides the step-by-step protocol for creating, transporting, receiving, validating, and applying sync packages. It is written for the operator who is about to plug a USB drive into their node and either export data for another node or import data from one. Every step matters. No step may be skipped.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Physical media preparation and selection for sync transport.</li>
+<li>Sync package creation: what is included, how it is structured, how it is sealed.</li>
+<li>Transport security: protecting the sync package during physical transit.</li>
+<li>Sync package reception and initial validation.</li>
+<li>Integrity verification: how to confirm the package has not been tampered with or corrupted.</li>
+<li>Applying a validated sync package to the receiving node.</li>
+<li>The complete sync protocol, step by step, for both the sending and receiving node.</li>
+<li>Failure handling: what to do when a sync package fails validation at any stage.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The initial commissioning sync (see D17-002, Phase 4).</li>
+<li>Conflict resolution when a sync reveals divergent changes (see D17-004).</li>
+<li>Trust verification beyond what is needed for sync validation (see D17-005).</li>
+<li>The philosophical justification for air-gapped sync (see D17-001).</li>
+<li>Content quarantine procedures for non-federation imports (see Domain 18).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Sneakernet Reality</h3>
+<p>This institution synchronizes via sneakernet -- the physical transport of storage media between locations. This is not a temporary compromise until network connectivity becomes available. It is the permanent, designed, and preferred synchronization method. The air gap is a security feature, not a limitation. Every design decision in this protocol preserves the air gap.</p>
+<p>Sneakernet synchronization has properties that network synchronization does not. It is high-bandwidth (a USB drive can carry terabytes), high-latency (transport takes hours, days, or weeks), and unidirectional per trip (the media travels from A to B; the return trip is a separate event). It is also physically observable -- the operator can see the media, hold it, lock it in a case, and hand it directly to the recipient. There is no packet-sniffing on a sneakernet. There is no man-in-the-middle attack that does not involve a physical man in the middle.</p>
+<h3>3.2 The Sync Package as Diplomatic Pouch</h3>
+<p>D17-001 introduced the sync package as the unit of communication between nodes. This article defines its concrete structure. A sync package is a self-contained, integrity-protected, sender-authenticated bundle that includes everything the receiving node needs to process it. The receiving node should not need to contact any other node, consult any external resource, or make any assumption about the package's contents that is not verifiable from the package itself.</p>
+<p>The diplomatic pouch analogy is precise. A diplomatic pouch is sealed by the sender. It is transported through territory the sender does not control. It is opened by the recipient, who verifies the seal before examining the contents. If the seal is broken, the contents are suspect. If the seal is intact, the contents are treated as authentic communications from the sender. The sync package works the same way.</p>
+<h3>3.3 The Risks of Physical Transport</h3>
+<p>Physical media can be lost, stolen, damaged, or tampered with during transport. The sync protocol must account for all of these:</p>
+<ul>
+<li><strong>Loss:</strong> The media never arrives. The sending node still has the data. The sync simply does not happen. Loss is an inconvenience, not a catastrophe, because no data exists exclusively on the transport media.</li>
+<li><strong>Theft:</strong> An unauthorized party obtains the media. If the sync package is encrypted, the thief gains nothing. If it is not encrypted, the thief gains read access to whatever was in the package. Encryption is therefore mandatory for any sync package that leaves secure premises.</li>
+<li><strong>Damage:</strong> The media is physically damaged during transport. The data may be partially or fully corrupted. The integrity verification process must detect this.</li>
+<li><strong>Tampering:</strong> An adversary intercepts the media, modifies the contents, and allows it to continue to its destination. The cryptographic seal must detect this.</li>
+</ul>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Sync Package Structure</h3>
+<p>A sync package consists of the following components, in this order:</p>
+<p><strong>Header (plaintext).</strong> Contains: the package format version, the sender's node identifier, the intended recipient's node identifier, a timestamp, and a human-readable description of the package contents. The header is plaintext so that the recipient can identify the package before decryption.</p>
+<p><strong>Manifest (signed).</strong> A complete list of every file in the package, with its path, size, content hash (SHA-256), and modification timestamp. The manifest is signed with the sender's private key.</p>
+<p><strong>Payload (encrypted).</strong> The actual data being synchronized: new or modified documents, metadata updates, institutional memory entries, governance decisions, and any other content included in the sync scope. The payload is encrypted with a key derived from the trust relationship between the sender and recipient (see D17-005 for key exchange procedures).</p>
+<p><strong>Integrity Seal (signed hash).</strong> A SHA-256 hash of the entire package (header + manifest + payload), signed with the sender's private key. This is the cryptographic seal that detects tampering.</p>
+<h3>4.2 The Sync Protocol</h3>
+<p>The sync protocol has two sides: the sending procedure and the receiving procedure. They are described separately because they happen at different times and places.</p>
+<p><strong>Sending Procedure (7 steps):</strong></p>
+<ol>
+<li>Prepare the transport media (see Section 4.3).</li>
+<li>Determine the sync scope: what data has changed since the last sync with this recipient.</li>
+<li>Build the manifest: catalog every item to be included.</li>
+<li>Assemble the payload: collect all items into a single archive.</li>
+<li>Encrypt the payload with the recipient-specific key.</li>
+<li>Generate the integrity seal over the complete package.</li>
+<li>Write the package to the transport media. Verify the write by reading it back and checking the seal.</li>
+</ol>
+<p><strong>Receiving Procedure (9 steps):</strong></p>
+<ol>
+<li>Receive the transport media. Do not connect it to the production system.</li>
+<li>Connect the media to the quarantine system.</li>
+<li>Read the header. Verify that this package is intended for this node.</li>
+<li>Verify the integrity seal. If the seal check fails, stop. Do not proceed. (See Section 7 for failure handling.)</li>
+<li>Verify the manifest signature. Confirm the sender's identity.</li>
+<li>Decrypt the payload.</li>
+<li>Verify each item in the payload against the manifest (compare hashes).</li>
+<li>Apply the validated payload to the production system, following conflict detection procedures (see D17-004 if conflicts are detected).</li>
+<li>Record the sync event in the node's institutional memory: date, sender, package identifier, number of items received, number of conflicts detected, and outcome.</li>
+</ol>
+<h3>4.3 Transport Media Preparation</h3>
+<p>Transport media must be prepared before use. The preparation procedure is:</p>
+<ol>
+<li>Use only media that the node operator has purchased new and opened from sealed packaging, or media that has been securely erased (full overwrite, not quick format) since its last use.</li>
+<li>Format the media with a simple, universally readable filesystem (FAT32 for packages under 4 GB, exFAT for larger packages).</li>
+<li>Write-test the media: write a known pattern to the full capacity of the media, read it back, and compare. This detects bad sectors and media failures before they corrupt a sync package.</li>
+<li>Label the media physically (a paper label or engraving, not an electronic label that can be spoofed) with: the preparing node's identifier, the preparation date, and a unique media serial number.</li>
+</ol>
+<p>Media that has been used for sync transport may be reused after secure erasure and re-preparation. Media that has shown any sign of failure (bad sectors, read errors, physical damage) must be destroyed, not reused.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li>
+<p><strong>R-D17-003-01: Sync Packages Must Be Encrypted.</strong> Every sync package that will leave the physical security perimeter of the sending node must be encrypted. The encryption key must be specific to the sender-recipient pair. Unencrypted sync packages are permitted only when the transport media never leaves the sending node's secure premises (e.g., a local backup that happens to use the sync package format).</p>
+</li>
+<li>
+<p><strong>R-D17-003-02: Integrity Must Be Verified Before Processing.</strong> The receiving node must verify the integrity seal and the manifest signature before decrypting or examining the payload. If integrity verification fails, the package is rejected in its entirety. No partial processing. No "salvaging what we can."</p>
+</li>
+<li>
+<p><strong>R-D17-003-03: Every Sync Is Logged.</strong> Both the sending node and the receiving node must log every sync event. The sending log records: date, recipient, package identifier, scope (what was included), and transport media identifier. The receiving log records: date, sender, package identifier, integrity check result, items received, conflicts detected, and resolution status.</p>
+</li>
+<li>
+<p><strong>R-D17-003-04: Transport Media Is Never Trusted.</strong> Transport media is treated as potentially hostile, even if it was prepared by the receiving node. The quarantine process applies to all incoming media without exception. This protects against both tampering during transport and the possibility that the media was swapped entirely.</p>
+</li>
+<li>
+<p><strong>R-D17-003-05: Sync Scope Is Explicit.</strong> The sending node must explicitly define what is included in each sync package. There is no "send everything" default. The operator reviews and approves the sync scope before the package is built. This prevents accidental inclusion of sensitive data and ensures the operator understands what they are sharing.</p>
+</li>
+<li>
+<p><strong>R-D17-003-06: No Bidirectional Sync on a Single Media.</strong> A transport medium carries a sync package in one direction only. The sending node writes; the receiving node reads. If the receiving node wishes to send data back, it prepares a separate sync package on separate media (or on the same media after secure erasure and re-preparation). This prevents cross-contamination and simplifies the integrity model.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Integrity seal failure.</strong> The hash or signature check fails on the receiving end. Causes include: media corruption during transport, tampering, bit rot, or a software bug in the package creation process. Response: reject the entire package. Notify the sender via the next available communication channel. Request retransmission. Log the failure with full details.</p>
+</li>
+<li>
+<p><strong>Manifest mismatch.</strong> The manifest signature verifies, but individual items in the payload do not match their manifest hashes. This indicates partial corruption -- the package structure is intact but some content was damaged. Response: reject the entire package. Do not attempt to salvage uncorrupted items. The package is atomic; it either arrives whole or it is rejected whole.</p>
+</li>
+<li>
+<p><strong>Decryption failure.</strong> The payload cannot be decrypted. Causes include: wrong recipient key (the package was encrypted for a different node), key compromise and rotation (the sender used an old key), or corruption of the encrypted payload. Response: verify the header to confirm the package was intended for this node. If it was, contact the sender to diagnose the key mismatch. Do not attempt repeated decryption with different keys -- this is not a password-guessing exercise.</p>
+</li>
+<li>
+<p><strong>Stale sync package.</strong> A sync package arrives that is older than a package already received from the same sender. The data in it is a subset of data already applied. Response: log the receipt but do not apply the package. Stale packages are not harmful, but applying them may revert newer data. The manifest timestamp and the sync log together provide the information needed to detect staleness.</p>
+</li>
+<li>
+<p><strong>Media failure during read.</strong> The transport media develops read errors while the receiving node is attempting to read the sync package. Response: abort the read. Do not retry from the failed media -- repeated reads of failing media can cause further degradation. Request retransmission from the sender on fresh media.</p>
+</li>
+<li>
+<p><strong>Scope leakage.</strong> The sending operator inadvertently includes sensitive or private data in the sync scope. This is detected after the package has left the node. Response: notify the recipient immediately (via whatever communication channel is available) to destroy the media without processing the package. If the package has already been processed, the recipient must flag and quarantine the inadvertently shared data. Log the incident. Review and tighten the scope review procedure.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a sync package fails integrity verification:</strong> Do not attempt to process any part of the package. Record the failure in the sync log with: the package identifier, the type of failure (seal failure, manifest mismatch, etc.), and the date. Securely erase the transport media. Contact the sending node to request retransmission. The sending node should verify its copy of the package against its own records before retransmitting.</p>
+</li>
+<li>
+<p><strong>If the transport media is lost in transit:</strong> The sending node still has all the data. Prepare a new sync package on new media and send it. Update the sync log to record the loss. If the lost media contained an encrypted package, the risk is limited to the metadata in the plaintext header. If for any reason the package was unencrypted, treat the contents as potentially compromised and take appropriate action based on the sensitivity of the data.</p>
+</li>
+<li>
+<p><strong>If the transport media is suspected of tampering:</strong> Do not connect it to any system. If it has already been connected to the quarantine system, isolate the quarantine system and rebuild it from known-good media. Log the incident with full details. Request retransmission from the sender on new media via a different transport path if possible.</p>
+</li>
+<li>
+<p><strong>If a sync package is accidentally applied twice:</strong> The second application should be idempotent if the sync software is functioning correctly (duplicate content with identical hashes should be detected and skipped). If duplicate application has caused data corruption, restore from the most recent pre-sync backup and re-apply the package once.</p>
+</li>
+<li>
+<p><strong>If the sending node discovers an error in a sync package after sending:</strong> The sending node prepares a correction package. The correction package contains a retraction notice identifying the erroneous package by its identifier, a description of the error, and corrected data if applicable. The correction follows the same sync protocol as any other package.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Sync will be infrequent and small. The protocol may feel over-engineered for transferring a few hundred files on a USB drive. It is not. The protocol's value is in the discipline it establishes, not in the volume it handles. Perform every step even when the package is trivially small.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Sync packages may grow significantly as nodes accumulate content. The protocol should be evaluated for efficiency -- whether the packaging format compresses well, whether incremental syncs are working correctly, and whether the integrity verification time is acceptable for larger packages.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Transport media technology will change. USB may be obsolete. The protocol is transport-agnostic by design -- it defines the package structure and the verification procedures, not the physical medium. When the medium changes, update Section 4.3. The rest of the protocol should not need modification.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The protocol may be executed by operators who have never used the specific media technologies of the founding era. The protocol must describe what to verify (integrity, authenticity, completeness) rather than how to verify it with a specific tool. Tools change. Verification principles do not.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The temptation with sync is to make it easy. Easy is dangerous. Easy means skipping the integrity check because "it is just a USB drive and I prepared it myself." Easy means not encrypting because "the drive is just going from my desk to the other room." Easy means not logging because "I will remember what I synced." Every shortcut in sync is a debt that compounds. One skipped integrity check is the one that would have caught the corrupted file. One unencrypted transport is the one that gets lost. One unlogged sync is the one that causes an unresolvable conflict six months later.</p>
+<p>The protocol is long because the stakes are high. Every step exists because its absence would create a specific vulnerability. If a future operator finds a step that serves no purpose, they should document why they believe it is unnecessary in this Commentary Section -- and then keep performing it until the community has reviewed and agreed to its removal.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D17-001 -- Federation Philosophy (sync package concept; partition tolerance; trust model)</li>
+<li>D17-002 -- New Node Setup and Commissioning (first sync procedure; initial media preparation)</li>
+<li>D17-004 -- Conflict Resolution Between Nodes (invoked when sync reveals conflicts)</li>
+<li>D17-005 -- Trust Establishment and Verification (key exchange for sync encryption)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (encryption requirements; integrity verification)</li>
+<li>OPS-001 -- Operations Philosophy (logging requirements; operational tempo)</li>
+<li>Domain 18 -- Import &amp; Quarantine (quarantine system used for incoming sync media)</li>
+<li>Domain 20 -- Institutional Memory (sync event logging; transport records)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

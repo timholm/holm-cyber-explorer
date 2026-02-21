@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D12-002 — Disaster Recovery Drill Framework - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li class="active"><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d12-002">
+  <h1>D12-002 &mdash; Disaster Recovery Drill Framework</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D12-002</dd>
+  <dt>Domain</dt>
+  <dd>12 -- Disaster Recovery</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D12-001, D6-002, D6-003, SEC-002, SEC-003</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D12-003, D13-002, GOV-007. All articles referencing disaster preparedness verification or institutional resilience testing.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the holm.chat Documentation Institution tests its own survival. It is the operational manual for disaster recovery drills -- the scheduled, controlled exercises that verify whether the institution can actually recover from the failures it claims to be prepared for.</p>
+<p>D12-001 established a foundational principle: drills matter more than plans. A mediocre plan that has been drilled quarterly is worth more than a perfect plan that has never been tested. This article operationalizes that principle. It defines when drills happen, what scenarios they simulate, how they are executed, how performance is evaluated, and how findings are fed back into the institution's recovery procedures.</p>
+<p>The purpose of a drill is not to confirm that everything works. The purpose is to discover what does not work -- before a real disaster forces the discovery under catastrophic conditions. A drill that reveals no problems is either testing too easy a scenario or not looking hard enough. The institution should expect every drill to produce findings. Those findings are the drill's primary output and the institution's most valuable resilience investment.</p>
+<p>This article is written for the operator who must plan, execute, and evaluate drills alone. Every procedure is designed for solo execution. Where a drill would benefit from a second person -- and some would -- the article notes this but provides a solo-execution alternative.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The drill schedule: frequency, rotation, and integration with the operational tempo.
+- Drill types: tabletop, functional, partial recovery, full recovery, surprise.
+- Five specific drill scripts for the five most likely disaster scenarios.
+- Execution procedures for each drill type.
+- The evaluation framework: how to grade drill performance.
+- After-action report format and procedures.
+- Integration of drill findings into recovery procedure updates.
+- Safety controls: how to prevent a drill from becoming a real disaster.</p>
+<p><strong>Out of scope:</strong>
+- The recovery procedures themselves (those are defined in D6-002, D6-003, SEC-003, and subsequent Domain 12 articles; this article tests them).
+- The disaster recovery philosophy (D12-001).
+- Post-incident review of real disasters (DR-013; this article covers drills, not real events).
+- Specific hardware failure diagnostics (Domain 4 and Domain 5 articles).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Drills Are Non-Negotiable</h3>
+<p>D12-001 Section 3.2 documents the failure of untested plans. This section does not repeat that argument. It adds a specific observation relevant to drill design: the value of a drill is proportional to the discomfort it creates.</p>
+<p>A drill that exercises only the procedures the operator is confident about teaches nothing. A drill that forces the operator to execute a procedure they have not touched in six months, on hardware they rarely interact with, under time pressure -- that drill teaches everything. It reveals forgotten steps, outdated assumptions, missing tools, and degraded media. It reveals the gap between the operator's mental model of the institution and the institution's actual state.</p>
+<p>This discomfort is the point. The drill schedule in this article is designed to ensure that every critical recovery procedure is exercised at least once per year, including the procedures the operator would rather not think about.</p>
+<h3>3.2 The Air-Gap Drill Constraint</h3>
+<p>In a networked institution, disaster recovery drills can leverage virtualization, cloud-based test environments, and automated testing frameworks. This institution has none of those luxuries. Drills must be conducted on physical hardware, using physical backup media, following physical procedures. This makes drills more expensive in time and effort -- but it also makes them more realistic, because real disasters will also involve physical hardware, physical media, and physical procedures.</p>
+<p>The air-gap constraint also means that drill findings cannot be supplemented by searching the internet for solutions. If a drill reveals that a procedure is incomplete, the operator must solve the problem from the institution's own documentation and knowledge. This is exactly what will happen during a real disaster, which is why air-gapped drills are more valuable, not less, than their networked equivalents.</p>
+<h3>3.3 The Drill Safety Principle</h3>
+<p>A drill must never cause the harm it is designed to prepare for. This is the drill safety principle, and it constrains every procedure in this article. Drills are conducted on backup copies, on test partitions, on secondary hardware, or through tabletop simulation -- never on production data or production systems without explicit safeguards.</p>
+<p>The one exception is the full recovery drill, which requires taking a system offline and rebuilding it from backup. This drill is performed only on systems that can be offline for the duration without causing data loss or service interruption, and only after verifying that current backups are valid.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Drill Schedule</h3>
+<p>Drills are integrated into the operational tempo defined in OPS-001:</p>
+<p><strong>Quarterly Drills (4 per year):</strong>
+Each quarter, one functional drill is conducted from the five-scenario rotation defined in Section 4.3. The rotation ensures that all five scenarios are covered within a fifteen-month cycle. The quarterly drill is scheduled during the quarterly operations day defined in OPS-001 Section 4.1.</p>
+<p>Quarterly drill rotation:
+- Q1 (January-March): Scenario 1 -- Primary storage failure.
+- Q2 (April-June): Scenario 2 -- Backup corruption discovery.
+- Q3 (July-September): Scenario 3 -- Complete site loss.
+- Q4 (October-December): Scenario 4 -- Operator incapacitation simulation.
+- Q1 (next year): Scenario 5 -- Encryption key loss.
+- Q2 (next year): Return to Scenario 1 with variations.</p>
+<p><strong>Annual Full Recovery Drill (1 per year):</strong>
+During the annual operations cycle (OPS-001 Section 4.1), one full recovery drill is conducted. This drill rebuilds a complete subsystem from backup, verifying the end-to-end recovery path from backup media to operational service. The subsystem selected for the annual drill should rotate each year to ensure comprehensive coverage.</p>
+<p><strong>Monthly Tabletop Reviews (12 per year):</strong>
+During each monthly operations session, a 30-minute tabletop review of one recovery procedure is conducted. The operator reads through the procedure, mentally executes each step, and notes any steps that reference outdated hardware, software, or configurations. This is a documentation audit disguised as a drill. It costs minimal time and catches procedure rot before it becomes dangerous.</p>
+<p><strong>Surprise Drills (at least 1 per year):</strong>
+At least once per year, the operator should conduct an unscheduled drill. The method: write the five scenario numbers on slips of paper, draw one at random on a day that is not a scheduled drill day, and execute the drill that session. The purpose of surprise drills is to test readiness under realistic conditions -- real disasters do not arrive on scheduled days.</p>
+<h3>4.2 Drill Types</h3>
+<p><strong>Type 1: Tabletop Drill.</strong>
+The operator reads through a recovery procedure step by step, without executing any commands or touching any hardware. At each step, the operator asks: do I have this tool? Do I know where this data is? Does this step still apply to the current system? Is this step clear enough for a stressed operator? Findings are recorded. Duration: 30-60 minutes.</p>
+<p>Use tabletop drills for: monthly procedure reviews, procedures that cannot be safely executed in a drill (such as full-site evacuation), and initial familiarization with new procedures.</p>
+<p><strong>Type 2: Functional Drill.</strong>
+The operator executes the recovery procedure on non-production systems or copies. Data is actually restored, keys are actually used, configurations are actually applied -- but on test targets, not on production systems. The operator follows the documented procedure exactly as written, noting any deviations required. Duration: 2-6 hours depending on scenario.</p>
+<p>Use functional drills for: quarterly scenario rotation, testing specific recovery procedures, and validating backup integrity.</p>
+<p><strong>Type 3: Partial Recovery Drill.</strong>
+The operator takes a non-critical subsystem offline and recovers it from backup. This is a real recovery on real hardware, but scoped to a subsystem whose temporary absence does not threaten institutional data or critical operations. Duration: 4-8 hours.</p>
+<p>Use partial recovery drills for: annual full recovery drill (applied to a selected subsystem), testing end-to-end recovery paths, and building operator confidence with real recovery operations.</p>
+<p><strong>Type 4: Full Recovery Drill.</strong>
+The operator rebuilds a complete system from bare metal using backup media and documented procedures. This is the most demanding drill type. It should only be attempted after multiple successful partial recovery drills and only on a system that can be offline for up to 24 hours. Duration: 8-24 hours.</p>
+<p>Use full recovery drills for: validating D12-003 (System Rebuild Procedures), testing the rebuild kit, and succession readiness verification.</p>
+<h3>4.3 The Five Disaster Scenario Scripts</h3>
+<p>Each script defines the simulated disaster, the pre-drill setup, the drill execution steps, the success criteria, and the time limit.</p>
+<p><strong>Scenario 1: Primary Storage Failure.</strong></p>
+<p>Simulated disaster: The primary storage device has failed. All data on the primary volume is inaccessible. The operating system may or may not be affected (drill variant A: OS survives on a separate disk; variant B: OS is also lost).</p>
+<p>Pre-drill setup:
+1. Verify that current backups exist and are valid (do not begin the drill without confirmed good backups).
+2. Identify the test target: a spare drive or partition that will serve as the "replacement" primary storage.
+3. Document the current state of the primary storage contents (file list, total size) for post-drill verification.
+4. If executing variant B, prepare bootable installation media.</p>
+<p>Drill execution (variant A -- OS survives):
+1. Simulate the loss by unmounting or logically disconnecting the primary data volume. Do not physically destroy it -- this is a drill.
+2. Following the backup restoration procedure in D6-002 Section 4.4, restore the most recent Tier 1 backup to the test target.
+3. Verify the restored data: compare file counts, spot-check files, verify checksums against the backup manifest.
+4. Restore Tier 2 data from the most recent backup.
+5. Verify service configurations that depend on the restored data.
+6. Record the total time from "failure" to "verification complete."</p>
+<p>Drill execution (variant B -- OS also lost):
+1. Simulate by booting from installation media (do not wipe the actual OS disk -- mark it as "failed" and set it aside).
+2. Install the operating system on the test target per D12-003 procedures.
+3. Restore system configuration from backup.
+4. Restore data per variant A steps 2-5.
+5. Verify that all critical services start and function correctly.
+6. Record total time.</p>
+<p>Success criteria:
+- All Tier 1 data restored and verified within 4 hours (variant A) or 8 hours (variant B).
+- All Tier 2 data restored and verified within 8 hours (variant A) or 12 hours (variant B).
+- No data loss beyond the recovery point objective defined in D6-002.
+- All critical services operational after restoration.</p>
+<p>Time limit: 8 hours (variant A), 16 hours (variant B). If the time limit is exceeded, the drill continues to completion but the time overrun is recorded as a finding.</p>
+<p>Post-drill:
+1. Reconnect the "failed" volume (it was never actually damaged).
+2. Verify production systems are intact.
+3. Clean up test targets.
+4. Complete the after-action report.</p>
+<p><strong>Scenario 2: Backup Corruption Discovery.</strong></p>
+<p>Simulated disaster: During a routine test restoration, you discover that your most recent backup set is corrupted. The backup appears complete but checksum verification fails on multiple files.</p>
+<p>Pre-drill setup:
+1. Identify a backup set to use as the "corrupted" set (select the most recent monthly backup).
+2. Prepare a list of files to mark as "corrupted" (select 5-10 files across Tier 1 and Tier 2 data).
+3. Do not actually corrupt the files. Instead, create a drill scenario document listing the "corrupted" files that the operator must treat as unrecoverable from this backup set.</p>
+<p>Drill execution:
+1. Begin by "discovering" the corruption: review the drill scenario document that lists the corrupted files.
+2. Assess the scope: what data is affected? What tier? What is the most recent known-good copy?
+3. Locate the next-oldest backup set (Location A weekly, Location B monthly, or Location C off-site).
+4. Restore the "corrupted" files from the older backup set.
+5. Verify the restored files.
+6. Assess the gap: is there any data that existed only in the corrupted backup and not in any older backup? Document the potential data loss.
+7. Review the backup verification procedures: would the existing verification process have caught this corruption? If not, what additional checks are needed?</p>
+<p>Success criteria:
+- Operator correctly identifies the scope of corruption within 30 minutes.
+- Operator locates and uses an alternative backup within 2 hours.
+- Operator identifies any unrecoverable data gap and documents it.
+- Operator proposes at least one improvement to backup verification procedures.</p>
+<p>Time limit: 4 hours.</p>
+<p><strong>Scenario 3: Complete Site Loss.</strong></p>
+<p>Simulated disaster: The primary site has been destroyed (fire, flood, catastrophic event). All hardware at the primary site is gone. The only surviving assets are the off-site backups (Location C) and any physical documentation stored off-site.</p>
+<p>Pre-drill setup:
+1. This is primarily a tabletop drill with a functional component. The tabletop component addresses the full scope of site loss. The functional component tests restoration from off-site backup media.
+2. Gather the off-site backup media (or a copy of it) and the printed recovery documentation.
+3. If a Succession Readiness Package exists off-site, retrieve it (or a copy) for the drill.
+4. Prepare a separate machine (a spare or test machine) to serve as the "new site."</p>
+<p>Drill execution -- tabletop component:
+1. Assume you are standing in front of the spare machine with only the off-site backup media and printed documentation. No other institutional resources are available.
+2. Walk through the complete rebuild sequence defined in D12-003: hardware assessment, OS installation, base configuration, data restoration, service configuration, verification.
+3. At each step, verify: do I have the information I need in the printed documentation? Are the credentials I need accessible from the off-site materials? Are the procedures clear enough to follow without additional context?
+4. Record every gap, every missing piece of information, every assumption that would not hold at a new site.</p>
+<p>Drill execution -- functional component:
+1. On the spare machine, restore Tier 1 data from the off-site backup.
+2. Verify the restoration.
+3. Attempt to access the documentation corpus from the restored data.
+4. Record the time from "start of restoration" to "documentation corpus accessible and readable."</p>
+<p>Success criteria:
+- Tabletop component identifies all information gaps in off-site documentation.
+- Functional component successfully restores Tier 1 data from off-site backup.
+- Documentation corpus is accessible and readable from restored data.
+- Operator can articulate a realistic timeline for full institutional rebuild.</p>
+<p>Time limit: 6 hours (2 hours tabletop, 4 hours functional).</p>
+<p><strong>Scenario 4: Operator Incapacitation Simulation.</strong></p>
+<p>Simulated disaster: The primary operator is incapacitated. A successor (simulated by the operator themselves, acting as an unfamiliar person) must assume operations using only the Succession Readiness Package and institutional documentation.</p>
+<p>Pre-drill setup:
+1. Retrieve the Succession Readiness Package.
+2. Set aside all personal knowledge of the institution. For the duration of this drill, the operator pretends to be a technically competent stranger who has never seen this system before.
+3. This is primarily a documentation audit. The operator attempts to perform basic operations using only the written documentation, without relying on any knowledge not contained in the documents.</p>
+<p>Drill execution:
+1. Open the Succession Readiness Package. Read the letter of introduction and the first-30-days guide per GOV-004 Section 4.6.
+2. Using only the documentation, attempt to:
+   a. Identify all physical hardware and its function.
+   b. Log in to the operator account (credentials should be accessible through the succession provisions in SEC-003).
+   c. Perform the daily operations checklist per D10-002.
+   d. Locate and read the most recent decision log entries.
+   e. Locate and verify the most recent backup.
+   f. Identify the next scheduled maintenance task.
+3. At each step, record: was the information sufficient? Was anything ambiguous? Was anything missing? Would a stranger be able to complete this step?
+4. Attempt one recovery procedure (select the simplest one) using only the documentation.</p>
+<p>Success criteria:
+- All six sub-tasks in step 2 are completable from documentation alone.
+- No critical information requires knowledge not present in the documentation.
+- The selected recovery procedure is executable from documentation alone.
+- The Succession Readiness Package is current (all references match current system state).</p>
+<p>Time limit: 8 hours.</p>
+<p><strong>Scenario 5: Encryption Key Loss.</strong></p>
+<p>Simulated disaster: The active copy of a critical encryption key has been lost (simulated -- not actually deleted). The operator must recover the key from backup and restore access to the encrypted data.</p>
+<p>Pre-drill setup:
+1. Select a non-critical encrypted volume or a test encrypted volume for the drill.
+2. Record the key fingerprint and the location of all backup copies per SEC-003 key inventory.
+3. Do not actually delete the active key. Instead, simulate the loss by pretending the active key location is inaccessible.</p>
+<p>Drill execution:
+1. "Discover" the key loss: attempt to access the encrypted volume and find that the active key is unavailable.
+2. Consult the key inventory (SEC-003 Section 4.1) to identify backup key locations.
+3. Retrieve the Tier B backup key from Zone 1.
+4. Decrypt the Tier B backup media.
+5. Extract the lost key.
+6. Use the recovered key to access the encrypted volume.
+7. Verify data integrity on the decrypted volume.
+8. Following SEC-003 Section 7.1, create a new Tier B backup (since the original was opened during recovery).</p>
+<p>Success criteria:
+- Operator locates the correct backup key within 30 minutes.
+- Key is successfully recovered from Tier B backup.
+- Encrypted volume is accessible with the recovered key.
+- Data integrity is verified.
+- New Tier B backup is created.</p>
+<p>Time limit: 4 hours.</p>
+<h3>4.4 The Evaluation Framework</h3>
+<p>Drill performance is evaluated on five dimensions, each scored on a three-point scale:</p>
+<p><strong>Dimension 1: Procedure Adherence.</strong>
+Did the operator follow the documented procedure, or did they improvise?
+- 3 (Excellent): Procedure followed as written with no deviations.
+- 2 (Adequate): Minor deviations required, all documented during drill.
+- 1 (Inadequate): Major deviations required, or operator abandoned procedure and improvised.</p>
+<p><strong>Dimension 2: Time Performance.</strong>
+Was the recovery completed within the defined time limit?
+- 3 (Excellent): Completed within 75% of the time limit.
+- 2 (Adequate): Completed within the time limit.
+- 1 (Inadequate): Time limit exceeded.</p>
+<p><strong>Dimension 3: Data Integrity.</strong>
+Was all data recovered intact?
+- 3 (Excellent): All data verified, all checksums match.
+- 2 (Adequate): All critical data recovered, minor discrepancies in non-critical data.
+- 1 (Inadequate): Critical data loss or unresolvable integrity failures.</p>
+<p><strong>Dimension 4: Documentation Quality.</strong>
+Were the recovery procedures adequate for the scenario?
+- 3 (Excellent): Procedures were complete, accurate, and clear.
+- 2 (Adequate): Procedures were usable but required clarification or minor updates.
+- 1 (Inadequate): Procedures were outdated, incomplete, or misleading.</p>
+<p><strong>Dimension 5: Finding Generation.</strong>
+Did the drill produce actionable findings for improving resilience?
+- 3 (Excellent): Multiple specific, actionable findings documented.
+- 2 (Adequate): At least one finding documented.
+- 1 (Inadequate): No findings generated (which itself is a finding -- the drill was too easy or the operator was not looking critically enough).</p>
+<p><strong>Overall Score:</strong>
+- 13-15: Strong resilience posture. Maintain current procedures.
+- 10-12: Adequate with room for improvement. Address findings within 30 days.
+- 7-9: Significant gaps. Prioritize remediation. Schedule a follow-up drill within 60 days.
+- 5-6: Critical deficiencies. Declare a Tier 3 governance action to address DR gaps immediately.</p>
+<h3>4.5 The After-Action Report</h3>
+<p>Every drill produces an after-action report (AAR). The AAR is a Tier 1 document per D6-001 and is stored in the documentation corpus.</p>
+<p><strong>After-Action Report Template:</strong></p>
+<p>```
+DISASTER RECOVERY DRILL -- AFTER-ACTION REPORT</p>
+<p>Drill ID:         DR-DRILL-[YYYY]-[sequential number]
+Date:             [date of drill execution]
+Scenario:         [scenario number and name]
+Drill Type:       [tabletop / functional / partial recovery / full recovery]
+Scheduled/Surprise: [scheduled / surprise]
+Duration:         [actual time from start to completion]
+Time Limit:       [defined time limit for this scenario]</p>
+<p>SCENARIO DESCRIPTION:
+[Brief description of the simulated disaster and any variants used]</p>
+<p>EXECUTION SUMMARY:
+[Narrative account of what happened during the drill, step by step.
+Note any deviations from the documented procedure.]</p>
+<p>EVALUATION SCORES:
+Procedure Adherence:    [1-3] -- [brief justification]
+Time Performance:       [1-3] -- [brief justification]
+Data Integrity:         [1-3] -- [brief justification]
+Documentation Quality:  [1-3] -- [brief justification]
+Finding Generation:     [1-3] -- [brief justification]
+Overall Score:          [5-15]</p>
+<p>FINDINGS:
+[Numbered list of specific findings. Each finding includes:]
+  F1: [Description of the gap, error, or issue discovered]
+      Severity: [Critical / Major / Minor]
+      Affected Procedure: [Document ID and section]
+      Recommended Action: [Specific action to address the finding]
+      Deadline: [Date by which the action should be completed]</p>
+<p>LESSONS LEARNED:
+[What worked well. What would the operator do differently next time.
+Any observations about the institution's overall resilience posture.]</p>
+<p>FOLLOW-UP ITEMS:
+[List of all action items generated by this drill, with owners and deadlines]</p>
+<p>Signed: [Operator identifier]
+Date:   [Date of report completion]
+```</p>
+<p>The AAR must be completed within 7 days of drill execution. Findings with severity "Critical" must have corrective actions initiated within 48 hours. Findings with severity "Major" must have corrective actions initiated within 30 days. Findings with severity "Minor" must be addressed before the next quarterly drill.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D12-02-01:</strong> Disaster recovery drills must be conducted at least quarterly per the schedule in Section 4.1. Missed drills must be rescheduled within 30 days and the miss documented in the operational log.</li>
+<li><strong>R-D12-02-02:</strong> No drill may be conducted on production data or production systems without explicit safeguards that prevent data loss. The drill safety principle (Section 3.3) is absolute.</li>
+<li><strong>R-D12-02-03:</strong> Every drill must produce an after-action report per Section 4.5. The AAR is a Tier 1 document.</li>
+<li><strong>R-D12-02-04:</strong> Critical findings from drills must have corrective actions initiated within 48 hours. Corrective actions must be tracked to completion.</li>
+<li><strong>R-D12-02-05:</strong> All five disaster scenarios must be exercised within every 15-month period. No scenario may go more than 18 months without being drilled.</li>
+<li><strong>R-D12-02-06:</strong> At least one surprise drill must be conducted per year.</li>
+<li><strong>R-D12-02-07:</strong> The drill schedule, scenario scripts, and evaluation framework must be reviewed during the annual operations cycle. Scenarios must be updated to reflect changes in the institution's systems and threat model.</li>
+<li><strong>R-D12-02-08:</strong> Drill findings that reveal gaps in recovery procedures must be integrated into the affected procedures within 90 days. The integration must be verified in the next drill of the affected scenario.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Drill theater.</strong> The operator conducts drills perfunctorily, following the motions without genuine engagement. The same easy scenarios are repeated. Difficult scenarios are avoided. Findings are generic rather than specific. Mitigation: the evaluation framework scores finding generation. A drill that produces no findings scores 1 on that dimension, which should prompt self-examination. The surprise drill requirement disrupts complacency. The scenario rotation prevents cherry-picking.</p>
+</li>
+<li>
+<p><strong>Drill avoidance.</strong> The operator postpones drills indefinitely. "Too busy this quarter" becomes a permanent state. Mitigation: R-D12-02-01 makes drills mandatory. The quarterly operations day in OPS-001 explicitly includes drill time. If drills are consistently skipped, this is a governance issue requiring Tier 3 review.</p>
+</li>
+<li>
+<p><strong>Drill-caused damage.</strong> A drill inadvertently damages production data or systems. The drill becomes the disaster. Mitigation: the drill safety principle (Section 3.3) and R-D12-02-02. All drill procedures specify the use of test targets, copies, and spare hardware. Pre-drill setup includes verification of current backups.</p>
+</li>
+<li>
+<p><strong>Finding accumulation without action.</strong> Drills produce findings, but the findings are never addressed. The AAR file grows; the procedures remain unchanged. Mitigation: R-D12-02-04 and R-D12-02-08 impose deadlines on corrective actions. The quarterly governance health check (GOV-007) reviews open drill findings.</p>
+</li>
+<li>
+<p><strong>Scenario staleness.</strong> The five scenarios become outdated as the institution evolves. New systems are not covered. Old systems referenced in scenarios have been decommissioned. Mitigation: R-D12-02-07 requires annual review and update of scenarios.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If drills have lapsed for more than two quarters:</strong> Do not attempt to catch up by drilling all scenarios at once. Begin with a tabletop drill of Scenario 1 (primary storage failure) to rebuild the drill habit. Schedule the remaining scenarios at two-week intervals until the rotation is current. Document the lapse in the operational log.</p>
+</li>
+<li>
+<p><strong>If a drill causes production damage:</strong> Stop the drill immediately. Assess the damage. If data loss has occurred, initiate the actual recovery procedure (not the drill procedure). Restore from the most recent verified backup. Document the incident as both a drill failure and a real incident. Investigate the cause: which safety control failed? Update drill procedures to prevent recurrence.</p>
+</li>
+<li>
+<p><strong>If drill findings are never addressed:</strong> Conduct a finding audit. List all open findings from the past 12 months. Categorize them by severity. Address all Critical findings immediately. Schedule Major findings into the next quarterly operations day. Assess whether Minor findings are still relevant. Close findings that have been overtaken by events. Document the audit results.</p>
+</li>
+<li>
+<p><strong>If scenarios no longer match institutional reality:</strong> Conduct an immediate scenario update. For each of the five scenarios, verify that the referenced hardware, software, backup locations, and procedures still exist. Update the scenario scripts. If a scenario is no longer relevant (for example, if the institution no longer uses the referenced encryption scheme), replace it with a scenario that reflects the current threat model.</p>
+</li>
+<li>
+<p><strong>If drill scores are consistently low (below 10):</strong> This indicates systemic problems with the institution's disaster recovery posture. Escalate to a Tier 3 governance decision. Conduct a comprehensive review of all recovery procedures, backup integrity, and spare hardware availability. Consider whether the institution's complexity has exceeded the operator's ability to maintain adequate disaster preparedness.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The drill framework is being established. Early drills will be rough. Scores will be low. This is expected and healthy -- the institution is young and its recovery procedures are untested. Use this period to refine both the drill procedures and the recovery procedures they test. Expect the scenario scripts to be revised frequently.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The drill framework should be routine. Scores should generally be in the 10-15 range. The focus shifts from establishing the framework to preventing complacency. Introduce more challenging variants of existing scenarios. Consider adding new scenarios for threats that have emerged since founding.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Hardware generations have changed. Scenarios must evolve with them. The drill history -- the accumulated AARs -- becomes a valuable record of the institution's resilience evolution. New operators brought in through succession should participate in drills as part of their training (GOV-004 Stage 2 requires participation in at least one recovery procedure).</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The drill framework should have been refined through decades of practice. The AAR archive tells the story of every test, every finding, every improvement. This archive is institutional knowledge of the highest order -- it documents not just what the institution can survive, but how it learned to survive it.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Writing drill scripts for disasters that have not happened is an exercise in structured imagination. I find myself torn between making the drills realistic enough to be useful and simple enough to be executable by one person in a day. I have erred on the side of realism for the quarterly functional drills and simplicity for the monthly tabletops.</p>
+<p>The scenario I am most anxious about is Scenario 4 -- the operator incapacitation simulation. Pretending to be a stranger to my own system is difficult. My hands know where things are even when my conscious mind pretends not to. I expect this scenario to produce the most uncomfortable findings, because it tests not just the systems but the documentation, and documentation gaps are the hardest to see from the inside.</p>
+<p>The evaluation framework uses a three-point scale deliberately. A more granular scale would invite false precision. The question is not whether the drill scored 7.3 or 7.5 -- it is whether the institution's resilience posture is strong, adequate, or deficient. Three levels are enough to answer that question honestly.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (self-contained operation, documentation completeness)</li>
+<li>GOV-001 -- Authority Model (governance tiers for DR decisions, decision logging)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (threat categories that inform drill scenarios)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo, quarterly and annual cycles, sustainability requirement)</li>
+<li>D12-001 -- Disaster Recovery Philosophy (three pillars, graceful degradation, rebuild mindset, drill philosophy)</li>
+<li>D6-002 -- Backup Doctrine (backup procedures tested by drills)</li>
+<li>D6-003 -- Data Integrity Verification (integrity verification procedures tested by drills)</li>
+<li>SEC-002 -- Access Control Procedures (physical zone model referenced in drill scenarios)</li>
+<li>SEC-003 -- Cryptographic Key Management (key recovery procedures tested in Scenario 5)</li>
+<li>GOV-004 -- Succession Planning and Execution (succession readiness verified by Scenario 4)</li>
+<li>GOV-007 -- Institutional Health Assessment (quarterly review of drill findings)</li>
+<li>D12-003 -- System Rebuild Procedures (rebuild procedures validated by full recovery drills)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

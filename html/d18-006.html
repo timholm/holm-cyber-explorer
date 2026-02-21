@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D18-006 — Quarantine Architecture - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li class="active"><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d18-006">
+  <h1>D18-006 &mdash; Quarantine Architecture</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D18-006</dd>
+  <dt>Domain</dt>
+  <dd>18 -- Import & Quarantine</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D18-001 (Import Philosophy), SEC-001, D4-001 (Infrastructure Foundations)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D18-002 (Validation Pipeline), D18-003 (Dangerous Content Handling), D18-007 (Format Recognition), D18-008 (Trust Scoring), D18-009 (Rejection &amp; Appeal)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the quarantine architecture for the holm.chat Documentation Institution -- the physical and logical isolation system through which all external content must pass before it can be considered for admission to institutional production systems. Quarantine is the institution's first line of defense and the physical embodiment of the principle articulated in D18-001 that everything external is suspect until proven otherwise.</p>
+
+<p>Without quarantine, the institution has no safe way to examine incoming content. Every import would be a gamble: either reject content sight unseen, or admit it and hope for the best. Quarantine provides the essential middle ground -- a controlled environment where content can be observed, analyzed, tested, and judged without risking institutional integrity.</p>
+
+<p>This article is addressed to the infrastructure operators who will build and maintain quarantine systems, to the import operators who will use quarantine daily, and to every future maintainer who will need to understand why the quarantine environment is designed the way it is. The quarantine architecture must survive hardware changes, operating system changes, and generational turnover among operators. What persists is the architectural principle: isolation that is genuine, auditable, and expendable.</p>
+
+<p>The quarantine system is the immune system's inspection chamber. It must be strong enough to contain anything hostile, transparent enough to permit thorough examination, and disposable enough that its compromise does not threaten the organism it protects.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The physical and logical isolation requirements for quarantine environments.</li>
+<li>The hardware and software architecture of quarantine stations.</li>
+<li>Access controls governing who may interact with quarantine systems and how.</li>
+<li>Time limits and lifecycle management of quarantined content.</li>
+<li>The rebuild and reconstitution process for compromised quarantine environments.</li>
+<li>Storage allocation for quarantine zones, including capacity planning for batch imports.</li>
+<li>The air-gap-within-an-air-gap model: how quarantine maintains its own isolation boundary inside the institution's perimeter.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The specific validation checks performed within quarantine (see D18-002, Validation Pipeline Design).</li>
+<li>The trust scoring algorithms applied to quarantined content (see D18-008, Trust Scoring Framework).</li>
+<li>Malware scanning procedures (see D18-003, Dangerous Content Handling).</li>
+<li>The decision to admit or reject content after quarantine examination (see D18-009, Rejection, Appeal &amp; Disposition).</li>
+<li>Physical transport of media to the institution (see D17-ART-012, Physical Transport Protocols).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>The Air-Gap-Within-an-Air-Gap</h3>
+<p>The institution is itself air-gapped from the outside world. But the quarantine system must be air-gapped from the institution's own production systems. This creates a nested isolation model: the outside world is separated from the institution by the primary air gap, and incoming content is separated from institutional data by the quarantine air gap. Only after content passes through the quarantine barrier does it cross into the institution proper.</p>
+
+<p>This nested model was chosen over a single-boundary model because a single boundary creates an all-or-nothing decision: content is either outside or inside. The nested model introduces a third state -- inside the perimeter but outside the trust boundary -- which allows for controlled examination. This third state is the essence of quarantine.</p>
+
+<h3>Expendability as a Design Principle</h3>
+<p>Traditional IT systems are designed for durability. Servers are protected, backed up, and maintained. Quarantine systems are designed for expendability. If a quarantine environment is compromised by malicious content, the correct response is not to repair it but to destroy it and rebuild from a known-good image. This expendability must be built into the architecture from the start. A quarantine system that is expensive to rebuild will not be rebuilt when it should be, and a quarantine system that is not rebuilt when compromised becomes a persistent threat vector.</p>
+
+<h3>Historical Precedent</h3>
+<p>The concept of quarantine for digital content borrows directly from biological quarantine, which itself has centuries of practice. Port cities quarantined arriving ships. Hospitals quarantine patients with unknown conditions. The principle is identical: isolate the unknown until it can be assessed, and design the isolation facility so that its breach does not contaminate the community it protects. The digital implementation differs in specifics but the architectural logic is the same.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>Quarantine Zone Architecture</h3>
+<pre>
+  OUTSIDE WORLD
+       |
+       | [Physical media carried by human]
+       v
+  +-----------------------------+
+  | RECEPTION DESK              |
+  | (Media logging, labeling,   |
+  |  visual inspection only)    |
+  +-----------------------------+
+       |
+       | [Media physically moved to quarantine station]
+       v
+  +-----------------------------+
+  | QUARANTINE ZONE             |
+  | +-------------------------+ |
+  | | Quarantine Station A    | |
+  | | (Isolated machine)      | |
+  | +-------------------------+ |
+  | +-------------------------+ |
+  | | Quarantine Station B    | |
+  | | (Backup / parallel)     | |
+  | +-------------------------+ |
+  | +-------------------------+ |
+  | | Quarantine Storage      | |
+  | | (Isolated filesystem)   | |
+  | +-------------------------+ |
+  +-----------------------------+
+       |
+       | [One-way validated transfer]
+       v
+  +-----------------------------+
+  | INSTITUTIONAL PRODUCTION    |
+  | SYSTEMS                     |
+  +-----------------------------+
+</pre>
+
+<h3>Component Descriptions</h3>
+<p><strong>Reception Desk:</strong> The point where physical media first enters the institution's perimeter. At this stage, no electronic connection is made. The operator logs the media's arrival, records provenance information from the carrier, inspects the physical condition of the media, and assigns a quarantine tracking identifier. The reception desk is a procedural checkpoint, not a technical system.</p>
+
+<p><strong>Quarantine Stations:</strong> Dedicated machines -- physically separate from production systems -- where incoming media is connected and its content examined. Each quarantine station runs from a read-only base image that can be restored at any time. The station has no network connection to production systems. Data transfer from quarantine to production occurs only through a deliberate, audited, one-way transfer mechanism (such as a write-once medium or a validated file-copy procedure with integrity verification at both ends).</p>
+
+<p><strong>Quarantine Storage:</strong> Isolated storage where content remains during the validation process. Quarantine storage is not backed up to production backup systems. It has its own retention policy and cleanup procedures. Content in quarantine storage is indexed by quarantine tracking identifier and has a maximum residency time.</p>
+
+<h3>Data Flow</h3>
+<p>Data flows in one direction: from outside, through quarantine, to production. There is no reverse flow. Production data never enters the quarantine zone. This one-way flow is enforced architecturally, not merely procedurally. The quarantine station has no read access to production systems, and the production systems have no write access to quarantine. The transfer mechanism is a controlled bridge, opened only for validated content, audited every time it is used.</p>
+
+<h3>State Model for Quarantined Content</h3>
+<table>
+<tr><th>State</th><th>Description</th><th>Transitions</th></tr>
+<tr><td>RECEIVED</td><td>Media logged at reception; not yet connected to quarantine station</td><td>RECEIVED &rarr; MOUNTED</td></tr>
+<tr><td>MOUNTED</td><td>Media connected to quarantine station; content catalog initiated</td><td>MOUNTED &rarr; UNDER_EXAMINATION</td></tr>
+<tr><td>UNDER_EXAMINATION</td><td>Validation checks in progress</td><td>UNDER_EXAMINATION &rarr; PENDING_DECISION</td></tr>
+<tr><td>PENDING_DECISION</td><td>All automated checks complete; awaiting human operator decision</td><td>PENDING_DECISION &rarr; ADMITTED or REJECTED or HELD</td></tr>
+<tr><td>ADMITTED</td><td>Content approved; transfer to production authorized</td><td>Terminal state (content leaves quarantine)</td></tr>
+<tr><td>REJECTED</td><td>Content denied admission; documented and scheduled for disposal</td><td>Terminal state (content destroyed or returned)</td></tr>
+<tr><td>HELD</td><td>Decision deferred; content remains in quarantine storage pending additional review</td><td>HELD &rarr; PENDING_DECISION (after review)</td></tr>
+</table>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D18-Q01: Physical Separation.</strong> At least one quarantine station MUST be a physically separate machine from all production systems. Logical isolation (virtual machines, containers) is acceptable for secondary quarantine stations only if a physically separate primary station exists and is used for all first-contact examination of unknown media.</p></li>
+
+<li><p><strong>R-D18-Q02: No Network Path to Production.</strong> Quarantine stations MUST NOT have any network connection -- wired, wireless, or otherwise -- to production systems. This includes shared storage, shared printers, shared USB hubs, and any other peripheral that could serve as a data channel. The only permitted data transfer mechanism is a deliberate, audited, one-way bridge.</p></li>
+
+<li><p><strong>R-D18-Q03: Rebuild Capability.</strong> Every quarantine station MUST be rebuildable from a known-good image within four hours. The rebuild image MUST be stored on read-only media and verified by checksum before every rebuild. If a quarantine station cannot be rebuilt within four hours, its design is too complex and must be simplified.</p></li>
+
+<li><p><strong>R-D18-Q04: Maximum Quarantine Residency.</strong> Content MUST NOT remain in quarantine storage for more than 90 days without an explicit, documented extension approved by the import operator and recorded in the import log. Content exceeding the maximum residency without extension MUST be treated as rejected and disposed of.</p></li>
+
+<li><p><strong>R-D18-Q05: Quarantine Logging.</strong> Every event in the quarantine zone -- media connection, file access, validation check execution, operator action, state transition -- MUST be logged to the quarantine audit log. The quarantine audit log MUST be transferable to production logging systems via the one-way bridge but MUST NOT be the sole copy; a local copy remains in quarantine storage until the quarantine station is rebuilt.</p></li>
+
+<li><p><strong>R-D18-Q06: Minimum Tooling.</strong> Each quarantine station MUST have, at minimum: a file integrity checker (checksum/hash tool), a file type identifier, a read-only file viewer for common formats (text, images, PDF), and sufficient storage for the largest anticipated batch import. SHOULD have: a hex editor for binary inspection and a format-conversion tool chain.</p></li>
+
+<li><p><strong>R-D18-Q07: Operator Access Control.</strong> Only certified import operators (per D18-014) are permitted to operate quarantine stations. Physical access to the quarantine zone SHOULD be restricted. A log of all personnel who enter the quarantine zone MUST be maintained.</p></li>
+
+<li><p><strong>R-D18-Q08: Expendability Over Durability.</strong> Quarantine station hardware SHOULD be commodity hardware that is easy to replace. Quarantine stations SHOULD NOT use specialized, expensive, or difficult-to-source components. The quarantine station is a disposable tool, not a precious asset.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Quarantine station compromise.</strong> Malicious content executes on the quarantine station and alters its behavior -- modifying validation tools, suppressing alerts, or corrupting logs. Likelihood: Low if the station runs from a read-only base image and is rebuilt regularly. Severity: High if undetected, because subsequent imports would be validated by a compromised system. Detection: Periodic checksum verification of quarantine station tooling against the known-good image. Anomalous behavior during validation.</p></li>
+
+<li><p><strong>One-way bridge failure.</strong> The transfer mechanism between quarantine and production develops a reverse path, allowing production data to leak into quarantine or quarantine data to enter production without validation. Likelihood: Low if the bridge is architecturally enforced. Higher if the bridge relies on procedural discipline alone. Severity: Critical. A bidirectional bridge negates the purpose of quarantine. Detection: Regular architectural review of the bridge mechanism. Penetration testing from the quarantine side.</p></li>
+
+<li><p><strong>Quarantine storage exhaustion.</strong> A large batch import or an accumulation of HELD content fills quarantine storage. New imports cannot be processed. Likelihood: Moderate, especially during major acquisition events. Severity: Medium. Import processing halts but no data is at risk. Detection: Storage monitoring with alerting at 80% capacity.</p></li>
+
+<li><p><strong>Rebuild image corruption.</strong> The known-good image used to rebuild quarantine stations becomes corrupted or outdated. A rebuild produces a quarantine station that is either non-functional or itself compromised. Likelihood: Low if the image is stored on read-only media and verified before each rebuild. Severity: High. Loss of the rebuild capability undermines the expendability principle. Detection: Checksum verification of the rebuild image before every rebuild. Multiple copies of the rebuild image stored on separate media.</p></li>
+
+<li><p><strong>Operator circumvention.</strong> An operator, under time pressure or through carelessness, bypasses quarantine -- connecting media directly to a production system or copying files from quarantine to production outside the one-way bridge. Likelihood: Moderate. Human error and impatience are persistent threats. Severity: Critical. The entire quarantine architecture is bypassed. Detection: Physical access controls. Cultural training that quarantine bypass is treated as a security incident. Post-incident audit capability.</p></li>
+
+<li><p><strong>Quarantine zone physical damage.</strong> Fire, flood, power surge, or physical impact destroys the quarantine zone. Likelihood: Low but non-zero over decades. Severity: Medium. Import processing halts but production systems are unaffected (by design). Detection: Physical inspection. Recovery: Rebuild quarantine from known-good image on replacement hardware.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If a quarantine station is compromised:</strong> Immediately power off the compromised station. Do not attempt to diagnose or repair. Quarantine the quarantine station -- remove it from the quarantine zone. Review the quarantine audit log (from the local copy, if available, and the production copy transferred via the one-way bridge) to determine what content was processed by the compromised station. All content validated by the compromised station since the last known-good state must be re-validated on a clean station. Rebuild the compromised station from the known-good image. Document the incident per Domain 20 requirements.</p></li>
+
+<li><p><strong>If the one-way bridge is found to be bidirectional:</strong> Immediately cease all transfer operations. Determine the scope of the breach: was production data exposed to quarantine? Was unvalidated quarantine data introduced to production? If unvalidated content entered production, treat as a security incident per SEC-001. If production data entered quarantine, assess the sensitivity of the exposed data and whether quarantine zone access controls were sufficient to prevent unauthorized disclosure. Redesign the bridge mechanism to restore one-way enforcement. Document the incident.</p></li>
+
+<li><p><strong>If quarantine storage is exhausted:</strong> Review HELD content and resolve decisions to free space. If all HELD content requires continued residency, provision additional quarantine storage (from commodity hardware, per R-D18-Q08). If a batch import caused the exhaustion, segment the batch and process it in stages. Do not expand quarantine storage by connecting production storage systems to the quarantine zone.</p></li>
+
+<li><p><strong>If the rebuild image is corrupted:</strong> Fall back to the secondary copy of the rebuild image (which must be stored on separate media per the redundancy principle). Verify the secondary copy's checksum against the recorded value. If no valid rebuild image exists, this is a critical failure: quarantine cannot be rebuilt. Escalate immediately. Construct a new rebuild image from first principles, document its construction, compute and record its checksum, and store on read-only media. Until a new rebuild image is validated, quarantine operations should continue only on stations whose integrity has been recently verified.</p></li>
+
+<li><p><strong>If an operator bypasses quarantine:</strong> Treat as a security incident. Identify all content that entered production outside the quarantine process. Subject that content to full quarantine validation retroactively if possible. If retroactive validation is not possible (content has already been integrated), flag the content in the institutional catalog with a provenance warning. Conduct a review of the bypass circumstances: was it willful or accidental? Update training (D18-014) to address the root cause. Document the incident.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> The quarantine architecture is established using available commodity hardware. Expect the architecture to be simple: one dedicated quarantine machine, one set of tools, manual one-way transfer via removable media. Document every operational lesson. The known-good rebuild image is created and tested. Procedures are formalized through practice.</p></li>
+
+<li><p><strong>Years 5-15:</strong> As import volume grows, consider adding a second quarantine station for parallel processing. The one-way bridge mechanism may evolve from simple removable-media transfer to a more structured process (e.g., a dedicated transfer appliance with hardware-enforced write direction). The quarantine tooling suite matures based on years of operational experience with real import scenarios.</p></li>
+
+<li><p><strong>Years 15-30:</strong> Hardware platforms will have changed. The quarantine station rebuild image must be updated for new hardware while maintaining the same architectural principles. The expendability principle becomes more valuable as older hardware becomes unreliable. Quarantine stations may need to support legacy media readers for content arriving from long-separated federated nodes on older media types.</p></li>
+
+<li><p><strong>Years 30-50+:</strong> The specific hardware and software of the quarantine system will have been replaced multiple times. What persists is the architectural pattern: nested isolation, one-way data flow, expendable examination environments, and audited transfers. If future maintainers understand the pattern, they can implement it on whatever hardware exists in their era. If they only inherited the specific implementation without the pattern, the architecture will fail its first hardware transition.</p></li>
+</ul>
+
+<p><strong>Triggers for revision of this article:</strong></p>
+<ul>
+<li>New hardware platform adopted for quarantine stations.</li>
+<li>Quarantine breach incident (any severity).</li>
+<li>Significant change in import volume or content types.</li>
+<li>New isolation technology becomes available that changes the cost/benefit of physical vs. logical separation.</li>
+<li>Federated node joins with incompatible media formats requiring quarantine tooling updates.</li>
+</ul>
+</section>
+
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The temptation will be to make the quarantine station comfortable -- to install convenience tools, to add network shares for easy file transfer, to accumulate state on the quarantine machine that makes it feel like a workstation rather than a disposable examination room. Resist this temptation. Every comfort added to the quarantine station is a potential attack surface, a reason not to rebuild it, a thread that ties it to the institution's infrastructure in ways that compromise its isolation.</p>
+
+<p>The quarantine station should be slightly uncomfortable to use. Not so uncomfortable that operators avoid using it, but uncomfortable enough that nobody mistakes it for a production workstation. It should feel temporary. It should feel disposable. Because it is.</p>
+
+<p>One open question: should quarantine stations have any persistent storage at all, or should all state be held on removable media that can be physically destroyed? The current design includes quarantine storage for practicality during multi-day validation processes, but a stricter design would eliminate persistent storage entirely. Future operators should revisit this question based on operational experience.</p>
+
+<p>Another open question: what is the right number of quarantine stations? The current design specifies a minimum of one with a recommendation for two. In practice, the right number depends on import volume, the duration of typical validation processes, and the institution's tolerance for import processing delay. This should be calibrated after the first year of operation.</p>
+</section>
+
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D18-001 -- Import & Quarantine Philosophy (foundational principles; the immune system analogy; quarantine as the third state)</li>
+<li>D18-002 -- Content Import Pipeline (validation checks performed within quarantine)</li>
+<li>D18-003 -- Malware Scanning for Air-Gapped Systems (dangerous content handling within quarantine)</li>
+<li>D18-013 -- Import Logging & Audit Trail (logging requirements for quarantine events)</li>
+<li>D18-014 -- Import Operator Training & Certification (who may operate quarantine stations)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (security incident procedures when quarantine is breached)</li>
+<li>D4-001 -- Infrastructure Foundations (hardware provisioning; commodity hardware principles)</li>
+<li>D17-ART-012 -- Physical Transport Protocols (media arriving at the quarantine boundary)</li>
+<li>Domain 20 -- Institutional Memory (incident documentation requirements)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

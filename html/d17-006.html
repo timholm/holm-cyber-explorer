@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-006 — Node Withdrawal and Data Separation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li class="active"><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-006">
+  <h1>D17-006 &mdash; Node Withdrawal and Data Separation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-006</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling & Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-001, D17-002, D17-003, D17-004, D17-005, SEC-001, GOV-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>Referenced by all Domain 17 articles as the terminal procedure for federation relationships.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the complete procedure for a node's departure from the federation. Withdrawal is the federation's most emotionally charged operation but it must be the most procedurally disciplined. A withdrawal performed badly -- data left entangled, keys left active, trust relationships left unresolved -- creates a wound that festers in the federation's institutional memory and a liability that the departing node carries into its post-federation existence.</p>
+<p>D17-001 established that withdrawal is always permitted (R-D17-07). This article defines how withdrawal is performed. The right to leave is unconditional. The obligation to leave cleanly is the price of that right.</p>
+<p>This article covers voluntary withdrawal (a node choosing to leave), involuntary withdrawal (a node being ejected following trust revocation by all federation members), and the special case of re-admission (a previously withdrawn node returning to the federation). It is addressed to the operator preparing to withdraw, the operators of nodes remaining in the federation, and the future operator who may consider re-admission after a withdrawal event.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The withdrawal decision: what triggers it and how it is communicated.</li>
+<li>Data separation: how shared and entangled data is divided.</li>
+<li>Key revocation: how the withdrawing node's keys are handled.</li>
+<li>Shared resource division: how jointly developed content, standards, and tools are allocated.</li>
+<li>The withdrawal protocol: the step-by-step procedure.</li>
+<li>Post-withdrawal verification: how both sides confirm the separation is complete.</li>
+<li>Re-admission procedures: how a withdrawn node may rejoin the federation.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophical right to withdraw (established in D17-001, R-D17-07).</li>
+<li>Ongoing single-node operations after withdrawal (see OPS-001).</li>
+<li>The emotional or interpersonal dimensions of withdrawal (these are real but outside the scope of a technical procedure).</li>
+<li>Dissolution of the entire federation (a special case where all nodes withdraw simultaneously, governed by the same procedures applied concurrently by all nodes).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Nodes Withdraw</h3>
+<p>Nodes withdraw for many reasons. Some are positive: the node's purpose has been fulfilled, the operator is consolidating to fewer nodes, or the node is being replaced by a more capable successor. Some are negative: irreconcilable conflicts with other nodes, trust failures, governance disagreements, or the operator's loss of confidence in the federation's direction. Some are neutral: the operator is moving, changing circumstances, or simply choosing to operate independently.</p>
+<p>The withdrawal procedure does not distinguish between these reasons. The procedure is the same whether the withdrawal is amicable or acrimonious, planned or sudden, permanent or potentially temporary. The reason for withdrawal is documented in the withdrawal record, but it does not change the procedure. This is deliberate. A procedure that varies based on the emotional temperature of the situation is a procedure that will be executed inconsistently.</p>
+<h3>3.2 The Data Entanglement Problem</h3>
+<p>During federation, data becomes entangled. Node A receives content from Node B. Node A modifies that content. Node B receives the modification and modifies it further. The resulting document is a collaborative product with contributions from both nodes. If Node A withdraws, who owns the document? What version does each node keep?</p>
+<p>The answer depends on the terms of the trust relationship established in D17-005 and any additional data-sharing agreements made during the federation. The withdrawal procedure enforces these terms. Where the terms are silent or ambiguous, the default is generous: both nodes retain all data they possess at the time of withdrawal. The withdrawing node does not lose data it received from the federation. The remaining nodes do not lose data they received from the withdrawing node. Collaborative works exist in full on all nodes that participated in their creation.</p>
+<h3>3.3 The Key Lifecycle</h3>
+<p>When a node withdraws, its cryptographic relationship with the federation changes fundamentally. Its keys, which were the basis of trust, become the basis of separation. The withdrawing node's public key, previously used to verify its sync packages, must be reclassified from "active trusted key" to "historical key -- withdrawn node." The key is not destroyed -- it is needed to verify historical sync packages and institutional memory entries. But it must no longer be used for current operations.</p>
+<p>The remaining nodes must also manage their own key exposure. Every key that was shared with the withdrawing node (encryption keys derived from bilateral trust relationships) must be rotated. The withdrawing node possessed these keys and continues to possess them after withdrawal. If the withdrawal is adversarial, those keys must be considered compromised from the moment of withdrawal.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Withdrawal Protocol</h3>
+<p>The withdrawal protocol has five phases:</p>
+<p><strong>Phase 1: Declaration.</strong>
+The withdrawing node communicates its intention to withdraw. The declaration includes: the date of the intended withdrawal, the reason (which may be as brief or as detailed as the operator chooses), and whether the operator is open to discussion that might resolve the underlying issue. The declaration is delivered as a signed document via sync package or physical letter.</p>
+<p>Declaration does not commit the node to withdraw. It opens a window for discussion. If the underlying issue is resolvable, the node may choose to remain. If the declaration period passes (minimum 30 days for voluntary withdrawal; immediate for involuntary withdrawal following trust revocation) without resolution, the withdrawal proceeds.</p>
+<p><strong>Phase 2: Data Audit.</strong>
+Both the withdrawing node and the remaining nodes audit their data holdings to identify:</p>
+<ul>
+<li>Data originated by the withdrawing node that exists on other nodes.</li>
+<li>Data originated by other nodes that exists on the withdrawing node.</li>
+<li>Collaborative data with contributions from both the withdrawing node and remaining nodes.</li>
+<li>Metadata, institutional memory entries, and governance records related to the withdrawing node.</li>
+</ul>
+<p>The audit produces a data separation plan: a document that specifies, for each category of data, what happens to it during withdrawal.</p>
+<p><strong>Phase 3: Final Synchronization.</strong>
+A final sync is performed between the withdrawing node and each remaining node with which it has a trust relationship. This final sync serves two purposes: it ensures all data is as current as possible before separation (no pending changes are lost), and it provides the vehicle for delivering the withdrawal record and the data separation plan.</p>
+<p><strong>Phase 4: Separation.</strong>
+The actual separation is executed according to the data separation plan:</p>
+<ul>
+<li>Trust is revoked bilaterally. The withdrawing node revokes trust in all remaining nodes. Each remaining node revokes trust in the withdrawing node. The revocation procedure follows D17-005, Section 4.4.</li>
+<li>Encryption keys derived from now-revoked trust relationships are rotated on all remaining nodes. The withdrawing node may also rotate its keys, but this is at its discretion since it is no longer part of the federation.</li>
+<li>Any data that the data separation plan specifies should be deleted is deleted. Deletion is verified using the same integrity mechanisms used for sync verification.</li>
+<li>The withdrawal record is finalized: a document signed by the withdrawing node and acknowledged by each remaining node, recording the date of withdrawal, the data separation plan, the key revocation records, and any post-withdrawal agreements.</li>
+</ul>
+<p><strong>Phase 5: Verification.</strong>
+After separation, both the withdrawing node and the remaining nodes verify:</p>
+<ul>
+<li>All trust revocations have been processed.</li>
+<li>All key rotations have been completed.</li>
+<li>All data deletions specified in the separation plan have been executed.</li>
+<li>The withdrawal record is complete and stored in institutional memory.</li>
+<li>No active references to the withdrawn node's keys remain in any trust store (the keys exist in the revoked key archive, not in the active store).</li>
+</ul>
+<h3>4.2 Data Separation Defaults</h3>
+<p>When the trust relationship or data-sharing agreement does not specify how data is handled on withdrawal, the following defaults apply:</p>
+<ul>
+<li><strong>Data originated by the withdrawing node:</strong> The withdrawing node retains it. Remaining nodes also retain their copies. The originator cannot compel other nodes to delete copies they legally possess.</li>
+<li><strong>Data originated by remaining nodes:</strong> The withdrawing node retains its copies. Remaining nodes retain their originals. The same principle applies in reverse.</li>
+<li><strong>Collaborative data:</strong> All nodes that participated in the collaboration retain the current version. No node is required to delete collaborative works.</li>
+<li><strong>Institutional memory entries:</strong> All nodes retain all institutional memory entries. These are historical records and are never deleted during withdrawal.</li>
+<li><strong>Governance records:</strong> All nodes retain all governance records for the same reason.</li>
+<li><strong>Federation-specific metadata:</strong> Metadata that is only meaningful in a federation context (sync logs, trust records, conflict logs referencing the withdrawing node) is retained for historical reference but flagged as pertaining to a withdrawn node.</li>
+</ul>
+<h3>4.3 Involuntary Withdrawal</h3>
+<p>Involuntary withdrawal occurs when all remaining nodes in the federation revoke trust in a specific node. This is not an expulsion -- no central authority has the power to expel. It is the cumulative effect of individual trust decisions that result in a node having no trusted relationships remaining.</p>
+<p>The involuntary withdrawal procedure differs from voluntary withdrawal in two ways:</p>
+<ul>
+<li>There is no declaration period. Trust revocation is effective immediately.</li>
+<li>The final synchronization may not occur if the trust revocation was triggered by suspected compromise. In this case, the data audit and separation plan are executed unilaterally by the remaining nodes, without the participation of the withdrawn node.</li>
+</ul>
+<p>The withdrawn node retains all data it possessed at the time of withdrawal. The remaining nodes retain all data they possessed. The data separation defaults apply.</p>
+<h3>4.4 Re-Admission</h3>
+<p>A previously withdrawn node may seek to rejoin the federation. Re-admission is not automatic. It is a new trust establishment process, treated as though the node were being commissioned for the first time from a federation perspective.</p>
+<p>The re-admission procedure is:</p>
+<ol>
+<li>The returning node declares its intention to rejoin, including an explanation of what has changed since withdrawal.</li>
+<li>Each remaining node independently decides whether to engage in a key exchange ceremony with the returning node. No node is obligated to re-admit.</li>
+<li>If any remaining node agrees, a full key exchange ceremony is performed (D17-005, Section 4.1). The returning node begins at Trust Level 1 regardless of its previous level.</li>
+<li>A re-admission record is created documenting: the original withdrawal record, the reason for return, the new key exchange ceremony records, and any conditions attached to re-admission.</li>
+<li>Synchronization resumes following the standard sync protocol. The first sync after re-admission is treated with the same care as a first sync after commissioning -- full end-to-end verification.</li>
+</ol>
+<p>The returning node's historical records (from its previous federation membership) are not erased. Its conflict log, trust log, and institutional memory entries from the prior period remain intact. The re-admission creates a new chapter, not a blank slate.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li>
+<p><strong>R-D17-006-01: Withdrawal Cannot Be Blocked.</strong> No node or group of nodes may prevent a voluntary withdrawal. The withdrawing node's right to leave is unconditional (D17-001, R-D17-07). Other nodes may attempt to resolve the underlying issue during the declaration period, but they may not delay or obstruct the withdrawal process.</p>
+</li>
+<li>
+<p><strong>R-D17-006-02: Data Separation Must Be Agreed Before Separation.</strong> The data separation plan must be completed and acknowledged by both sides before the separation phase begins. If agreement cannot be reached, the defaults in Section 4.2 apply.</p>
+</li>
+<li>
+<p><strong>R-D17-006-03: Final Sync Is Mandatory for Voluntary Withdrawal.</strong> A withdrawing node must perform a final sync with each remaining trusted node. This ensures no pending changes are lost and the withdrawal record is distributed. The only exception is if a trusted node refuses to participate in the final sync, in which case the withdrawing node sends the withdrawal record via physical letter.</p>
+</li>
+<li>
+<p><strong>R-D17-006-04: Key Rotation After Withdrawal Is Mandatory.</strong> All remaining nodes must rotate any encryption keys derived from the trust relationship with the withdrawing node. This rotation must be completed within 30 days of the withdrawal. Until rotation is complete, sync packages between remaining nodes must use temporary keys or must not contain data that would be sensitive if the withdrawn node still possessed the decryption key.</p>
+</li>
+<li>
+<p><strong>R-D17-006-05: The Withdrawal Record Is Permanent.</strong> The withdrawal record is a permanent institutional memory entry on all nodes. It is never deleted, even if the node later returns through re-admission. The record includes: the withdrawal date, the reason, the data separation plan, the key revocation records, and the verification results.</p>
+</li>
+<li>
+<p><strong>R-D17-006-06: Re-Admission Starts at Level 1.</strong> A returning node always begins at Trust Level 1, regardless of the trust level it held before withdrawal. Previous operational history is relevant context but does not substitute for earning trust anew.</p>
+</li>
+<li>
+<p><strong>R-D17-006-07: Involuntary Withdrawal Requires Universal Revocation.</strong> A node is involuntarily withdrawn only when all remaining nodes have independently revoked trust. A node that retains even one trust relationship is still a federation member, even if other nodes have revoked trust.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Acrimonious withdrawal without procedure.</strong> The withdrawing operator, angry or hurt, simply stops communicating. No declaration, no data audit, no final sync, no key revocation. The node vanishes. The remaining federation is left with active trust records for a node that no longer participates, unrotated keys, and no withdrawal record. Mitigation: the remaining nodes execute the involuntary withdrawal procedure unilaterally. They revoke trust, rotate keys, and create a withdrawal record documenting the circumstances. The withdrawn node's data remains on any node that possesses it, governed by the separation defaults.</p>
+</li>
+<li>
+<p><strong>Data separation disagreement.</strong> The withdrawing node and the remaining nodes cannot agree on the data separation plan. The withdrawing node wants remaining nodes to delete content; the remaining nodes refuse (or vice versa). Mitigation: the defaults in Section 4.2 are designed for exactly this case. When agreement fails, the defaults apply: everyone keeps what they have. This may not satisfy either party, but it is fair and unambiguous.</p>
+</li>
+<li>
+<p><strong>Delayed key rotation.</strong> Remaining nodes fail to rotate keys within the 30-day window, leaving them vulnerable if the withdrawn node's operator is adversarial. Mitigation: R-D17-006-04 mandates rotation within 30 days. The trust audit (D17-005) must verify that rotation has occurred. If rotation has not occurred within 30 days, the lagging node must cease sync operations with other nodes until rotation is complete.</p>
+</li>
+<li>
+<p><strong>Re-admission without accountability.</strong> A node withdraws due to trust violations, then seeks re-admission without addressing the violations. The returning operator expects to resume the previous trust level. Mitigation: R-D17-006-06 requires Level 1 restart. The re-admission record must include an explanation of what has changed. Each remaining node decides independently whether the explanation is satisfactory.</p>
+</li>
+<li>
+<p><strong>Emotional contagion.</strong> One node's withdrawal triggers anxiety in other nodes, leading to a cascade of withdrawals. The federation unravels not because of systemic failure but because of panic. Mitigation: this is fundamentally a human problem, not a technical one. The procedure can help by ensuring that each withdrawal is documented with its specific reason, making it clear that one node's withdrawal does not imply a systemic problem. The declaration period also helps -- 30 days provides time for the remaining federation to stabilize and for potentially anxious operators to assess the situation rationally.</p>
+</li>
+<li>
+<p><strong>Ghost node.</strong> A node withdraws but the remaining federation's systems continue to reference it -- in sync schedules, in trust stores (incorrectly left in active status), in documentation. The ghost node creates confusion: new operators encounter references to a node that does not respond. Mitigation: the verification phase (Phase 5) is designed to catch this. All references to the withdrawn node must be flagged or updated. The quarterly review should include a check for ghost node references.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a withdrawal was performed without following the protocol:</strong> Reconstruct what should have happened. Perform the data audit retroactively. Execute key revocation and rotation. Create a withdrawal record that documents both what happened and what should have happened. Flag the withdrawal as non-standard in institutional memory.</p>
+</li>
+<li>
+<p><strong>If key rotation was not completed within 30 days:</strong> Treat all sync packages sent during the un-rotated period as potentially compromised (they were encrypted with keys known to the withdrawn node). Perform key rotation immediately. Review the content of any sync packages sent during the gap for sensitivity. If sensitive content was transmitted, notify affected nodes.</p>
+</li>
+<li>
+<p><strong>If a withdrawn node's data is discovered to have been corrupted before withdrawal:</strong> The withdrawing node is no longer reachable through federation channels. If the data corruption is limited, the remaining nodes correct it locally and document the correction. If the corruption is extensive, the remaining nodes must assess whether data received from the withdrawn node during the suspected corruption period should be quarantined and re-verified.</p>
+</li>
+<li>
+<p><strong>If re-admission is denied by all remaining nodes:</strong> The returning node remains a single-node institution. It retains all its data. It may seek to establish trust with individual nodes on a bilateral basis, which is functionally distinct from "re-admission to the federation" but achieves a similar result.</p>
+</li>
+<li>
+<p><strong>If the entire federation dissolves (all nodes withdraw simultaneously):</strong> Each node executes the voluntary withdrawal procedure with respect to every other node. All key rotations are performed. All withdrawal records are created. Each node becomes a standalone institution. The federation's institutional memory is preserved on all former member nodes. The dissolution is documented as a specific event type in institutional memory.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Withdrawal is likely a theoretical concern. The federation is new, nodes are few, and relationships are strong. Use this period to establish the data-sharing agreements and trust relationship terms that will govern eventual withdrawals. The agreements that seem unnecessary now will be essential later.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The first withdrawal may occur. It will test the procedure and the operators' ability to execute it with discipline. Expect the emotional dimension to be harder than the technical dimension. Document the experience thoroughly -- future withdrawals will benefit from the precedent.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Withdrawals and re-admissions may become periodic events as the federation matures. The procedure should be routine enough to execute without drama. The withdrawal record archive should be rich enough to inform future decisions about federation structure and trust terms.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The federation may have seen multiple withdrawals, re-admissions, and even a complete dissolution and re-formation. The withdrawal records from earlier decades will serve as institutional memory -- examples of how the federation handled separation and what worked and what did not. Future operators will learn from these records. That is why the records must be thorough.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I wrote the withdrawal procedure before the federation exists. This is like writing a prenuptial agreement before the first date. It feels premature and slightly morbid. It is neither. The time to define how separation works is before there is any acrimony, before there is entangled data, before there are relationships that make it hard to think clearly about procedure.</p>
+<p>The most important design decision in this article is the data separation defaults. The default is generous: everyone keeps everything. This avoids the most acrimonious disputes (demands that the other side delete content) and preserves the most institutional knowledge (nothing is lost in the separation). It means a withdrawn node walks away whole, and the remaining federation continues whole. The total amount of knowledge in the world does not decrease when a node withdraws. That feels right.</p>
+<p>The re-admission procedure is deliberately rigorous. A node that returns to the federation starts at Level 1, full stop. This is not punitive. It is realistic. Trust was broken or abandoned. Rebuilding it requires the same process as building it the first time. The returning operator may find this frustrating, especially if they left on good terms. The procedure does not distinguish. Trust Level 1 is not a judgment. It is a starting point.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D17-001 -- Federation Philosophy (R-D17-07: withdrawal right; sovereignty principle; governance model)</li>
+<li>D17-002 -- New Node Setup and Commissioning (re-admission parallels commissioning procedures)</li>
+<li>D17-003 -- Air-Gapped Synchronization Procedures (final sync protocol)</li>
+<li>D17-004 -- Conflict Resolution Between Nodes (unresolved conflicts at withdrawal)</li>
+<li>D17-005 -- Trust Establishment and Verification (trust revocation; key management; re-admission key exchange)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (key rotation; post-compromise procedures)</li>
+<li>GOV-001 -- Authority Model (governance record preservation; decision authority during withdrawal)</li>
+<li>OPS-001 -- Operations Philosophy (operational continuity after withdrawal; complexity budget adjustment)</li>
+<li>Domain 20 -- Institutional Memory (withdrawal record as permanent institutional record)</li>
+</ul>
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

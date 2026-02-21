@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-013 — Insider Threat Considerations - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li class="active"><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-013">
+  <h1>SEC-013 &mdash; Insider Threat Considerations</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-013</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security &amp; Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>SEC-001 (Threat Model), SEC-009 (Trust Boundaries), GOV-001 (Authority Model)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>SEC-008 (Security Audit Framework)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article addresses the most uncomfortable category of security threat: the insider. An insider threat is a security risk that originates from within the institution -- from someone who has legitimate, authorized access to institutional systems, data, and physical spaces. In a single-operator institution, the insider is the operator. This article is, in essence, a document about how the institution protects itself from its own operator.</p>
+
+<p>This is not a document born of paranoia. It is born of honesty. The operator is human. Humans make mistakes. Humans experience cognitive degradation under stress, fatigue, illness, and aging. Humans are susceptible to social engineering. Humans can become compromised -- not through malice, but through coercion, manipulation, or the gradual erosion of discipline over time. And in the long horizon of this institution's intended life, the operator will eventually be replaced by a successor whose character, competence, and trustworthiness are not yet known.</p>
+
+<p>The purpose of this document is to establish controls that protect the institution's integrity even when the operator acts incorrectly -- whether through error, impairment, or intent. These controls are not punitive. They are structural. They are the same reason a pilot follows a pre-flight checklist even after twenty years of flying: because human reliability, even at its best, is insufficient for systems that must not fail.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The taxonomy of insider threats relevant to a single-operator institution.</li>
+<li>The distinction between malicious, negligent, and compromised insider actions.</li>
+<li>Structural controls that limit the damage any single action can cause.</li>
+<li>Procedural controls that make harmful actions more difficult and detectable.</li>
+<li>The balance between trust and verification in a single-operator context.</li>
+<li>Succession-specific insider threat considerations.</li>
+<li>The ethical framework for self-imposed constraints.</li>
+</ul>
+
+<p>This article does not cover external threats (those are addressed throughout SEC-001 and other Domain 3 articles), technical access control implementations (SEC-002), or the governance authority structures that determine who may hold the operator role (GOV-001). This article defines the <em>philosophy and framework</em> for managing the threat that the operator poses to the institution. Other articles provide the specific mechanisms.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Operator as Threat Actor</h3>
+<p>In conventional security analysis, the insider threat is the authorized employee who abuses their access. In this institution, the analysis is both simpler and more profound. The operator has total access. There is no access control that the operator cannot circumvent, because the operator administers the access controls. There is no audit log that the operator cannot modify, because the operator controls the logging infrastructure. There is no physical security that the operator cannot bypass, because the operator holds the keys.</p>
+
+<p>This total access means that traditional insider threat controls -- separation of duties, mandatory access controls, independent audit -- cannot be implemented in their conventional forms. There is no second person to provide separation of duties. There is no independent auditor. The operator is both the subject and the supervisor of every control.</p>
+
+<p>The institution must therefore rely on a different class of controls: structural controls that make harmful actions difficult, even for someone with total access; procedural controls that make harmful actions visible, even to the person who performed them; and temporal controls that create checkpoints at which past actions are reviewed with the benefit of hindsight.</p>
+
+<h3>3.2 The Three Categories of Insider Threat</h3>
+<p>Insider threats manifest in three forms, each requiring different controls:</p>
+
+<p><strong>Negligent insider.</strong> The operator makes an honest mistake -- deletes the wrong file, applies the wrong configuration, skips a verification step out of haste. This is the most common form of insider threat and the one most likely to cause harm over the institution's lifetime. Controls: checklists, confirmation prompts, undo capabilities, backup verification, and the habit of deliberation before action.</p>
+
+<p><strong>Compromised insider.</strong> The operator acts under external influence -- coercion, social engineering, manipulation, or impairment (illness, substance use, extreme stress). The operator may not even realize they have been compromised. Controls: time-delayed actions for irreversible operations, mandatory cooling-off periods for significant changes, the hash chain that makes all modifications detectable in retrospect, and the self-awareness to recognize one's own impairment.</p>
+
+<p><strong>Malicious insider.</strong> The operator deliberately harms the institution. In a single-operator institution, this is the most difficult threat to address because the operator has both the access and the authority. Controls: the hash chain provides after-the-fact detection of tampering, geographically distributed backups limit the scope of destruction, and the constitutional framework (Domain 1) provides the philosophical grounding for why the institution's integrity must survive even the operator's own wish to compromise it.</p>
+
+<h3>3.3 The Ethical Dimension</h3>
+<p>A conventional insider threat program monitors employees for signs of malice. This institution cannot and should not monitor its own operator in that way. The controls described in this article are self-imposed constraints, not surveillance mechanisms. They are analogous to Ulysses binding himself to the mast: the operator, while clearheaded and well-intentioned, designs constraints that will protect the institution from the operator's future moments of weakness, error, or compromised judgment.</p>
+
+<p>This self-binding is not a sign of mistrust. It is a sign of maturity. The operator who acknowledges their own fallibility and builds safeguards against it is more trustworthy, not less, than the operator who insists they will never make a mistake.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Structural Controls</h3>
+<p>Structural controls are built into the architecture of the institution's systems. They operate automatically and do not depend on the operator's discipline or judgment to be effective.</p>
+
+<p><strong>The hash chain (SEC-012).</strong> Every modification to the archive is recorded in an append-only hash chain. The operator can modify data, but they cannot modify data without leaving a cryptographic record of the modification. This does not prevent malicious changes, but it ensures that malicious changes are detectable -- by the operator during a moment of clarity, by an auditor, or by a successor.</p>
+
+<p><strong>Geographically distributed backups.</strong> Backups are stored in multiple physical locations. Destroying the institution's data requires physical access to all backup locations simultaneously. This structural control limits the scope of destruction that any single action -- deliberate or accidental -- can cause.</p>
+
+<p><strong>Zone separation (SEC-009).</strong> The separation of the archive core (Zone A) from the working environment (Zone B) means that day-to-day operations occur in a different context from archival storage. Accidental modifications to the archive require crossing a trust boundary, which involves deliberate steps that provide a checkpoint against negligent errors.</p>
+
+<p><strong>Time-delayed irreversible operations.</strong> For operations that cannot be undone -- deletion of archival data, destruction of cryptographic keys, modification of the hash chain's signing key -- the system should implement a mandatory delay between the initiation of the operation and its execution. During this delay, the operator can reconsider. This is the technical implementation of "sleep on it" -- a wisdom as old as human decision-making.</p>
+
+<h3>4.2 Procedural Controls</h3>
+<p>Procedural controls depend on the operator's discipline but reduce the probability of error and increase the probability of detecting errors that do occur.</p>
+
+<p><strong>Checklists for critical operations.</strong> Every operation that modifies the archive, rotates cryptographic keys, or crosses a trust boundary must be performed using a written checklist. The checklist is not a suggestion. It is a requirement. The operator checks each item as it is completed. The completed checklist is stored as part of the operational record. Checklists reduce the probability of step-skipping, which is the most common negligent insider failure mode.</p>
+
+<p><strong>Mandatory review before commit.</strong> Before any change is committed to Zone A, the operator must review the change. The review must occur in a separate step from the creation of the change -- not immediately after writing, but after a pause of at least one operational session. This temporal separation between creation and commitment provides a window for the operator to notice errors that were invisible during creation.</p>
+
+<p><strong>Regular self-audit.</strong> The operator must periodically review their own recent actions against the institution's policies and procedures. This self-audit is documented. The purpose is not to catch malice -- a malicious operator would falsify the self-audit -- but to catch negligence. An honest operator reviewing their own actions with the benefit of hindsight will notice deviations that were invisible in the moment.</p>
+
+<h3>4.3 Temporal Controls</h3>
+<p>Temporal controls exploit the fact that the operator's judgment varies over time. A decision made in haste today may be recognized as an error tomorrow. A deviation from procedure made under stress this week may be caught during next week's calmer review.</p>
+
+<p><strong>The quarterly integrity review.</strong> Every quarter, the operator conducts a full integrity verification of the archive (per SEC-012). This review is a temporal checkpoint that catches modifications -- negligent, compromised, or malicious -- that occurred during the preceding quarter. The hash chain provides the reference against which current state is compared.</p>
+
+<p><strong>The annual security posture review.</strong> Once per year, the operator reviews the institution's entire security posture, including this document, and assesses whether the insider threat controls remain adequate. This review should be conducted with a critical eye: are the checklists being followed? Are the procedures being maintained? Has discipline eroded? Has the operator developed habits that bypass controls? Honest answers to these questions are the institution's best defense against the slow degradation of security discipline.</p>
+
+<h3>4.4 Succession-Specific Considerations</h3>
+<p>The insider threat model changes fundamentally during succession. The founding operator has decades of context, institutional knowledge, and demonstrated commitment to the institution's values. A successor has none of these. The successor is, from a security perspective, an unknown quantity with total access.</p>
+
+<p>The controls for managing succession-related insider threat include: a probationary period during which the successor operates under enhanced oversight (if the outgoing operator is available); a mandatory review of all actions taken during the first year of the successor's tenure; a requirement that the successor demonstrate understanding of the institutional values (Domain 1) before being granted full operational authority; and the pre-existing structural controls (hash chain, distributed backups, zone separation) that limit the damage any operator can inflict regardless of their tenure.</p>
+
+<p>The succession protocol in GOV-001 defines the procedural details. This article establishes the principle: succession is the highest-risk insider threat event in the institution's lifecycle, and it must be treated as such.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-IT-01:</strong> Irreversible operations (archival deletion, key destruction, hash chain signing key rotation) must have a mandatory delay of at least 24 hours between initiation and execution. During this delay, the operator must re-confirm the operation. If the operator cannot re-confirm with the same reasoning that motivated the initial decision, the operation must be aborted.</li>
+<li><strong>R-IT-02:</strong> All critical operations must be performed using documented checklists. Deviations from the checklist must be documented and justified. Completed checklists must be retained as part of the operational record.</li>
+<li><strong>R-IT-03:</strong> Changes to Zone A must not be committed in the same operational session in which they are created. A minimum separation of one operational session (or 12 hours, whichever is greater) is required between creation and commitment.</li>
+<li><strong>R-IT-04:</strong> The operator must conduct a self-audit of recent actions at least monthly. The self-audit must compare actions taken against documented procedures and flag any deviations. The self-audit record must be stored in Zone A.</li>
+<li><strong>R-IT-05:</strong> The annual security posture review must include an honest assessment of insider threat control compliance. The assessment must address: checklist adherence, delay compliance, self-audit completion, and any instances of control bypass (whether justified or unjustified).</li>
+<li><strong>R-IT-06:</strong> During the first year of a successor's tenure, all Zone A modifications must be flagged for retrospective review at the first quarterly integrity check. This enhanced scrutiny is not a reflection of mistrust but a structural control appropriate to the elevated risk period.</li>
+<li><strong>R-IT-07:</strong> No single action by the operator should be capable of destroying all copies of any institutional data. Backup distribution must be sufficient to survive the worst-case insider scenario: deliberate destruction of all locally accessible data.</li>
+<li><strong>R-IT-08:</strong> The insider threat controls defined in this article must not be used as justification for external surveillance of the operator. These are self-imposed constraints, not externally imposed monitoring. The institution's sovereignty (Domain 1) includes the operator's sovereignty over their own person.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Control erosion.</strong> Over months and years, the operator gradually relaxes adherence to insider threat controls. Checklists are skimmed rather than followed. Delays are shortened or bypassed. Self-audits become pro forma. The controls exist on paper but not in practice. Mitigation: the annual security posture review specifically targets this failure mode. The hash chain provides a structural backstop that operates regardless of procedural compliance.</li>
+<li><strong>Self-deception.</strong> The operator convinces themselves that a particular deviation is justified, then another, then another. The deviations compound until the control framework is effectively hollow. Mitigation: the documentation requirement for deviations (R-IT-02) forces the operator to articulate their justification in writing. Written justifications are harder to self-deceive about than unspoken ones, because they can be reviewed critically during later audits.</li>
+<li><strong>Succession without preparation.</strong> The founding operator becomes unavailable before a successor has been identified or trained. The successor, thrust into the role without preparation, may lack the understanding or discipline to maintain insider threat controls. Mitigation: the succession planning in GOV-001 must include training on insider threat controls. The structural controls (hash chain, distributed backups) provide a safety net regardless of the successor's training level.</li>
+<li><strong>Over-constraint.</strong> The insider threat controls become so burdensome that they impede the institution's primary function. The operator spends more time on security procedures than on the work the institution exists to perform. Mitigation: the controls in this article are calibrated to the minimum necessary for institutional protection. They should not be expanded beyond what is defined here without a formal review that considers the operational cost of additional constraints.</li>
+<li><strong>Philosophical collapse.</strong> The operator concludes that the institution does not matter, or that the insider threat controls are pointless, and abandons them. This is the ultimate insider threat: not a specific action against the institution, but the withdrawal of the commitment that sustains it. Mitigation: Domain 1 (Constitution) exists to anchor the operator's commitment. But ultimately, this failure mode cannot be fully prevented by technical or procedural controls. It is addressed by the institution's philosophical foundations, which are outside the scope of this security article.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If negligent insider damage is detected:</strong> Follow the incident response framework (SEC-011). Classify based on the scope of damage. Restore affected data from verified backups. Review the circumstances that led to the error. Update checklists or procedures to prevent recurrence. If the error resulted from a skipped checklist item, reinforce the checklist discipline rather than adding more items.</li>
+<li><strong>If compromised insider actions are suspected:</strong> If the operator suspects their own judgment has been impaired or influenced, the correct action is to halt all operations and wait. Do not make changes while compromised. If the compromise is discovered after the fact (e.g., social engineering recognized in retrospect), review all actions taken during the period of suspected compromise. Verify the integrity of all data modified during that period using the hash chain. Restore any data that cannot be verified.</li>
+<li><strong>If malicious insider damage is detected (post-succession scenario):</strong> This is the most severe insider threat event. Immediately secure all backup locations. Verify the integrity of all backups against the hash chain. Identify the earliest point at which the hash chain confirms institutional integrity. Restore from that point. Revoke all credentials associated with the compromised operator. Conduct a complete security review before resuming operations.</li>
+<li><strong>If control erosion is discovered during review:</strong> Do not treat it as a personal failure. Treat it as a systemic finding. Identify which controls eroded and why. If the controls were too burdensome, simplify them (but do not eliminate them). If the operator simply lost discipline, re-establish the habit through deliberate practice. Update the self-audit to specifically check for the eroded controls in future reviews.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> Establish insider threat controls and develop the habits of compliance. This period is critical because habits formed now will persist for decades. Take the checklist discipline seriously from the beginning, even when the archive is small and the stakes feel low. The stakes will grow; the habits must already be in place.</li>
+<li><strong>Years 2-10:</strong> Refine controls based on operational experience. Some controls may prove too burdensome; simplify them while preserving their protective intent. Some controls may prove insufficient; strengthen them. The annual security posture review is the mechanism for this ongoing calibration.</li>
+<li><strong>Years 10-25:</strong> The operator's relationship with the institution will have evolved. The controls may feel routine -- which is a sign that they have been internalized, or a sign that they are being ignored. The annual review must distinguish between these two states.</li>
+<li><strong>Years 25-40:</strong> Succession planning becomes urgent. The insider threat model must be updated to account for the specific characteristics of potential successors. The structural controls (hash chain, distributed backups) become more important as the institution prepares for a transition that introduces new insider risk.</li>
+<li><strong>Years 40-50+:</strong> The institution may be under its second or third operator. The insider threat framework must survive successive operators, each of whom brings different strengths and weaknesses. The framework's value is proportional to its independence from any particular operator's personality.</li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Writing a document about protecting the institution from myself is a peculiar exercise. It requires a kind of honest self-assessment that does not come naturally. I must acknowledge that I will make mistakes -- not hypothetically, but certainly. I must acknowledge that I may, at some future point, be impaired, influenced, or simply wrong. And I must build structures now, while I am clearheaded, that will constrain me then, when I am not.</p>
+
+<p>The temptation is to skip this article. To say: "I built this institution. I would never harm it." But that is exactly the kind of thinking that insider threat controls are designed to guard against. The insider who harms an institution rarely sets out to do so. They cut a corner because they are tired. They skip a check because they are in a hurry. They make a decision under stress that they would never make at rest. The damage accumulates in small increments until it becomes irreversible.</p>
+
+<p>The controls in this article are my gift to my future self and to whoever comes after me. They are not a burden. They are a safety net. And a safety net is not a sign of weakness. It is a sign that you take the work seriously enough to plan for your own fallibility.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>SEC-001 -- Threat Model and Security Philosophy (insider threat as a category within the institutional threat model)</li>
+<li>SEC-002 -- Access Control Procedures (access controls that the insider can bypass)</li>
+<li>SEC-008 -- Security Audit Framework (audits as a detection mechanism for insider actions)</li>
+<li>SEC-009 -- Trust Boundary Definitions (the human-machine boundary and its limitations)</li>
+<li>SEC-011 -- Incident Response Framework (response to insider-caused incidents)</li>
+<li>SEC-012 -- Data Integrity and Provenance (the hash chain as the primary insider threat detection mechanism)</li>
+<li>GOV-001 -- Authority Model (succession protocol and authority constraints)</li>
+<li>ETH-001 -- Ethical Foundations (the philosophical basis for self-imposed constraints)</li>
+<li>Domain 1 -- Constitution &amp; Philosophy (the institutional values that anchor the operator's commitment)</li>
+</ul>
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

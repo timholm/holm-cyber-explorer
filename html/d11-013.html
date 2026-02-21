@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D11-013 — Administrative Self-Audit and Process Review - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li class="active"><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="D11-013">
+  <h1>D11-013 &mdash; Administrative Self-Audit and Process Review</h1>
+
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D11-013</dd>
+  <dt>Domain</dt>
+  <dd>11 &mdash; Administration</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Draft</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+<p>This article defines how the administration domain audits its own processes for drift, waste, corruption, and obsolescence. Every other article in Domain 11 defines a process. This article defines the process for evaluating all those processes. It is the capstone of the administrative framework &mdash; the mechanism by which administration holds itself accountable and ensures that its own procedures remain aligned with institutional reality over decades.</p>
+<p>Self-audit is inherently difficult because it requires the operator to evaluate their own work with the same critical eye they would apply to a stranger's. The structures defined here are designed to counteract the natural human tendency toward self-leniency: they define specific questions, require quantitative evidence, compare current practice against documented procedure, and demand honest answers about whether administrative processes are actually being followed, are actually useful, and are actually current.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+<p><strong>In scope:</strong></p>
+<ul>
+  <li>The audit framework: what is audited, how, by whom, and how often.</li>
+  <li>Audit dimensions: compliance (are processes being followed?), effectiveness (are processes achieving their goals?), efficiency (are processes proportionate to their value?), currency (do processes reflect current reality?).</li>
+  <li>The audit checklist and its structure.</li>
+  <li>Audit findings: classification, documentation, and remediation.</li>
+  <li>The relationship between self-audit and the reporting framework (D11-008).</li>
+  <li>Mechanisms for counteracting self-leniency bias.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+  <li>Auditing of non-administrative domains (each domain is responsible for its own quality assurance; see Domain 19).</li>
+  <li>Financial audit in the traditional accounting sense (D11-003 covers budget reconciliation).</li>
+  <li>Security audit (Domain 3 defines its own audit procedures).</li>
+  <li>The audit processes defined here do not constitute external audit or regulatory compliance, which are outside the institution's scope.</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+<h3>The Problem of Administrative Decay</h3>
+<p>Administrative processes decay in predictable ways. In the early period, processes are followed meticulously because they are new and the operator is conscious of them. Over time, shortcuts develop: a form is partially completed, a ledger entry is deferred, an inspection is rescheduled "just this once." Each individual shortcut is minor. But shortcuts compound. After a year of minor shortcuts, the administrative system described in documentation and the administrative system actually practiced may be significantly different. After five years, they may be unrecognizably different.</p>
+<p>This gap between documented procedure and actual practice is administrative decay. It is dangerous because it is invisible from the inside: the operator believes they are following the process because they are doing something that resembles it. The self-audit is the mechanism for making the gap visible. It compares what the documentation says should happen against what is actually happening, and it requires the operator to confront every discrepancy.</p>
+
+<h3>The Four Dimensions of Administrative Health</h3>
+<p>A process can fail in four distinct ways, and the audit must check for all four:</p>
+<ol>
+  <li><strong>Compliance failure:</strong> The process is not being followed. Forms are not being completed. Inspections are not being conducted. Records are not being updated. The process exists in documentation but not in practice.</li>
+  <li><strong>Effectiveness failure:</strong> The process is being followed but is not achieving its intended outcome. The budget is maintained but does not accurately forecast expenditure. The procurement calendar is followed but procurement events are consistently insufficient. The process is being executed but is not producing value.</li>
+  <li><strong>Efficiency failure:</strong> The process is being followed and achieves its outcome, but at disproportionate cost. Record-keeping consumes three hours per week for records that are consulted once per year. An inspection checklist has forty items when ten would suffice. The process works but violates the Lightness Principle (D11-001).</li>
+  <li><strong>Currency failure:</strong> The process was appropriate when written but no longer reflects institutional reality. The asset registry includes categories for equipment that was decommissioned years ago. The procurement procedures reference vendors that no longer exist. The scheduling assumes an energy profile that has changed with the addition of new solar capacity. The process is executed faithfully but against an outdated model of reality.</li>
+</ol>
+
+<h3>Self-Audit vs. External Audit</h3>
+<p>An external audit &mdash; conducted by someone other than the person being audited &mdash; is inherently more reliable than a self-audit because it eliminates the evaluator's conflict of interest. In a single-operator institution, external audit is generally unavailable. The self-audit must therefore include structural safeguards against self-leniency: specific questions that require specific evidence, quantitative metrics that cannot be fudged, and comparison against documented standards that do not shift to accommodate poor performance.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+<h3>Audit Scope and Frequency</h3>
+<p>The administrative self-audit covers all processes defined in Domain 11 articles (D11-001 through D11-012). The audit is conducted annually, timed to coincide with or immediately precede the annual Institutional Health Report (D11-008). This timing ensures that audit findings feed directly into the institution's most comprehensive assessment.</p>
+<p>In addition to the annual comprehensive audit, each quarterly administrative report (D11-008) includes a brief process health check: are the core administrative processes (budget tracking, asset registry maintenance, record-keeping) current? The quarterly check is a lightweight scan; the annual audit is a thorough examination.</p>
+
+<h3>The Audit Checklist</h3>
+<p>The audit uses a structured checklist (Form F-AUD-01, defined in D11-009) that evaluates each administrative process across the four dimensions. For each process, the checklist asks:</p>
+
+<p><strong>Compliance questions:</strong></p>
+<ul>
+  <li>Is this process being executed at its defined frequency? (Evidence: records, ledger entries, completed forms)</li>
+  <li>Are all required records being generated? (Evidence: master index, record archive)</li>
+  <li>Are forms being used correctly and completely? (Evidence: sample review of recent forms)</li>
+</ul>
+
+<p><strong>Effectiveness questions:</strong></p>
+<ul>
+  <li>Is this process achieving its stated purpose? (Evidence: outcomes, incident rates, forecast accuracy)</li>
+  <li>Has any decision been made without information this process was supposed to provide? (Evidence: decision log, incident reports)</li>
+  <li>Would the institution be materially worse off if this process had not been followed? (Judgment, supported by examples)</li>
+</ul>
+
+<p><strong>Efficiency questions:</strong></p>
+<ul>
+  <li>How much time does this process consume per execution? (Evidence: time tracking or estimation)</li>
+  <li>Is the time investment proportionate to the value delivered? (Judgment, informed by the Lightness Principle)</li>
+  <li>Could this process be simplified without reducing its effectiveness? (Judgment, with specific proposals if yes)</li>
+</ul>
+
+<p><strong>Currency questions:</strong></p>
+<ul>
+  <li>Does this process reference systems, assets, personnel, or conditions that no longer exist? (Evidence: cross-reference against current reality)</li>
+  <li>Has the institutional context changed in ways that affect this process? (Evidence: changes since last audit)</li>
+  <li>Are the forms and templates used by this process current with the documented procedures? (Evidence: form version comparison)</li>
+</ul>
+
+<h3>Audit Findings Classification</h3>
+<p>Audit findings are classified by severity:</p>
+<ul>
+  <li><strong>Critical:</strong> A process failure that creates immediate risk to institutional data, assets, or safety. Example: backup verification has not been performed in six months; fire extinguisher is expired. Remediation timeline: immediate (within one week).</li>
+  <li><strong>Major:</strong> A process failure that degrades institutional capability or creates medium-term risk. Example: the asset registry is three months out of date; the budget has not been reconciled this quarter. Remediation timeline: within one month.</li>
+  <li><strong>Minor:</strong> A process imperfection that does not create significant risk but should be corrected. Example: a form has an outdated version number; a record is missing a cross-reference. Remediation timeline: within one quarter.</li>
+  <li><strong>Observation:</strong> A potential improvement or concern that does not constitute a process failure. Example: a process seems to take longer than necessary; a form field is rarely filled in. No remediation timeline; logged for consideration during the next process review.</li>
+</ul>
+
+<h3>Audit Report</h3>
+<p>The annual audit produces a report with the following structure:</p>
+<ol>
+  <li><strong>Summary:</strong> Overall administrative health assessment. Number of findings by severity. Comparison to previous year's audit.</li>
+  <li><strong>Process-by-Process Assessment:</strong> For each Domain 11 process, the compliance, effectiveness, efficiency, and currency evaluation with supporting evidence.</li>
+  <li><strong>Findings List:</strong> All findings, classified by severity, with specific remediation actions and timelines.</li>
+  <li><strong>Trend Analysis:</strong> Comparison with previous audit(s). Are the same findings recurring? Are new issues emerging? Is overall administrative health improving, stable, or degrading?</li>
+  <li><strong>Recommendations:</strong> Proposed process changes, form updates, schedule adjustments, or resource reallocations based on audit findings. Classified as administrative (can be implemented by the operator) or governance (requires a governance decision).</li>
+  <li><strong>Operator Capacity Assessment:</strong> Honest evaluation of the operator's current ability to maintain all administrative processes. Identification of any processes that are consistently neglected due to capacity constraints. Recommendation for graceful degradation (D11-011) if capacity is insufficient.</li>
+</ol>
+
+<h3>Counteracting Self-Leniency</h3>
+<p>The following structural safeguards reduce the risk of self-lenient auditing:</p>
+<ul>
+  <li><strong>Evidence requirement:</strong> Every compliance answer must be supported by evidence (records, forms, ledger entries). "I believe I have been doing this" is not evidence. The record either exists or it does not.</li>
+  <li><strong>Quantitative metrics:</strong> Where possible, audit criteria use numbers rather than judgments. "Were monthly inspections conducted?" has a verifiable answer: count the inspection records and compare to 12.</li>
+  <li><strong>Year-over-year comparison:</strong> Comparing this year's audit to last year's makes it difficult to normalize decline. If last year's audit found two major findings and this year's finds five, the direction is visible.</li>
+  <li><strong>The stranger test:</strong> For each process, ask: if a stranger examined the records, would they conclude that this process is being followed? This perspective shift counteracts the insider's tendency to fill in gaps with assumption.</li>
+  <li><strong>Pre-commitment to honesty:</strong> The audit report is an administrative record (D11-007) with permanent retention. The operator is writing for their future self and for successors. Dishonesty in the audit report deceives the people the operator should most want to protect.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules and Constraints</h2>
+<ul>
+  <li><strong>R-AUD-01:</strong> An administrative self-audit must be conducted annually. The audit may not be deferred. If the operator cannot complete a full audit, a partial audit covering at minimum the Critical and Major finding categories must be completed on schedule, with the remainder completed within one month.</li>
+  <li><strong>R-AUD-02:</strong> All compliance findings must be supported by documentary evidence. Self-reported compliance without evidence is classified as "unverifiable" and treated as a Minor finding.</li>
+  <li><strong>R-AUD-03:</strong> Critical findings must be remediated within one week. A Critical finding that remains unresolved after one week becomes an escalation to governance (GOV-001) as a potential institutional risk.</li>
+  <li><strong>R-AUD-04:</strong> Recurring findings &mdash; the same finding appearing in two consecutive annual audits &mdash; are automatically elevated one severity level. A Minor finding that recurs becomes Major. A Major finding that recurs becomes Critical. Recurring findings indicate a systemic problem that the standard remediation timeline has failed to address.</li>
+  <li><strong>R-AUD-05:</strong> The audit report must include the Operator Capacity Assessment. This section may not be omitted or replaced with a generic statement. Declining capacity is not shameful; unacknowledged declining capacity is dangerous.</li>
+  <li><strong>R-AUD-06:</strong> Audit reports are classified as Audit Records with 15-year minimum retention per D11-007. They must be stored in the standard format and indexed in the master record index.</li>
+  <li><strong>R-AUD-07:</strong> If the institution has multiple operators, the audit must include cross-verification: each operator audits at least one process area that another operator is primarily responsible for. This introduces a limited form of external audit within the institution's own resources.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+<ul>
+  <li><strong>Audit theater.</strong> The audit is conducted on schedule but without genuine critical evaluation. The checklist is completed with checkmarks but no real investigation. Findings are classified as Minor or Observation to avoid the remediation obligations of higher severities. The audit report looks healthy, but the institution is not. Mitigation: the evidence requirement (R-AUD-02) forces the auditor to produce records, not just checkmarks. The stranger test provides a perspective check. Year-over-year comparison makes persistent "all clear" findings increasingly implausible as the institution ages.</li>
+  <li><strong>Audit dread.</strong> The operator comes to dread the annual audit because it always reveals uncomfortable truths about neglected processes. The dread leads to avoidance, which leads to deferral, which leads to an institution that has not been audited in years. Mitigation: R-AUD-01 makes the audit non-deferrable. The audit should be understood not as a judgment on the operator but as a diagnostic tool. Finding problems is the point of the audit; finding no problems would be suspicious.</li>
+  <li><strong>Remediation fatigue.</strong> The audit consistently produces more findings than the operator can remediate within the defined timelines. Findings accumulate. The operator becomes demoralized by the growing list of unresolved issues. Mitigation: if findings consistently exceed remediation capacity, this is itself a finding about institutional scope versus operator capacity. The recommendation should be to simplify processes (Lightness Principle) or to initiate graceful degradation (D11-011), not to generate more work than can be completed.</li>
+  <li><strong>Audit scope creep.</strong> The audit expands beyond administrative processes to encompass the entire institution. Instead of auditing whether the budget is being maintained, the audit evaluates whether the budget is adequate; instead of checking whether inspections are conducted, it evaluates whether the inspection criteria are correct. The audit becomes an endless review of everything. Mitigation: the audit scope is defined as the processes in D11-001 through D11-012. The four dimensions (compliance, effectiveness, efficiency, currency) provide structure. Questions about policy adequacy belong in governance, not in the administrative audit.</li>
+  <li><strong>Self-leniency despite safeguards.</strong> The operator, despite the structural safeguards, still grades themselves generously. The evidence is technically present but is interpreted in the most favorable light. Findings are downgraded. Mitigation: no structural safeguard can fully eliminate self-leniency. The pre-commitment to honesty, the evidence requirement, and the year-over-year comparison reduce it. If a multi-operator state is achieved, R-AUD-07's cross-verification provides the strongest available check.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+<ol>
+  <li><strong>If the audit has been skipped for one or more years:</strong> Conduct an immediate audit. Do not try to reconstruct the missed years. The audit assesses current state, not historical state. A current audit that reveals significant findings after a gap is exactly what the audit is designed to do. Document the gap in the audit report and note it as a finding (Major at minimum, since the audit itself is a defined process that was not followed).</li>
+  <li><strong>If the audit reveals systemic non-compliance:</strong> This is a major institutional finding. The operator must decide whether the processes are unrealistic (and should be simplified) or whether the operator has drifted from necessary discipline (and must recommit). This decision is a governance-level matter (GOV-001) because it affects the institution's administrative framework. Document the decision and its reasoning.</li>
+  <li><strong>If remediation backlog has accumulated:</strong> Triage the backlog. Address Critical findings immediately. Prioritize Major findings by impact. Consider whether Minor findings can be resolved by simplifying the process they relate to (if the form is never fully completed, perhaps the form has too many fields). Set a realistic remediation schedule that the operator can actually follow. An impossible schedule creates more demoralization than it resolves.</li>
+  <li><strong>If the audit consistently finds the same problems:</strong> The remediation is failing. The root cause is not the individual finding but the condition that creates it. Investigate the systemic cause: is the process too complex? Is the operator lacking a necessary skill? Is the time allocation insufficient? Is the process genuinely unnecessary (and should be eliminated)? Address the root cause, not the symptom.</li>
+  <li><strong>If the operator's capacity is genuinely declining:</strong> Acknowledge this finding honestly in the audit report. Activate the graceful degradation model from D11-011. Accelerate succession planning per D11-006. The audit's detection of declining capacity is one of its most valuable functions &mdash; it provides early warning of a transition that, unmanaged, would end the institution.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+<ul>
+  <li><strong>Years 0-3:</strong> The first audit establishes the baseline. There is no year-over-year comparison, so the trend analysis section is inapplicable. The primary value of the early audits is calibrating the audit process itself: which questions produce useful information? Which are too vague? Which are too detailed? Expect to revise the audit checklist based on the first two or three audits.</li>
+  <li><strong>Years 3-10:</strong> Trend analysis becomes meaningful. The audit reveals patterns: which processes are consistently well-maintained, which consistently need attention, and which are improving or degrading over time. The audit becomes the institution's most reliable diagnostic tool for administrative health.</li>
+  <li><strong>Years 10-25:</strong> The audit archive shows the administrative history of the institution across a significant span. Periods of high compliance and periods of drift are visible. The correlation between audit findings and institutional events (hardware failures, procurement problems, personnel changes) becomes apparent. The audit transitions from diagnostic tool to institutional self-knowledge.</li>
+  <li><strong>Years 25-50+:</strong> The audit archive spans multiple operator generations. It shows how administrative discipline was maintained (or not) across transitions. For successor operators, the audit reports are the most honest assessment of institutional health &mdash; more honest than promotional descriptions, more specific than architectural diagrams, more current than founding documents. The audit is the institution's conscience, externalized into a repeating process and a permanent record.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 &mdash; Founding Entry:</strong>
+I am writing the article that will judge all my other articles. This is an uncomfortable position. I have just defined thirteen administrative processes, and this article is the mechanism that will tell me, every year, how many of them I am actually following. I know already that I will not score perfectly. I know that some forms will be incomplete, some inspections will be late, and some records will be missing. The point of the audit is not perfection. The point is awareness. If I know where I am falling short, I can decide whether to improve or to simplify. If I do not know &mdash; if I am running on the comfortable illusion that everything is fine &mdash; then I am a single surprise away from discovering, too late, that the institution's administrative foundations have been quietly eroding. The audit is my annual reckoning with reality. I commit to conducting it honestly, even when honesty is uncomfortable. Especially when it is uncomfortable.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+<ul>
+  <li>D11-001 &mdash; Administration Philosophy (Lightness Principle, three functions of administration, R-ADM-02 annual review requirement)</li>
+  <li>D11-002 through D11-012 &mdash; All administrative process articles (audit scope covers all)</li>
+  <li>D11-003 &mdash; Budget and Resource Accounting Framework (budget reconciliation as audit input)</li>
+  <li>D11-006 &mdash; Personnel Administration (operator capacity assessment, succession acceleration)</li>
+  <li>D11-007 &mdash; Record-Keeping Standards (audit report archival, master index, evidence sources)</li>
+  <li>D11-008 &mdash; Reporting Structures (annual audit feeds into institutional health report, quarterly process health checks)</li>
+  <li>D11-009 &mdash; Administrative Forms (F-AUD-01 Audit Checklist)</li>
+  <li>D11-011 &mdash; Administrative Continuity (graceful degradation model for declining capacity)</li>
+  <li>GOV-001 &mdash; Authority Model (governance escalation for systemic audit findings)</li>
+  <li>ETH-001 &mdash; Ethical Foundations (Principle 6: honest accounting of limitations)</li>
+  <li>Domain 19 &mdash; Quality Assurance (broader institutional quality framework)</li>
+</ul>
+</section>
+
+</article>
+</main>
+</body>
+</html>

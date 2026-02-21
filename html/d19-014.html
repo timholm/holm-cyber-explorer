@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D19-014 — QA Tooling &amp; Methods Catalog - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li class="active"><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d19-014">
+  <h1>D19-014 &mdash; QA Tooling &amp; Methods Catalog</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D19-014</dd>
+  <dt>Domain</dt>
+  <dd>19 -- Quality Assurance</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D19-003 (Testing Framework), D19-002 (Audit Procedures)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>Referenced by all domains that conduct quality assessments. Serves as a practical reference for QA practitioners.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article catalogs the specific tools, techniques, and methods available for quality assessment within the institution. While other Domain 19 articles define what quality means, how to measure it, and when to check it, this article answers the practical question: how do you actually do it? What checklists do you use? What sampling methods are appropriate? What heuristic evaluation techniques are available? How do you conduct a structured review?</p>
+<p>The catalog is tool-agnostic by design. It describes methods, not software. An air-gapped institution cannot depend on any particular software tool surviving across decades. The methods described here can be implemented with paper and pencil, with any text editor, or with specialized tools -- the choice of implementation is a local decision that changes with available technology.</p>
+<p>This article is addressed to every person who conducts quality assessments: QA practitioners, reviewers at gates, domain leads conducting self-assessments, and any participant asked to review another's work.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Checklists for common quality assessment tasks.</li>
+<li>Sampling methods for assessing large document corpora.</li>
+<li>Heuristic evaluation techniques for documentation quality.</li>
+<li>Structured review methods.</li>
+<li>Statistical approaches for trend analysis.</li>
+<li>Cross-reference verification methods.</li>
+<li>Guidance on selecting the right method for a given assessment task.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>When to use each method (see D19-007 for gate definitions, D19-002 for audit scheduling).</li>
+<li>The quality standards that methods assess against (see D19-005 for taxonomy, D19-006 for metrics).</li>
+<li>Tool-specific instructions (any tool-specific procedures should be documented separately and referenced from this catalog).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why a Methods Catalog</h3>
+<p>Quality assessment is a skill, and skills benefit from a shared toolkit. Without a catalog, each reviewer invents their own approach. Reviews become inconsistent. One reviewer focuses on formatting while another focuses on accuracy. One uses a rigorous checklist while another relies on gut feeling. The catalog standardizes the approach without being prescriptive -- it says "here are the tools; choose the appropriate one" rather than "you must use this tool for this task."</p>
+
+<h3>3.2 Tool-Agnostic Design</h3>
+<p>This catalog describes methods, not implementations. A checklist is a method. Whether the checklist is printed on paper, implemented in a spreadsheet, or encoded in a software application is an implementation detail. The method remains valid regardless of the tool. This design principle ensures the catalog remains useful across technology transitions. When a tool becomes obsolete, only the tool-specific documentation needs updating, not this catalog.</p>
+
+<h3>3.3 The Practitioner Perspective</h3>
+<p>This article is deliberately practical. Other Domain 19 articles define philosophy, standards, and processes. This article says: "You have been asked to review an article. Here is how to do it well." It is the article a new reviewer reads first, before tackling the more abstract frameworks.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Method Categories</h3>
+<p>Quality assessment methods are organized into five categories:</p>
+
+<p><strong>Category 1: Checklists.</strong> Structured lists of items to verify. Checklists reduce the risk of overlooking important quality dimensions. They are the simplest and most widely applicable method.</p>
+
+<p><strong>Category 2: Sampling.</strong> Techniques for selecting a representative subset of a larger body of work. Used when assessing the entire corpus is impractical.</p>
+
+<p><strong>Category 3: Heuristic Evaluation.</strong> Expert-based assessment using a set of known quality principles. More flexible than checklists but more dependent on reviewer expertise.</p>
+
+<p><strong>Category 4: Structured Review.</strong> Formal review methods that guide the reviewer through a systematic examination of the work.</p>
+
+<p><strong>Category 5: Statistical Analysis.</strong> Quantitative methods for analyzing quality data to identify trends, patterns, and anomalies.</p>
+
+<h3>4.2 Checklists</h3>
+
+<p><strong>Template Compliance Checklist.</strong> Verifies that an article conforms to the standard article template.</p>
+<ul>
+<li>All 10 required sections present (Purpose through References)?</li>
+<li>Metadata aside present and complete (ID, Domain, Version, Date, Status, Dependencies)?</li>
+<li>No section marked "not applicable" without explicit rationale?</li>
+<li>References section includes cross-references by formal ID?</li>
+</ul>
+
+<p><strong>Cross-Reference Integrity Checklist.</strong> Verifies that all references within an article are valid.</p>
+<ul>
+<li>Every document ID referenced exists in the active corpus?</li>
+<li>Quoted or paraphrased content from referenced documents is accurate?</li>
+<li>Referenced documents have not been deprecated since the reference was created?</li>
+<li>No circular references without acknowledgment?</li>
+</ul>
+
+<p><strong>Currency Checklist.</strong> Verifies that an article reflects current institutional reality.</p>
+<ul>
+<li>Last review date within defined review period?</li>
+<li>Described systems, processes, and configurations match current state?</li>
+<li>Personnel references (roles, responsibilities) match current assignments?</li>
+<li>External references (if any) have been verified as still accessible?</li>
+</ul>
+
+<p><strong>Successor Readability Checklist.</strong> Assesses whether a future reader without current context could understand the article.</p>
+<ul>
+<li>Specialized terms defined on first use or in glossary?</li>
+<li>Assumptions stated explicitly?</li>
+<li>Rationale for decisions included (not just the decisions themselves)?</li>
+<li>No reliance on "common knowledge" that may not be common in the future?</li>
+</ul>
+
+<h3>4.3 Sampling Methods</h3>
+
+<p><strong>Simple Random Sampling.</strong> Select articles at random from the corpus. Appropriate for general quality assessment when no specific concerns exist. Sample size recommendation: 10% of the corpus or 10 articles, whichever is larger.</p>
+
+<p><strong>Stratified Sampling.</strong> Divide the corpus into strata (by domain, by age, by type) and sample proportionally from each stratum. Appropriate when quality may vary systematically across categories. Ensures that no category is over- or under-represented in the sample.</p>
+
+<p><strong>Risk-Based Sampling.</strong> Prioritize articles for assessment based on their risk profile: articles that are frequently referenced, recently revised, authored by departing personnel, or in domains with recent quality concerns. Appropriate when resources are limited and must be focused on the highest-risk areas.</p>
+
+<p><strong>Staleness Sampling.</strong> Select the articles with the oldest last-review dates. Appropriate specifically for detecting currency degradation. These articles are the most likely to be outdated.</p>
+
+<h3>4.4 Heuristic Evaluation Principles</h3>
+<p>When conducting a heuristic evaluation (expert assessment without a specific checklist), use the following principles as guides:</p>
+<ol>
+<li><strong>Purpose clarity.</strong> Can the reviewer determine the article's purpose within 30 seconds of reading?</li>
+<li><strong>Scope honesty.</strong> Does the scope section accurately describe what is and is not covered?</li>
+<li><strong>Decision traceability.</strong> Can every rule or procedure be traced back to a stated rationale?</li>
+<li><strong>Failure imagination.</strong> Has the author thought about what can go wrong, or only about what should go right?</li>
+<li><strong>Recovery completeness.</strong> For every failure mode listed, is there a recovery procedure?</li>
+<li><strong>Temporal awareness.</strong> Does the article acknowledge that it will need to change over time?</li>
+<li><strong>Self-sufficiency.</strong> Could someone use this article without additional oral explanation?</li>
+</ol>
+
+<h3>4.5 Structured Review Method</h3>
+<p>For a thorough review of a single article:</p>
+<ol>
+<li><strong>First pass (10 minutes):</strong> Read the title, purpose, and scope. Form an expectation of what the article should contain. Note any questions.</li>
+<li><strong>Second pass (20-40 minutes):</strong> Read the entire article. For each section, assess whether it fulfills its stated purpose. Note specific findings (using the quality dimensions from D19-006 as a framework).</li>
+<li><strong>Third pass (10-20 minutes):</strong> Check cross-references. Verify metadata. Apply the template compliance checklist.</li>
+<li><strong>Scoring (10 minutes):</strong> Score the article per D19-006 metrics. Provide brief justifications for any Partial or Fail scores.</li>
+<li><strong>Report (10 minutes):</strong> Write the review summary. Include: overall assessment, key strengths, key deficiencies, and recommended actions.</li>
+</ol>
+
+<h3>4.6 Statistical Approaches</h3>
+<p>For trend analysis (used primarily by the QA function):</p>
+<ul>
+<li><strong>Moving average.</strong> Calculate a rolling average of quality metric scores over 4 quarters. This smooths out noise and reveals underlying trends.</li>
+<li><strong>Baseline deviation.</strong> Calculate the percentage deviation of current indicator values from the established baseline. Flag any deviation exceeding defined thresholds (per D19-013).</li>
+<li><strong>Distribution analysis.</strong> For a set of quality scores, examine the distribution. A shift in the median is more meaningful than a shift in the mean (the mean is sensitive to outliers). A widening spread (increasing variance) suggests inconsistent quality even if the average is stable.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D19-14-01: Methods Must Be Documented.</strong> Any quality assessment method used within the institution must be documented in or referenced from this catalog. Ad hoc methods used once are acceptable; ad hoc methods used repeatedly must be formalized.</p></li>
+<li><p><strong>R-D19-14-02: Checklists Must Be Versioned.</strong> Checklists are living documents. When a checklist is revised, the revision date and the nature of the change must be recorded. Historical versions must be retained for comparison.</p></li>
+<li><p><strong>R-D19-14-03: Method Selection Must Be Justified.</strong> When conducting a quality assessment, the reviewer should document which method(s) they used and why. This enables evaluation of whether the method was appropriate and whether the results are comparable to other assessments.</p></li>
+<li><p><strong>R-D19-14-04: No Tool Lock-In.</strong> Methods described in this catalog must not depend on any specific software tool. They must be implementable with basic, widely-available tools (text files, simple calculations). Tool-specific implementations may exist but must not be the only way to execute a method.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Checklist ossification.</strong> Checklists are never updated. They check for quality issues that were relevant years ago but no longer apply. New quality issues are not represented. Likelihood: high over long timeframes. Severity: moderate. Detection: compare checklist items to actual defects found. If checklists consistently fail to catch the types of defects that are being reported, the checklists are outdated.</p></li>
+<li><p><strong>Method misapplication.</strong> A method designed for one purpose is applied to another. A sampling method designed for general assessment is used for targeted investigation. A heuristic evaluation is used where a formal checklist is needed. Likelihood: moderate. Severity: low to moderate. Detection: review of assessment reports for method-task alignment.</p></li>
+<li><p><strong>Catalog abandonment.</strong> The catalog exists but no one uses it. Reviewers develop their own informal methods. The catalog becomes a historical artifact. Likelihood: moderate. Severity: moderate (quality assessment still occurs, just inconsistently). Detection: survey reviewers about which methods they actually use. If the answers do not match the catalog, the catalog has either fallen behind practice or practice has fallen behind the catalog.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If checklists have ossified:</strong> Review each checklist against the past two years of defect data. Remove items that correspond to no reported defects. Add items that correspond to frequently reported defects. Have an active reviewer validate the revised checklist by applying it to a recently reviewed article.</p></li>
+<li><p><strong>If methods are being misapplied:</strong> Provide a method selection guide: a simple decision tree that recommends a method based on the assessment context (what are you assessing? how much time do you have? what are you looking for?). Include this guide in reviewer training.</p></li>
+<li><p><strong>If the catalog has been abandoned:</strong> Interview active reviewers. Document the methods they actually use. Incorporate the effective informal methods into the catalog. Retire catalog methods that no one finds useful. The catalog should describe what practitioners actually do (formalized), not what theorists think they should do.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-3:</strong> The catalog starts with the foundational methods described above. As reviewers gain experience, new methods will emerge from practice. Capture these and add them to the catalog.</p></li>
+<li><p><strong>Years 3-10:</strong> The catalog should stabilize around a core set of widely-used methods. Some methods will prove more useful than others. Retire methods that are never used. Expand methods that are frequently extended by practitioners.</p></li>
+<li><p><strong>Years 10-25:</strong> New quality challenges will require new methods. Technology transitions may enable new approaches (or invalidate old ones). The catalog must evolve with the institution's needs while maintaining its tool-agnostic design.</p></li>
+<li><p><strong>Years 25-50+:</strong> The catalog is a living record of how the institution has assessed quality over decades. Historical methods, even if retired, should be preserved for reference. They tell future practitioners what quality challenges mattered in each era.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The best quality assessment method is the one that gets used. A sophisticated statistical analysis that no one performs is less valuable than a simple checklist that every reviewer follows. This catalog should always prioritize practical utility over theoretical elegance. If a method described here is not being used, the first question should be "why not?" -- and the answer may be that the method is too complex, too time-consuming, or too abstract. In that case, simplify or replace it. The catalog serves the practitioners. The practitioners do not serve the catalog.</p>
+</section>
+
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D19-002 -- Audit Procedures (audit methods that use this catalog)</li>
+<li>D19-003 -- Documentation Testing Framework (testing methods complementary to this catalog)</li>
+<li>D19-006 -- Documentation Quality Metrics (scoring system used in structured reviews)</li>
+<li>D19-007 -- Review Gate Definitions (gates where these methods are applied)</li>
+<li>D19-009 -- Internal Compliance Framework (compliance assessments using these methods)</li>
+<li>D19-013 -- Quality Degradation Detection (statistical methods for trend analysis)</li>
+<li>Stage 1 Documentation Framework Preamble -- Article Template Structure (template compliance checklist)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

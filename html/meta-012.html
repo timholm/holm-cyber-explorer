@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>META-012 — Version History as Institutional Memory - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li class="active"><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="meta-012">
+  <h1>META-012 &mdash; Version History as Institutional Memory</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>META-012</dd>
+  <dt>Domain</dt>
+  <dd>0 -- Meta-Documentation & Standards</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, META-001, META-011</dd>
+  <dt>Depended Upon By</dt>
+  <dd>META-013, META-014, META-015. All articles that maintain version histories, which is to say all articles.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes the principle that version history is not mere bookkeeping. It is a form of institutional memory -- a narrative record of how the institution's knowledge has evolved, what was believed and then corrected, what was tried and then abandoned, what endured and why. The version history table in every article, when read with care, tells a story. This article teaches the operator how to read that story, how to write it well, and how to preserve it across format migrations and structural changes.</p>
+<p>The Stage 1 Meta-Framework defines the version history table format and requires its presence in every article. This article goes further. It examines what version history means as an institutional practice, what patterns in version history reveal about institutional health, and how the accumulation of version history over decades creates a resource that no other part of the institution can replicate: a record not just of what the institution knows, but of how it came to know it.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The philosophy of version history as institutional memory.</li>
+<li>How to read changelogs as narrative: what the patterns mean.</li>
+<li>What version history patterns reveal about institutional health and dysfunction.</li>
+<li>The craft of writing version history entries that serve future readers.</li>
+<li>Preserving version history during format migrations, article merges, article forks, and system transitions.</li>
+<li>The relationship between version history, the Commentary Section, and the decision log.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The technical format of version history tables (see Stage 1 Meta-Framework, Section 2.4).</li>
+<li>The versioning rules themselves (see Stage 1 Meta-Framework, Section 2).</li>
+<li>The file-level version management procedures (see Stage 1 Meta-Framework, Section 2.5).</li>
+<li>Git or version control system operations (the institution is air-gapped and does not assume Git).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Difference Between a Changelog and a Memory</h3>
+<p>A changelog records what changed. A memory records what it meant. Most software projects maintain changelogs that are useful for exactly one purpose: determining what is different between version 1.2.3 and version 1.2.4. These changelogs are written for machines and for developers who need to make immediate decisions about upgrading. They are not written for a person who, twenty years from now, needs to understand why the institution's approach to backup verification changed three times between 2028 and 2035.</p>
+<p>This institution's version histories serve a different purpose. They are written for the future reader who needs context, not just facts. "Added winter maintenance procedures" is a changelog entry. "Added winter maintenance procedures after the January 2028 cold snap revealed that the existing procedures did not account for temperatures below minus twenty Celsius, and the battery bank suffered recoverable damage as a result" is a memory. Both record the same change. Only one tells the future reader why the change happened, what motivated it, and what the institution learned.</p>
+<h3>3.2 Why Version History Cannot Be Reconstructed</h3>
+<p>If a backup fails, you can restore data from another copy. If documentation falls behind, you can reconstruct it from the existing systems. But if version history is lost, it cannot be reconstructed. The knowledge of how a document evolved -- what was tried and changed, what order things were added, what corrections were made -- exists only in the version history. Once lost, the institution retains the document's current state but loses the path that led there. And the path matters, because understanding why something is the way it is requires understanding what it used to be and why that was changed.</p>
+<h3>3.3 The Narrative in the Numbers</h3>
+<p>Semantic versioning itself tells a story, even before you read the summary fields. An article that has been at v1.0.0 for five years is stable -- either because it was written well the first time, or because nobody has bothered to maintain it. An article that has progressed through v1.0, v1.1, v1.2, v1.3 in steady six-month intervals is actively maintained by someone who cares about incremental improvement. An article that jumped from v1.0.0 to v3.0.0 in two years has been fundamentally rethought twice -- something significant changed in the institution's understanding. An article with fifteen patch versions and no minor versions has been corrected many times but never substantively improved -- perhaps it was rushed to publication and has been paying the debt ever since.</p>
+<p>These patterns are legible to anyone who knows how to read them. This article teaches that reading.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Three Layers of Institutional Memory</h3>
+<p>The institution maintains memory through three complementary mechanisms, each serving a different purpose:</p>
+<p><strong>Layer 1: The Decision Log (GOV-001).</strong> Records deliberate decisions: what was decided, by whom, when, and why. This is the memory of governance -- the record of conscious choices that shaped the institution.</p>
+<p><strong>Layer 2: The Commentary Sections.</strong> Record reflections, observations, and context that do not rise to the level of governance decisions but are too important to lose. This is the memory of experience -- the human voice speaking about what it has learned.</p>
+<p><strong>Layer 3: The Version Histories.</strong> Record every change to every document, with summaries that explain what changed and why. This is the memory of evolution -- the record of how knowledge was refined through iteration.</p>
+<p>No single layer is sufficient. The decision log tells you what was decided but not how the decision affected specific documents. The Commentary Section tells you what was learned but not what specific edits resulted. The version history tells you what changed but not the full reasoning behind the change. Together, the three layers create a comprehensive institutional memory that can answer the question a future maintainer will inevitably ask: "Why is this document the way it is?"</p>
+<h3>4.2 The Version History Entry as a Micro-Document</h3>
+<p>Each entry in a version history table is a micro-document with four fields: version number, date, state, and summary of changes. Of these, the summary is by far the most important and the most frequently under-served.</p>
+<p><strong>What a good summary contains:</strong>
+- What changed (the fact).
+- Why it changed (the motivation).
+- What triggered the change (the cause: an incident, an audit finding, a Commentary observation, a governance decision, or simply accumulated experience).</p>
+<p><strong>What a good summary omits:</strong>
+- Technical details that belong in the article body.
+- The full rationale that belongs in the decision log.
+- The reflective context that belongs in the Commentary Section.</p>
+<p>The summary is a pointer -- detailed enough to stand on its own, concise enough to fit in a table cell, and specific enough to lead a curious reader to the full story in the decision log or Commentary Section.</p>
+<p><strong>Examples of poor summaries:</strong>
+- "Updated." (What was updated? Why?)
+- "Fixed errors." (What errors? How were they discovered?)
+- "Revised per feedback." (Whose feedback? What did they identify?)</p>
+<p><strong>Examples of adequate summaries:</strong>
+- "Added winter maintenance procedures after January 2028 cold event."
+- "Corrected Step 7 of backup procedure: restore path was wrong since v1.1.0."
+- "Rewrote Section 4 to reflect migration from ext4 to ZFS, per decision GOVR-2029-047."</p>
+<h3>4.3 Reading Version History Diagnostically</h3>
+<p>The version history of an article, or of the entire corpus, can be read as a diagnostic instrument. The following patterns are meaningful:</p>
+<p><strong>Healthy patterns:</strong>
+- Steady minor version increments at regular intervals: the article is being maintained.
+- Occasional major version increments preceded by Commentary entries: the article evolves deliberately.
+- Patch versions that decrease over time: early errors are being corrected and the quality is stabilizing.</p>
+<p><strong>Warning patterns:</strong>
+- No version changes for more than two years: the article may be abandoned.
+- Rapid major version increments (three or more in a year): the article's scope or approach is unstable.
+- Version history entries that are vague ("updated," "revised," "minor changes"): the editorial discipline has weakened.
+- Many patches but no minor versions: the article is being corrected but not improved.</p>
+<p><strong>Alarm patterns:</strong>
+- Version history entries that contradict each other: earlier entries say one thing, later entries say the opposite, with no explanation of the reversal.
+- Version history entries that reference decision log entries which do not exist: governance discipline has broken down.
+- Large time gaps followed by sudden bursts of activity: maintenance has been neglected and is being caught up in a panic, which is error-prone.</p>
+<h3>4.4 The Corpus-Level Version Narrative</h3>
+<p>Beyond individual articles, the institution can read its collective version history as a narrative of institutional evolution. When you lay out the version history entries from all articles on a single timeline, patterns emerge:</p>
+<ul>
+<li><strong>Periods of rapid expansion:</strong> many v1.0.0 entries clustered together. The institution is building new capability.</li>
+<li><strong>Periods of consolidation:</strong> many minor version increments, few new articles. The institution is refining what it has.</li>
+<li><strong>Periods of upheaval:</strong> many major version increments across multiple domains. Something fundamental has changed -- a hardware generation transition, a governance reform, a security incident that forced widespread revision.</li>
+<li><strong>Quiet periods:</strong> few changes of any kind. Either the institution is stable and well-maintained, or it has been neglected. The operational log (OPS-001) disambiguates these two possibilities.</li>
+</ul>
+<p>The annual operations review should include a reading of the corpus-level version narrative for the preceding year. This is not a quantitative exercise -- counting versions is less useful than reading the summaries and understanding the trajectory.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-META-12-01:</strong> Every article must maintain a version history table per the format defined in the Stage 1 Meta-Framework, Section 2.4. No article in Published state may have an empty or missing version history.</li>
+<li><strong>R-META-12-02:</strong> Version history summaries must include both what changed and why it changed. Single-word summaries ("Updated," "Fixed," "Revised") are not acceptable for minor or major version increments. Patches may use brief summaries when the change is genuinely trivial.</li>
+<li><strong>R-META-12-03:</strong> Version history summaries that reference governance decisions must include the decision ID from the decision log. Summaries that reference incidents must include the incident date.</li>
+<li><strong>R-META-12-04:</strong> Version history is append-only. Existing entries may not be modified except to correct errors in the history itself, which must be noted with a correction entry.</li>
+<li><strong>R-META-12-05:</strong> When an article is merged, the version histories of both source articles must be preserved in the surviving article, clearly marked with their origin.</li>
+<li><strong>R-META-12-06:</strong> When an article is forked, the complete version history of the original article must be preserved in both resulting articles, with a note indicating the fork point.</li>
+<li><strong>R-META-12-07:</strong> During format migrations (changes to the file format, directory structure, or metadata schema), version history must be preserved with the same fidelity as article body text. Version history is not metadata that can be regenerated -- it is primary institutional memory.</li>
+<li><strong>R-META-12-08:</strong> The corpus-level version narrative must be reviewed during the annual operations cycle. The review should note institutional trends and record observations in the Commentary Section of this article.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Summary neglect.</strong> The most common failure. Version histories are maintained mechanically -- the version number and date are updated, but the summary is vague or missing. The version history becomes a record of changes without meaning, like a library catalog with titles but no descriptions. Mitigation: R-META-12-02 sets a quality floor. The quarterly review should spot-check version history summaries across a random sample of articles.</p>
+</li>
+<li>
+<p><strong>History loss during migration.</strong> A format migration or system transition causes version history to be truncated or corrupted. The institution retains the current version of every article but loses the record of how they evolved. Mitigation: R-META-12-07 requires version history to be treated as primary content during migrations. Pre-migration verification should include a version history integrity check.</p>
+</li>
+<li>
+<p><strong>History loss during merge or fork.</strong> When articles are combined or split, version histories are lost, mangled, or combined without clear attribution. A future reader cannot determine which changes were to which original article. Mitigation: R-META-12-05 and R-META-12-06 require explicit preservation and marking.</p>
+</li>
+<li>
+<p><strong>False narrative.</strong> Version history summaries are written to present a more flattering picture than reality warrants. Errors are described as "refinements." Reversals are described as "improvements." The version history tells a story, but not the true story. Mitigation: the institutional commitment to honest accounting (ETH-001, Principle 6) applies to version histories as much as to any other documentation.</p>
+</li>
+<li>
+<p><strong>Diagnostic blindness.</strong> The institution maintains version histories but never reads them diagnostically. The warning patterns described in Section 4.3 accumulate unnoticed. Articles go unmaintained for years. Quality erosion is invisible because nobody looks at the patterns. Mitigation: the annual corpus-level narrative review (R-META-12-08) is the institutional mechanism for reading the patterns.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<h3>7.1 Recovery from Summary Neglect</h3>
+<ol>
+<li>Identify all articles with vague version history summaries through a systematic review.</li>
+<li>For each vague entry, consult the decision log, Commentary Sections, and operational logs to reconstruct the context of the change.</li>
+<li>Append a correction entry to the version history: "Correction to v{X.Y.Z} summary (originally 'Updated'): Changed Section 4 to reflect migration to ZFS filesystem after performance testing in Q3 2028."</li>
+<li>Going forward, enforce R-META-12-02 during the review process -- no article passes review with a vague summary.</li>
+</ol>
+<h3>7.2 Recovery from History Loss</h3>
+<ol>
+<li>Assess the extent of the loss. Which articles have incomplete version histories? What time periods are missing?</li>
+<li>Reconstruct what can be reconstructed from the <code>_versions/</code> directory (comparing successive versions to determine what changed), the decision log, the Commentary Sections, and the operational logs.</li>
+<li>For entries that cannot be reconstructed, create placeholder entries marked "RECONSTRUCTED -- original summary lost during [event]. Best available reconstruction based on [sources]."</li>
+<li>Record the loss event in the institutional log, including the cause, the extent, and the preventive measures adopted.</li>
+</ol>
+<h3>7.3 Recovery from False Narrative</h3>
+<ol>
+<li>This is a cultural recovery, not a technical one. Acknowledge that version history summaries have not been honest.</li>
+<li>Do not retroactively rewrite history entries -- that would compound the dishonesty.</li>
+<li>Add Commentary entries to affected articles noting that version histories from a specific period may be misleadingly worded, and explaining the actual context.</li>
+<li>Going forward, recommit to ETH-001, Principle 6: honest accounting of limitations.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Version histories are short and frequent. The institution is learning what level of detail is useful and sustainable. Expect the summary style to mature through experimentation.</li>
+<li><strong>Years 5-15:</strong> Version histories become the primary record of how the institution's knowledge has developed. The corpus-level narrative becomes readable and meaningful. The diagnostic patterns in Section 4.3 begin to provide real insight.</li>
+<li><strong>Years 15-30:</strong> Version histories are decades long. They tell the story of generational changes in hardware, software, and institutional priorities. For a successor operator, reading the version histories is one of the most efficient ways to understand how the institution arrived at its current state.</li>
+<li><strong>Years 30-50+:</strong> The version histories are a historical record of an institution's intellectual life. They document not just what was known, but how knowledge was acquired, corrected, and refined over a human lifetime. Their value to a future reader is incalculable -- if they have been maintained with the discipline this article demands.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I am writing this at a moment when none of the articles in this institution have version histories longer than a single entry. The idea of reading version histories diagnostically is, at this point, entirely theoretical. But I have seen what happens to documentation systems that treat version history as an afterthought -- the information is there but it means nothing, like a guest book with illegible signatures. The discipline starts now, with the first entry, or it never starts. Every version history summary I write today is a letter to the person who will read it in 2046 and either thank me for the context or curse me for the lack of it.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>META-001 -- Stage 1 Meta-Framework (Section 2: Versioning Rules; Section 2.4: Version History Requirements)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 6: Honest Accounting of Limitations)</li>
+<li>GOV-001 -- Authority Model (decision log as complementary memory mechanism)</li>
+<li>OPS-001 -- Operations Philosophy (annual review cycle, documentation-first principle)</li>
+<li>META-011 -- The Documentation Dependency Graph (version changes affect dependency relationships)</li>
+<li>D6-001 -- Data Philosophy (Tier 1: Institutional Memory -- version histories are institutional memory)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-005 — Long-Term Cryptographic Survival - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li class="active"><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-005">
+  <h1>SEC-005 &mdash; Long-Term Cryptographic Survival</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-005</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security & Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, SEC-003, SEC-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>SEC-008, D6-002, D12-001. All articles involving encryption, hashing, digital signatures, or long-term data integrity.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article addresses a problem that most security documents ignore because their time horizon is measured in years, not decades: how does the institution maintain cryptographic security over a fifty-year operational lifetime?</p>
+<p>Cryptographic algorithms are not permanent. They are mathematical constructions whose security depends on computational assumptions -- assumptions about how hard certain problems are to solve. These assumptions erode over time as computational power increases, as mathematical breakthroughs occur, and as new computing paradigms (most notably quantum computing) emerge. An encryption algorithm that is unbreakable today may be trivially broken in twenty years. A hash function that guarantees integrity today may be vulnerable to collisions in fifteen.</p>
+<p>The institution's data must remain confidential and its integrity must remain verifiable across the full fifty-year horizon. This requires not merely selecting strong algorithms today, but building a cryptographic architecture that can survive algorithm obsolescence -- a property known as crypto-agility. This article specifies that architecture: what it means, how it works, and how the operator maintains it across decades of cryptographic evolution.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The theory of cryptographic longevity and why algorithms become obsolete.</li>
+<li>The quantum computing threat: what it is, what it affects, and what it does not.</li>
+<li>The crypto-agility architecture: how the institution's systems are designed to survive algorithm transitions.</li>
+<li>The cryptographic watchlist: how the operator monitors the health of deployed algorithms.</li>
+<li>Migration procedures: how to re-encrypt, re-hash, and re-sign data when an algorithm is broken or deprecated.</li>
+<li>Algorithm selection criteria for long-term deployments.</li>
+<li>The relationship between key management (SEC-003) and cryptographic survival.</li>
+</ul>
+<p>This article does not cover the specific key management procedures (see SEC-003), the specific encryption configurations for particular systems (see domain-specific articles), or the operational procedures for daily cryptographic operations (see Stage 3 articles). It provides the strategic framework within which all cryptographic decisions are made.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Algorithms Die</h3>
+<p>Cryptographic algorithms become obsolete through three mechanisms:</p>
+<p><strong>Analytical attacks.</strong> Mathematicians discover weaknesses in the algorithm's structure that allow it to be broken faster than brute force. This happened to MD5 (collision attacks demonstrated in 2004), SHA-1 (theoretical weaknesses published in 2005, practical collisions demonstrated in 2017), and DES (effective key length recognized as insufficient by the 1990s). Analytical attacks are unpredictable. An algorithm that appears secure today could be broken by a paper published tomorrow.</p>
+<p><strong>Computational advances.</strong> Increases in available computing power reduce the effective security margin of algorithms. A 1024-bit RSA key was considered secure in 2000; by 2020, it was considered inadequate not because the algorithm was broken but because the computational cost of factoring 1024-bit numbers had decreased to within range of well-funded adversaries. This mechanism is gradual and somewhat predictable, but the rate of advance can spike with architectural innovations (GPUs, ASICs, distributed computing).</p>
+<p><strong>Paradigm shifts.</strong> A fundamentally new computing paradigm renders the mathematical assumptions underlying an algorithm invalid. The most significant current example is quantum computing. Shor's algorithm, when executed on a sufficiently powerful quantum computer, can factor large integers and compute discrete logarithms in polynomial time, which breaks RSA, DSA, Diffie-Hellman, and elliptic curve cryptography. Grover's algorithm provides a quadratic speedup for brute-force search, effectively halving the key length of symmetric ciphers (AES-256 becomes equivalent to AES-128 against a quantum adversary).</p>
+<h3>3.2 The Fifty-Year Problem</h3>
+<p>Over fifty years, the institution can expect:</p>
+<ul>
+<li>At least two major hash function transitions (comparable to MD5 to SHA-1 to SHA-2 to SHA-3).</li>
+<li>At least one major asymmetric cryptography transition (comparable to the anticipated transition from classical to post-quantum algorithms).</li>
+<li>Multiple increases in recommended key lengths for symmetric ciphers.</li>
+<li>The possible emergence of computing paradigms beyond quantum that are not yet imagined.</li>
+</ul>
+<p>Data encrypted today must either remain secure for fifty years under its current encryption, or the institution must be capable of re-encrypting it under a stronger algorithm before the current one is broken. Integrity hashes computed today must either remain collision-resistant for fifty years, or the institution must be capable of re-hashing data under a stronger function before the current one is compromised.</p>
+<p>This is not a theoretical concern. It is a design requirement.</p>
+<h3>3.3 The Harvest-Now, Decrypt-Later Threat</h3>
+<p>Even in an air-gapped institution, the harvest-now-decrypt-later threat is relevant. If encrypted backups are stored at geographically separate locations (as they should be for disaster recovery), those backups are physically outside the air-gap perimeter. An adversary who obtains a backup today cannot decrypt it today -- but they can store it and wait for the encryption algorithm to be broken. If the institution uses RSA-2048 for backup encryption and a practical quantum computer is built in 2045, every backup encrypted before the migration to post-quantum cryptography is retroactively compromised.</p>
+<p>This is why crypto-agility is not optional. The cost of re-encrypting data proactively is small. The cost of discovering that decades of backups are now readable by an adversary is catastrophic.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Crypto-Agility Architecture</h3>
+<p>Crypto-agility means that the institution's systems are designed so that the cryptographic algorithms they use can be replaced without redesigning the systems themselves. This requires four architectural properties:</p>
+<p><strong>Property 1: Algorithm Abstraction.</strong>
+No system should hardcode a specific cryptographic algorithm. All systems should reference algorithms through an abstraction layer -- a configuration file, a library interface, or a protocol parameter -- that allows the algorithm to be changed without modifying the system's code or architecture. For example, full-disk encryption should use LUKS (Linux Unified Key Setup), which supports multiple cipher suites and allows re-encryption with a different cipher without decrypting the entire volume first.</p>
+<p><strong>Property 2: Metadata Completeness.</strong>
+Every encrypted file, every hashed value, and every digital signature must include metadata specifying which algorithm was used, which key (by identifier, not by value) was used, and when the operation was performed. Without this metadata, the institution cannot determine which data needs to be migrated when an algorithm is deprecated. The metadata format should be standardized across all institutional systems.</p>
+<p><strong>Property 3: Layered Encryption.</strong>
+For the most sensitive data, the institution may employ layered encryption: encrypting data with one algorithm and then encrypting the result with a second, independent algorithm. If either algorithm is broken, the data remains protected by the other. This is computationally expensive and should be reserved for data whose confidentiality must be maintained for the full fifty-year horizon regardless of cost.</p>
+<p><strong>Property 4: Re-encryption Capability.</strong>
+The institution must maintain the operational capability to re-encrypt, re-hash, and re-sign its entire data corpus within a reasonable timeframe. This means maintaining tools, procedures, and sufficient computational resources to perform a full cryptographic migration. The migration procedure must be tested periodically (see Section 4.4) so that it works when needed, not merely in theory.</p>
+<h3>4.2 Algorithm Selection Criteria</h3>
+<p>When selecting cryptographic algorithms for institutional use, the following criteria apply:</p>
+<ul>
+<li><strong>Standardization:</strong> Prefer algorithms that have been standardized by recognized bodies (NIST, ISO, IETF). Standardization reflects broad expert review.</li>
+<li><strong>Maturity:</strong> Prefer algorithms that have been publicly analyzed for at least ten years without practical attacks being found. Novelty is a risk factor, not an advantage, in cryptography.</li>
+<li><strong>Conservative parameters:</strong> Select key lengths and parameters at or above the highest recommended level. Use AES-256 rather than AES-128. Use SHA-512 rather than SHA-256 when performance permits. The marginal cost of larger parameters is small; the security margin is substantial.</li>
+<li><strong>Post-quantum readiness:</strong> For any new deployment, evaluate whether a post-quantum alternative exists and whether it is mature enough for institutional use. As of this writing, NIST has standardized ML-KEM (formerly CRYSTALS-Kyber) for key encapsulation and ML-DSA (formerly CRYSTALS-Dilithium) for digital signatures. These should be evaluated for institutional adoption.</li>
+<li><strong>Implementation quality:</strong> An algorithm is only as strong as its implementation. Prefer well-audited, open-source implementations. Avoid implementing cryptographic algorithms from scratch.</li>
+</ul>
+<h3>4.3 The Cryptographic Watchlist</h3>
+<p>The cryptographic watchlist is a maintained document that tracks the health status of every cryptographic algorithm in use within the institution. For each algorithm, the watchlist records:</p>
+<ul>
+<li><strong>Algorithm name and version.</strong></li>
+<li><strong>Institutional use cases:</strong> Where in the institution this algorithm is deployed.</li>
+<li><strong>Current status:</strong> One of four levels:</li>
+<li><em>Green:</em> No known weaknesses. Considered secure for the foreseeable future.</li>
+<li><em>Yellow:</em> Theoretical weaknesses published or computational margins shrinking. Begin planning migration.</li>
+<li><em>Orange:</em> Practical attacks demonstrated in academic settings or algorithm formally deprecated by standards body. Execute migration within 12 months.</li>
+<li><em>Red:</em> Practical attacks demonstrated in real-world conditions. Execute emergency migration immediately.</li>
+<li><strong>Last review date:</strong> When the algorithm's status was last assessed.</li>
+<li><strong>Migration target:</strong> The algorithm that will replace this one if migration is needed.</li>
+</ul>
+<p>The watchlist is reviewed at least annually during the annual security review (SEC-008). The review involves consulting the current state of cryptographic research, which requires bringing information across the air gap via the sneakernet protocol. This is one of the essential inbound data transfers that justifies the sneakernet's existence.</p>
+<h3>4.4 Migration Procedures</h3>
+<p>When an algorithm moves to Orange or Red status on the watchlist, the institution executes a cryptographic migration:</p>
+<p><strong>Phase 1: Inventory.</strong>
+Identify every system, file, key, hash, and signature that uses the deprecated algorithm. The metadata completeness property (Section 4.1, Property 2) makes this possible. Without complete metadata, this phase becomes an archaeological excavation through the entire data corpus.</p>
+<p><strong>Phase 2: Priority Assessment.</strong>
+Rank the inventory by sensitivity and exposure. Data stored outside the air gap (offsite backups) is the highest priority because it is most exposed to the harvest-now-decrypt-later threat. Data stored inside the air gap is lower priority because physical access is required to exploit any weakness.</p>
+<p><strong>Phase 3: Migration Execution.</strong>
+Re-encrypt, re-hash, or re-sign data using the migration target algorithm. For encrypted data, this means decrypting with the old algorithm and re-encrypting with the new one. For hashed data, this means recomputing hashes with the new function. For signatures, this means re-signing with the new algorithm.</p>
+<p><strong>Phase 4: Verification.</strong>
+Verify that all migrated data is accessible and intact under the new algorithm. Test decryption. Test hash verification. Test signature validation.</p>
+<p><strong>Phase 5: Cleanup.</strong>
+Once migration is verified, securely delete data encrypted solely under the deprecated algorithm (if copies under the new algorithm exist and are verified). Update the watchlist. Update cryptographic metadata across all institutional systems.</p>
+<p><strong>Phase 6: Documentation.</strong>
+Record the migration in the institutional decision log (Tier 2 decision). Update all articles that reference the deprecated algorithm. Add a commentary entry to this article documenting the migration and the lessons learned.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-SEC05-01:</strong> Every encrypted file, hash value, and digital signature in the institution must include metadata identifying the algorithm, key identifier, and date of operation.</li>
+<li><strong>R-SEC05-02:</strong> No cryptographic algorithm may be deployed in the institution without first being evaluated against the selection criteria in Section 4.2 and recorded on the cryptographic watchlist.</li>
+<li><strong>R-SEC05-03:</strong> The cryptographic watchlist must be reviewed at least annually. The review must include consultation of current cryptographic research obtained via the sneakernet.</li>
+<li><strong>R-SEC05-04:</strong> When an algorithm reaches Orange status, migration planning must begin within 30 days and migration execution must complete within 12 months.</li>
+<li><strong>R-SEC05-05:</strong> When an algorithm reaches Red status, migration execution must begin immediately and complete as fast as is operationally feasible.</li>
+<li><strong>R-SEC05-06:</strong> The migration procedure must be tested at least once every three years on a representative data sample, even when no migration is pending. An untested migration procedure is not a procedure.</li>
+<li><strong>R-SEC05-07:</strong> Post-quantum cryptographic readiness must be evaluated during each annual review. When mature post-quantum algorithms are available, migration planning must begin.</li>
+<li><strong>R-SEC05-08:</strong> Layered encryption must be used for any data whose confidentiality must be maintained for the full institutional lifetime and that is stored outside the air-gap perimeter.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Watchlist neglect.</strong> The cryptographic watchlist is not reviewed. An algorithm degrades from Green to Red without the institution noticing. Data encrypted under the broken algorithm is exposed. Mitigation: the annual security review (SEC-008) includes a mandatory watchlist review. The review is a checklist item, not an optional addendum.</li>
+<li><strong>Metadata absence.</strong> Cryptographic operations are performed without recording metadata. When migration is needed, the institution cannot determine which data uses the deprecated algorithm. Migration becomes guesswork. Mitigation: R-SEC05-01 makes metadata mandatory. Automated tooling should enforce metadata recording.</li>
+<li><strong>Migration paralysis.</strong> The migration procedure has never been tested. When a real migration is needed, unforeseen complications delay it beyond the window of safety. Mitigation: R-SEC05-06 requires periodic testing of the migration procedure itself.</li>
+<li><strong>Algorithm monoculture.</strong> The institution uses a single algorithm for all purposes. When that algorithm is broken, everything is compromised simultaneously. Mitigation: use different algorithms for different purposes where practical (e.g., AES for bulk encryption, a different algorithm family for key encapsulation), so that a break in one does not compromise all.</li>
+<li><strong>Quantum surprise.</strong> A practical quantum computer is developed sooner than anticipated, breaking all classical asymmetric cryptography before the institution has migrated to post-quantum alternatives. Mitigation: begin post-quantum migration planning now, even though the timeline is uncertain. Use layered encryption for the most sensitive data. Prioritize symmetric algorithms (which are quantum-resistant at doubled key lengths) over asymmetric algorithms for long-term protection.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If an algorithm is broken unexpectedly:</strong> Treat it as a Red-status event. Execute the migration procedure immediately. Assess what data was encrypted solely under the broken algorithm and is stored outside the air gap. That data should be considered potentially compromised. Assess the impact. Migrate all remaining data as rapidly as possible. Document the event.</li>
+<li><strong>If cryptographic metadata is missing:</strong> Develop tooling to scan the data corpus and identify algorithm usage by file headers, magic numbers, and structural analysis. This is labor-intensive and error-prone. Once identified, add the missing metadata. Treat this as a lesson in why metadata discipline matters. Add a commentary entry documenting the remediation.</li>
+<li><strong>If the migration procedure fails mid-execution:</strong> Do not panic. The pre-migration data still exists (migrations should never destroy the source until the destination is verified). Diagnose the failure. Fix the procedure. Resume from the point of failure. This is why Phase 4 (verification) exists as a separate step: it catches problems before Phase 5 (cleanup) makes them irreversible.</li>
+<li><strong>If post-quantum migration is needed urgently:</strong> Prioritize data stored outside the air gap. Use hybrid encryption (classical + post-quantum) as a transitional measure if full post-quantum migration is not immediately feasible. Hybrid encryption ensures that data is protected if either algorithm is secure, which is the safest posture during a transition of uncertain duration.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Establish the cryptographic watchlist. Deploy algorithms with conservative parameters. Implement metadata recording across all systems. Test the migration procedure on a representative data sample. Evaluate post-quantum algorithms for maturity and institutional suitability.</li>
+<li><strong>Years 5-15:</strong> Expect at least one watchlist status change requiring attention. Execute the first real migration if needed. By this period, post-quantum algorithms should be mature enough for institutional deployment. Plan and execute the post-quantum migration if not already done.</li>
+<li><strong>Years 15-30:</strong> The post-quantum migration should be complete. The watchlist continues to evolve. New algorithm families may emerge. The crypto-agility architecture proves its value as the institution navigates its first full algorithm lifecycle.</li>
+<li><strong>Years 30-50+:</strong> The cryptographic landscape will have changed in ways we cannot predict. The crypto-agility architecture and the watchlist discipline are the institution's defenses against that unpredictability. They do not require predicting the future. They require responding to the future as it arrives.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Cryptography is the only security domain where the threat travels backward in time. Data encrypted today can be captured today and decrypted in the future when the algorithm breaks. This means that every cryptographic decision we make today has consequences that extend to the end of the institution's lifetime. It also means that procrastination is uniquely dangerous in this domain: by the time you realize you should have migrated, the window for safe migration may have already closed. I have designed this article to make procrastination structurally difficult, through the watchlist, the mandatory reviews, and the periodic migration testing. Future maintainers: take the watchlist seriously. The algorithms will change. The only question is whether you change with them proactively or reactively.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (long-term data preservation mandate)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (threat categories 2 and 3)</li>
+<li>SEC-003 -- Key Management (key lifecycle and storage)</li>
+<li>SEC-004 -- Air-Gap Architecture (sneakernet protocol for watchlist updates)</li>
+<li>SEC-008 -- Security Audit Framework (annual cryptographic review)</li>
+<li>NIST SP 800-57 -- Recommendation for Key Management (algorithm lifecycle guidance)</li>
+<li>NIST Post-Quantum Cryptography Standardization (ML-KEM, ML-DSA standards)</li>
+<li>Domain 6 -- Data Architecture (data format and metadata standards)</li>
+<li>Domain 12 -- Disaster Recovery (backup encryption requirements)</li>
+<li>Stage 1 Documentation Framework, Domain 3: Security &amp; Integrity</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

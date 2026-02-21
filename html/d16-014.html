@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D16-014 — Interface Component Catalog &amp; Pattern Language - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li class="active"><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d16-014">
+  <h1>D16-014 &mdash; Interface Component Catalog &amp; Pattern Language</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D16-014</dd>
+  <dt>Domain</dt>
+  <dd>16 -- Interface & Navigation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D16-001 (Interface Philosophy), D16-006 (Accessibility Standards), D16-007 (Typography & Layout)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D16-010 (Multi-Generational Continuity), D16-013 (User Onboarding)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the vocabulary of interface elements that the institution uses to communicate with its users. It establishes a pattern language -- a named, documented set of reusable interaction patterns -- that ensures consistency across the interface and provides a shared vocabulary for everyone who designs, builds, evaluates, or discusses the interface.</p>
+
+<p>A pattern language is not a style guide, though it serves some of the same purposes. A style guide says "buttons look like this." A pattern language says "when the user needs to make a choice between two mutually exclusive options, use the Binary Choice pattern, which presents both options with equal visual weight and requires explicit selection." The pattern language describes the problem, the solution, the context in which the solution applies, and the relationships between patterns. It is a design grammar, not a design dictionary.</p>
+
+<p>This article is addressed to every person who builds, modifies, or evaluates interface components. It is the reference document that ensures a navigation menu built by one person looks and behaves the same as a navigation menu built by another person, across decades of development. It is also addressed to the person who must add a new pattern to the catalog: it defines the process by which the vocabulary grows.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The structure and format of pattern definitions.</li>
+<li>The foundational pattern catalog: the initial set of patterns that cover the institution's core interaction needs.</li>
+<li>Pattern relationships: how patterns compose, substitute, and conflict.</li>
+<li>The process for proposing, reviewing, and adding new patterns.</li>
+<li>The process for deprecating and replacing existing patterns.</li>
+<li>Pattern compliance requirements: when and how existing interface elements must conform to cataloged patterns.</li>
+<li>Degraded-mode variants: how patterns adapt when resources are constrained (per D16-011).</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The visual styling of patterns (covered by D16-007; this article defines structure and behaviour, not appearance).</li>
+<li>The implementation technology used to build patterns (the catalog is technology-agnostic).</li>
+<li>Content strategy or editorial patterns (covered by content domains).</li>
+<li>Quality assurance procedures for testing pattern compliance (covered by Domain 19).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>Why a Pattern Language, Not Just Components</h3>
+
+<p>Component libraries are common in software development. They provide reusable visual and interactive building blocks: buttons, forms, menus, dialogs. But component libraries are implementation artefacts. They are tied to specific technologies, specific rendering platforms, and specific code bases. When the technology changes -- and it will change multiple times in fifty years -- the component library must be rewritten.</p>
+
+<p>A pattern language operates at a higher level. It describes abstract interaction patterns that can be implemented in any technology. The "Confirmation Dialog" pattern describes a problem (the user is about to perform a consequential action), a solution (present the consequences and require explicit confirmation), and constraints (the destructive option must not be the default). This description is valid whether the pattern is implemented in HTML, in a native application framework, or in a technology that does not exist yet. The pattern survives technology transitions; only its implementation changes.</p>
+
+<h3>The Value of a Shared Vocabulary</h3>
+
+<p>When an institution has a named set of patterns, discussions about the interface become precise. Instead of "let's add a way for users to pick from a list," the discussion becomes "this is a Single-Select List pattern; it requires keyboard navigation, a visible selection indicator, and a clear empty state." The name carries the requirements. The name carries the accessibility constraints. The name carries the degraded-mode variant. Every participant in the discussion knows exactly what is being proposed because they share the vocabulary.</p>
+
+<p>Over fifty years, the people designing the interface will change many times. The pattern language provides continuity across personnel transitions. A new designer can read the pattern catalog and understand not just what the interface looks like today, but what principles and patterns underlie it, why specific patterns were chosen, and how to extend the system consistently.</p>
+
+<h3>Relationship to Christopher Alexander</h3>
+
+<p>The concept of a pattern language in software design originates with architect Christopher Alexander, whose "A Pattern Language" (1977) described recurring solutions to recurring problems in building and urban design. Alexander's insight was that good design is not the product of individual genius but of the disciplined application of solutions that have proven their value across many contexts. This article applies the same insight to interface design: the patterns documented here are not inventions but recognitions -- named solutions to problems that every interface encounters.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<pre>
+PATTERN DEFINITION STRUCTURE
+===============================
+Every pattern in the catalog follows this structure:
+
+PATTERN NAME: [Unique, descriptive name]
+PATTERN ID:   [P-D16-NNN]
+STATUS:       [Active / Deprecated / Proposed]
+PROBLEM:      What recurring interaction problem does this pattern solve?
+CONTEXT:      When should this pattern be used? When should it NOT be used?
+SOLUTION:     How does the pattern solve the problem? Structure and behavior.
+CONSTRAINTS:  What rules from D16-001, D16-006, D16-007, D16-008 apply?
+ACCESSIBILITY:What specific accessibility requirements does this pattern carry?
+DEGRADED:     How does this pattern behave under D16-011 degradation classes?
+COMPOSED OF:  What sub-patterns does this pattern include?
+RELATED:      What other patterns solve similar problems?
+EXAMPLES:     Where is this pattern used in the current interface?
+
+
+FOUNDATIONAL PATTERN CATALOG
+===============================
+
+Navigation Patterns:
+  P-D16-001  Primary Navigation       -- Main menu, always visible
+  P-D16-002  Breadcrumb Trail         -- Location indicator, hierarchical
+  P-D16-003  Table of Contents        -- Document-level section navigation
+  P-D16-004  Pagination               -- Sequential content traversal
+  P-D16-005  Cross-Reference Link     -- Inline link to related content
+
+Content Display Patterns:
+  P-D16-010  Article View             -- Full document display with metadata
+  P-D16-011  List View                -- Multiple items in scrollable list
+  P-D16-012  Detail-on-Demand         -- Summary with expandable detail
+  P-D16-013  Data Table               -- Structured tabular data display
+  P-D16-014  Metadata Display         -- Document properties sidebar
+
+Input Patterns:
+  P-D16-020  Text Field               -- Single-line text input
+  P-D16-021  Text Area                -- Multi-line text input
+  P-D16-022  Single Select            -- Choose one from list
+  P-D16-023  Multi Select             -- Choose many from list
+  P-D16-024  Binary Choice            -- Yes/No, On/Off, True/False
+  P-D16-025  Date Input               -- Locale-aware date entry
+
+Feedback Patterns:
+  P-D16-030  Confirmation Message     -- Transient success acknowledgement
+  P-D16-031  Warning Banner           -- Persistent caution notice
+  P-D16-032  Error Message            -- Persistent error with resolution steps
+  P-D16-033  Progress Indicator       -- Operation progress (determinate)
+  P-D16-034  Activity Indicator       -- Operation in progress (indeterminate)
+  P-D16-035  Confirmation Dialog      -- Pre-action destructive confirmation
+
+System Patterns:
+  P-D16-040  Degradation Indicator    -- Current system health status
+  P-D16-041  Search Interface         -- Query input, results display, filters
+  P-D16-042  Help Tooltip             -- Brief contextual explanation
+  P-D16-043  Help Expansion           -- Detailed contextual explanation
+  P-D16-044  Empty State              -- What to show when there is no content
+</pre>
+
+<h3>Pattern Composition</h3>
+
+<p>Patterns compose to form more complex interface regions. The Article View pattern (P-D16-010) composes the Breadcrumb Trail (P-D16-002), the Table of Contents (P-D16-003), the Metadata Display (P-D16-014), and potentially the Cross-Reference Link (P-D16-005). The composition is documented in the pattern definition, so a designer implementing the Article View can trace its requirements down to each constituent pattern.</p>
+
+<h3>Pattern Registry</h3>
+
+<p>The pattern catalog is maintained as a versioned registry. Each pattern has a unique ID that is never reused. Deprecated patterns remain in the registry with their deprecated status, a deprecation date, and a pointer to the replacement pattern. The registry is itself an article in the institution's content system and is navigable through the standard interface.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D16-14-01: Pattern Compliance.</strong> Every interactive element in the institution's interface MUST correspond to a pattern in the catalog. If an element does not match any existing pattern, either it must be adapted to fit an existing pattern or a new pattern must be proposed and approved before the element is deployed. No ad hoc interaction elements are permitted.</p></li>
+
+<li><p><strong>R-D16-14-02: Pattern Completeness.</strong> Every pattern definition MUST include all fields specified in the Pattern Definition Structure. No field may be omitted. The Accessibility and Degraded fields are particularly important and MUST NOT contain placeholders or "to be determined" entries. A pattern without defined accessibility behaviour is not ready for use.</p></li>
+
+<li><p><strong>R-D16-14-03: New Pattern Proposal Process.</strong> A new pattern may be proposed by anyone involved in interface design. The proposal MUST include a complete pattern definition plus a justification explaining why no existing pattern adequately addresses the problem. The proposal is reviewed by the Domain 16 lead and at least one other reviewer (preferably from Domain 19 for quality assurance perspective). If approved, the pattern is added to the catalog with Active status.</p></li>
+
+<li><p><strong>R-D16-14-04: Deprecation Process.</strong> A pattern may be deprecated when a superior alternative is available or when the problem the pattern solved no longer exists. Deprecation MUST include: a deprecation notice with the date, the reason, and a reference to the replacement pattern (if any). Deprecated patterns MUST remain in the catalog indefinitely. Interface elements using a deprecated pattern MUST be migrated to the replacement within 12 months of the deprecation date.</p></li>
+
+<li><p><strong>R-D16-14-05: Technology Independence.</strong> Pattern definitions MUST NOT reference specific implementation technologies, programming languages, frameworks, or rendering engines. A pattern must be implementable in any technology that supports the basic capabilities described in the pattern (text display, user input, visual hierarchy). Technology-specific implementation notes may be maintained separately but are not part of the pattern definition.</p></li>
+
+<li><p><strong>R-D16-14-06: Accessibility as Pattern Property.</strong> Every pattern MUST define its accessibility requirements as an inherent part of the pattern, not as an optional enhancement. The Confirmation Dialog pattern, for example, does not have "optional" screen reader support; it has "required screen reader announcement of the dialog content and required focus trapping within the dialog." Accessibility is structural, not cosmetic.</p></li>
+
+<li><p><strong>R-D16-14-07: Degraded-Mode Variant Required.</strong> Every pattern MUST define how it behaves under each degradation class from D16-011 (D1 through D4). If a pattern cannot function at a given degradation class, it must specify this explicitly and identify what simpler pattern (if any) replaces it. The Search Interface pattern (P-D16-041) may not function at D4 (minimal system); the pattern definition must state this and point to the Table of Contents pattern (P-D16-003) as the D4 alternative for content discovery.</p></li>
+
+<li><p><strong>R-D16-14-08: Catalog Versioning.</strong> The pattern catalog is versioned. Every addition, modification, or deprecation increments the catalog version. The complete catalog at every version is preserved in the institutional archive per D20 standards. This allows future maintainers to determine which patterns were available at any point in the institution's history.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Pattern proliferation.</strong> Too many patterns are added without sufficient justification, many of them slight variations on existing patterns. The catalog becomes a sprawling, confusing mess that no one reads. Designers ignore it and build ad hoc elements. Likelihood: moderate over time. Severity: high (defeats the purpose of having a catalog). Detection: periodic review of catalog size versus actual pattern usage; any pattern not used in the interface should be evaluated for removal or deprecation.</p></li>
+
+<li><p><strong>Pattern rigidity.</strong> The catalog becomes so authoritative that designers are afraid to propose new patterns or to argue that existing patterns do not serve a new use case. The catalog, intended to enable consistent design, becomes a constraint that prevents effective design. Likelihood: moderate. Severity: medium (suboptimal design choices are made to fit existing patterns rather than proposing better ones). Detection: tracking of new pattern proposals; if proposals drop to zero for more than 12 months, the catalog may be intimidating rather than enabling.</p></li>
+
+<li><p><strong>Orphaned implementations.</strong> The interface contains elements that were built to match patterns that were later deprecated, but the elements were never migrated to the replacement pattern. Over time, the interface becomes a museum of deprecated interaction styles. Likelihood: high without enforcement of the 12-month migration window. Severity: medium (creates inconsistency and confusion). Detection: automated inventory of interface elements mapped to their pattern IDs; flag any elements using deprecated patterns.</p></li>
+
+<li><p><strong>Accessibility regression in pattern evolution.</strong> A pattern is updated to add new capabilities, and the update inadvertently breaks an accessibility requirement that was met by the previous version. Likelihood: moderate. Severity: critical (accessibility regressions are always critical per D16-006). Detection: accessibility testing of every pattern update, with comparison against the previous version's accessibility profile.</p></li>
+
+<li><p><strong>Technology-implementation leakage.</strong> Pattern definitions gradually accumulate technology-specific language and assumptions, making them unintelligible after a technology transition. Likelihood: moderate (especially if the same technology is used for many years, making tech-specific language feel "normal"). Severity: high during a technology transition (the patterns that should guide the reimplementation are instead tied to the old implementation). Detection: periodic review of pattern definitions for technology-specific language; any reference to a specific framework, library, or runtime should be flagged and removed.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If the pattern catalog has become bloated:</strong> Conduct a comprehensive usage audit. Map every interface element to its corresponding pattern. Identify patterns that are defined in the catalog but not used anywhere in the interface. For each unused pattern, determine whether it serves a future need (keep it) or was an overspecification (deprecate it). Merge near-duplicate patterns into single patterns with configurable variants. Aim for the smallest catalog that covers all actual interface needs.</p></li>
+
+<li><p><strong>If designers are bypassing the catalog:</strong> Investigate why. Common reasons: the catalog is hard to search, existing patterns do not fit real needs, the proposal process is too burdensome, or the catalog is seen as a bureaucratic obstacle rather than a design tool. Address the root cause. Simplify the proposal process if it is too heavy. Add missing patterns if the catalog has gaps. Improve catalog navigation if it is hard to search. The catalog serves the designers; if designers are not using it, the catalog needs to change, not the designers.</p></li>
+
+<li><p><strong>If orphaned implementations are found:</strong> Create a migration plan that prioritises the most visible and most used orphaned elements. Assign migration tasks with deadlines. Update the interface and the pattern registry as each migration is completed. If the 12-month migration window from R-D16-14-04 has been exceeded, treat this as a quality defect per Domain 19 and escalate accordingly.</p></li>
+
+<li><p><strong>If a technology transition reveals technology-dependent patterns:</strong> Freeze the current pattern catalog. Review every pattern for technology-specific language or assumptions. Rewrite those patterns in technology-neutral terms, preserving the problem, solution, and constraints while removing implementation-specific language. The rewritten patterns become the authoritative version; the old version is archived. This is a significant effort, but it is the pattern catalog's primary value proposition: it should survive technology transitions.</p></li>
+
+<li><p><strong>If an accessibility regression is discovered in a pattern update:</strong> Immediately revert the pattern to the previous version in the catalog. Fix the accessibility issue in the updated version. Test the fix against all accessibility requirements defined in the pattern and in D16-006. Only re-deploy the updated version after the fix is verified. Record the regression, its cause, and the fix in the pattern's revision history and in this article's Commentary Section.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> Establish the foundational pattern catalog as defined in this article. Implement each pattern as a reference example. Build the pattern registry infrastructure. Expect rapid growth in the catalog as the interface reveals interaction needs not anticipated in the initial set. This is healthy; the catalog should grow during this period. Resist the urge to over-specify; keep patterns at the level of problem and solution, not at the level of pixel-perfect specification.</p></li>
+
+<li><p><strong>Years 5-15:</strong> The catalog should stabilise. New patterns are added less frequently because the foundational set covers most needs. Focus shifts to refinement: improving existing patterns based on user feedback and accessibility audits. The first deprecations may occur as early patterns are superseded by better solutions. This is also the period when the pattern language proves its value in onboarding new designers who can learn the vocabulary from the catalog.</p></li>
+
+<li><p><strong>Years 15-30:</strong> A technology transition is likely. The pattern catalog should provide the continuity bridge: new implementations of the same patterns on new technology. If the catalog was kept technology-neutral per R-D16-14-05, this transition is straightforward. If technology-specific language crept in, this is when the cost of that leakage is paid. Conduct a full catalog review during any technology transition.</p></li>
+
+<li><p><strong>Years 30-50:</strong> The pattern catalog is one of the institution's most valuable design assets. It contains decades of accumulated knowledge about what interaction patterns work and which do not. New entries in the "Deprecated" section tell the story of the institution's interface evolution as clearly as any historical document. Protect the catalog per D20 standards. It is not just a design tool; it is institutional memory in its most practical form.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The initial catalog contains approximately 30 patterns. I expect this number to grow to perhaps 50-70 over the first five years and then stabilise. If it grows to hundreds, something has gone wrong -- either patterns are being defined at too granular a level, or the institution's interface has become excessively complex.</p>
+
+<p>I have chosen the name "pattern language" deliberately, invoking Alexander's concept. The key insight from Alexander is that patterns are not isolated solutions; they form a language in which each pattern connects to others. The Confirmation Dialog pattern makes sense only in the context of the Error Message pattern and the Binary Choice pattern. The patterns must be read as a network, not as a list. Future maintainers should resist the temptation to treat the catalog as a flat inventory and should instead maintain the relational structure (Composed Of, Related) that gives the catalog its power.</p>
+
+<p>The technology-independence rule (R-D16-14-05) will be the hardest rule to enforce because it requires ongoing vigilance. When you implement the same pattern in the same framework for ten years, the framework's idioms start to feel like the pattern's requirements. They are not. The pattern is "present a choice and confirm the user's intent." The framework is how you happen to achieve that today. Future maintainers: guard this boundary ruthlessly. It is the pattern catalog's immune system against technological obsolescence.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D16-001 -- Interface Philosophy (foundational principles that constrain all patterns)</li>
+<li>D16-006 -- Accessibility Standards & Universal Design (accessibility requirements for every pattern)</li>
+<li>D16-007 -- Typography, Layout & Visual Structure (visual rendering of patterns)</li>
+<li>D16-008 -- Input Method Abstraction Layer (input method requirements for interactive patterns)</li>
+<li>D16-009 -- Error States, Feedback & System Communication (feedback pattern requirements)</li>
+<li>D16-010 -- Multi-Generational Interface Continuity (pattern deprecation and migration governance)</li>
+<li>D16-011 -- Offline & Degraded-Mode Interface Behavior (degraded-mode pattern variants)</li>
+<li>D16-012 -- Interface Localization & Cultural Adaptation (locale-aware pattern behaviour)</li>
+<li>D16-013 -- User Onboarding & Training Pathways (patterns as teachable vocabulary)</li>
+<li>D19-006 -- Review Gate Definitions (pattern compliance as a review gate)</li>
+<li>D20-002 -- Decision Log Architecture (logging pattern decisions and deprecations)</li>
+<li>Christopher Alexander, "A Pattern Language" (1977) -- conceptual foundation, archived locally per D18 provenance standards</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

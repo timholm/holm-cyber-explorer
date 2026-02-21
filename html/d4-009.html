@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D4-009 — Graceful Degradation and Minimum Viable Infrastructure - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li class="active"><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d4-009">
+  <h1>D4-009 &mdash; Graceful Degradation and Minimum Viable Infrastructure</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D4-009</dd>
+  <dt>Domain</dt>
+  <dd>4 -- Infrastructure &amp; Power</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D4-001, D4-002, D4-006, GOV-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D4-012 (spare parts priorities), D12-001 (disaster recovery infrastructure requirements)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the holm.chat Documentation Institution continues to function when infrastructure components fail. It establishes the priority order for systems, defines the concept of Minimum Viable Infrastructure (MVI), specifies load-shedding procedures, and ensures that partial failure never becomes total failure through lack of planning.</p>
+
+<p>The institution cannot guarantee that all infrastructure will function all the time. Hardware fails. Power systems degrade. Environmental controls malfunction. What the institution can guarantee is that it knows, in advance, exactly what it will sacrifice and what it will protect when failures occur. This article is that guarantee.</p>
+
+<p>Graceful degradation is not merely a technical property of a system. It is a discipline of thought. It requires the operator to decide, before a crisis, which systems matter most and what the minimum configuration is that preserves the institution's core purpose: the integrity and availability of its documentary corpus. Every system that is not part of that minimum is a system that can be sacrificed to protect the systems that are.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The system priority classification: Tier 1 (protect at all costs), Tier 2 (protect if possible), Tier 3 (sacrifice first).</li>
+<li>The definition of Minimum Viable Infrastructure: the smallest set of functioning hardware that preserves institutional continuity.</li>
+<li>Load-shedding procedures: how to reduce infrastructure load in a controlled sequence during power scarcity or equipment failure.</li>
+<li>Partial-failure operating modes: how the institution functions when specific subsystems are unavailable.</li>
+<li>Decision authority during degradation events: who decides what to shed and when.</li>
+<li>Recovery sequencing: the order in which systems are restored after a degradation event.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The causes of infrastructure failure (covered by the specific system articles: D4-002 for solar, D4-003 for batteries, D4-005 for environmental, D4-006 for power distribution).</li>
+<li>Full disaster recovery from catastrophic loss (see D12-001).</li>
+<li>Software-level graceful degradation (see Domain 5).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<p>Most organizations design their infrastructure for the normal case and handle failures reactively. When a server fails, someone decides in the moment what to do. When power becomes scarce, someone makes ad hoc decisions about what to shut down. This reactive approach works when the organization has IT staff on call and replacement hardware available in hours. It does not work for a single-operator, air-gapped institution where replacement hardware may take days or weeks to procure.</p>
+
+<p>The institution's approach is the opposite: every failure scenario that can be anticipated is anticipated, and the response is documented before the failure occurs. The operator does not make decisions during a crisis. The operator executes decisions that were made calmly, in advance, and documented in this article.</p>
+
+<p>This approach has deep roots in engineering practice. Submarine crews train for casualties using pre-defined response procedures. Power grid operators follow load-shedding schedules that were designed months in advance. Hospital triage protocols assign priorities before the patients arrive. The institution follows the same principle: decide the priorities now, while there is time to think clearly, so that during a crisis the only question is execution, not decision.</p>
+
+<p>D4-001's three-tier power architecture was designed specifically to support graceful degradation. The tiers are not merely three sources of power; they are three stages of degradation, each with a defined scope and duration. This article extends that concept from power to all infrastructure systems.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>9.1 System Priority Classification</h3>
+
+<p>Every infrastructure component is classified into one of three tiers based on its relationship to the institution's core purpose:</p>
+
+<p><strong>Tier 1 -- Institutional Survival (protect at all costs):</strong></p>
+<ul>
+<li>Primary storage server and its storage media (contains the canonical copy of the documentary corpus).</li>
+<li>Primary power path to the storage server (including the UPS protecting it).</li>
+<li>Environmental controls sufficient to prevent thermal damage to the storage server.</li>
+<li>Network connectivity between the storage server and the primary backup server (to maintain the ability to replicate data).</li>
+</ul>
+
+<p><strong>Tier 2 -- Operational Capability (protect if resources allow):</strong></p>
+<ul>
+<li>Primary backup server and its storage media.</li>
+<li>Operator workstation (required for the operator to interact with the institution).</li>
+<li>Network switch providing connectivity between Tier 1 and Tier 2 systems.</li>
+<li>Environmental monitoring sensors (to detect conditions that threaten Tier 1 systems).</li>
+<li>Secondary power systems (generators, secondary battery banks).</li>
+</ul>
+
+<p><strong>Tier 3 -- Convenience and Expansion (sacrifice first):</strong></p>
+<ul>
+<li>Secondary backup servers and archive storage.</li>
+<li>Quarantine machine and import processing systems.</li>
+<li>Additional workstations beyond the primary.</li>
+<li>Non-essential monitoring and logging systems.</li>
+<li>Development and testing environments.</li>
+</ul>
+
+<h3>9.2 Minimum Viable Infrastructure (MVI)</h3>
+
+<p>The MVI is the smallest infrastructure configuration that preserves the institution's core function. At MVI, the institution can:</p>
+<ul>
+<li>Store and serve the documentary corpus from the primary storage server.</li>
+<li>Accept operator queries and modifications via a single workstation.</li>
+<li>Maintain environmental conditions sufficient to prevent hardware damage.</li>
+<li>Run on available power without exceeding supply.</li>
+</ul>
+
+<p>At MVI, the institution cannot:</p>
+<ul>
+<li>Perform automated backups (the backup server may be powered down).</li>
+<li>Import new content (the quarantine machine may be powered down).</li>
+<li>Perform archive operations.</li>
+<li>Run non-essential services or monitoring.</li>
+</ul>
+
+<p>The MVI configuration consumes approximately 30-40% of the institution's normal power draw, depending on the specific hardware in use. This significantly extends the duration that secondary and emergency power can sustain operations.</p>
+
+<h3>9.3 Load-Shedding Sequence</h3>
+
+<p>When available power drops below the institution's normal demand, the operator executes the load-shedding sequence in order:</p>
+
+<ol>
+<li><strong>Phase 1: Shed Tier 3 systems.</strong> Gracefully shut down all Tier 3 systems. This is a controlled, non-emergency action. Data is saved, services are stopped, and systems are powered off cleanly. Power savings: approximately 30-40% of normal draw.</li>
+<li><strong>Phase 2: Shed non-essential Tier 2 systems.</strong> Gracefully shut down the quarantine machine, secondary backup servers, and additional workstations. Retain the primary backup server, one operator workstation, and the network switch. Power savings: an additional 15-25% of normal draw.</li>
+<li><strong>Phase 3: Shed remaining Tier 2 systems.</strong> Gracefully shut down the primary backup server. The operator workstation remains operational to manage the storage server. At this point, only MVI remains. Power savings: approximately 10-15% additional.</li>
+<li><strong>Phase 4: Controlled shutdown (emergency only).</strong> If power is insufficient even for MVI, execute a controlled shutdown of all systems. Save all data. Stop all services. Power off cleanly. This is the last resort and triggers D12-001 disaster recovery procedures upon restoration.</li>
+</ol>
+
+<h3>9.4 Partial-Failure Operating Modes</h3>
+
+<p><strong>Primary storage server failure (non-power-related):</strong> Promote the primary backup server to serve as the document server. Restrict operations to read-only until the primary server is repaired or replaced. Do not perform writes to the backup copy unless absolutely necessary -- the backup is a known-good state that should be preserved.</p>
+
+<p><strong>Network failure:</strong> If the switch fails, the storage server and workstation can be connected directly via a crossover cable or a direct Ethernet connection. This provides minimal connectivity for the operator to interact with the storage server. All other network-dependent operations are suspended.</p>
+
+<p><strong>Environmental control failure:</strong> If cooling fails, immediately reduce the thermal load by shutting down Tier 3 and non-essential Tier 2 systems. Open doors and windows for passive ventilation if outdoor temperatures permit. Monitor the equipment room temperature continuously. If the room temperature approaches 35 degrees Celsius, execute a controlled shutdown of all remaining systems to prevent thermal damage.</p>
+
+<p><strong>Single drive failure in a RAID array:</strong> The array continues to operate in degraded mode. The failed drive is replaced at the earliest opportunity. No additional drive failures can be tolerated during this period. If a second drive shows S.M.A.R.T. warnings during the rebuild, proactively replace it before it fails.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D4-30: Data Integrity Over Availability.</strong> In any degradation scenario, data integrity takes absolute precedence over system availability. If there is any risk that continued operation will corrupt data, the affected systems are shut down. It is better to be offline with intact data than online with corrupted data.</li>
+<li><strong>R-D4-31: Load Shedding Follows the Sequence.</strong> The operator does not improvise load-shedding decisions during a power scarcity event. The sequence in Section 9.3 is followed in order. Deviations from the sequence are permitted only if the specific situation makes the sequence inapplicable (e.g., a Tier 3 system cannot be shut down because it is already off), and deviations are documented after the event.</li>
+<li><strong>R-D4-32: MVI Is Tested Annually.</strong> Once per year, the operator reduces the institution to MVI configuration and operates in that state for at least four hours. This test verifies that MVI actually works -- that the storage server can function without the backup server, that the workstation can interact with the storage server directly, and that the power draw at MVI is within the documented range.</li>
+<li><strong>R-D4-33: Every Degradation Event Is Documented.</strong> Any event that triggers load shedding or partial-failure operation is documented within 48 hours of resolution. The documentation includes: the triggering event, the systems affected, the actions taken, the duration of degraded operation, any data integrity issues, and recommendations for preventing recurrence.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Cascade failure.</strong> A single component failure triggers a chain of secondary failures. Example: a cooling failure causes a drive to overheat and fail, which causes a RAID array to degrade, which increases load on remaining drives, which causes another drive to fail. Mitigation: the load-shedding sequence is designed to break cascades by proactively removing load. When any failure occurs, the operator immediately assesses whether the failure could trigger secondary effects and preemptively takes action.</li>
+<li><strong>Decision paralysis during crisis.</strong> The operator, faced with a rapidly evolving failure, freezes or makes poor decisions because the situation was not anticipated. Mitigation: this article pre-makes all decisions. The operator does not decide what to shed; the operator follows the sequence. Annual MVI testing builds familiarity with the degraded-operation procedures.</li>
+<li><strong>MVI proves insufficient.</strong> The MVI configuration, as documented, turns out not to work in practice -- perhaps a dependency was not identified, or a single machine cannot perform both storage and workstation roles as assumed. Mitigation: annual MVI testing catches these problems before a real crisis reveals them. The MVI definition in Section 9.2 is updated based on test results.</li>
+<li><strong>Extended degradation.</strong> The institution operates in a degraded state for an extended period (weeks or months) because replacement hardware is not available. Operating at MVI for extended periods increases the risk of the remaining hardware failing from overwork or lack of maintenance. Mitigation: during extended degradation, the operator reduces operational tempo (fewer hours of active operation per day) to reduce wear. Procurement of replacement hardware is treated as the highest priority.</li>
+<li><strong>Failure during maintenance.</strong> A component fails while another component is being maintained, pushing the institution below MVI unexpectedly. Mitigation: maintenance on Tier 1 components is never performed simultaneously. Before beginning maintenance on any component, the operator verifies that all other components in the same tier are healthy.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>Restoring from MVI to full operations:</strong> Systems are restored in reverse order of the load-shedding sequence. First, restore Tier 2 systems: power on the primary backup server, verify connectivity, initiate a backup of the storage server to confirm the backup server is operational. Then restore Tier 3 systems one at a time, verifying each before proceeding to the next. Perform a full system health check after all systems are restored.</li>
+<li><strong>Restoring from controlled shutdown (Phase 4):</strong> Follow D12-001 restart procedures. Power on systems in priority order: primary storage server first, then network switch, then operator workstation. Verify storage integrity (filesystem checks, data checksums) before bringing any services online. Once the primary storage server is verified, power on the backup server and initiate a full backup. Then restore remaining systems per the standard sequence.</li>
+<li><strong>Restoring from a cascade failure:</strong> Identify the root cause of the cascade before restoring any systems. If the root cause is not identified and corrected, restoring systems may simply restart the cascade. Once the root cause is addressed, restore systems one at a time in priority order, monitoring each for 15 minutes before proceeding to the next.</li>
+<li><strong>Restoring after extended degradation:</strong> After an extended period of MVI operation, perform a full hardware health assessment before restoring to full operations. Check S.M.A.R.T. data on all drives. Check UPS battery health. Inspect all cables and connections. Replace any components showing signs of stress or degradation before returning to full load.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The load-shedding sequence and MVI definition are calibrated against the actual hardware estate. Initial definitions in this article are based on anticipated hardware; they are refined through annual MVI testing to reflect reality. The first real degradation event will test the procedures and likely reveal improvements needed.</li>
+<li><strong>Years 5-15:</strong> As the hardware estate grows, the tier classifications are updated. New systems are classified at the time of deployment. The load-shedding sequence may become more granular as more systems are available to shed. The MVI power draw may increase as the primary storage server's capacity grows.</li>
+<li><strong>Years 15-30:</strong> Major hardware transitions may temporarily increase degradation risk as new systems are integrated alongside old ones. During transition periods, the MVI definition is expanded to include both old and new primary storage systems until the transition is complete. The load-shedding sequence is updated to account for dual-generation infrastructure.</li>
+<li><strong>Years 30-50:</strong> The concept of graceful degradation and the discipline of pre-made decisions persist indefinitely. The specific systems, power draws, and shedding sequences will change completely. The principle -- decide now, execute later -- endures because it is not a technical solution but a philosophical commitment to preparedness.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong></p>
+
+<p>The most dangerous moment in any infrastructure failure is the moment the operator starts thinking "maybe I can keep everything running if I just..." and then makes a series of improvised decisions that delay the inevitable while increasing the damage. I have been that operator. I have watched a RAID array degrade to the point of unrecoverability because I kept the system running instead of shutting it down and addressing the problem.</p>
+
+<p>This article exists to prevent that. The decisions are made now, while there is no crisis and no pressure. The shedding sequence is deliberate, not improvised. The MVI definition is explicit, not discovered in the moment. When the power flickers or the temperature rises or a drive clicks ominously, the operator does not think. The operator opens this article, finds the relevant procedure, and follows it. Thinking is for before the crisis and after the crisis. During the crisis, there are only procedures.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D4-001 -- Infrastructure Philosophy and Physical Site Requirements (three-tier power architecture as degradation framework)</li>
+<li>D4-002 -- Solar Power System Design and Maintenance (primary power capacity and limitations)</li>
+<li>D4-003 -- Battery Systems (secondary power duration and capacity)</li>
+<li>D4-005 -- Environmental Control Systems (thermal management during degradation)</li>
+<li>D4-006 -- Power Distribution and UPS Management (power distribution during load shedding)</li>
+<li>D4-012 -- Spare Parts and Inventory Management (spare availability for recovery)</li>
+<li>D12-001 -- Disaster Recovery Philosophy (full recovery from catastrophic loss)</li>
+<li>GOV-001 -- Authority Model (decision authority during degradation events)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo during extended degradation)</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

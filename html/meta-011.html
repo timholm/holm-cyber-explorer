@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>META-011 — The Documentation Dependency Graph: Maintenance and Verification - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li class="active"><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="meta-011">
+  <h1>META-011 &mdash; The Documentation Dependency Graph: Maintenance and Verification</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>META-011</dd>
+  <dt>Domain</dt>
+  <dd>0 -- Meta-Documentation & Standards</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, META-001 (Stage 1 Meta-Framework)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>META-012, META-013, META-014, META-015. All articles that participate in the dependency graph, which is to say all articles.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes the procedures and principles for maintaining the dependency graph that connects every article in the holm.chat Documentation Institution to every other article it references, relies upon, or constrains. The dependency graph is not a decorative feature. It is a structural element of the institution -- the connective tissue that transforms a collection of individual articles into a coherent system of knowledge. When the graph is accurate, the institution can be navigated, audited, and understood. When the graph is inaccurate, the institution is a pile of documents pretending to be a system.</p>
+<p>The dependency graph is defined in Section 8 of the Stage 1 Meta-Framework and is recorded in the front-matter of every article through the <code>depends_on</code> and <code>depended_on_by</code> fields. This article goes beyond the definition. It addresses the ongoing maintenance of that graph as the institution grows -- how to detect when the graph has become inaccurate, how to repair it, how to visualize it, how to audit it, and how to evolve it as articles are added, merged, archived, or split.</p>
+<p>Every article in the institution participates in the dependency graph. Therefore, every article is affected by the health of the graph. A broken reference in one article can propagate confusion across the entire corpus. This article treats the dependency graph as a system that requires maintenance, just like the hardware, the power systems, or the security architecture. It has failure modes. It needs recovery procedures. It evolves over time. And it must be tended by someone who understands why it matters.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition of a dependency in this institution and the distinction between hard dependencies, soft dependencies, and informational references.</li>
+<li>The procedures for maintaining the dependency graph as articles are created, revised, merged, archived, or split.</li>
+<li>The dependency audit: a periodic procedure for verifying the accuracy and completeness of the graph.</li>
+<li>Detection of common graph pathologies: broken references, orphaned articles, circular dependencies, stale dependencies, and phantom dependencies.</li>
+<li>Visualization procedures for rendering the graph in forms that support human comprehension and diagnostic analysis.</li>
+<li>The evolution of the graph over the institution's lifetime and the principles that guide its growth.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The initial construction of the dependency graph (see Stage 1 Meta-Framework, Section 8).</li>
+<li>The website rendering of the dependency graph visualization (see SITE domain articles).</li>
+<li>The cross-domain review process triggered by dependency changes (see Stage 1 Meta-Framework, Section 5).</li>
+<li>Specific tooling for graph analysis (tooling decisions belong in Domain 5, constrained by the principles stated here).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Dependency Graphs Matter</h3>
+<p>A documentation corpus of 250 to 400 articles -- the projected size of this institution -- is too large to hold in a single person's head. No operator will remember that SEC-004 depends on D18-001, or that archiving D6-003 will break references in seven other articles across four domains. The dependency graph externalizes this knowledge. It makes the invisible connections visible.</p>
+<p>But a dependency graph is only as useful as it is accurate. An outdated graph is worse than no graph at all, because it creates false confidence. The operator trusts the graph, acts on its information, and discovers too late that the graph lied. A dependency listed in the front-matter that no longer exists in the article body. A reference added to the text but never recorded in the metadata. An article archived without updating the articles that depended on it. Each of these is a graph corruption, and each creates a small pocket of institutional confusion that compounds over time.</p>
+<h3>3.2 The Living Graph</h3>
+<p>The dependency graph is not created once and preserved like a monument. It is a living structure that changes every time an article is written, revised, merged, split, or archived. Over the lifetime of the institution, the graph will undergo hundreds of modifications. Some will be carefully managed through the governance process. Others will be the result of editorial changes that seem minor but have structural implications the author did not anticipate.</p>
+<p>This is normal. The graph is not fragile. But it requires periodic maintenance, just like any other system. The audit procedures in this article are the graph's equivalent of the quarterly infrastructure review: a systematic check to ensure that reality matches the model.</p>
+<h3>3.3 The Graph as Diagnostic Tool</h3>
+<p>A healthy dependency graph reveals the institution's structure at a glance. It shows which articles are foundational and which are peripheral. It shows where knowledge is concentrated and where it is sparse. It shows which domains are tightly coupled and which are independent. And it shows, through its pathologies, where the institution is stressed.</p>
+<p>An article with no incoming dependencies may be orphaned -- valuable knowledge that nothing else in the institution connects to. An article with fifty incoming dependencies may be overloaded -- carrying too much structural weight and representing a single point of failure. A cluster of circular dependencies may indicate a conceptual knot that needs to be untangled through refactoring. The graph, read with diagnostic intent, is a health monitor for the institution's knowledge architecture.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Dependency Types</h3>
+<p>Not all dependencies are equal. The institution recognizes three types:</p>
+<p><strong>Hard Dependency.</strong> Article A has a hard dependency on Article B when A cannot be understood, followed, or implemented without B. If B is removed or fundamentally changed, A must be revised. Hard dependencies are recorded in the <code>depends_on</code> front-matter field and must be bidirectionally maintained in B's <code>depended_on_by</code> field.</p>
+<p><strong>Soft Dependency.</strong> Article A has a soft dependency on Article B when A references B for additional context, background, or related information, but A remains independently comprehensible and actionable without B. Soft dependencies are recorded in the References section but do not appear in the <code>depends_on</code> front-matter field.</p>
+<p><strong>Informational Reference.</strong> Article A mentions Article B in passing -- perhaps in a Commentary entry or an Evolution Path note -- without creating any functional relationship. Informational references do not appear in the front-matter or the formal References section. They are captured only through full-text search.</p>
+<p>The distinction matters because hard dependencies create structural obligations. When you modify or archive an article, you must update all articles that have hard dependencies on it. Soft dependencies create awareness obligations -- you should check, but the system does not break if you do not. Informational references create no obligations at all.</p>
+<h3>4.2 The Graph Structure</h3>
+<p>The dependency graph is a directed graph. An edge from A to B means "A depends on B." The graph has the following structural properties:</p>
+<p><strong>Roots.</strong> Articles with no outgoing dependency edges -- they depend on nothing. In practice, the only true root is ETH-001, because even CON-001 depends on ETH-001. Some articles may appear root-like because their dependencies are on documents outside the formal article system (external references, physical artifacts), but within the institution's article corpus, ETH-001 is the sole root.</p>
+<p><strong>Leaves.</strong> Articles with no incoming dependency edges -- nothing depends on them. Leaves are not inherently problematic. A highly specialized operational procedure may be a leaf because it serves a specific function that no other article needs to reference. But a large number of leaves may indicate orphaned knowledge or poor cross-referencing.</p>
+<p><strong>Hubs.</strong> Articles with many incoming dependency edges -- many other articles depend on them. The five Core Charter articles (ETH-001, CON-001, GOV-001, SEC-001, OPS-001) are natural hubs. Hubs require special care: any change to a hub article has a blast radius proportional to its incoming edge count.</p>
+<p><strong>Clusters.</strong> Groups of articles with dense internal connections and sparse connections to other clusters. Clusters often correspond to domains, but not always. A cross-domain cluster around a shared subsystem (such as the sneakernet protocol, which involves SEC, OPS, and Domain 18 articles) may emerge naturally.</p>
+<h3>4.3 The Dependency Audit Procedure</h3>
+<p>The dependency audit is performed quarterly as part of the operational tempo defined in OPS-001. It consists of five steps:</p>
+<p><strong>Step 1: Extract.</strong> For every published article, extract the <code>depends_on</code> and <code>depended_on_by</code> fields from the front-matter. Compile these into a single adjacency list. This is the "declared graph."</p>
+<p><strong>Step 2: Scan.</strong> For every published article, scan the body text for all Article ID references (matching the pattern <code>{DOMAIN}-{SEQ}-ART-{NUM}</code> or the shorthand <code>{DOMAIN}-{NUM}</code> convention). Compile these into a second adjacency list. This is the "actual graph."</p>
+<p><strong>Step 3: Compare.</strong> Compare the declared graph to the actual graph. Flag every discrepancy:
+- References in the body that do not appear in the front-matter (potential undeclared dependencies).
+- Dependencies in the front-matter that do not appear in the body (potential stale dependencies).
+- Articles referenced in the body that do not exist or are archived without a successor (broken references).
+- Bidirectionality violations: A lists B in <code>depends_on</code> but B does not list A in <code>depended_on_by</code>, or vice versa.</p>
+<p><strong>Step 4: Classify.</strong> For each discrepancy, determine whether it is a graph error (the metadata needs updating), a classification error (a hard dependency should be a soft reference, or vice versa), or a substantive error (the article body references an article it should not, or fails to reference one it should).</p>
+<p><strong>Step 5: Repair.</strong> For graph errors and classification errors, update the front-matter. For substantive errors, create a revision task per GOV-001. Record the audit results in the institutional log with the count of discrepancies found, classified, and resolved.</p>
+<h3>4.4 Visualization Procedures</h3>
+<p>The dependency graph should be rendered visually at least once per year, during the annual operations cycle. Visualization serves two purposes: it makes the graph's structure comprehensible to a human observer, and it reveals structural patterns that are invisible in the raw adjacency list.</p>
+<p><strong>Domain-level visualization.</strong> Show the 20 domains as nodes with edges representing inter-domain dependencies. This is the highest-level view and is already defined in the Stage 1 Meta-Framework, Section 8.1. Update it when domain-level dependencies change.</p>
+<p><strong>Article-level visualization within a domain.</strong> For each domain, show all articles as nodes with intra-domain dependency edges. This reveals the internal structure of a domain and identifies articles that are central versus peripheral.</p>
+<p><strong>Cross-domain detail visualization.</strong> For a specific cross-domain relationship (such as SECR-to-OPSYS), show all articles involved with their inter-domain edges. This reveals the coupling between domains at the article level.</p>
+<p><strong>Hub visualization.</strong> Show the top 10 most-depended-upon articles with their incoming edges. This identifies structural keystones and single points of failure.</p>
+<p>Visualizations should be stored as assets alongside this article. They are snapshots, not live views. Each visualization should be dated and preserved in the <code>_versions/</code> directory so that the institution can compare its structure over time.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-META-11-01:</strong> Every article in Published state must have accurate <code>depends_on</code> and <code>depended_on_by</code> fields in its front-matter. Accuracy is verified through the dependency audit.</li>
+<li><strong>R-META-11-02:</strong> The <code>depends_on</code> and <code>depended_on_by</code> relationship must be bidirectional. If A lists B in <code>depends_on</code>, B must list A in <code>depended_on_by</code>. The dependency audit verifies this.</li>
+<li><strong>R-META-11-03:</strong> When an article is archived, all articles listing it in <code>depends_on</code> must be reviewed and updated. If the archived article has a successor, the dependency must be redirected. If it has no successor, the depending article must be revised to remove or replace the dependency.</li>
+<li><strong>R-META-11-04:</strong> When an article is merged, all dependencies on both source articles must be redirected to the surviving article.</li>
+<li><strong>R-META-11-05:</strong> When an article is split (forked), the dependencies of the original article must be partitioned between the two resulting articles according to which article now owns the relevant content.</li>
+<li><strong>R-META-11-06:</strong> The dependency audit must be performed quarterly. Results must be recorded in the institutional log. Discrepancies must be resolved within 30 days of discovery.</li>
+<li><strong>R-META-11-07:</strong> No article may be published with a <code>[PENDING: ...]</code> reference in its body. All dependencies must resolve to existing articles before publication.</li>
+<li><strong>R-META-11-08:</strong> Circular dependencies between two articles (A depends on B and B depends on A) are permitted only when the dependency is genuinely bidirectional and both articles are necessary for the other's comprehension. Circular dependencies must be documented in the Commentary Section of both articles with an explanation of why the circularity exists and why it cannot be resolved.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Graph drift.</strong> The most common failure. The dependency graph in the front-matter gradually diverges from the actual references in article bodies. Authors add references without updating metadata, or update metadata without updating references. The graph becomes unreliable. Mitigation: the quarterly dependency audit (Section 4.3) catches drift before it compounds.</p>
+</li>
+<li>
+<p><strong>Orphaned articles.</strong> An article exists in Published state but nothing depends on it and nothing references it. It is functionally invisible -- part of the corpus but disconnected from the knowledge network. The article may be valuable, but its value is inaccessible because nobody encounters it through the normal navigation of the graph. Mitigation: the annual visualization review identifies articles with zero incoming edges.</p>
+</li>
+<li>
+<p><strong>Broken references.</strong> An article references another article that has been archived, merged, or never existed. The operator follows the reference and finds nothing, or finds an archived article with no clear successor. Mitigation: the dependency audit detects broken references. R-META-11-03 prevents them during archival.</p>
+</li>
+<li>
+<p><strong>Hub overload.</strong> A single article accumulates so many incoming dependencies that any change to it triggers a cascade of required reviews across the entire institution. The article becomes effectively frozen -- too dangerous to change, too important to ignore. Mitigation: when an article's incoming dependency count exceeds 25, evaluate whether its content should be factored into multiple articles with narrower scopes.</p>
+</li>
+<li>
+<p><strong>Phantom dependencies.</strong> The front-matter lists dependencies that no longer reflect actual content relationships. The articles were once connected, but revisions removed the substantive link while leaving the metadata intact. Phantom dependencies clutter the graph and waste audit time. Mitigation: the dependency audit compares front-matter to body text.</p>
+</li>
+<li>
+<p><strong>Visualization neglect.</strong> The graph is maintained in metadata but never visualized. Structural pathologies accumulate invisibly because nobody has looked at the graph's shape in years. Mitigation: annual visualization requirement.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<h3>7.1 Recovery from Graph Drift</h3>
+<ol>
+<li>Perform a full dependency audit per Section 4.3, covering all published articles, not just the subset scheduled for the current quarter.</li>
+<li>Compile the complete list of discrepancies.</li>
+<li>Classify each discrepancy using the categories in Step 4 of the audit procedure.</li>
+<li>For graph errors and classification errors: update front-matter in a single dedicated session. Version-bump each corrected article as a patch increment.</li>
+<li>For substantive errors: create revision tasks. Prioritize by incoming dependency count -- fix errors in hub articles first.</li>
+<li>Record the recovery in the institutional log, including the total count of corrections and the estimated time period over which the drift accumulated.</li>
+</ol>
+<h3>7.2 Recovery from Orphaned Articles</h3>
+<ol>
+<li>Generate the list of articles with zero incoming dependency edges (excluding ETH-001, which is the root and has no incoming edges by definition).</li>
+<li>For each orphaned article, determine whether the orphaning is intentional (the article is standalone by design) or accidental (references that should exist were never created or were lost during revisions).</li>
+<li>For intentionally standalone articles: add a Commentary entry explaining why the article has no incoming dependencies.</li>
+<li>For accidentally orphaned articles: identify which articles should reference them and create revision tasks.</li>
+<li>For articles that are orphaned because they are no longer relevant: begin the archival process per the Stage 1 Meta-Framework, Section 4.</li>
+</ol>
+<h3>7.3 Recovery from Broken References</h3>
+<ol>
+<li>Identify all broken references through the dependency audit.</li>
+<li>For each broken reference, determine whether the target article was archived (check the <code>_versions/</code> directory and archival records), merged (check the surviving article's version history), or never existed (check the institutional log for pending articles that were never completed).</li>
+<li>Redirect references to successor articles, surviving articles, or remove references that point to content that no longer exists anywhere in the institution.</li>
+<li>Update both the body text and the front-matter of every affected article.</li>
+<li>Document the repair in the institutional log.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The dependency graph is being constructed alongside the articles themselves. Expect frequent additions and corrections as the initial corpus is built. The quarterly audit will be intensive during this period because many articles are being created simultaneously and cross-references are still being established.</li>
+<li><strong>Years 5-15:</strong> The graph stabilizes as the core corpus reaches maturity. The quarterly audit becomes lighter -- more verification, less correction. Visualization becomes more valuable as the graph is large enough to reveal meaningful structural patterns.</li>
+<li><strong>Years 15-30:</strong> As articles are revised, merged, archived, and replaced, the graph undergoes structural evolution. The procedures in this article should be mature enough to handle these transitions smoothly. The historical visualizations become a valuable record of how the institution's knowledge structure has changed over time.</li>
+<li><strong>Years 30-50+:</strong> A successor operator inherits the graph along with the articles. The graph is their primary navigation tool for understanding how the institution's knowledge fits together. Its accuracy at this point is a measure of institutional discipline over the preceding decades.</li>
+<li><strong>Long-term tooling evolution:</strong> The manual audit procedures defined here may eventually be augmented or replaced by automated tools. When tooling changes occur, the principles remain: bidirectionality, quarterly verification, visualization, and prompt repair.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The dependency graph is one of those features that seems like administrative overhead until the first time it saves you. The first time you archive an article and the graph tells you exactly which seven other articles need attention -- that is the moment the graph pays for every minute invested in maintaining it. I have chosen a quarterly audit cycle because it balances thoroughness against sustainability. If the audit consistently finds zero discrepancies, the cycle can be relaxed. If it consistently finds dozens, something in the editorial process needs to be tightened. The audit is a diagnostic of the editorial process as much as it is a diagnostic of the graph itself.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>META-001 -- Stage 1 Meta-Framework (Sections 8.1 through 8.5: original graph definition, dependency matrix, critical path, and circular dependency resolution)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 3: Transparency of Operation -- the graph makes the institution's structure transparent)</li>
+<li>GOV-001 -- Authority Model (decision tier classification for dependency-related changes)</li>
+<li>OPS-001 -- Operations Philosophy (quarterly review cycle within which the dependency audit is performed)</li>
+<li>CON-001 -- The Founding Mandate (the documentation-first principle that makes the graph necessary)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D4-006 — Power Distribution and UPS Management - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li class="active"><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d4-006">
+  <h1>D4-006 &mdash; Power Distribution and UPS Management</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D4-006</dd>
+  <dt>Domain</dt>
+  <dd>4 -- Infrastructure & Power</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, OPS-001, D4-001, D4-002, D4-003</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D4-004 (Network Hardware -- power supply), D4-005 (Environmental Controls -- power supply). All articles involving equipment power connections, power reliability, or shutdown procedures.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article provides a complete reference for the internal power distribution system of the holm.chat Documentation Institution: how electrical power flows from the battery bank and inverter to every piece of equipment, how uninterruptible power supply (UPS) systems provide bridging power during transitions and failures, how loads are balanced across circuits, and how the institution responds to extended power outages including generator integration.</p>
+<p>The solar array generates power. The battery bank stores it. The inverter converts it to usable AC. But between the inverter's output terminals and the computing equipment's power supplies, there is an entire distribution system that must be designed, documented, and maintained. Circuit breakers, distribution panels, UPS units, power distribution units (PDUs), transfer switches, and the wiring that connects them all -- each component is a potential point of failure, and a failure in the power distribution system can damage equipment or cause data loss just as surely as a failure in the generation system.</p>
+<p>This article is also the institution's guide to power emergencies. When the sun does not shine for a week, when the inverter fails, when the battery bank is depleted, or when a circuit breaker trips at 3 AM -- the procedures are here. The operator who faces a power emergency should not have to reason from first principles. They should have to follow documented steps.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Power distribution architecture: from inverter output to equipment power supply input.</li>
+<li>Circuit design: how many circuits, what capacity, how they are protected.</li>
+<li>UPS systems: sizing, battery maintenance, testing, and replacement.</li>
+<li>Transfer switch configuration: automatic and manual transfer between power sources.</li>
+<li>Load balancing: distributing equipment across circuits to prevent overload.</li>
+<li>The power audit: a structured assessment of the entire power distribution chain.</li>
+<li>Power monitoring: what to measure, how to measure it, and how to interpret the data.</li>
+<li>Extended power outage procedures: load shedding, orderly shutdown, and generator integration.</li>
+<li>Generator systems: selection, fuel management, connection, and operational procedures.</li>
+</ul>
+<p>This article does not cover solar panel systems (see D4-002) or battery bank management (see D4-003) except where they interface with the distribution system. It covers power from the point where it leaves the battery/inverter system to the point where it enters the equipment.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Power Distribution Chain</h3>
+<p>In a grid-connected building, power distribution is handled by the utility and the building's electrical panel. The operator plugs equipment in and gives it no further thought. In an off-grid institution, the operator is the utility. The entire power distribution chain is the operator's responsibility: from solar panel to battery to inverter to distribution panel to circuit breaker to outlet to power strip to equipment power supply. A failure anywhere in this chain interrupts power to everything downstream.</p>
+<p>The chain has another property that demands attention: it concentrates risk. A single inverter failure takes out all AC loads. A single distribution panel fault takes out all circuits it feeds. A single circuit breaker trip takes out everything on that circuit. The distribution system must be designed with these concentration points in mind, and redundancy must be introduced where the consequences of failure are severe.</p>
+<h3>3.2 Why UPS in an Off-Grid System</h3>
+<p>The question is natural: if the entire institution runs on batteries already, why add UPS batteries? The answer is about transition time.</p>
+<p>The institution's main battery bank powers the inverter, which produces AC power. But the inverter itself can fail, be switched off for maintenance, or trip on a fault condition. When it does, AC power disappears instantly. Computing equipment -- especially servers and storage arrays with data in flight -- can suffer data corruption from unclean shutdowns. A UPS provides bridging power: enough time for the operator to respond, switch to a backup inverter, start a generator, or perform an orderly shutdown of critical systems.</p>
+<p>The UPS also provides power conditioning: it filters electrical noise, suppresses voltage spikes, and ensures that the power reaching the equipment is stable and clean. Even a pure sine wave inverter can produce transient anomalies during load changes or switching events. The UPS smooths these out.</p>
+<h3>3.3 The Generator Question</h3>
+<p>A generator is the power source of last resort. When the solar array cannot generate, the battery bank is depleted, and the institution faces a choice between shutting down and running a combustion engine -- the generator is the answer. Not every institution needs one. In climates with reliable solar resources and modest computing loads, a properly sized solar and battery system may provide sufficient autonomy year-round. In climates with extended low-sun periods (northern latitudes in winter), a generator provides the margin of safety that solar and batteries alone cannot.</p>
+<p>This article covers generator integration as an optional but recommended component of the power system. The decision to include a generator is a Tier 2 governance decision based on the site's solar resource, the institution's load profile, and the operator's risk tolerance.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Power Distribution Architecture</h3>
+<p>The institution's power distribution follows a hierarchical architecture:</p>
+<p><strong>Level 1: Source.</strong> The primary source is the inverter, fed by the battery bank (which is charged by the solar array). The secondary source is the generator (if installed). A transfer switch -- manual or automatic -- selects between the primary and secondary sources.</p>
+<p><strong>Level 2: Main distribution panel.</strong> The transfer switch output feeds a main distribution panel (breaker panel). The panel contains circuit breakers sized for each branch circuit. All wiring from this point forward is standard AC electrical wiring installed to applicable electrical codes.</p>
+<p><strong>Level 3: Branch circuits.</strong> Individual circuits run from the distribution panel to the equipment areas. Each circuit serves a defined set of outlets or equipment. Circuits are segregated by function: critical computing equipment on dedicated circuits, environmental controls on separate circuits, lighting and general power on separate circuits.</p>
+<p><strong>Level 4: UPS systems.</strong> Critical computing equipment is powered through UPS units. The UPS is plugged into the branch circuit and the equipment is plugged into the UPS. The UPS provides bridging power and power conditioning between the branch circuit and the equipment.</p>
+<p><strong>Level 5: Power distribution units (PDUs).</strong> In rack-mounted installations, PDUs distribute power from the UPS to individual devices in the rack. PDUs with per-outlet monitoring allow the operator to measure the power consumption of individual devices.</p>
+<h3>4.2 Circuit Design</h3>
+<p><strong>Sizing:</strong> Each branch circuit must be rated for 125% of the maximum expected continuous load on that circuit (per standard electrical code practice). A circuit serving 800 watts of continuous load requires a circuit breaker rated for at least 1,000 watts (approximately 8.3 amps at 120VAC or 4.3 amps at 230VAC).</p>
+<p><strong>Segregation:</strong> Separate critical and non-critical loads onto different circuits. This ensures that a non-critical fault (a tripped breaker on the lighting circuit, for example) does not affect computing equipment. Recommended circuit groups:</p>
+<ul>
+<li>Critical computing (servers, primary storage): dedicated circuits through UPS.</li>
+<li>Network infrastructure (switches, access points): dedicated circuit through UPS.</li>
+<li>Secondary storage and backup systems: dedicated circuit, optionally through UPS.</li>
+<li>Environmental controls (cooling, dehumidifier): dedicated circuit(s), not through UPS (too high a load for battery-backed UPS, and brief power interruptions do not damage cooling equipment).</li>
+<li>Lighting and general power: separate circuit, no UPS.</li>
+<li>Workstation: separate circuit, optionally through UPS.</li>
+</ul>
+<p><strong>Labeling:</strong> Every circuit breaker must be labeled with the circuit number and the equipment it serves. Every outlet must be labeled with the circuit number. The circuit map -- showing which circuit serves which outlet and which equipment -- must be documented and posted in the electrical room.</p>
+<h3>4.3 UPS Sizing and Selection</h3>
+<p><strong>Capacity sizing:</strong> The UPS must support the connected load for the desired runtime. Determine the total load in watts (measured, not estimated). Multiply by the desired runtime in hours. Add a 25% margin. This gives the required UPS capacity in watt-hours. Example: 500 watts of critical computing equipment, 15 minutes (0.25 hours) desired runtime: 500 x 0.25 x 1.25 = 156 Wh minimum UPS capacity.</p>
+<p>Note that 15 minutes is a minimum bridging time for the operator to assess the situation and initiate an orderly shutdown. If the operator may not be present when a power event occurs (overnight, for example), longer runtimes or automated shutdown scripts are necessary.</p>
+<p><strong>Type selection:</strong> Online (double-conversion) UPS is preferred for critical computing loads. It continuously converts AC to DC and back to AC, providing complete isolation from input power anomalies. Line-interactive UPS is acceptable for less critical loads. Standby (offline) UPS is not recommended for computing equipment due to the transfer time gap when switching to battery.</p>
+<p><strong>Battery type:</strong> UPS units typically use sealed lead-acid (SLA/VRLA) batteries internally. These batteries have a shorter life than the main battery bank (3-5 years typical) and must be replaced on schedule. Some higher-end UPS units accept external battery packs for extended runtime. LFP-based UPS systems are becoming available and offer longer battery life; evaluate if available.</p>
+<p><strong>Output waveform:</strong> Pure sine wave output only. This requirement is the same as for the main inverter (D4-002) and for the same reasons.</p>
+<h3>4.4 UPS Battery Maintenance</h3>
+<p>UPS batteries are the weakest link in the power distribution chain. They are small, sealed lead-acid batteries that degrade faster than the main battery bank because they are often subjected to higher temperatures (inside the UPS enclosure) and receive less attention.</p>
+<p><strong>Monthly:</strong> Check UPS status indicators. Record battery charge level and estimated runtime. Compare estimated runtime to the rated runtime -- declining runtime indicates battery degradation.</p>
+<p><strong>Quarterly:</strong> Run a UPS self-test (most UPS units have a built-in self-test function). Record the test result. If the UPS reports a battery warning, schedule replacement.</p>
+<p><strong>Annually:</strong> Perform a load test: run the UPS on battery for a measured duration and compare to the expected runtime. If actual runtime is less than 80% of rated runtime with fresh batteries, replace the batteries.</p>
+<p><strong>Replacement schedule:</strong> Replace UPS batteries every 3-4 years regardless of test results. Lead-acid batteries in UPS service have a predictable lifespan, and the cost of proactive replacement is trivial compared to the cost of a UPS battery failure during a power event. Order replacement batteries before removing old ones. Test replacement batteries immediately after installation.</p>
+<h3>4.5 Transfer Switch</h3>
+<p>The transfer switch selects between the primary power source (inverter) and the secondary power source (generator). It can be manual or automatic.</p>
+<p><strong>Manual transfer switch:</strong> The operator physically switches between sources. Simple, reliable, no electronics to fail. Disadvantage: requires the operator to be present and aware that a transfer is needed.</p>
+<p><strong>Automatic transfer switch (ATS):</strong> Monitors the primary source and automatically switches to the secondary source when the primary fails. Returns to the primary source when it is restored. Advantage: responds faster than a human. Disadvantage: adds complexity, requires power, is itself a potential failure point.</p>
+<p>For the institution, an ATS is recommended if a generator is installed. The transfer sequence: primary source fails, UPS absorbs the load, ATS starts the generator, ATS verifies generator output is stable, ATS transfers the load to the generator, UPS returns to standby. When the primary source is restored, the ATS transfers back.</p>
+<p><strong>Transfer switch testing:</strong> Test the transfer switch quarterly by simulating a primary source failure. Verify that the transfer occurs cleanly with no disruption to UPS-backed loads. Document the test results.</p>
+<h3>4.6 Load Balancing</h3>
+<p>In a multi-circuit installation, distribute loads across circuits to prevent any single circuit from being overloaded while others are underutilized. The goal is to keep each circuit below 80% of its rated capacity during normal operation, leaving headroom for transient peaks and future load additions.</p>
+<p><strong>The power audit:</strong> The power audit is a comprehensive measurement of the entire power distribution chain, performed annually. It measures:</p>
+<ul>
+<li>Total power consumption at the inverter output (total institutional load).</li>
+<li>Power consumption on each branch circuit.</li>
+<li>Power consumption of each major device (using a clamp meter or per-outlet PDU monitoring).</li>
+<li>UPS input power, output power, and efficiency (to verify UPS health).</li>
+<li>Voltage at multiple points in the distribution chain (to detect voltage drop from undersized wiring or poor connections).</li>
+<li>Temperature of all distribution panel breakers, wire terminations, and UPS units (hot spots indicate high-resistance connections or overloaded circuits).</li>
+</ul>
+<p>Document the power audit results. Compare to previous audits. Track trends: is total consumption growing? Is any circuit approaching its capacity? Is the UPS runtime declining?</p>
+<h3>4.7 Extended Power Outage Procedures</h3>
+<p>An extended power outage occurs when the battery bank is depleted and no solar generation is available. The institution's response follows a staged protocol:</p>
+<p><strong>Stage 1: Awareness (battery bank above 50% state of charge).</strong> Normal operation. Monitor the weather forecast and solar generation trend. If generation is expected to be low for multiple days, begin voluntary load reduction: defer non-essential computing tasks, shut down development environments, reduce lighting.</p>
+<p><strong>Stage 2: Conservation (battery bank at 30-50% state of charge).</strong> Mandatory load shedding. Shut down all non-essential systems. Operate only critical systems: primary storage, network core, one workstation. Reduce environmental controls to minimum (rely on passive cooling and ventilation). Start the generator if available and if the outage is expected to continue.</p>
+<p><strong>Stage 3: Critical (battery bank at 15-30% state of charge).</strong> Operate only the systems required to maintain data integrity. Primary storage must remain online. Network can be shut down. Workstation can be shut down. If the generator is running, it should be carrying the full load and the battery bank should be recovering. If no generator is available, prepare for orderly shutdown.</p>
+<p><strong>Stage 4: Emergency shutdown (battery bank at 10-15% state of charge).</strong> Perform an orderly shutdown of all remaining systems. Ensure all data is flushed to disk, all filesystems are cleanly unmounted, and all systems are powered off gracefully. The battery bank's remaining capacity is reserved for the UPS to prevent abrupt shutdown of the last systems.</p>
+<p><strong>Stage 5: Dark institution.</strong> All systems are off. The battery bank is depleted. The institution waits for solar generation to resume or for the generator to be started. No data should be at risk because Stage 4 performed an orderly shutdown. When power is restored, bring systems up in reverse priority order: storage first, then network, then servers, then workstations, then non-essential systems.</p>
+<p>Document the shutdown state of each system during the outage. When power is restored, verify data integrity before resuming normal operations.</p>
+<h3>4.8 Generator Integration</h3>
+<p><strong>Generator selection:</strong> For institutional use, a diesel or propane generator in the 3-10 kW range is typical, depending on the institution's load profile. Sizing: the generator must support the institution's critical load plus the battery charging load plus environmental control load simultaneously. Oversize by 25% to avoid running the generator at continuous full load, which accelerates wear.</p>
+<p><strong>Fuel management:</strong> Store fuel in approved containers in a well-ventilated, fire-safe location away from the equipment room. Diesel fuel has a shelf life of 6-12 months without stabilizer, 12-24 months with stabilizer. Propane has an indefinite shelf life, making it advantageous for standby generator fuel. Maintain a fuel inventory log. Rotate fuel stock.</p>
+<p><strong>Connection:</strong> The generator connects to the power system through the transfer switch (Section 4.5). Never connect a generator directly to the institution's wiring without a transfer switch. Direct connection creates the risk of backfeed, which is both a safety hazard and an equipment damage risk.</p>
+<p><strong>Starting procedure:</strong> Start the generator according to the manufacturer's procedure. Allow the generator to warm up and stabilize (typically 2-5 minutes). Verify voltage and frequency output with a meter. Then engage the transfer switch to transfer the load.</p>
+<p><strong>Runtime management:</strong> Generators require periodic rest and maintenance. For extended outages, establish a run schedule: run the generator for 8-12 hours to charge batteries and run equipment, then shut down for 4-8 hours while batteries carry the load. This extends fuel supply and reduces generator wear.</p>
+<p><strong>Maintenance:</strong> Generators require regular maintenance even when not in use: monthly engine run (15-30 minutes under load), annual oil change, annual fuel filter replacement, spark plug or glow plug inspection, and air filter inspection. A generator that has sat idle for a year without maintenance may not start when needed. Treat generator maintenance as part of the monthly operations cycle (OPS-001).</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D4-006-01:</strong> Every circuit breaker must be labeled, and the circuit map must be documented and kept current. An unlabeled breaker panel is a diagnostic nightmare during a power emergency.</li>
+<li><strong>R-D4-006-02:</strong> Critical computing equipment must be powered through a UPS. Direct connection of critical equipment to branch circuits without UPS protection is prohibited.</li>
+<li><strong>R-D4-006-03:</strong> UPS batteries must be replaced on a 3-4 year schedule regardless of test results. Aging UPS batteries are the most common cause of UPS failure during power events.</li>
+<li><strong>R-D4-006-04:</strong> The power audit must be performed annually. Results must be documented and trends tracked.</li>
+<li><strong>R-D4-006-05:</strong> The transfer switch must be tested quarterly by simulating a primary source failure. Untested transfer switches have an unquantified failure rate.</li>
+<li><strong>R-D4-006-06:</strong> No circuit shall be loaded above 80% of its rated capacity during normal operation. Circuits approaching 80% must be rebalanced.</li>
+<li><strong>R-D4-006-07:</strong> If a generator is installed, it must be exercised monthly under load. A generator that has not been run in 30 days has unknown readiness.</li>
+<li><strong>R-D4-006-08:</strong> The extended power outage protocol (Section 4.7) must be printed on physical media and posted in the equipment room. During a power outage, the electronic documentation system may not be accessible.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Inverter failure.</strong> The main inverter stops producing AC power. Impact: total loss of AC power to the distribution system. UPS units absorb their connected loads; non-UPS loads go dark immediately. Detection: immediate -- non-UPS loads fail, UPS units alarm. Mitigation: switch to generator (via transfer switch) or to spare inverter (D4-002). UPS runtime provides the bridging time.</p>
+</li>
+<li>
+<p><strong>UPS battery failure.</strong> The UPS batteries are depleted or have failed. The UPS cannot bridge a power event. Impact: when the next power interruption occurs, critical equipment experiences an unclean shutdown. Detection: UPS self-test failure, declining runtime measurements in quarterly tests. Mitigation: replace batteries on schedule. Do not defer replacement.</p>
+</li>
+<li>
+<p><strong>Circuit breaker trip.</strong> A breaker trips due to overcurrent (overloaded circuit) or ground fault. Impact: all equipment on that circuit loses power. Detection: immediate for monitored circuits. May go undetected for unmonitored circuits until the operator notices a system is down. Mitigation: do not overload circuits. Investigate and resolve the cause before resetting the breaker. A breaker that trips repeatedly indicates a wiring fault, an equipment fault, or an overloaded circuit -- not a defective breaker.</p>
+</li>
+<li>
+<p><strong>Transfer switch failure.</strong> The transfer switch fails to transfer to the secondary source during a primary source failure. Impact: the generator is running and ready, but the load remains on the failing primary source. Detection: generator is running but loads remain off or on UPS battery. Mitigation: manual bypass -- most transfer switches include a manual override. Test the transfer switch quarterly to detect failures before they matter.</p>
+</li>
+<li>
+<p><strong>Generator failure to start.</strong> The generator does not start when needed. Impact: no secondary power source during an extended primary source outage. The institution relies entirely on battery reserves. Detection: immediate -- the generator does not respond to start command. Mitigation: monthly exercise under load. Maintain fuel freshness. Keep a documented troubleshooting guide for the specific generator model.</p>
+</li>
+<li>
+<p><strong>Wiring failure.</strong> A connection in the distribution system fails due to corrosion, vibration, or thermal cycling. Impact: intermittent or complete loss of power on the affected circuit. Can cause arcing, which is a fire hazard. Detection: intermittent equipment reboots on a specific circuit, hot spots detected during power audit, tripped breaker with no apparent overload. Mitigation: annual thermal scan of all terminations during the power audit. Retorque all connections annually.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>Inverter failure with generator available:</strong> UPS units bridge the load. Start the generator. Verify generator output. Engage the transfer switch. Verify loads have transferred. Diagnose and repair or replace the inverter. When the inverter is repaired, test it off-load, then transfer back from the generator.</p>
+</li>
+<li>
+<p><strong>Inverter failure without generator:</strong> UPS units bridge the load for their rated runtime. Immediately begin orderly shutdown of non-critical systems. If a spare inverter is available (D4-002), install it. If no spare is available, perform a complete orderly shutdown before UPS batteries are depleted. The institution remains dark until the inverter is repaired or replaced.</p>
+</li>
+<li>
+<p><strong>UPS failure during power event:</strong> Equipment on the failed UPS experiences unclean shutdown. After primary power is restored, check all affected systems for data integrity (filesystem checks, database integrity verification, log analysis). Replace the UPS. Restore affected systems from backup if integrity checks fail.</p>
+</li>
+<li>
+<p><strong>Circuit breaker trip -- cause known:</strong> If the cause is a known temporary overload (equipment startup surge), reset the breaker and monitor. If the cause is a permanent overload, redistribute loads before resetting. If the cause is a ground fault, do not reset until the fault is identified and repaired.</p>
+</li>
+<li>
+<p><strong>Extended outage recovery (Stage 5 to normal operation):</strong> When power is restored (sun returns, generator running, inverter repaired), do not bring everything up at once. Start with storage systems. Verify storage integrity. Start network infrastructure. Verify network connectivity. Start servers one at a time. Verify each server's services. Start workstations. Resume non-essential systems. Resume environmental controls. This staged approach prevents a startup surge from tripping breakers or overloading the recovering power system, and it allows integrity verification at each step.</p>
+</li>
+<li>
+<p><strong>Generator failure during extended outage:</strong> If the generator fails during an extended outage and cannot be immediately repaired, implement the battery conservation protocol (Section 4.7, Stages 2-4). If battery reserves are already low, proceed directly to orderly shutdown. The generator should have a documented troubleshooting guide for common failure modes (fuel starvation, dead starter battery, clogged fuel filter, loss of spark/compression).</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The power distribution system is new. Establish baseline measurements with the first power audit. The initial load balance may need adjustment as the institution's equipment complement stabilizes. UPS batteries are new and reliable. Generator (if installed) requires only routine maintenance.</p>
+</li>
+<li>
+<p><strong>Years 5-10:</strong> First UPS battery replacement cycle occurs. The distribution panel and wiring remain stable. Generator may need its first significant maintenance (carburetor cleaning for gasoline, injector service for diesel). Evaluate whether the circuit layout still matches the institution's needs as equipment has been added or moved.</p>
+</li>
+<li>
+<p><strong>Years 10-15:</strong> Second or third UPS battery replacement. Consider replacing the UPS units themselves if they show signs of age (capacitor bulging, fan noise, erratic behavior). The distribution wiring should be inspected for insulation degradation, particularly in areas with temperature extremes. Generator may need overhaul or replacement depending on total runtime hours.</p>
+</li>
+<li>
+<p><strong>Years 15-20:</strong> The distribution system is mature. The transfer switch, if mechanical, may need servicing (contact cleaning, spring replacement). Circuit breakers have a long life but should be exercised (tripped and reset) annually to prevent mechanical seizure. Evaluate whether the overall power architecture still serves the institution's needs or whether a redesign is warranted.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Power distribution is the most mundane and the most consequential infrastructure topic. Nobody is excited about circuit breakers. Nobody wants to spend a Saturday testing the transfer switch. But the institution's relationship with its power distribution system is like a building's relationship with its foundation: you do not think about it when it is working, and you cannot think about anything else when it is not.</p>
+<p>The single most important practice in this article is the power audit. Measure everything. Know your loads. Know your margins. Know which circuits are approaching capacity and which have headroom. A power audit takes a few hours once a year. A power fire takes your institution away permanently.</p>
+<p>The second most important practice is UPS battery replacement. UPS batteries fail silently. The UPS sits there with its green light on, looking perfectly healthy, while its batteries quietly turn into expensive paperweights. When the next power event arrives, the UPS transfers to battery, the battery delivers nothing, and your servers crash. Test your UPS. Replace the batteries on schedule. This is not optional.</p>
+<p>On generators: if your climate has seasons where solar generation drops significantly, a generator is not optional either. Three days of battery autonomy sounds like plenty until you experience two weeks of overcast winter weather. A small propane generator, exercised monthly and maintained properly, is cheap insurance against the scenario where the sun simply does not cooperate. Propane does not go stale. A propane generator that has been sitting for six months will start just as readily as one that ran last week, provided it has been properly maintained. That property alone makes propane the preferred generator fuel for standby applications.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (off-grid mandate)</li>
+<li>OPS-001 -- Operations Philosophy (maintenance tempo, power audit as part of annual review)</li>
+<li>D4-001 -- Infrastructure Architecture Overview</li>
+<li>D4-002 -- Solar Power System Design and Maintenance (primary power source)</li>
+<li>D4-003 -- Battery Systems: Selection, Management, and End-of-Life (energy storage)</li>
+<li>D4-004 -- Network Hardware Lifecycle Management (power requirements for network equipment)</li>
+<li>D4-005 -- Environmental Control Systems (power requirements for environmental controls)</li>
+<li>NFPA 70 (NEC) -- National Electrical Code (applicable wiring standards)</li>
+<li>IEEE 1100 -- Recommended Practice for Powering and Grounding Sensitive Electronic Equipment</li>
+<li>NFPA 110 -- Standard for Emergency and Standby Power Systems</li>
+</ul>
+<hr />
+<p><em>End of Stage 4: Specialized Systems -- Infrastructure Advanced</em></p>
+<p><strong>Document Total:</strong> 5 articles
+<strong>Combined Estimated Word Count:</strong> ~15,000 words
+<strong>Status:</strong> All five articles ratified as of 2026-02-16.
+<strong>Next Stage:</strong> Stage 4 continues with additional specialized system articles for storage, software platforms, and data management.</p>
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D7-003 — Analytical Frameworks and Methods - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li class="active"><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d7-003">
+  <h1>D7-003 &mdash; Analytical Frameworks and Methods</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D7-003</dd>
+  <dt>Domain</dt>
+  <dd>7 -- Intelligence & Analysis</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D7-001, D7-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D7-004, D7-005, D7-006, D7-008, D7-010. All Domain 7 articles that produce analytical assessments.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article provides the single analyst-operator with a toolkit of structured analytical techniques -- formal methods for converting processed information into reliable assessments. It specifies which techniques exist, when each is appropriate, how to execute each technique step by step, and how to document the results.</p>
+<p>D7-001 established the mandate for structured analytical techniques as Cognitive Defense 1. D7-002 defined Stage 5 (Analysis and Production) of the intelligence cycle as the point where these techniques are applied. This article is the toolbox that makes those mandates actionable. It answers the question the analyst asks when sitting down with processed information and a requirement to address: "How do I think about this in a way that is less likely to be wrong?"</p>
+<p>These techniques are not magic. They do not guarantee correct conclusions. They reduce the probability of specific analytical errors by forcing the analyst to consider alternatives, surface assumptions, and stress-test conclusions. For a single analyst without peer review, these techniques are the closest available substitute for a team of critical thinkers.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Four primary analytical techniques: Analysis of Competing Hypotheses (ACH), Devil's Advocate Analysis, Key Assumptions Check, and Red Team Analysis.</li>
+<li>Selection criteria: how to choose the right technique for a given analytical problem.</li>
+<li>Step-by-step execution procedures for each technique.</li>
+<li>Worked examples demonstrating each technique in an institutional context.</li>
+<li>Templates for documenting analytical work.</li>
+<li>Integration with the intelligence cycle defined in D7-002.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophical justification for structured analysis (see D7-001).</li>
+<li>The intelligence cycle stages before and after analysis (see D7-002).</li>
+<li>Cognitive bias identification and mitigation beyond what the techniques address (see D7-004).</li>
+<li>Specific threat assessment methodology, which uses these techniques but adds its own structure (see D7-006).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Structure Matters More for a Solo Analyst</h3>
+<p>In a team, analytical errors are caught by social dynamics: someone disagrees, someone asks an uncomfortable question, someone brings a different perspective. The single analyst has none of this. Their reasoning, once begun, tends to flow downhill toward a single conclusion -- the one that first seemed plausible. Structured analytical techniques interrupt this flow. They force the analyst to consider paths they would not naturally take, to argue positions they do not hold, to question assumptions they take for granted. The structure is not a replacement for good judgment. It is a corrective for the specific ways that solitary judgment fails.</p>
+<h3>3.2 The Right Tool for the Right Problem</h3>
+<p>Not every analytical question requires every technique. The four techniques in this article address different types of analytical failure:</p>
+<ul>
+<li><strong>Analysis of Competing Hypotheses:</strong> Counters the tendency to evaluate evidence only against the favored hypothesis. Best for: questions where multiple explanations are plausible.</li>
+<li><strong>Devil's Advocate Analysis:</strong> Counters the tendency to build one-sided arguments. Best for: assessments where the analyst has a strong initial view. Mandatory per D7-001 R-D7-02 for Level 3+ assessments informing Tier 1-3 decisions.</li>
+<li><strong>Key Assumptions Check:</strong> Counters the tendency to treat assumptions as facts. Best for: long-standing assessments, complex models, and any analysis that "everyone knows" to be true.</li>
+<li><strong>Red Team Analysis:</strong> Counters the tendency to see situations only from your own perspective. Best for: security assessments, threat analysis, and any situation where an adversary or external actor is involved.</li>
+</ul>
+<h3>3.3 The Documentation Imperative</h3>
+<p>An undocumented analysis is an unrepeatable analysis. If you cannot show how you reached a conclusion, you cannot audit it, learn from it, or explain it to a successor. Every technique in this article includes documentation requirements. This is not bureaucratic overhead. It is the mechanism by which the institution learns from its own thinking over time -- the calibration tracking mandated by D7-001 Defense 4.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Analysis of Competing Hypotheses (ACH)</h3>
+<p><strong>When to use:</strong> When there are multiple possible explanations for an observed situation and you need to determine which is most consistent with the available evidence. Use ACH when you catch yourself favoring one explanation early -- the technique exists precisely for those moments.</p>
+<p><strong>Step-by-step procedure:</strong></p>
+<p><strong>Step 1: Identify all reasonable hypotheses.</strong> Brainstorm every plausible explanation for the situation. Include hypotheses you consider unlikely. The goal is comprehensiveness. Write each hypothesis as a clear, testable statement. Aim for at least three hypotheses; fewer suggests insufficient imagination.</p>
+<p><strong>Step 2: List all significant evidence and arguments.</strong> For each hypothesis, list every piece of evidence and every logical argument that is relevant -- both supporting and contradicting. Include the absence of expected evidence as evidence itself ("The dog that did not bark").</p>
+<p><strong>Step 3: Build the evidence matrix.</strong> Create a matrix with hypotheses as columns and evidence items as rows. For each cell, mark whether the evidence is Consistent (C), Inconsistent (I), or Not Applicable (N/A) with the hypothesis. Do not evaluate evidence against your favored hypothesis first -- evaluate it against each hypothesis in turn.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Hypothesis A</th>
+<th>Hypothesis B</th>
+<th>Hypothesis C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Evidence 1</td>
+<td>C</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Evidence 2</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Evidence 3</td>
+<td>N/A</td>
+<td>I</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step 4: Evaluate the matrix.</strong> The key insight of ACH: focus on disconfirming evidence, not confirming evidence. A hypothesis that is inconsistent with multiple pieces of credible evidence is weakened, regardless of how much evidence supports it. A hypothesis with no inconsistent evidence remains viable.</p>
+<p><strong>Step 5: Assess the sensitivity of key evidence.</strong> Identify the evidence items that do the most work in the matrix -- the ones that differentiate between hypotheses. Assess their reliability. If the conclusion depends on one or two pivotal pieces of evidence, and those pieces are rated below B2 (per D7-002 Section 4.4), the conclusion is fragile.</p>
+<p><strong>Step 6: State your conclusion.</strong> Identify the hypothesis most consistent with the evidence, state the confidence level per D7-001 Section 4.1, and explicitly note which evidence would need to change to alter the conclusion.</p>
+<p><strong>Step 7: Identify milestones for re-evaluation.</strong> Define what new evidence or changed circumstances should trigger re-running this analysis.</p>
+<p><strong>Worked Example:</strong></p>
+<p>Requirement: IR-2026-007 -- Why has the primary backup drive's SMART data shown increasing reallocated sector counts over the past three months?</p>
+<p>Hypotheses:
+- H1: Normal wear approaching end of life.
+- H2: Environmental factor (heat, vibration) accelerating degradation.
+- H3: Manufacturing defect in this specific drive batch.</p>
+<p>Evidence matrix:
+| Evidence | H1 (Normal wear) | H2 (Environmental) | H3 (Defect) |
+|----------|-------------------|---------------------|-------------|
+| Drive is 4 years old (typical life 5-7 years) | C | N/A | C |
+| Second drive of same age shows no degradation | I | C | C |
+| Equipment zone temperature log shows normal range | N/A | I | N/A |
+| No vibration sources added recently | N/A | I | N/A |
+| Online archive (imported) shows no recalls for this batch | N/A | N/A | I |</p>
+<p>Assessment: H2 (environmental) has two inconsistencies. H3 (defect) has one inconsistency. H1 (normal wear) has one inconsistency. H1 is weakened by the second drive comparison. H3 is weakened by no known recalls but could survive that (recalls are not always issued). Conclusion: H1 and H3 are both viable; H2 is least likely. Confidence: Level 4 (Informed Estimate). Action: increase monitoring frequency, prepare replacement drive, check next import cycle for drive batch information.</p>
+<h3>4.2 Devil's Advocate Analysis</h3>
+<p><strong>When to use:</strong> Mandatory per D7-001 R-D7-02 for Level 3+ assessments informing Tier 1-3 decisions. Also use whenever you notice strong conviction early in analysis -- strong conviction is the signal that you need this technique most.</p>
+<p><strong>Step-by-step procedure:</strong></p>
+<p><strong>Step 1: Complete your initial analysis.</strong> Reach your preliminary conclusion using whatever methods are appropriate. Write it down with supporting evidence and reasoning. This is the position you will now attack.</p>
+<p><strong>Step 2: Adopt the opposing position.</strong> Formally assume the role of the advocate for the opposite conclusion. This is not a token exercise. You must genuinely attempt to construct the strongest possible argument against your preliminary conclusion. Allocate at least as much time to the devil's advocate position as you spent on the initial analysis.</p>
+<p><strong>Step 3: Identify the strongest counter-arguments.</strong> What evidence contradicts your conclusion? What evidence is missing that, if present, would support the opposite view? What assumptions in your initial analysis are vulnerable? Where did you give yourself the benefit of the doubt?</p>
+<p><strong>Step 4: Construct the counter-case.</strong> Write a complete argument for the opposing position. It must have evidence, reasoning, and a stated conclusion. It must be written as if you believe it. If you cannot write a convincing counter-case, either your initial conclusion is very strong (rare) or you are not trying hard enough (common).</p>
+<p><strong>Step 5: Reconcile.</strong> Compare the initial analysis and the devil's advocate analysis side by side. Identify where the counter-case is strong enough to weaken your initial conclusion. Adjust your confidence level accordingly. Document both the initial analysis and the devil's advocate analysis in the final product -- the reader should see both.</p>
+<p><strong>Step 6: State the surviving conclusion.</strong> After reconciliation, state the final assessment. If the devil's advocate exercise has not changed the conclusion at all, be suspicious -- genuine devil's advocacy almost always introduces at least a modest reduction in confidence.</p>
+<p><strong>Template for documentation:</strong></p>
+<p>```
+DEVIL'S ADVOCATE ANALYSIS
+Product ID: [ID]
+Date: [Date]</p>
+<p>INITIAL POSITION:
+[Statement of preliminary conclusion]
+[Supporting evidence and reasoning]</p>
+<p>DEVIL'S ADVOCATE POSITION:
+[Statement of opposing conclusion]
+[Counter-evidence and counter-reasoning]</p>
+<p>RECONCILIATION:
+[Assessment of where the counter-case has merit]
+[Adjusted confidence level]
+[Final conclusion with modifications, if any]
+```</p>
+<h3>4.3 Key Assumptions Check</h3>
+<p><strong>When to use:</strong> Before any assessment that will drive a significant decision. During the quarterly requirements review. Whenever an established assessment has been standing for more than six months without challenge. When the analyst realizes they have been treating a judgment as a fact.</p>
+<p><strong>Step-by-step procedure:</strong></p>
+<p><strong>Step 1: List every assumption.</strong> Review the analysis and extract every statement that is assumed rather than proven. Include assumptions that seem obvious -- especially those. Common categories: assumptions about the operating environment, about hardware longevity, about the stability of external conditions, about the accuracy of reference materials, about the operator's own competence.</p>
+<p><strong>Step 2: Classify each assumption.</strong>
+- <strong>Foundational:</strong> If this assumption is wrong, the entire analysis collapses.
+- <strong>Supporting:</strong> If this assumption is wrong, the analysis is weakened but may survive.
+- <strong>Peripheral:</strong> If this assumption is wrong, the analysis is largely unaffected.</p>
+<p><strong>Step 3: Assess each foundational and supporting assumption.</strong>
+- What is the evidence for this assumption?
+- Has it been tested, or is it accepted by habit?
+- Under what conditions could this assumption become false?
+- How would you know if it became false?
+- When was the last time you checked?</p>
+<p><strong>Step 4: Identify the most vulnerable assumptions.</strong> Which foundational assumptions have the weakest evidentiary basis? These are the load-bearing pillars of your analysis that might be made of sand.</p>
+<p><strong>Step 5: Determine monitoring indicators.</strong> For each vulnerable assumption, define an observable indicator that would signal the assumption is failing. Add these indicators to the monitoring plan per D7-005.</p>
+<p><strong>Step 6: Document the results.</strong> Produce a Key Assumptions Check document that lists all assumptions, their classifications, their vulnerability assessments, and their monitoring indicators. Attach this to the intelligence product it supports.</p>
+<p><strong>Template:</strong></p>
+<p>```
+KEY ASSUMPTIONS CHECK
+Product ID: [ID]
+Analysis Reviewed: [Reference to the assessment]
+Date: [Date]</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Assumption</th>
+<th>Classification</th>
+<th>Evidence Basis</th>
+<th>Vulnerability</th>
+<th>Monitor Indicator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>[Statement]</td>
+<td>Foundational</td>
+<td>[Evidence or "Habit"]</td>
+<td>[High/Med/Low]</td>
+<td>[Observable sign]</td>
+</tr>
+<tr>
+<td>2</td>
+<td>[Statement]</td>
+<td>Supporting</td>
+<td>[Evidence or "Habit"]</td>
+<td>[High/Med/Low]</td>
+<td>[Observable sign]</td>
+</tr>
+<tr>
+<td>```</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3>4.4 Red Team Analysis</h3>
+<p><strong>When to use:</strong> When assessing threats, vulnerabilities, or the resilience of institutional defenses. When evaluating a plan from the perspective of someone who wants it to fail. During annual threat reviews per D7-006. Whenever the analyst needs to step outside their own institutional perspective.</p>
+<p><strong>Step-by-step procedure:</strong></p>
+<p><strong>Step 1: Define the adversary or failure agent.</strong> Who or what are you thinking as? A burglar? A natural disaster? Hardware entropy? A hostile successor? An accidental fire? Each "adversary" has different capabilities, motivations, and constraints. Define these explicitly.</p>
+<p><strong>Step 2: Adopt the adversary's perspective.</strong> Set aside your knowledge of what is convenient or comfortable for the institution. Think as the adversary thinks. What do they want? What can they see? What are their strengths?</p>
+<p><strong>Step 3: Identify attack vectors or failure paths.</strong> From the adversary's perspective, how would you defeat the institution's defenses or exploit its weaknesses? Identify every plausible path. Be creative -- the real adversary will be.</p>
+<p><strong>Step 4: Assess each vector.</strong> For each identified attack vector or failure path, assess: feasibility (how easy is it?), detectability (would the institution notice?), impact (what happens if it succeeds?), and recovery difficulty (how hard is it to recover afterward?).</p>
+<p><strong>Step 5: Rank the vectors.</strong> Order by risk -- the combination of feasibility and impact. The highest-ranking vectors are the institution's most significant vulnerabilities.</p>
+<p><strong>Step 6: Propose countermeasures.</strong> For each significant vector, propose defensive measures, detection mechanisms, or recovery procedures. Note which countermeasures already exist and which are gaps.</p>
+<p><strong>Step 7: Document the full red team exercise.</strong> The document should read as an adversary's operational plan, followed by the institution's defensive response.</p>
+<h3>4.5 Technique Selection Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Analytical Situation</th>
+<th>Primary Technique</th>
+<th>Supporting Technique</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Multiple explanations for an observation</td>
+<td>ACH</td>
+<td>Key Assumptions Check</td>
+</tr>
+<tr>
+<td>Strong conviction on an important assessment</td>
+<td>Devil's Advocate</td>
+<td>ACH</td>
+</tr>
+<tr>
+<td>Long-standing assessment, unchanged for 6+ months</td>
+<td>Key Assumptions Check</td>
+<td>Devil's Advocate</td>
+</tr>
+<tr>
+<td>Security or threat-related assessment</td>
+<td>Red Team</td>
+<td>ACH</td>
+</tr>
+<tr>
+<td>Annual threat review</td>
+<td>Red Team</td>
+<td>All techniques</td>
+</tr>
+<tr>
+<td>Decision with irreversible consequences</td>
+<td>ACH + Devil's Advocate</td>
+<td>Key Assumptions Check</td>
+</tr>
+<tr>
+<td>"Everyone knows" situation</td>
+<td>Key Assumptions Check</td>
+<td>Devil's Advocate</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D7-03-01:</strong> At least one structured analytical technique must be applied during Stage 5 (Analysis and Production) of every intelligence cycle. Freeform reasoning alone is insufficient for any formal intelligence product.</li>
+<li><strong>R-D7-03-02:</strong> The technique used must be documented in the intelligence product. The product must show the technique's work product (the ACH matrix, the devil's advocate counter-case, the assumptions list, or the red team assessment), not just the conclusion.</li>
+<li><strong>R-D7-03-03:</strong> Devil's Advocate Analysis is mandatory per D7-001 R-D7-02 for Level 3+ assessments informing Tier 1-3 decisions. This requirement is non-negotiable. The counter-case must appear in the product.</li>
+<li><strong>R-D7-03-04:</strong> Key Assumptions Check must be performed on every standing assessment at least annually during the annual operations cycle per OPS-001.</li>
+<li><strong>R-D7-03-05:</strong> Red Team Analysis must be performed during every annual threat review per D7-006.</li>
+<li><strong>R-D7-03-06:</strong> When a technique reveals a significant weakness in an existing assessment, the assessment must be revised, and the revision must be recorded in the intelligence product archive with a reference to the technique that prompted it.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Technique theater.</strong> The analyst goes through the motions of a technique without genuine cognitive engagement. The ACH matrix is filled in to confirm the favored hypothesis. The devil's advocate is a straw man. The assumptions check does not include the real assumptions. Mitigation: the quality check at Stage 5 per D7-002 requires that techniques demonstrate genuine alternative consideration. Calibration tracking over time reveals whether technique use correlates with analytical accuracy.</p>
+</li>
+<li>
+<p><strong>Technique avoidance.</strong> The analyst consistently chooses the easiest technique or avoids techniques for their most consequential assessments. Mitigation: R-D7-03-03 mandates devil's advocacy for major assessments. The quarterly review should audit technique usage across products.</p>
+</li>
+<li>
+<p><strong>Analysis paralysis via technique overload.</strong> The analyst applies every technique to every question, consuming enormous time and energy on low-stakes assessments. Mitigation: the technique selection matrix provides guidance. Low-priority requirements with straightforward evidence need only one technique. Reserve multi-technique analysis for high-stakes questions.</p>
+</li>
+<li>
+<p><strong>Template rigidity.</strong> The templates become prisons -- the analyst forces every analysis into a template even when the template does not fit the problem. Mitigation: the templates are aids, not mandates. If a technique requires adaptation for a specific problem, adapt it. Document the adaptation. The principles matter more than the forms.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If technique theater is detected (calibration review shows techniques are not improving accuracy):</strong> Conduct a self-audit of the last five products that used structured techniques. For each, honestly assess: did the technique genuinely change how you thought about the problem, or did you fill in the template to confirm what you already believed? If the latter, slow down. Re-do one analysis with genuine commitment to the technique. Set a timer -- allocate real time to the devil's advocate position.</p>
+</li>
+<li>
+<p><strong>If techniques are being avoided for major assessments:</strong> Review the last three Tier 2+ decisions. Did the supporting intelligence products use appropriate techniques? If not, retroactively apply the required techniques to the current standing assessments that inform those decisions. Document the gap and institute a pre-production checklist.</p>
+</li>
+<li>
+<p><strong>If analysis paralysis has set in:</strong> Establish time limits for each technique. ACH: maximum 2 hours per analysis. Devil's Advocate: time equal to initial analysis, maximum 2 hours. Key Assumptions Check: maximum 1 hour. Red Team: maximum 3 hours. Publish at whatever quality the time limit permits. Imperfect structured analysis is better than perfect paralysis.</p>
+</li>
+<li>
+<p><strong>If templates feel constraining:</strong> Modify them. The templates in this article are starting points. If a different format better captures the technique's output, use it. Document the new template and explain why it works better. The institution adapts its tools; the tools do not constrain the institution.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The analyst is learning the techniques. Expect the first applications to feel forced and mechanical. This is normal. The value of structured techniques emerges over time as the analyst develops the habit of questioning their own conclusions. The worked examples in this article are starting points -- build a personal library of examples from actual institutional analyses.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Technique use should be habitual. The analyst should know intuitively which technique fits which problem. The templates may have evolved significantly from the originals. Calibration tracking should show whether structured analysis is actually improving decision quality.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The techniques should be deeply internalized. The formal documentation may become lighter as the cognitive habits become second nature -- but the documentation must not disappear entirely. A successor needs to see the techniques in action, not just hear about them in the abstract.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> New analytical techniques will have been developed in the broader world. Import and evaluate new methods during the annual intelligence review. Retire techniques that prove ineffective. Adopt new ones that address analytical failures the current toolkit does not.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If calibration tracking shows that structured analysis produces results no better than unstructured analysis over a five-year period, either the techniques are being applied theatrically (fix the application) or the techniques themselves need replacement (research and adopt better methods).</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The hardest technique is the devil's advocate. Not because the procedure is complex -- it is simple. But because genuinely arguing against your own conclusion requires a kind of intellectual self-violence. You must take the thing you believe and try to destroy it. Every instinct resists this. The result, when done honestly, is almost always a more nuanced and accurate conclusion. When done dishonestly -- when the counter-argument is deliberately weak -- it is worse than useless because it creates the illusion of rigor.</p>
+<p>I have provided four techniques. This is not an exhaustive list. These four address the most common analytical failures for a solo analyst: favoring the first hypothesis (ACH), one-sided argumentation (Devil's Advocate), unchecked assumptions (Key Assumptions Check), and failure of perspective (Red Team). If the institution discovers other systematic failures, develop or adopt techniques that address them. The toolkit grows with the institution.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (self-sovereign operation requiring self-sufficient analysis)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (threat categories for red team analysis)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo, annual review cycle)</li>
+<li>D7-001 -- Intelligence Philosophy (epistemic hierarchy, cognitive defenses, devil's advocate requirement)</li>
+<li>D7-002 -- The Intelligence Cycle (Stage 5 where techniques are applied, production standards)</li>
+<li>D7-004 -- Cognitive Bias Countermeasures (bias awareness supporting technique use)</li>
+<li>D7-006 -- Threat Assessment Procedures (primary consumer of red team and ACH techniques)</li>
+<li>D7-008 -- Intelligence Product Standards (product format requirements)</li>
+<li>D7-011 -- Estimative Language and Uncertainty Communication (confidence level standards)</li>
+<li>Richards J. Heuer Jr., "Psychology of Intelligence Analysis" (foundational text, archived)</li>
+<li>Central Intelligence Agency, "A Tradecraft Primer: Structured Analytical Techniques" (reference, archived)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

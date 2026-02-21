@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D16-006 — Print and Offline Access Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li class="active"><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d16-006">
+  <h1>D16-006 &mdash; Print and Offline Access Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D16-006</dd>
+  <dt>Domain</dt>
+  <dd>16 -- Interface & Navigation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, OPS-001, D16-001, D16-002, D16-003, D16-005</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-002 (backup procedures for print materials). Domain 19 (quality metrics for print outputs). Domain 20 (institutional memory in physical form).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the procedures for producing printed versions of institutional documentation, maintaining print stylesheets, assembling critical document print packages, creating laminated emergency references, providing offline mobile access, and producing the annual print archive.</p>
+<p>D16-001 R-D16-08 states: "All critical content must be renderable on paper. The interface must support or enable a print path that produces readable, structured output. In a fifty-year institution, there will be times when the only functioning interface is ink on paper." This article implements that requirement.</p>
+<p>Print and offline access are not secondary concerns. They are survival mechanisms. When the hardware fails, when the power is out, when the digital system is being rebuilt or migrated, the institution's knowledge must still be accessible. Paper does not crash. Paper does not require a boot sequence. Paper does not suffer from bit rot. Paper is the institution's most durable interface, and it must be maintained as deliberately as any digital system.</p>
+<p>This article is written for the operator who must produce print materials, maintain the print stylesheet, decide what gets printed and how often, and store printed materials so they remain usable for decades.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The print stylesheet: requirements, design principles, and maintenance.</li>
+<li>The critical documents print package: what is printed, how, and how often.</li>
+<li>Laminated emergency references: which documents are laminated and why.</li>
+<li>Offline mobile access: serving documentation on a local device without the primary system.</li>
+<li>The annual print archive: the yearly full print of the institutional documentation.</li>
+<li>Storage and preservation of printed materials.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The digital rendering of documentation (see subsequent Domain 16 presentation articles).</li>
+<li>Backup procedures for digital content (see D6-002).</li>
+<li>The content of specific documents (see domain-specific articles).</li>
+<li>Paper and supply procurement (see operational logistics articles).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Paper Still Matters</h3>
+<p>The institution is digital-first. Its primary interface is a screen. Its primary storage is a disk. But "digital-first" does not mean "digital-only." Digital systems fail. Hardware breaks. Software corrupts. Power goes out. In any of these scenarios, the institution's knowledge exists only in a form that requires a functioning digital system to access.</p>
+<p>Paper is the institution's backup interface. A printed document can be read with no electricity, no hardware, no software, and no technical skill beyond literacy. A printed document does not require a boot sequence. It does not suffer from incompatible file formats. It does not become inaccessible because a software dependency is no longer available. It is technology-independent in a way that no digital format can match.</p>
+<p>This does not mean everything should be printed. It means certain critical documents must be printed, and the institution must maintain the capability to print any document when needed.</p>
+<h3>3.2 The Spectrum of Offline Access</h3>
+<p>The institution maintains four levels of access, each a fallback for the levels above it: (1) the primary digital system, (2) an offline mobile device with a static documentation copy, (3) printed documents requiring only light and literacy, and (4) laminated emergency references surviving conditions that destroy ordinary paper.</p>
+<h3>3.3 Print Quality and Readability</h3>
+<p>Web pages printed without a print stylesheet produce broken layouts, cut-off text, and navigation waste. A proper print stylesheet transforms screen layout into paper layout. Print readability is an accessibility concern -- if a printed document is illegible, the institution has failed the person relying on it.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Print Stylesheet</h3>
+<p>The institution maintains a CSS print stylesheet that is applied whenever a document is printed from the browser or converted to PDF. The print stylesheet ensures:</p>
+<p><strong>Typography:</strong> Body text in serif font, 11-12pt, black on white. Headings bold and proportionally larger (H1: 18pt, H2: 14pt, H3: 12pt). Code blocks in monospace, 9-10pt. Line height 1.4-1.6 for body text.</p>
+<p><strong>Page layout:</strong> A4 default, US Letter secondary. Margins at least 20mm. Headers show document title and ID on every page. Footers show page number and total ("Page 3 of 17"). Page breaks avoid splitting paragraphs, table rows, or separating headings from their content.</p>
+<p><strong>Content adaptation:</strong> Navigation elements hidden. Hyperlink URLs displayed in parentheses or as footnotes (internal document ID references need no URL expansion). Decorative images hidden; informational images included with alt text as captions. Tables repeat headers if split across pages.</p>
+<p><strong>Maintenance:</strong> Test the stylesheet after every platform update by printing at least three documents of different types. The stylesheet is version-controlled in the platform configuration.</p>
+<h3>4.2 The Critical Documents Print Package</h3>
+<p>The following documents are printed and maintained as a physical package. This package is the minimum documentation needed to operate and recover the institution if the digital system is unavailable.</p>
+<p><strong>Contents of the Critical Documents Print Package:</strong></p>
+<ol>
+<li><strong>ETH-001 -- Ethical Foundations.</strong> The institution's values. Without these, nothing else makes sense.</li>
+<li><strong>CON-001 -- The Founding Mandate.</strong> What the institution is, what it does, and why.</li>
+<li><strong>GOV-001 -- Authority Model.</strong> Who decides what, especially the succession protocol.</li>
+<li><strong>SEC-001 -- Threat Model and Security Philosophy.</strong> What the institution protects against.</li>
+<li><strong>SEC-002 -- Access Control Procedures.</strong> How to get into the system.</li>
+<li><strong>SEC-003 -- Cryptographic Key Management.</strong> How to handle the keys (the keys themselves are stored separately per SEC-003; this is the procedure document).</li>
+<li><strong>OPS-001 -- Operations Philosophy.</strong> How the institution operates.</li>
+<li><strong>D6-002 -- Backup Doctrine.</strong> How to restore the institution from backup.</li>
+<li><strong>D10-002 -- Daily Operations Doctrine.</strong> The daily operational procedures.</li>
+<li><strong>D10-003 -- Incident Response Procedures.</strong> What to do when something goes wrong.</li>
+<li><strong>The site map</strong> (from D16-002). A complete listing of all institutional documents.</li>
+<li><strong>The key inventory</strong> (from SEC-003, metadata only -- no actual keys).</li>
+<li><strong>The hardware inventory</strong> (from D8-001).</li>
+<li><strong>The software inventory</strong> (from D8-001).</li>
+</ol>
+<p><strong>Print schedule:</strong> The critical documents print package is reprinted:
+- Annually, during the annual review cycle.
+- Whenever any document in the package is substantively revised.
+- Whenever a succession event occurs, so the new operator has a current physical copy.</p>
+<p><strong>Storage:</strong> The print package is stored in a binder or folder in Zone 3 (the Storage Zone per SEC-002). A second copy is stored at the off-site backup location if one exists. The binder is labeled with the print date and the version of each document included.</p>
+<h3>4.3 Laminated Emergency References</h3>
+<p>Certain documents are printed on laminated stock for durability. Laminated documents survive water, dirt, handling, and the conditions that would destroy ordinary paper. They are the institution's last-resort documentation.</p>
+<p><strong>Documents that are laminated:</strong></p>
+<ol>
+<li>
+<p><strong>Emergency Recovery Card.</strong> A single-page reference (front and back) containing:
+   - The institution's name and physical address.
+   - The location of the primary hardware.
+   - The location of backup media.
+   - The boot sequence for the primary system.
+   - The location of the succession packet.
+   - The key inventory summary (which keys exist and where they are stored -- no actual keys).
+   - Contact information for the designated successor.
+   - A brief list of first-response procedures for common emergencies (power failure, hardware failure, suspected compromise).</p>
+</li>
+<li>
+<p><strong>Succession Summary Card.</strong> A single-page reference containing:
+   - The succession protocol summary from GOV-001.
+   - The location of the succession packet.
+   - The accounts available to the successor and how to activate them.
+   - The location of the critical documents print package.
+   - The first ten steps a new operator should take.</p>
+</li>
+<li>
+<p><strong>Daily Operations Quick Reference.</strong> A single-page reference containing:
+   - The daily checklist from D10-002.
+   - The weekly checklist from D10-002.
+   - The monthly checklist from D10-002.
+   - The location of the full D10-002 document for detailed procedures.</p>
+</li>
+</ol>
+<p><strong>Lamination procedure:</strong> Print at 100% scale, verify content is current, laminate with heavy-weight pouches (at least 5 mil / 125 micron), label with date. Store one copy with the critical documents print package and one copy adjacent to the primary hardware.</p>
+<p><strong>Reprint schedule:</strong> Annually or whenever content changes.</p>
+<h3>4.4 Offline Mobile Access</h3>
+<p>The institution can produce a portable copy of its documentation for use on a mobile device (tablet, laptop, e-reader) that is separate from the primary system.</p>
+<p><strong>Production procedure:</strong> Generate a static HTML version of the entire documentation site including the search index. Copy to a USB drive or mobile device. The static site must function from the local file system with relative links, local resources, and client-side search. Verify loading and search on the target device. Label with the copy date.</p>
+<p><strong>Update schedule:</strong> Quarterly or when significant content changes occur.</p>
+<p><strong>Use cases:</strong> Consulting documentation during primary system maintenance; carrying documentation to off-site locations; providing a successor with documentation before primary system access.</p>
+<p><strong>Security note:</strong> The offline copy must not contain cryptographic keys, passwords, or credential material. It is a documentation copy, not a system backup.</p>
+<h3>4.5 The Annual Print Archive</h3>
+<p>Once per year, during the annual review cycle, the institution produces a complete print of all documentation. This is not a selective print like the critical documents package. It is an exhaustive print of every document in the institution.</p>
+<p><strong>Purpose:</strong> The annual print archive serves as a point-in-time snapshot of the institution's entire knowledge base. If the digital system and all digital backups were lost, the most recent annual print archive would be the starting point for reconstruction.</p>
+<p><strong>Procedure:</strong> Generate print-ready versions of every document, organized by stage and domain. Print using the stylesheet (Section 4.1). Assemble in a binder with divider tabs, a cover page (institution name, "Annual Print Archive," date, document count), a table of contents, and a printed site map. Store in Zone 3 per SEC-002. Retain all previous years' archives as historical records.</p>
+<p><strong>Practical considerations:</strong> If a full print is impractical, print at minimum the critical documents package plus documents created or revised since the last full print, and record the partial print in the operational log. Use double-sided printing and archival-quality (acid-free) paper when available.</p>
+<h3>4.6 Storage and Preservation of Printed Materials</h3>
+<p>Store printed materials at room temperature, low-to-moderate humidity (use desiccant packets in humid locations), minimal light exposure, and in binders or closed cabinets for physical protection. Label every container with contents and date. Record the inventory of printed materials in the operational log.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D16-06-01: The Print Stylesheet Is Maintained.</strong> The print stylesheet must be tested after every platform update and every significant template change. A broken print stylesheet is a print access failure.</li>
+<li><strong>R-D16-06-02: The Critical Documents Print Package Is Current.</strong> The physical print package must reflect the current versions of all included documents. An outdated print package is worse than none at all because it may be relied upon and mislead.</li>
+<li><strong>R-D16-06-03: Laminated References Are Updated Annually.</strong> Laminated emergency references must be reprinted annually or whenever their content changes, whichever comes first.</li>
+<li><strong>R-D16-06-04: The Annual Print Archive Is Produced.</strong> A complete or substantial print archive is produced annually during the annual review cycle. If a complete print is impractical, a partial print plus the critical documents package is the minimum.</li>
+<li><strong>R-D16-06-05: Offline Mobile Copies Exclude Credentials.</strong> No offline mobile copy may contain cryptographic keys, passwords, or other credential material. Documentation content only.</li>
+<li><strong>R-D16-06-06: Previous Print Archives Are Retained.</strong> Old print archives are not discarded. They are historical records of the institution's knowledge at a point in time.</li>
+<li><strong>R-D16-06-07: Print Materials Are Stored Properly.</strong> Printed materials must be stored in conditions that preserve their readability per Section 4.6. Materials stored in damaging conditions must be relocated.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Print stylesheet neglect.</strong> Platform updates break the stylesheet silently; printing later produces unusable output. Mitigation: R-D16-06-01 requires testing after every update.</p>
+</li>
+<li>
+<p><strong>Critical documents package staleness.</strong> Revised documents make the printed package inaccurate. Mitigation: R-D16-06-02 requires currency; the annual review checks print dates against revision dates.</p>
+</li>
+<li>
+<p><strong>Laminated card omission.</strong> Cards reference obsolete hardware or personnel. Mitigation: R-D16-06-03 mandates annual reprinting.</p>
+</li>
+<li>
+<p><strong>Print archive impracticality.</strong> Corpus grows too large for full annual printing. Mitigation: R-D16-06-04 allows partial prints as a fallback.</p>
+</li>
+<li>
+<p><strong>Paper degradation.</strong> Poor storage makes materials unreadable within a decade. Mitigation: R-D16-06-07 requires proper storage; the annual review includes physical inspection.</p>
+</li>
+<li>
+<p><strong>Offline copy with credentials.</strong> Key material inadvertently included on a lost device. Mitigation: R-D16-06-05 prohibits credentials; the annual review verifies compliance.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If the print stylesheet is broken:</strong> Identify what changed (usually a platform update). Update the stylesheet. Test with three document types. Use "export to PDF" as a temporary workaround if needed.</p>
+</li>
+<li>
+<p><strong>If the critical documents print package is outdated:</strong> Reprint revised documents and replace outdated pages. Update the cover page date. Reprint the entire package if more than half the documents need updating.</p>
+</li>
+<li>
+<p><strong>If laminated references are outdated:</strong> Reprint with current content, laminate, replace old cards, and destroy old versions to prevent confusion.</p>
+</li>
+<li>
+<p><strong>If annual print archives have been missed:</strong> Produce a current-year archive. Do not retroactively print missed years. Note the gap in the operational log.</p>
+</li>
+<li>
+<p><strong>If printed materials have degraded:</strong> Relocate readable materials to better storage. Reprint unreadable ones from digital sources, or consult D6-002 if digital sources are also lost.</p>
+</li>
+<li>
+<p><strong>If credentials are in an offline copy:</strong> Retrieve the device, delete the copy, assess whether the device was outside physical control (if so, rotate credentials per SEC-003), remove credentials from the source, and rebuild.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The print infrastructure is established. The print stylesheet is written and tested. The first critical documents package and laminated cards are produced. The first annual print archive is created. The habit of maintaining print alongside digital is formed. This is the hardest period because the print effort feels redundant when the digital system is working perfectly.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The annual print archive becomes routine. The critical documents package is updated naturally as documents are revised. The print stylesheet may need updating as the documentation platform evolves. The stored archives begin to have historical value -- they show how the institution's knowledge evolved over time.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Print materials may be needed for the first time in a real emergency or succession event. Their value becomes concrete rather than theoretical. The storage conditions should be inspected and, if necessary, improved. The accumulated print archives should be reviewed for physical condition.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The oldest print archives are now decades old. Archival-quality paper should still be readable. Standard paper may have degraded. This is the period that validates the paper quality and storage decisions made at founding. If the materials have survived, the institution has proven its physical durability alongside its digital durability.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I expect the print procedures to feel like the most old-fashioned part of this entire framework. We live in a digital world. Printing documentation feels like keeping a horse in case the car breaks down. But the analogy is not quite right. A car has many failure modes. A horse has many failure modes. Paper has almost none. It does not require maintenance. It does not require power. It does not require software updates. It sits on a shelf, unchanging, until the moment you need it.</p>
+<p>The critical documents print package is the part of this article I feel most strongly about. If the digital system fails catastrophically -- disk failure, cryptographic key loss, fire, flood -- the print package is what allows the next person to understand what this institution was, what it contained, and how to rebuild it. That is worth a binder on a shelf and an hour of printing once a year.</p>
+<p>The laminated emergency recovery card is inspired by the laminated checklists used in aviation. Pilots do not rely on memory during emergencies. They rely on checklists that have been printed, laminated, and placed within arm's reach. An institution should extend the same courtesy to its operator.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (institutional durability; self-contained operation)</li>
+<li>OPS-001 -- Operations Philosophy (annual review cycle; operational discipline)</li>
+<li>D16-001 -- Interface Philosophy (R-D16-08: Printability; R-D16-06: Graceful Degradation)</li>
+<li>D16-002 -- Information Architecture (site map; document identification system)</li>
+<li>D16-003 -- Content Style Guide (formatting standards that affect print output)</li>
+<li>D16-005 -- Accessibility Standards (print accessibility considerations)</li>
+<li>SEC-002 -- Access Control Procedures (Zone 3: Storage Zone)</li>
+<li>SEC-003 -- Cryptographic Key Management (key inventory; credential exclusion from print)</li>
+<li>D6-002 -- Backup Doctrine (relationship between digital backup and print archive)</li>
+<li>D8-001 -- Platform Doctrine (hardware and software inventories)</li>
+<li>D10-002 -- Daily Operations Doctrine (operational checklists)</li>
+<li>D10-003 -- Incident Response Procedures (emergency procedures referenced in laminated cards)</li>
+<li>GOV-001 -- Authority Model (succession protocol referenced in succession summary card)</li>
+</ul>
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

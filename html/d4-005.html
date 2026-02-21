@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D4-005 — Environmental Control Systems - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li class="active"><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d4-005">
+  <h1>D4-005 &mdash; Environmental Control Systems</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D4-005</dd>
+  <dt>Domain</dt>
+  <dd>4 -- Infrastructure & Power</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, OPS-001, D4-001, D4-002, D4-003</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D4-004 (Network Hardware -- environmental requirements), D4-006 (Power Distribution -- power for environmental controls). All articles involving equipment placement, server room design, or hardware longevity.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article provides a complete reference for the environmental control systems of the holm.chat Documentation Institution. It covers temperature management, humidity control, dust mitigation, and the monitoring systems that tie them together. It defines the environmental envelope within which the institution's computing equipment can operate safely and for maximum longevity, and it specifies the systems, procedures, and contingencies required to maintain that envelope.</p>
+<p>Computing equipment is physical. It occupies space. It generates heat. It is damaged by moisture, dust, and temperature extremes. These facts are easy to overlook when thinking about digital infrastructure, but they are as fundamental as the electrical power supply. A server operating at 45 degrees C in a dusty, humid room will fail years before an identical server operating at 22 degrees C in a clean, dry room. Environmental control is not a luxury. It is a direct determinant of hardware lifespan, and hardware lifespan directly determines the institution's replacement costs and operational continuity.</p>
+<p>The challenge for an off-grid institution is that environmental control consumes power. Air conditioning, dehumidification, and active filtration all draw from the same solar-charged battery bank that powers the computing equipment itself. Every watt spent on cooling is a watt not available for computing. The design philosophy of this article reflects that tension: prefer passive solutions where possible, use active solutions only where necessary, and size everything to the actual requirements rather than to datacenter standards that assume unlimited grid power.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Recommended environmental parameters for the institution's computing equipment.</li>
+<li>Heat load calculation: how much heat the equipment generates.</li>
+<li>Passive cooling strategies: ventilation, thermal mass, orientation, insulation.</li>
+<li>Active cooling strategies: when passive is insufficient and mechanical cooling is required.</li>
+<li>Humidity monitoring and control: acceptable ranges, condensation prevention, dehumidification.</li>
+<li>Dust management: filtration, sealing, cleaning schedules.</li>
+<li>Environmental monitoring systems: sensors, logging, alerting.</li>
+<li>The environmental control audit: structured assessment of the equipment environment.</li>
+<li>Contingency procedures: what happens when environmental controls fail.</li>
+</ul>
+<p>This article does not cover the power systems that supply electricity to environmental controls (see D4-002, D4-003, D4-006) or the specific hardware being protected (see D4-004, Domain 5). It covers the environment itself and the systems that maintain it.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Environment Matters</h3>
+<p>The relationship between operating environment and hardware lifespan is well-documented and quantifiable. The Arrhenius equation applied to electronics predicts that for every 10 degrees C increase in operating temperature above the recommended range, component life expectancy is approximately halved. At 35 degrees C ambient, a hard drive rated for 5 years at 25 degrees C may last only 2.5 years. At 45 degrees C, perhaps 1.5 years.</p>
+<p>Humidity compounds the damage. High humidity (above 60% relative humidity) promotes corrosion of circuit board traces, connector contacts, and solder joints. It also creates conditions for condensation when temperatures drop, and condensation on live electronics causes short circuits. Low humidity (below 20% relative humidity) promotes electrostatic discharge, which can damage sensitive components instantly and invisibly.</p>
+<p>Dust accumulates on heat sinks, fan blades, and air intake filters, reducing cooling efficiency. A dust-clogged heat sink can raise a processor's operating temperature by 15-20 degrees C, pushing a comfortably cooled chip into the thermal throttling zone or beyond.</p>
+<p>For a conventional datacenter, the solution is industrial HVAC, precision cooling, and dedicated maintenance staff. For an off-grid, single-operator institution, those solutions are neither available nor appropriate. The institution needs solutions that work within its power budget, can be maintained by one person, and will last as long as the equipment they protect.</p>
+<h3>3.2 The Passive-First Philosophy</h3>
+<p>The institution's environmental control strategy follows a passive-first philosophy: design the physical space to minimize the need for active mechanical systems. Passive solutions consume no power, have no moving parts, and require minimal maintenance. They include building orientation, insulation, thermal mass, natural ventilation paths, and equipment placement.</p>
+<p>Active systems -- air conditioners, dehumidifiers, powered ventilation fans -- are deployed only where passive solutions are insufficient to maintain the required environmental envelope. When active systems are deployed, they must be sized for the actual heat load, not for worst-case estimates that lead to oversized, power-hungry installations.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Environmental Parameters</h3>
+<p>The following parameters define the acceptable environmental envelope for the institution's computing equipment. These are based on ASHRAE TC 9.9 recommendations for data processing environments, adapted for the institution's context.</p>
+<p><strong>Temperature:</strong>
+- Recommended operating range: 18-27 degrees C (64-80 degrees F).
+- Allowable range (short-term, not to exceed 96 hours): 15-32 degrees C (59-90 degrees F).
+- Maximum rate of change: 5 degrees C per hour (rapid temperature changes cause thermal stress on solder joints and connections).
+- Storage (for powered-off equipment): 5-40 degrees C.</p>
+<p><strong>Relative Humidity:</strong>
+- Recommended operating range: 30-55% RH.
+- Allowable range (short-term): 20-60% RH.
+- Dew point: must remain below 15 degrees C at all times. Condensation on equipment is a critical failure condition.</p>
+<p><strong>Particulate contamination:</strong>
+- Target: ISO 14644-1 Class 8 or better (equivalent to a clean office environment).
+- Visible dust accumulation on equipment surfaces should not be detectable between monthly cleaning cycles.</p>
+<h3>4.2 Heat Load Calculation</h3>
+<p>The equipment's heat load determines the cooling requirement. In a computing environment, virtually all electrical energy consumed is converted to heat. The heat load in watts is therefore approximately equal to the total power consumption of all equipment in the space.</p>
+<p><strong>Step 1:</strong> Sum the power consumption of all equipment in the computing space: servers, storage arrays, network switches, UPS systems, monitors, and any other electrical loads. Use measured values from the power audit (D4-006), not nameplate ratings.</p>
+<p><strong>Step 2:</strong> Add the heat contribution from lighting and from the operator's presence (approximately 100W per person).</p>
+<p><strong>Step 3:</strong> Add solar heat gain if the space has windows or uninsulated exterior walls exposed to direct sunlight. Solar gain can be significant -- up to 200-600 watts per square meter of sun-exposed window.</p>
+<p><strong>Step 4:</strong> The result is the total heat load in watts that must be removed from the space to maintain temperature. In well-insulated, below-grade spaces with no solar gain, the equipment heat load dominates. In above-grade spaces with windows, solar gain may exceed the equipment load in summer.</p>
+<h3>4.3 Passive Cooling Strategies</h3>
+<p><strong>Building orientation and placement:</strong> If the equipment room's location is a choice, place it on the north side of the building (Northern Hemisphere) or south side (Southern Hemisphere) to minimize solar gain. Below-grade (basement) locations offer natural temperature stability -- ground temperature at depth varies far less than air temperature.</p>
+<p><strong>Insulation:</strong> Insulate the equipment room to reduce heat transfer from the external environment. In hot climates, insulation keeps external heat out. In cold climates, insulation retains the equipment's waste heat, reducing or eliminating the need for dedicated heating.</p>
+<p><strong>Thermal mass:</strong> Dense materials (concrete, stone, earth) absorb heat during warm periods and release it during cool periods, dampening temperature swings. A below-grade room with concrete walls provides excellent thermal mass.</p>
+<p><strong>Natural ventilation:</strong> When outside air temperature is lower than the equipment room temperature and humidity is within acceptable range, ventilation can remove heat without mechanical cooling. Design ventilation paths so that cool air enters at the bottom of the space and warm air exits at the top (hot air rises). Ventilation openings must be filtered to prevent dust and pest ingress. Ventilation must be closable for periods when outside conditions are not suitable (too hot, too humid, too dusty).</p>
+<p><strong>Equipment arrangement:</strong> Arrange equipment so that hot exhaust air is directed toward the room's exhaust path, not toward the intake of adjacent equipment. In rack-mounted installations, maintain consistent front-to-back airflow and fill empty rack spaces with blanking panels to prevent hot exhaust from recirculating to the front.</p>
+<h3>4.4 Active Cooling</h3>
+<p>When passive strategies cannot maintain the temperature within the recommended range, active cooling is required. For the off-grid institution, the options are:</p>
+<p><strong>Split-system air conditioner (mini-split):</strong> The most common and most practical option for small equipment rooms. A high-efficiency inverter-type mini-split consumes 300-1,500 watts depending on the heat load. Select a unit rated for the calculated heat load with a seasonal energy efficiency ratio (SEER) of 20 or higher to minimize power consumption. Ensure the unit can operate in cooling mode at the expected range of outdoor temperatures.</p>
+<p><strong>Evaporative cooling:</strong> In hot, dry climates (relative humidity consistently below 30%), evaporative cooling can reduce temperature significantly at very low energy cost. Not suitable for humid climates. Increases humidity, which must be monitored.</p>
+<p><strong>Dedicated computer room air conditioner (CRAC):</strong> Overkill for most institutional installations. Only consider if the heat load exceeds 5 kW and no other solution is adequate.</p>
+<p>The power consumption of active cooling must be included in the load analysis for the solar and battery systems (D4-002, D4-003). This is critical: the cooling system may represent 20-40% of the total institutional power load in hot climates.</p>
+<h3>4.5 Humidity Control</h3>
+<p><strong>High humidity (above 55% RH):</strong> Deploy a dehumidifier. For small spaces, a desiccant dehumidifier may be adequate and is simpler to maintain than a compressor-based unit. For larger spaces or persistent high humidity, a compressor dehumidifier is more efficient. Drain collected water automatically if possible; manual draining creates a maintenance task that is easily forgotten.</p>
+<p><strong>Low humidity (below 30% RH):</strong> Common in cold, dry climates and in spaces with significant heating. Low humidity increases electrostatic discharge risk. Humidification is the solution but adds complexity and a water source to the equipment room, which carries its own risks. In practice, maintaining relative humidity above 20% is sufficient to prevent most ESD damage. Wrist grounding straps and ESD-safe work practices may be more practical than humidification equipment for a small installation.</p>
+<p><strong>Condensation prevention:</strong> Condensation occurs when surface temperatures fall below the air's dew point. The most common cause in equipment rooms is cold equipment being brought from outdoors into a warm, humid room, or temperature drops in a humid room when cooling shuts off overnight. Mitigation: allow cold equipment to acclimate to room temperature before powering on (at least 2 hours). Maintain humidity within the recommended range. Avoid sudden temperature changes.</p>
+<h3>4.6 Dust Management</h3>
+<p><strong>Source control:</strong> Seal the equipment room against dust ingress. Seal cable penetrations, pipe entries, and gaps around doors with appropriate materials. Use a positive-pressure ventilation design (slightly more air entering through filtered intakes than leaving) to prevent unfiltered air from being drawn in through gaps.</p>
+<p><strong>Filtration:</strong> All air entering the equipment room -- whether through ventilation openings, air conditioner intakes, or doorways -- should pass through appropriate filters. MERV 8 or higher for general dust. MERV 13 for environments with significant airborne particulate (dusty climates, agricultural settings, construction activity).</p>
+<p><strong>Cleaning schedule:</strong>
+- Monthly: Wipe external surfaces of all equipment. Inspect air intake filters on all devices with internal fans. Clean or replace filters as needed.
+- Quarterly: Vacuum the floor and all horizontal surfaces. Inspect cable runs for dust accumulation. Clean air handling filters.
+- Annually: Open each device (if safe and warranty-appropriate) and inspect internal components for dust accumulation. Use compressed air (filtered, moisture-free) to clean heat sinks, fan blades, and circuit boards. This is part of the annual infrastructure review (OPS-001).</p>
+<h3>4.7 Environmental Monitoring</h3>
+<p>Deploy sensors to continuously monitor the equipment room environment:</p>
+<p><strong>Minimum sensor deployment:</strong>
+- Temperature sensor(s): at least one per equipment rack or cluster of equipment. Place at the intake side of the equipment where air enters, not at the exhaust where it is hottest. For critical equipment, add a second sensor at the exhaust side to monitor the temperature differential.
+- Humidity sensor(s): at least one per room, placed at a representative location away from direct air conditioner or dehumidifier output.
+- Water leak sensor(s): on the floor beneath any water-carrying equipment (dehumidifier, air conditioner condensate line) and in any area where water could enter the room from external sources.</p>
+<p><strong>Data logging:</strong> All sensor data should be logged continuously at intervals of no more than 5 minutes. Retain log data for at least two years to enable trend analysis and seasonal comparison. Plot temperature and humidity trends monthly.</p>
+<p><strong>Alerting:</strong> Configure alerts for conditions outside the allowable range. Alerts must be detectable by the operator even when not actively monitoring. In an air-gapped institution, this means local audible or visual alarms (alarm buzzer, indicator light), not email or text message notifications.</p>
+<h3>4.8 The Environmental Control Audit</h3>
+<p>The environmental control audit is performed semi-annually (once at the peak of the hot season, once at the peak of the cold season) to verify that the environmental control systems are maintaining the required parameters under the most demanding conditions.</p>
+<p>The audit inspects:</p>
+<ul>
+<li>All temperature and humidity sensor readings against the required parameters.</li>
+<li>All sensor calibrations (compare readings to a known-good reference instrument).</li>
+<li>Active cooling system performance: is it maintaining setpoint, or is it running continuously without achieving setpoint (indicating insufficient capacity)?</li>
+<li>Passive ventilation paths: are they clear, are filters clean, are dampers operating?</li>
+<li>Dust levels: visual inspection and surface wipe test.</li>
+<li>Water leak sensors: test each sensor by applying a small amount of water.</li>
+<li>Environmental log data trends: is the average temperature rising over time? Is humidity control becoming less effective? Trends indicate developing problems before they become acute.</li>
+</ul>
+<p>Document the audit results in the infrastructure log. Compare to previous audits to identify trends.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D4-005-01:</strong> The equipment room temperature must remain within 15-32 degrees C at all times. Temperatures outside this range require immediate action (load reduction, emergency ventilation, or equipment shutdown if necessary to prevent damage).</li>
+<li><strong>R-D4-005-02:</strong> Relative humidity must remain between 20-60% at all times. Persistent humidity outside this range accelerates equipment degradation.</li>
+<li><strong>R-D4-005-03:</strong> Environmental monitoring must be continuous and logged. Gaps in monitoring data are gaps in the institution's knowledge of its equipment's operating conditions.</li>
+<li><strong>R-D4-005-04:</strong> The environmental control audit must be performed at least semi-annually, timed to capture the most demanding seasonal conditions.</li>
+<li><strong>R-D4-005-05:</strong> All filtration media must be inspected monthly and replaced on a schedule documented in the operational log. Clogged filters reduce cooling effectiveness and increase energy consumption.</li>
+<li><strong>R-D4-005-06:</strong> The power consumption of all environmental control systems must be included in the load analysis for D4-002 (solar sizing) and D4-003 (battery sizing). Environmental controls that are not accounted for in the power budget will cause power shortfalls.</li>
+<li><strong>R-D4-005-07:</strong> Equipment must not be powered on until it has acclimated to the room temperature. Cold equipment in a warm, humid room will form condensation. Allow a minimum of 2 hours for acclimation.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Active cooling failure.</strong> The air conditioner or mechanical cooling system stops operating. Impact: room temperature begins to rise. The rate of rise depends on the heat load and the room's thermal mass. A well-insulated, high-thermal-mass room may take hours to reach the allowable limit. A poorly insulated, low-thermal-mass room may reach it in 30-60 minutes. Detection: temperature sensor alerts. Mitigation: implement the cooling failure protocol (Section 7).</p>
+</li>
+<li>
+<p><strong>Dehumidifier failure.</strong> In humid climates, the dehumidifier's failure allows relative humidity to climb. Impact: corrosion risk increases. Condensation risk increases if temperature drops. Detection: humidity sensor alerts. Mitigation: manual ventilation with dry outside air if available. Reduce moisture sources. Repair or replace the dehumidifier.</p>
+</li>
+<li>
+<p><strong>Ventilation blockage.</strong> Intake or exhaust paths become blocked (filter clogging, debris, pest nesting, accidental obstruction). Impact: reduced airflow, rising temperature, potential positive/negative pressure loss. Detection: temperature rise without corresponding cooling system failure. Visual inspection. Mitigation: clear the blockage. Inspect all ventilation paths during the semi-annual audit.</p>
+</li>
+<li>
+<p><strong>Sensor failure.</strong> A temperature or humidity sensor fails or becomes decalibrated. Impact: monitoring gap -- the institution loses awareness of conditions at that sensor's location. Detection: sudden flat-line or erratic readings in the sensor log. Comparison to adjacent sensors shows divergence. Mitigation: replace the sensor. Maintain spare sensors in inventory.</p>
+</li>
+<li>
+<p><strong>Water intrusion.</strong> Leak from dehumidifier, air conditioner condensate, plumbing, or external source. Impact: potential for equipment damage if water contacts electronics. Electrical hazard. Humidity spike. Detection: water leak sensors, visual observation. Mitigation: immediate cleanup. Power down any equipment at risk of water contact. Identify and repair the water source.</p>
+</li>
+<li>
+<p><strong>Dust event.</strong> Construction activity, natural disaster, or filter failure allows significant dust ingress. Impact: accelerated clogging of equipment fans and heat sinks, potential for electrical shorts from conductive dust. Detection: visible dust accumulation, temperature rise from clogged cooling. Mitigation: emergency cleaning. Identify and seal the ingress path. Replace compromised filters. Inspect and clean all affected equipment.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>Cooling failure -- temperature rising:</strong> If active cooling fails and passive ventilation cannot maintain temperature within the allowable range, implement load shedding. Shut down non-essential equipment in order of priority: development systems first, then non-critical services, then secondary storage, then primary services. The institution's shutdown priority list (documented in D4-006) determines the order. If temperature reaches 32 degrees C with all non-essential loads shed, shut down remaining equipment in an orderly fashion to prevent damage. Diagnose and repair the cooling system before resuming operations.</p>
+</li>
+<li>
+<p><strong>Cooling failure -- extended duration:</strong> If the cooling system cannot be repaired within 24 hours, implement temporary measures: portable fans to increase air circulation, temporary ventilation openings (filtered), reduction of computing load to the minimum required for data integrity. If necessary, operate equipment only during the coolest hours (overnight) and shut down during peak heat. Document the entire event.</p>
+</li>
+<li>
+<p><strong>Humidity excursion -- high:</strong> If humidity exceeds 60% and the dehumidifier is non-functional, increase ventilation with outside air if the outside air is drier. If outside air is also humid, reduce the ventilation rate to limit moisture ingress and wait for the dehumidifier repair. Monitor for condensation continuously. If condensation is observed on any equipment surface, shut that equipment down immediately.</p>
+</li>
+<li>
+<p><strong>Water contact with equipment:</strong> Power down the affected equipment immediately. Do not attempt to wipe water off energized electronics. Once power is removed, carefully dry all accessible surfaces. Allow the equipment to dry completely in a warm, well-ventilated environment for at least 48 hours. Before powering back on, inspect for corrosion or residue. Test the equipment thoroughly before returning it to production service.</p>
+</li>
+<li>
+<p><strong>Post-dust-event recovery:</strong> Shut down equipment in the affected area. Inspect all air intakes and internal components. Clean thoroughly with filtered compressed air. Replace any intake filters. Seal the dust ingress path. Monitor equipment temperatures closely for the following week to confirm that no hidden dust accumulation is causing elevated temperatures.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Establish baseline environmental data. The first two years of continuous monitoring reveal the seasonal extremes and the effectiveness of the passive design. Adjust active systems based on actual data rather than design estimates.</p>
+</li>
+<li>
+<p><strong>Years 5-10:</strong> Active cooling equipment (mini-splits, dehumidifiers) approaches mid-life. Refrigerant may need topping off. Filters may need replacement more frequently as they age. Source replacement units while current models are available. The passive design elements (insulation, thermal mass, ventilation paths) should remain stable and maintenance-free.</p>
+</li>
+<li>
+<p><strong>Years 10-15:</strong> First generation of active cooling equipment may need replacement. This is an opportunity to upgrade to more efficient models. Evaluate the heat load: has it changed as computing equipment was replaced? Newer servers often consume less power and generate less heat than older ones. Resize the cooling system if appropriate.</p>
+</li>
+<li>
+<p><strong>Years 15-20:</strong> Review the passive design. Has the building envelope changed? Has insulation degraded? Has vegetation growth affected ventilation paths? The semi-annual audit should catch these issues, but a comprehensive review at this interval is warranted.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Environmental control is where the off-grid constraint bites hardest. A grid-connected datacenter runs a 5,000-watt air conditioner without thinking about it. An off-grid institution must generate, store, and deliver every watt that the cooling system consumes. This is why the passive-first philosophy is not a nice-to-have; it is an economic necessity. Every degree of temperature rise that the building's passive design can handle without mechanical cooling is a degree's worth of air conditioning energy saved -- energy that can instead power the computing equipment that is the reason the institution exists.</p>
+<p>If you are building the equipment room from scratch, invest in insulation and thermal mass. A below-grade room with concrete walls and good insulation may not need active cooling at all in temperate climates. If you are adapting an existing room, do what you can to improve insulation and ventilation before deploying an air conditioner. The air conditioner should be the last resort, not the first response.</p>
+<p>One more thing: monitor your environment even when everything seems fine. Especially when everything seems fine. The temperature trend that moves from 22 degrees C to 24 degrees C over six months is telling you something. A clogged filter, a degrading refrigerant charge, an insulation failure, or a new heat source has entered the equation. Catch it at 24 degrees C and the fix is easy. Catch it at 35 degrees C and you are doing emergency shutdowns.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (off-grid mandate, self-built mandate)</li>
+<li>OPS-001 -- Operations Philosophy (maintenance tempo, documentation-first principle)</li>
+<li>D4-001 -- Infrastructure Architecture Overview</li>
+<li>D4-002 -- Solar Power System Design and Maintenance (power budget for cooling)</li>
+<li>D4-003 -- Battery Systems (power budget for cooling)</li>
+<li>D4-004 -- Network Hardware Lifecycle Management (environmental requirements for network equipment)</li>
+<li>D4-006 -- Power Distribution and UPS Management (power for environmental controls)</li>
+<li>ASHRAE TC 9.9 -- Thermal Guidelines for Data Processing Environments</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

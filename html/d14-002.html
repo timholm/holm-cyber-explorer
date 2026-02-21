@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D14-002 — Experimental Design for Solo Researchers - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li class="active"><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d14-002">
+  <h1>D14-002 &mdash; Experimental Design for Solo Researchers</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D14-002</dd>
+  <dt>Domain</dt>
+  <dd>14 -- Research & Theory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, D14-001, OPS-001, GOV-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D14-003, D14-005, D14-006. All Domain 14 articles that involve structured investigation. Referenced by Domain 13 for experimental validation of evolution proposals.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how to design and execute rigorous experiments when the institution consists of a single researcher operating in isolation. It addresses the fundamental challenge that most experimental methodology was developed for research teams -- groups of people who can divide the roles of experimenter, observer, analyst, and critic. When all of those roles collapse into one person, the standard methodology does not simply scale down. It breaks in specific, predictable ways, and those breakages must be addressed with deliberate structural countermeasures.</p>
+<p>The purpose is not to pretend that solo research can achieve the same rigor as a well-funded laboratory with peer review. It cannot. D14-001 is honest about that limitation (per ETH-001, Principle 6). The purpose is to extract the maximum possible rigor from a single-person operation -- to identify which elements of experimental methodology still apply, which must be adapted, and which must be replaced with alternatives that serve the same epistemological function.</p>
+<p>This article also defines the experiment log format -- the standardized documentation structure that ensures every experiment conducted by this institution is recorded completely enough to be understood, evaluated, and replicated by a future operator who was not present when it was conducted.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- Experimental design principles adapted for a single researcher with no external peer review.
+- Variable identification and control in small-scale, resource-constrained environments.
+- Blinding and bias mitigation strategies for solo operation.
+- Statistical validity at small sample sizes, including when statistics are and are not appropriate.
+- The experiment log format: mandatory fields, optional fields, completion criteria.
+- Pre-registration of hypotheses and success criteria before experimentation begins.
+- The relationship between experiment design and the knowledge classification system (D14-004).</p>
+<p><strong>Out of scope:</strong>
+- The philosophical justification for research (D14-001).
+- Technology evaluation specifically (D14-003, though it uses these methods).
+- Knowledge taxonomy management (D14-004).
+- Negative results documentation format (D14-005, though experimental failures feed that registry).
+- Multi-generational continuity of research programs (D14-006).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Solo Experimentation Requires Its Own Methodology</h3>
+<p>The standard scientific method assumes, implicitly, a social infrastructure. Hypotheses are tested by experimenters who report results to peers who scrutinize the methodology, attempt replication, and challenge the conclusions. The rigor of the method depends on this social process as much as it depends on the experimental procedure itself. Remove the social process, and the methodology must compensate.</p>
+<p>A solo researcher faces three specific challenges that team-based research does not:</p>
+<p>First, there is no role separation. The person who designs the experiment, the person who executes it, the person who observes the results, and the person who interprets them are all the same individual. This means the biases that role separation is designed to mitigate -- observer bias, confirmation bias, expectation effects -- are all fully active in every phase of every experiment.</p>
+<p>Second, there is no independent replication. The results of any experiment are correlated with the experimenter's equipment, environment, habits, and blind spots. D14-001 describes adapted replication strategies (temporal, methodological, environmental, documentation-based), but these are mitigations, not solutions.</p>
+<p>Third, there is no external calibration. In a research community, the researcher learns what constitutes sufficient evidence by observing the standards applied to others' work. In isolation, the researcher must set their own evidentiary standards, which means those standards are subject to the same biases they are meant to control.</p>
+<h3>3.2 The Pre-Registration Principle</h3>
+<p>The single most important safeguard against confirmation bias in solo research is pre-registration: the practice of writing down the hypothesis, the experimental procedure, the variables, and the success/failure criteria before the experiment begins. Pre-registration does not prevent bias -- nothing fully prevents bias in a solo operation. But it makes bias visible. When the results arrive and the experimenter is tempted to reinterpret the success criteria to fit the data, the pre-registered criteria are there in writing, immutable, forcing a confrontation between what was expected and what was found.</p>
+<p>Pre-registration is mandatory in this institution (see R-EXP-01). It is not a formality. It is the primary structural defense against the most common experimental failure mode: unconsciously adjusting the question to fit the answer.</p>
+<h3>3.3 Statistical Validity and Honesty About Sample Size</h3>
+<p>Many experiments conducted by this institution will involve small sample sizes -- often extremely small. When you are testing whether a particular backup strategy is reliable, you may run it ten times. When you are evaluating hardware durability, your sample may be a single unit. When you are comparing two approaches to a task, your sample is your own performance under two conditions.</p>
+<p>Statistical methods designed for large samples do not apply here, and pretending they do is worse than not using statistics at all. A p-value calculated from three data points is not meaningful. A confidence interval from a sample of one is fiction.</p>
+<p>This article takes the position that honest qualitative assessment, clearly labeled as such, is superior to dishonest quantitative analysis. When sample sizes support statistical analysis, use it. When they do not, describe what you observed, acknowledge the limitations, and assign an appropriate confidence level through the knowledge classification system. Do not dress opinion in the costume of data.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Experiment Lifecycle</h3>
+<p>Every experiment in this institution follows a defined lifecycle with five phases:</p>
+<p><strong>Phase 1: Question Formulation.</strong> The experiment begins with a question that is specific enough to be testable. "Is ZFS a good filesystem?" is not a testable question. "Does ZFS scrub detect and correct single-bit errors on the institution's hardware within 24 hours?" is testable. The question formulation phase ends with a written question and a clear statement of why the answer matters to the institution.</p>
+<p><strong>Phase 2: Pre-Registration.</strong> Before any experimental work begins, the experimenter writes and files a pre-registration document containing: the hypothesis (what the experimenter expects to find), the null hypothesis (what the result looks like if the hypothesis is wrong), the experimental procedure, the variables (independent, dependent, and controlled), the sample size and justification, the success criteria, the failure criteria, and the planned analysis method. The pre-registration is timestamped and filed in the research archive. It cannot be modified after filing; if the experimenter realizes the design is flawed, a new pre-registration is filed and the old one is retained with a note explaining the revision.</p>
+<p><strong>Phase 3: Execution.</strong> The experiment is conducted according to the pre-registered procedure. Deviations from the procedure are recorded in real time in the experiment log. The experimenter records raw observations, not interpretations. "The scrub completed in 4 hours 17 minutes and reported 0 errors" is a raw observation. "The scrub worked as expected" is an interpretation, and it belongs in Phase 4.</p>
+<p><strong>Phase 4: Analysis.</strong> The raw data is analyzed according to the pre-registered analysis method. The analysis compares the observed results against the pre-registered success and failure criteria. The analysis must explicitly address: did the results match the hypothesis, the null hypothesis, or neither? Were there unexpected observations? Were there deviations from the procedure that may have affected the results? The analysis is documented in full, including the reasoning process, not just the conclusion.</p>
+<p><strong>Phase 5: Classification and Archival.</strong> The results are classified according to D14-004 (Knowledge Classification) and archived according to the research archive procedures. If the results are negative (the hypothesis was disproven or the experiment was inconclusive), an entry is created in the Negative Results Registry (D14-005).</p>
+<h3>4.2 Variable Control in a Solo Environment</h3>
+<p>Classical experimental design distinguishes between independent variables (what the experimenter manipulates), dependent variables (what the experimenter measures), and controlled variables (what the experimenter holds constant). In a solo environment with limited resources, controlling variables is the primary methodological challenge.</p>
+<p><strong>Environmental controls.</strong> Many experiments are conducted on the institution's production or test hardware, which means the environment cannot be fully isolated. The experimenter must document the environmental conditions under which the experiment is conducted: what else was running on the system, what the ambient temperature was, what the power state was, what the time of day was. These become part of the experiment record and allow future analysis of whether environmental factors affected the results.</p>
+<p><strong>Temporal controls.</strong> Experiments should be conducted at consistent times and under consistent conditions when possible. If an experiment must be run multiple times, the runs should be spaced to avoid temporal confounds (such as system load varying by time of day, or battery state varying by season).</p>
+<p><strong>Blinding adaptations.</strong> True blinding -- where the experimenter does not know which condition they are testing -- is generally impossible in a solo environment. The adapted alternatives are: delayed analysis (record raw data, then analyze it at least 48 hours later, after the emotional investment in the outcome has faded), pre-registered criteria (the success/failure criteria are locked before the data arrives), and quantitative measurement (where possible, use numerical measurements rather than subjective assessments, as numbers are harder to unconsciously distort).</p>
+<h3>4.3 The Experiment Log Format</h3>
+<p>Every experiment is documented in a standardized experiment log with the following mandatory fields:</p>
+<ul>
+<li><strong>Experiment ID:</strong> A unique identifier in the format EXP-YYYY-NNN (year and sequential number).</li>
+<li><strong>Date initiated:</strong> The date pre-registration was filed.</li>
+<li><strong>Date completed:</strong> The date the final analysis was written.</li>
+<li><strong>Question:</strong> The specific, testable question.</li>
+<li><strong>Hypothesis:</strong> What the experimenter expected to find.</li>
+<li><strong>Null hypothesis:</strong> What the result looks like if the hypothesis is wrong.</li>
+<li><strong>Variables:</strong> Independent, dependent, and controlled.</li>
+<li><strong>Procedure:</strong> Step-by-step instructions for executing the experiment.</li>
+<li><strong>Sample size and justification:</strong> How many trials, and why that number.</li>
+<li><strong>Success criteria:</strong> Pre-registered, specific, measurable.</li>
+<li><strong>Failure criteria:</strong> Pre-registered, specific, measurable.</li>
+<li><strong>Raw data:</strong> Observations recorded during execution, without interpretation.</li>
+<li><strong>Deviations:</strong> Any departures from the pre-registered procedure.</li>
+<li><strong>Analysis:</strong> Interpretation of the data against the criteria.</li>
+<li><strong>Conclusion:</strong> The result, classified by confidence level per D14-004.</li>
+<li><strong>Negative result entry:</strong> If applicable, reference to the D14-005 registry entry.</li>
+<li><strong>Implications:</strong> What this result means for institutional practice.</li>
+<li><strong>Related experiments:</strong> Cross-references to prior or subsequent experiments.</li>
+<li><strong>Adversarial review:</strong> The documented attempt to disprove the conclusion (mandatory for verified results per D14-001, R-RES-04).</li>
+</ul>
+<p>Optional fields include: photographs or diagrams, equipment serial numbers, software versions, environmental measurements, and links to raw data files.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-EXP-01:</strong> Pre-registration is mandatory for all formal experiments. No experimental result may be classified above "speculative" without a pre-registration document filed before execution began.</li>
+<li><strong>R-EXP-02:</strong> The experiment log format (Section 4.3) is mandatory for all formal experiments. Informal observations and quick tests do not require the full format but must still be documented in the operational log with a note indicating they were not conducted under formal experimental protocols.</li>
+<li><strong>R-EXP-03:</strong> Raw data must be recorded during execution, not reconstructed afterward. If raw data was not recorded, the experiment's maximum confidence classification is "provisional," regardless of the result.</li>
+<li><strong>R-EXP-04:</strong> No experiment may be conducted on production systems without a documented risk assessment approved through the appropriate governance tier per GOV-001 and D14-001 R-RES-08. Test environments must be used unless the question specifically requires production conditions, and this requirement must be documented and justified.</li>
+<li><strong>R-EXP-05:</strong> Statistical methods may only be applied when the sample size and data characteristics justify their use. The experimenter must document why a given statistical test is appropriate. If the sample size does not support statistical analysis, the result must be reported as a qualitative observation with an explicit statement of the sample limitation.</li>
+<li><strong>R-EXP-06:</strong> Every experiment must be documented completely enough that a future operator, unfamiliar with the experiment, could reproduce the procedure from the documentation alone. This is tested by the documentation replication method described in D14-001, Section 4.3.</li>
+<li><strong>R-EXP-07:</strong> Experiments that produce negative results must file an entry in the Negative Results Registry (D14-005) within 30 days of experiment completion.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Pre-registration drift.</strong> The experimenter modifies the pre-registration after seeing preliminary results, consciously or unconsciously adjusting the criteria to fit the data. Mitigation: pre-registration documents are timestamped and filed immutably. Revisions require a new filing with an explanation. The original is never deleted.</li>
+<li><strong>Observer effect contamination.</strong> The experimenter's expectations influence what they observe, particularly with subjective measurements. Mitigation: prefer quantitative measurement. Use delayed analysis. Pre-register success criteria in numerical terms where possible.</li>
+<li><strong>Sample size delusion.</strong> The experimenter treats a small number of observations as statistically significant, applying formal tests that are not valid for the sample size. Mitigation: R-EXP-05 requires explicit justification of statistical methods. The default is qualitative assessment with acknowledged limitations.</li>
+<li><strong>Procedure drift.</strong> Over the course of a multi-session experiment, the experimenter gradually deviates from the pre-registered procedure without noticing or recording the deviations. Mitigation: the experiment log requires real-time recording of deviations. The procedure should be physically present (printed or displayed) during each experimental session.</li>
+<li><strong>Analysis paralysis.</strong> The experimenter generates so much raw data that analysis becomes overwhelming and is deferred indefinitely. Mitigation: pre-register the analysis method. The analysis method defines what data is relevant to the conclusion. Everything else is supplementary.</li>
+<li><strong>Rigor theater.</strong> The experimenter follows the formal procedures -- pre-registration, log format, analysis -- without genuine intellectual engagement. The forms are completed, but the adversarial self-critique required by D14-001 is absent. Mitigation: the adversarial review field in the experiment log is not optional for verified results. The review must contain a genuine attempt to disprove the conclusion, and "I could not think of any objections" is not a genuine attempt.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If pre-registration has been neglected:</strong> Do not retroactively create pre-registrations for completed experiments. That defeats their purpose. Instead, classify all un-pre-registered results as "provisional" at best. Begin pre-registering all new experiments immediately. Review the un-pre-registered results with explicit awareness that confirmation bias may have affected the conclusions.</p>
+</li>
+<li>
+<p><strong>If experiment logs are incomplete:</strong> Reconstruct what can be reconstructed from operational logs, notes, and memory. Mark reconstructed entries explicitly. Accept that incompletely documented experiments carry lower confidence. Establish the habit of recording in real time by keeping the log physically present during experimentation.</p>
+</li>
+<li>
+<p><strong>If statistical methods have been misapplied:</strong> Conduct a statistical audit. For each experiment that used formal statistical analysis, verify that the sample size and data characteristics justified the method used. Re-analyze with appropriate methods or downgrade to qualitative assessment. Update the knowledge classification accordingly.</p>
+</li>
+<li>
+<p><strong>If rigor theater is occurring:</strong> This is the hardest failure to recover from because it requires honest self-assessment. Review the last five adversarial reviews. For each, ask: did I genuinely try to disprove this conclusion? If the adversarial reviews are pro forma, re-conduct them with a specific mandate: identify at least one plausible alternative explanation or methodological weakness for each result. If none can be found, that is acceptable -- but the search must be genuine.</p>
+</li>
+<li>
+<p><strong>If experiments are being avoided entirely:</strong> Return to D14-001 R-RES-06, which requires at least two formal investigations per year. Identify the simplest, lowest-risk experimental question relevant to current institutional operations. Design and execute it. The goal is to restart the practice, not to produce significant results.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Experimental methodology is being learned and practiced. The first experiments will likely be crude -- simple comparisons, basic performance measurements, straightforward technology tests. This is expected. The value of these early experiments is in building the habit and refining the process, not in producing groundbreaking results. The experiment log format may need adjustment as practical experience reveals fields that are missing or unnecessary.</li>
+<li><strong>Years 5-15:</strong> The experiment archive grows. Patterns emerge across experiments. The experimenter becomes better at identifying confounds, designing controls, and recognizing their own biases. Temporal replication of early experiments becomes possible and may reveal that some early conclusions were wrong. This is a feature, not a failure.</li>
+<li><strong>Years 15-30:</strong> If succession has occurred, the new operator brings genuinely different biases and perspectives to experimental design. This is the closest the institution comes to independent replication. The experiment archive serves as a training resource, showing the successor how the institution conducts research and what has been learned.</li>
+<li><strong>Years 30-50+:</strong> The experiment archive is a longitudinal dataset spanning decades. It contains not just individual results but the institution's evolving understanding of its own systems. Hardware generations, software paradigms, and operational practices have changed. The archive records how those changes were evaluated and adopted.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I am writing an experimental methodology document for a laboratory that consists of one person, one desk, and whatever hardware I have built. The absurdity is not lost on me. But the absurdity is the point. The experiments I conduct here -- on backup reliability, on hardware longevity, on software stability -- are not academic exercises. They are the basis for decisions that affect whether this institution survives the next decade. If I test a backup strategy badly and conclude it works when it does not, I will discover the error at the worst possible time: during a recovery. So I will test carefully, document thoroughly, and be honest about what the results do and do not tell me. The formality is not for show. It is for the version of me who needs to trust these results at 3 AM during an actual failure.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (self-contained knowledge, lifetime operation)</li>
+<li>GOV-001 -- Authority Model (governance tiers for experiments on production systems)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first, operational logging)</li>
+<li>D14-001 -- Research Philosophy (knowledge lifecycle, anti-echo-chamber structures, replication adaptations, R-RES-04, R-RES-06, R-RES-08)</li>
+<li>D14-004 -- Knowledge Classification and Taxonomy (confidence levels, classification system)</li>
+<li>D14-005 -- Negative Results Registry (documentation of failed experiments)</li>
+<li>Stage 1 Documentation Framework, Domain 14 (article list, dependencies)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

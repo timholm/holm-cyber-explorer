@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D6-011 — Physical Backup Media: Selection and Rotation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li class="active"><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d6-011">
+  <h1>D6-011 &mdash; Physical Backup Media: Selection and Rotation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D6-011</dd>
+  <dt>Domain</dt>
+  <dd>6 -- Data & Archives</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-005, D6-006, D6-007, D6-009</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-012, D6-013, all Domain 10 articles involving backup operations, all Domain 12 disaster recovery articles.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article provides the detailed technical assessment of physical backup media available to this institution, defines the rotation and testing schedules that keep backups viable, and establishes the media health monitoring program that detects degradation before data loss occurs. D6-005 defines the overall physical media strategy. D6-006 defines the backup doctrine. This article is the bridge between them -- the specific knowledge about which media to buy, how to store it, how to test it, how long to trust it, and when to replace it.</p>
+<p>Backup media is the institution's insurance policy. It is the thing that sits on a shelf, unused for months or years, and then must work perfectly the one time it is needed. This creates a fundamental problem: the moment you most need your backup is the moment you discover whether your backup media has been silently dying on its shelf. A backup that exists but cannot be read is worse than no backup at all, because it creates a false sense of security that prevents you from taking the protective actions you would take if you knew you had no backup.</p>
+<p>This article exists to prevent that scenario. Every backup medium degrades. Every storage technology has a limited lifespan. The question is not whether your backup media will fail but when, and whether you will detect the degradation and act before the failure becomes irreversible. This article defines how.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Honest technical assessment of each backup media type: magnetic tape, optical disc, hard disk drives (HDD), and solid-state drives (SSD).</li>
+<li>Expected lifespans, degradation characteristics, and failure signatures for each media type.</li>
+<li>Environmental storage requirements: temperature, humidity, light, magnetic field exposure.</li>
+<li>The rotation schedule: how often media is replaced regardless of apparent health.</li>
+<li>The media health monitoring program: how degradation is detected.</li>
+<li>The media migration procedure: how data is moved off aging media before failure.</li>
+<li>Cost and practicality considerations for a single-operator air-gapped institution.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Backup procedures and scheduling (see D6-006).</li>
+<li>Filesystem selection for backup media (see D6-009; ext4 for backup media is established there).</li>
+<li>Logical backup organization and naming (see D6-004).</li>
+<li>Off-site storage location selection and security (see SEC-001 and D6-006).</li>
+<li>Cloud or network-attached storage (prohibited by the air-gap architecture).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Media Longevity Problem</h3>
+<p>Every physical storage medium is in a state of slow decay from the moment it is manufactured. Magnetic domains weaken. Optical dye layers degrade. Flash cells lose charge. The marketing claims for media longevity are often aspirational rather than empirical -- a manufacturer claiming "100-year archival lifespan" for an optical disc is extrapolating from accelerated aging tests, not from a century of observation. The institution must treat all longevity claims with skepticism and rely instead on its own testing, the broader community's experience, and conservative replacement schedules.</p>
+<h3>3.2 The Air-Gap Media Constraint</h3>
+<p>In a connected institution, backup might mean replication to a remote server or a cloud storage service. In this institution, backup means physical media. Every backup is a physical object that must be stored, protected, tested, and eventually replaced. This makes the choice of backup media a physical as well as a technical decision -- the media must be storable in the institution's environment, durable under the institution's conditions, and readable with the institution's equipment.</p>
+<h3>3.3 The Single-Copy Danger</h3>
+<p>D6-001 Rule R-D6-02 requires a minimum of three copies on at least two distinct media types. This article is about the media those copies live on. The media assessment directly determines whether the institution's backup redundancy is real or merely theoretical. Three copies on three drives from the same manufacturing batch, stored in the same location, subject to the same environmental conditions, is effectively one copy with three labels. True redundancy requires media diversity, storage diversity, and schedule diversity.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Media Type Assessment</h3>
+<p><strong>Hard Disk Drives (HDD).</strong></p>
+<p>HDDs store data as magnetic orientations on spinning platters. They are the workhorse of digital storage and the most practical backup medium for this institution at the founding date.</p>
+<p>Expected lifespan: 3-7 years in active use; 5-10 years in powered-off archival storage. These are conservative estimates. Some drives last much longer; some fail much sooner. The institution treats 5 years as the maximum trust horizon for any individual HDD used as backup media.</p>
+<p>Degradation characteristics: HDDs can fail suddenly (mechanical failure of heads, motor, or controller board) or gradually (increasing sector errors as magnetic domains weaken). Sudden failures are catastrophic but obvious. Gradual failures are insidious -- the drive appears to work but is silently accumulating unreadable sectors. SMART (Self-Monitoring, Analysis, and Reporting Technology) attributes provide early warning for some failure modes but not all. Reallocated sector count, pending sector count, and uncorrectable error count are the most predictive SMART indicators.</p>
+<p>Environmental requirements: Store horizontally in a stable position. Temperature 15-25 degrees Celsius. Humidity 20-50% relative. Avoid vibration, strong magnetic fields, and temperature cycling. Power on the drive at least once every six months to exercise the motor and refresh any weakening sectors. This last point is critical and often overlooked -- a drive that sits unpowered for years may fail to spin up when needed.</p>
+<p>Strengths: High capacity, relatively low cost per gigabyte, fast read/write speeds, universally supported interfaces (SATA, USB). Easy to verify with standard tools. Familiar technology with well-understood failure modes.</p>
+<p>Weaknesses: Mechanical components are inherently fragile. Vulnerable to physical shock. The combination of high capacity and mechanical fragility means a single drive failure can lose a large amount of data. Power-on requirement for long-term archival is an operational burden.</p>
+<p>Institutional role: Primary backup medium. Used for the regular backup rotation defined in Section 4.3. Not relied upon for archival storage beyond the 5-year trust horizon without verified refresh.</p>
+<p><strong>Solid-State Drives (SSD).</strong></p>
+<p>SSDs store data as electrical charges in flash memory cells. They have no moving parts, which eliminates the mechanical failure modes of HDDs.</p>
+<p>Expected lifespan: Highly variable and dependent on the type of flash memory (SLC, MLC, TLC, QLC), the controller firmware, and crucially, the storage conditions when powered off. Write endurance is measured in drive writes per day over a warranty period, but for backup media, the critical question is data retention when unpowered. Manufacturer specifications typically claim 1-10 years of data retention at room temperature, with higher temperatures accelerating charge leakage.</p>
+<p>Degradation characteristics: Flash cells lose charge over time. Unlike HDDs, which degrade at the sector level, SSDs can lose entire blocks or, in extreme cases, become completely unreadable if the controller firmware cannot compensate for charge loss. The degradation is invisible during normal use -- the drive reports success until the moment it does not. SMART reporting on SSDs is less standardized and less predictive than on HDDs.</p>
+<p>Environmental requirements: Temperature is the critical factor. At 25 degrees Celsius, enterprise SSDs may retain data for years. At 40 degrees, retention drops dramatically. Store at the lowest practical temperature. Humidity is less critical than for HDDs (no mechanical components to corrode), but condensation must be avoided. Power on the drive periodically (at least annually) to allow the controller to refresh weakening cells.</p>
+<p>Strengths: No mechanical failure mode. Resistant to physical shock. Fast read speeds. Compact form factor. Silent operation.</p>
+<p>Weaknesses: Data retention when unpowered is the Achilles' heel for archival use. QLC (quad-level cell) drives, which are the cheapest and most common, have the worst retention characteristics. The technology is evolving rapidly, which means failure modes are still being discovered. The cost per gigabyte, while declining, remains higher than HDDs. Controller firmware is proprietary and complex, introducing a dependency on the controller's ability to manage cell degradation.</p>
+<p>Institutional role: Secondary backup medium. Used for portable copies that need shock resistance (transport media for off-site storage). Not relied upon as the sole backup medium. Always paired with HDD backups. The 5-year trust horizon applies, with annual power-on verification mandatory.</p>
+<p><strong>Optical Media (Blu-ray, M-DISC).</strong></p>
+<p>Optical media stores data as physical marks (pits, dye changes, or phase changes) readable by a laser. Blu-ray offers 25-100 GB per disc. M-DISC is a variant that uses a rock-like inorganic recording layer instead of organic dye, claiming significantly longer archival life.</p>
+<p>Expected lifespan: Standard Blu-ray writable discs (organic dye): 5-15 years, highly dependent on manufacturing quality and storage conditions. M-DISC: manufacturer claims hundreds of years; independent accelerated aging tests suggest at least 50-100 years under ideal conditions. These claims are inherently unverifiable at the institution's timescale, but M-DISC's inorganic recording layer is physically more stable than organic dye -- this is a real advantage, not marketing.</p>
+<p>Degradation characteristics: Organic dye discs degrade through chemical breakdown of the dye layer, accelerated by light exposure, heat, and humidity. The outer edge of the disc typically degrades first. M-DISC resists dye degradation by not using dye, but the polycarbonate substrate can still degrade (yellowing, warping, delamination) over very long periods. Read errors manifest as increasing uncorrectable error rates, detectable during verification reads.</p>
+<p>Environmental requirements: Store in jewel cases or archival-grade sleeves. Temperature 15-25 degrees Celsius. Humidity 20-50% relative. No direct light exposure -- UV light is the primary enemy of organic dye layers. Handle by edges only. Do not stack discs without separators. Vertical storage is preferred to prevent warping.</p>
+<p>Strengths: No power required for data retention. No moving parts in the medium itself (the drive has moving parts but the disc does not). Low cost per disc. M-DISC offers the best passive data retention of any medium available to consumers. Write-once nature prevents accidental overwriting. Disc-level storage creates natural data segmentation -- losing one disc does not lose everything.</p>
+<p>Weaknesses: Low capacity per disc means many discs are needed for large datasets. Optical drive availability is declining -- fewer computers include optical drives, and external drives may become difficult to source. Verification requires a working optical drive. Write speeds are slow. The ecosystem is contracting as streaming and flash storage replace optical media in consumer use. The long-term availability of compatible drives is the primary risk.</p>
+<p>Institutional role: Archival backup for Tier 1 data. M-DISC is used for the highest-value institutional memory data that must survive the longest. The institution maintains spare optical drives and stockpiles M-DISC blanks. Data on optical media is verified annually. The drive availability risk is monitored per the evolution path in Section 8.</p>
+<p><strong>Magnetic Tape (LTO).</strong></p>
+<p>LTO (Linear Tape-Open) stores data magnetically on tape media. It is the gold standard for archival storage in enterprise environments. LTO-9 offers 18 TB native capacity per cartridge.</p>
+<p>Expected lifespan: 15-30 years per cartridge under proper storage conditions. The LTO Consortium has maintained backward compatibility (each generation can read tapes from two prior generations), which provides a migration path.</p>
+<p>Degradation characteristics: Magnetic domains weaken over time. Tape substrate can deteriorate (shedding, stretching, sticky shed syndrome). Environmental conditions are critical. Tape is vulnerable to magnetic fields. Degradation is gradual and detectable through read verification.</p>
+<p>Environmental requirements: The most demanding of any medium. Temperature 16-25 degrees Celsius with minimal variation (less than 5 degrees per hour). Humidity 20-50% relative with minimal variation. Stored vertically. Acclimatized for 24 hours before use if moved between environments. Protected from magnetic fields, dust, and contaminants. Requires climate-controlled storage that the institution may or may not be able to maintain in an off-grid environment.</p>
+<p>Strengths: Highest capacity per unit. Best cost per gigabyte for large datasets. Long archival life when properly stored. Mature, well-understood technology. The write-once nature of properly managed tape prevents accidental overwriting. Industry standard for archival storage.</p>
+<p>Weaknesses: Requires specialized tape drives, which are expensive and may be difficult to maintain in an air-gapped environment. The backward compatibility guarantee extends only two generations -- eventually, older tapes must be migrated. Sequential access means slow random access to specific files. The environmental requirements are stringent and may be difficult to maintain off-grid. The cost of entry (drive plus media) is significantly higher than HDD-based backup. For a single-operator institution, the operational overhead may be disproportionate.</p>
+<p>Institutional role: Optional. If the institution's data volume grows large enough to justify the investment, LTO tape becomes the archival storage tier. At founding, the institution's data volume does not justify the expense and operational burden. This decision is revisited when total institutional data exceeds 10 TB or when the five-year review occurs, whichever comes first. If tape is adopted, the procedures in this article are extended to include tape-specific handling, verification, and migration schedules.</p>
+<h3>4.2 The Institutional Media Strategy</h3>
+<p>Based on the assessment above, the institution's backup media strategy at founding is:</p>
+<p><strong>Primary backup media:</strong> HDD. Two independent backup sets on HDDs from different manufacturers or manufacturing batches.</p>
+<p><strong>Secondary backup media:</strong> M-DISC optical. Tier 1 data is additionally backed up to M-DISC for long-term passive preservation.</p>
+<p><strong>Transport media:</strong> SSD. When data must be physically transported to an off-site location, SSDs are used for their shock resistance.</p>
+<p><strong>Future consideration:</strong> LTO tape when data volume or resource availability justifies it.</p>
+<p>This strategy satisfies R-D6-02 (three copies on two distinct media types) and provides media diversity (magnetic HDD, optical M-DISC, flash SSD), storage diversity (different physical locations per D6-006), and technology diversity (three fundamentally different storage technologies).</p>
+<h3>4.3 Rotation Schedule</h3>
+<p><strong>HDD backup rotation:</strong> The institution maintains three sets of HDD backups, labeled A, B, and C. Each set is a complete backup of all institutional data at the tier levels defined in D6-006.</p>
+<ul>
+<li>Set A: Updated weekly. Stored on-site.</li>
+<li>Set B: Updated monthly. Stored off-site at the designated secondary location.</li>
+<li>Set C: Updated quarterly. Stored off-site at the designated tertiary location (or secondary location if a third is not available, but stored separately from Set B).</li>
+</ul>
+<p>Every 5 years, all HDD backup media is replaced with new drives. Data is copied from old drives to new drives, verified, and the old drives are securely wiped and disposed of per SEC-003. This is the media refresh cycle. It is not optional. It is not deferrable. It is the mechanism that keeps backup media ahead of degradation.</p>
+<p><strong>M-DISC archival rotation:</strong> M-DISC backups of Tier 1 data are created annually. Each annual set is a complete snapshot. Previous annual sets are retained permanently (M-DISC's passive longevity makes retention cost-effective). Sets are verified annually by reading every disc and checking against known-good checksums.</p>
+<p><strong>SSD transport media:</strong> SSDs used for transport are refreshed every 3 years. Between uses, transport SSDs are stored powered-off at the on-site location and powered on quarterly for controller maintenance.</p>
+<h3>4.4 Media Health Monitoring Program</h3>
+<p><strong>HDD health monitoring:</strong>
+- SMART attributes are checked monthly for all backup HDDs. Key indicators: Reallocated Sector Count, Current Pending Sector Count, Uncorrectable Error Count, Spin Retry Count. Any non-zero value in Reallocated Sector Count or Uncorrectable Error Count triggers immediate investigation.
+- Full read verification (read every sector, compare against backup checksums) is performed quarterly.
+- Any HDD that fails a SMART threshold or produces read errors during verification is retired immediately and replaced. Data is restored to the replacement drive from the remaining good copies.</p>
+<p><strong>M-DISC health monitoring:</strong>
+- Annual full-disc read with error rate reporting. Optical drives report C1/C2 error rates (or PI/PO for Blu-ray) which indicate disc quality degradation.
+- Any disc with rising error rates is flagged. If error rates approach the correction threshold, the disc is duplicated to a new disc and the original is retired but retained for reference.</p>
+<p><strong>SSD health monitoring:</strong>
+- SMART attributes checked at each power-on (quarterly minimum). Key indicators: Percentage Used, Available Spare, Media and Data Integrity Errors.
+- Full read verification at each power-on event.
+- Any SSD reporting reduced spare capacity below 20% or any data integrity errors is retired immediately.</p>
+<h3>4.5 Environmental Monitoring</h3>
+<p>The institution monitors the environmental conditions where backup media is stored:</p>
+<ul>
+<li>Temperature and humidity are logged continuously using a standalone data logger (a battery-operated device that does not require network connectivity).</li>
+<li>Acceptable ranges: 15-25 degrees Celsius, 20-50% relative humidity.</li>
+<li>If conditions exceed acceptable ranges for more than 24 hours, a media health check is triggered for all media stored in the affected location.</li>
+<li>If conditions consistently exceed acceptable ranges, the storage location must be changed or environmentally remediated.</li>
+</ul>
+<p>In an off-grid environment, environmental control may be challenging. The institution prioritizes media storage locations that are naturally stable -- interior rooms, below-grade spaces, locations with high thermal mass. Active climate control (air conditioning, dehumidifiers) is preferred but not always available. When active control is unavailable, passive measures (insulation, ventilation, desiccants) are employed and monitoring frequency is increased.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D6-11-01:</strong> No single media type may be the sole backup medium for Tier 1 or Tier 2 data. At least two distinct media types must hold copies of all data at these tiers.</li>
+<li><strong>R-D6-11-02:</strong> HDD backup media must be replaced on a 5-year rotation cycle regardless of apparent health. No HDD older than 5 years may serve as the sole or primary backup medium for any data tier.</li>
+<li><strong>R-D6-11-03:</strong> All backup media must be verified at least quarterly through full read verification against known-good checksums. Verification results must be recorded in the operational log.</li>
+<li><strong>R-D6-11-04:</strong> Media that exhibits any sign of degradation (SMART warnings, rising error rates, read failures) must be retired immediately and replaced. "Immediately" means before the next scheduled backup rotation.</li>
+<li><strong>R-D6-11-05:</strong> Backup media must be stored in environmental conditions within the acceptable ranges defined in Section 4.5. Environmental conditions must be monitored continuously.</li>
+<li><strong>R-D6-11-06:</strong> The institution must maintain a minimum stockpile of replacement media: at least two spare HDDs of the currently-used capacity and at least fifty blank M-DISC media. Running below stockpile triggers a procurement action.</li>
+<li><strong>R-D6-11-07:</strong> Media procurement must prioritize diversity. Do not buy all backup HDDs from the same manufacturer in the same batch. Correlating failures across identical drives from the same batch is a documented phenomenon.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Simultaneous multi-drive failure.</strong> All backup HDDs fail at once because they were purchased together, are the same model, and have the same firmware bug or manufacturing defect. Mitigation: R-D6-11-07 requires procurement diversity. The M-DISC backup provides a technology-diverse fallback. The rotation schedule ensures that not all backup sets are the same age.</p>
+</li>
+<li>
+<p><strong>Environmental damage.</strong> A storage location experiences a temperature excursion (heat, cold, flooding) that damages all media stored there. Mitigation: Backup sets are stored at different locations (Section 4.3). Environmental monitoring provides early warning. Off-site backups survive even if the on-site location is compromised.</p>
+</li>
+<li>
+<p><strong>Optical drive obsolescence.</strong> Optical drives become unavailable. The institution can no longer read its M-DISC backups. Mitigation: The institution stockpiles spare optical drives (at least two). The evolution path (Section 8) monitors drive availability and triggers migration if optical drives approach end-of-availability. Data on M-DISC is also present on HDDs, so optical drive loss does not mean data loss -- it means loss of one redundancy layer.</p>
+</li>
+<li>
+<p><strong>Silent backup corruption.</strong> Backup media degrades without obvious symptoms. The institution discovers the corruption only when attempting to restore from backup. Mitigation: R-D6-11-03 requires quarterly verification. The ZFS scrub schedule (D6-009) catches corruption on ZFS-formatted backup media. The monitoring program (Section 4.4) detects degradation trends before they become failures.</p>
+</li>
+<li>
+<p><strong>Backup media stockpile depletion.</strong> The institution runs out of replacement media and cannot purchase more (supply chain disruption, technology discontinuation, financial constraints). Mitigation: R-D6-11-06 maintains a minimum stockpile. The evolution path monitors media availability. When a media type approaches end-of-availability, the institution stockpiles aggressively and begins planning migration to the successor technology.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a backup HDD fails during verification.</strong> Identify which backup set is affected (A, B, or C). Verify that the other two sets are intact by running immediate verification on them. Replace the failed drive with a drive from the stockpile. Recreate the affected backup set from the primary data source (if the primary is intact) or from one of the two remaining good backup sets. Document the failure, including the drive model, age, SMART data at time of failure, and any environmental factors. Update the stockpile.</p>
+</li>
+<li>
+<p><strong>If an M-DISC is discovered to be unreadable.</strong> Attempt to read it on a different optical drive -- the problem may be the drive, not the disc. If the disc is truly unreadable, document which data was on it (using the disc catalogue per D6-008). Verify that the same data exists on other backup media (HDD backup sets). If so, recreate the M-DISC from the HDD copy. If the data does not exist on other media, this is a data loss incident -- escalate per D6-013.</p>
+</li>
+<li>
+<p><strong>If environmental monitoring reveals sustained out-of-range conditions.</strong> Assess how long conditions were out of range and how severe the excursion was. If mild and brief (a few degrees for a few hours), note it in the log and monitor the affected media more closely at the next verification cycle. If severe or prolonged, run immediate full verification on all media stored in the affected location. Move media to a location with acceptable conditions. If a better location is not available, investigate environmental remediation (insulation, ventilation, climate control).</p>
+</li>
+<li>
+<p><strong>If a media technology approaches obsolescence.</strong> When the institution identifies that a media type used for backups is approaching end-of-availability (drives becoming scarce, media production declining), initiate migration planning. Identify the successor media type. Purchase and test the successor technology. Begin migrating data from the old media type to the new one, verifying at each step. Complete migration before the old technology becomes unavailable. Stockpile spare drives or readers for the old technology as a safety margin.</p>
+</li>
+<li>
+<p><strong>If all backup copies of specific data are found to be corrupt.</strong> This is the nightmare scenario addressed more fully in D6-013. Immediately assess: is the primary data still intact? If yes, recreate all backup copies immediately. If the primary is also corrupt, invoke D6-013 disaster recovery procedures. Assess whether the corruption is the same across all copies (indicating the corruption occurred before backup and was replicated) or different (indicating independent media degradation). The answer determines whether the root cause is a media problem or a source data problem.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The initial media strategy is established. The primary learning is whether the environmental conditions achievable in the institution's physical location are adequate for media preservation. The first rotation cycle completes. Operational rhythms for verification and monitoring are established.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The first HDD rotation cycle completes. The institution gains real-world data on HDD longevity in its specific environment. Optical drive availability is monitored -- if the market trajectory continues toward eliminating optical drives, migration planning begins. LTO tape is re-evaluated if data volume has grown.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Storage media technology will have changed significantly. New media types may exist that are superior to all current options. The institution must evaluate them without assuming that newer is better -- wait for a technology to prove itself before adopting it. The HDD will likely still exist but may have been superseded for archival use. The M-DISC investment pays off during this period if optical drives remain available.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> At least one complete media technology transition will have occurred. The institution's data will have been migrated through at least one media generation change. The procedures in this article must have been updated to reflect the current media landscape. The principles -- diversity, verification, rotation, monitoring -- remain constant even as the specific media types change.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If any media type used by the institution can no longer be purchased new, revision of this article is mandatory. If the institution's data volume exceeds 10 TB, the LTO tape assessment in Section 4.1 must be revisited. If environmental monitoring consistently shows conditions outside acceptable ranges, the media strategy must be adapted to media types that tolerate those conditions.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I do not trust any single storage medium. I have lost data to every type -- HDDs that clicked and died, SSDs that simply stopped responding, CDs that turned into coasters. The only defense that actually works is redundancy across different technologies. If my HDDs and my M-DISCs and my SSDs all fail simultaneously, the coincidence is so extreme that something much larger than media failure has occurred.</p>
+<p>The M-DISC decision was made after considerable research. The claims are extraordinary -- centuries of data retention. I do not fully believe them, but I believe the underlying physics. An inorganic recording layer is more stable than an organic dye layer. That is chemistry, not marketing. Whether it lasts a hundred years or fifty, it is meaningfully more durable than a standard Blu-ray disc, and for the cost of a few dollars per disc, that insurance is worth buying.</p>
+<p>The tape decision was harder. Tape is genuinely excellent archival media. The LTO ecosystem is mature and well-managed. But the cost of entry -- a tape drive costs as much as several terabytes of HDD storage -- and the operational overhead of tape management do not currently make sense for this institution's data volume. When data volume grows, this decision should change. I left explicit criteria for when to revisit it.</p>
+<p>The thing that worries me most is not media failure. It is the slow disappearance of the drives that read the media. Optical drives are already uncommon in new computers. If that trend continues for another decade, reading an M-DISC will require vintage hardware. I have stockpiled drives, but drives fail too. This is the paradox of archival media: the medium may outlast the equipment needed to read it. Future operators should monitor drive availability more anxiously than media availability.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (air-gap requirement, physical sovereignty)</li>
+<li>D6-001 -- Data Philosophy (data tier system, R-D6-02 redundancy requirement, triage framework)</li>
+<li>D6-005 -- Storage Architecture: Physical Media Strategy (overall media strategy)</li>
+<li>D6-006 -- Backup Doctrine (backup procedures, off-site requirements)</li>
+<li>D6-007 -- Data Integrity &amp; Verification (checksum generation and verification)</li>
+<li>D6-008 -- Metadata Standards &amp; Cataloguing (media catalogue, disc-level tracking)</li>
+<li>D6-009 -- File System Architecture for Longevity (filesystem choice for backup media)</li>
+<li>D6-013 -- Disaster Data Recovery (escalation when backup media fails)</li>
+<li>SEC-003 -- Cryptographic Key Management (secure media disposal procedures)</li>
+<li>LTO Consortium. "Ultrium LTO Technology" specification documents (archived locally)</li>
+<li>Millenniata, Inc. M-DISC technical white papers (archived locally)</li>
+<li>Backblaze Hard Drive Stats (annual reports, archived locally) -- empirical HDD failure rate data</li>
+<li>US National Institute of Standards and Technology (NIST). "Care and Handling of CDs and DVDs: A Guide for Librarians and Archivists." Special Publication 500-252 (archived locally)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

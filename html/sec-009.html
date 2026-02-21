@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-009 — Trust Boundary Definitions - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li class="active"><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-009">
+  <h1>SEC-009 &mdash; Trust Boundary Definitions</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-009</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security &amp; Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>SEC-001 (Threat Model), SEC-002 (Access Control), GOV-001 (Authority Model)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>SEC-004 (Air-Gap Architecture), SEC-013 (Insider Threat), SEC-006 (Physical Security), Domain 4 (Infrastructure), Domain 5 (Platform)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article formally defines every trust boundary within the holm.chat Documentation Institution. A trust boundary is a line -- sometimes physical, sometimes logical, sometimes procedural -- across which the level of trust changes. On one side of a trust boundary, certain assumptions hold. On the other side, those assumptions do not hold, or hold only conditionally.</p>
+
+<p>The reason trust boundaries must be explicitly defined is that implicit trust is the root cause of most security failures. When a system designer assumes that data crossing a boundary is safe without stating that assumption, the assumption becomes invisible. Invisible assumptions cannot be tested, audited, or challenged. They persist until an attacker exploits them.</p>
+
+<p>This document makes every trust assumption visible. It names every boundary. It states what is trusted on each side, what is not trusted, and what mechanisms enforce the transition. Future maintainers who modify any system, process, or relationship within the institution must consult this document to understand which trust boundaries are affected by the change and what compensating controls must be maintained.</p>
+
+<p>The trust boundaries defined here are not permanent in their specific implementations. Hardware changes. Software changes. People change. But the principle that trust boundaries must be explicitly defined, documented, and enforced -- that principle is permanent. When a boundary moves, this document must be updated before the move is executed, not after.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers the following categories of trust boundaries:</p>
+<ul>
+<li>The boundary between the institution and the external world (the outermost perimeter).</li>
+<li>The boundary between the operator and the institutional systems (the human-machine interface).</li>
+<li>The boundaries between different zones within the institution (internal segmentation).</li>
+<li>The boundary between trusted hardware and untrusted hardware.</li>
+<li>The boundary between trusted software and untrusted software.</li>
+<li>The boundary between current data and imported data.</li>
+<li>The boundary between the founding operator and any future successor.</li>
+<li>The temporal trust boundary: the point at which previously trusted artifacts (keys, media, software versions) become untrusted due to age, degradation, or obsolescence.</li>
+</ul>
+
+<p>This article does not define the specific access control mechanisms that enforce these boundaries (that is SEC-002), the cryptographic protocols used at boundaries (that is SEC-003 and SEC-005), or the physical implementations of boundary enforcement (that is SEC-006). This article defines <em>where</em> the boundaries are and <em>what changes</em> across them. The other articles define <em>how</em> the boundaries are enforced.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Nature of Trust in a Single-Operator Institution</h3>
+<p>In a conventional enterprise, trust boundaries exist primarily between people -- between departments, between employees and contractors, between the organization and its customers. In this institution, the primary operator is a single individual. This might suggest that internal trust boundaries are unnecessary. That suggestion is dangerously wrong.</p>
+
+<p>Even a single operator must contend with the following trust distinctions: the operator's intent versus the operator's execution (human error crosses no organizational boundary, but it crosses the boundary between intention and action); the operator's current knowledge versus the operator's future knowledge (procedures documented today may be misunderstood by the same person in ten years); and the operator as authenticated user versus a potential adversary who has gained physical access to the operator's equipment.</p>
+
+<p>Furthermore, this institution is designed to outlive its founding operator. The moment a successor assumes control, every assumption about the operator's identity, knowledge, and trustworthiness must be re-evaluated. Trust boundaries that were invisible when there was only one person become critical when there are two.</p>
+
+<h3>3.2 Trust as a Directed Graph</h3>
+<p>Trust in this institution is not symmetric. The operator trusts the hardware after inspection, but the hardware does not trust the operator -- it enforces authentication regardless of who presents credentials. The institution trusts verified software, but verified software does not trust unverified inputs. Data inside the air gap is trusted for integrity, but data being imported is not trusted until it has passed quarantine.</p>
+
+<p>This asymmetry is deliberate. Symmetric trust -- where A trusts B exactly as much as B trusts A -- is a simplification that obscures real security relationships. Every trust relationship in this institution is documented with its direction, its conditions, and its limitations.</p>
+
+<h3>3.3 The Cost of Undefined Boundaries</h3>
+<p>History provides abundant examples of security failures caused by undefined or poorly defined trust boundaries. Air-gapped systems have been compromised because the boundary between "inside the air gap" and "outside the air gap" was not rigorously maintained -- a USB drive that crossed the boundary carried malware with it. Encrypted systems have been compromised because the boundary between "encrypted at rest" and "decrypted in memory" was not considered -- an attacker with physical access extracted keys from RAM. These failures share a common root: the boundary existed conceptually but was not defined precisely enough to be enforced consistently.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Institutional Perimeter (Boundary Class 1)</h3>
+<p>The outermost trust boundary separates the institution from everything else. On the inside of this boundary, data, hardware, and software have been vetted, verified, and accepted into the institutional domain. On the outside, nothing is trusted.</p>
+
+<p>This boundary is primarily enforced by the air gap. The air gap is not merely a network disconnection; it is the physical manifestation of the institutional perimeter. Nothing crosses this boundary without a deliberate, documented, physical act by the operator. There is no passive crossing. There is no automated crossing. Every crossing is an event that must be logged and verified.</p>
+
+<p>The perimeter includes: all institutional hardware (computing devices, storage media, networking equipment that is disconnected but physically present), all institutional software (operating systems, applications, scripts, configurations), all institutional data (documents, databases, archives, logs), and the physical space in which these assets reside.</p>
+
+<p>The perimeter excludes: all network-connected devices, all cloud services, all external storage media not yet processed through quarantine, all software not yet verified from source, and all persons other than the authenticated operator (or an authenticated successor operating under the succession protocol defined in GOV-001).</p>
+
+<h3>4.2 The Human-Machine Boundary (Boundary Class 2)</h3>
+<p>The boundary between the operator and the institutional systems is enforced through authentication. The systems do not trust the physical presence of a human body. They trust the presentation of valid credentials -- a passphrase, a cryptographic key, a hardware token, or a combination thereof as defined in SEC-002.</p>
+
+<p>This boundary exists to protect the institution from two threats: unauthorized physical access (someone other than the operator gains access to the hardware) and operator error under duress or confusion (the operator, in an impaired state, attempts actions that should be prevented). The authentication mechanism serves as a checkpoint that requires the operator to demonstrate both identity and intent.</p>
+
+<p>The human-machine boundary is also the point at which the institution's audit trail begins. Actions taken by the operator on institutional systems are logged. Actions taken by the operator outside institutional systems (thinking, planning, writing on paper) are not logged and are not within the institution's security model. This is a deliberate limitation. The institution secures its digital and physical assets. It does not attempt to secure the operator's mind.</p>
+
+<h3>4.3 Internal Zone Boundaries (Boundary Class 3)</h3>
+<p>Within the institution, not all systems and data are equal. The institution is segmented into zones, each with its own trust level:</p>
+
+<p><strong>Zone A -- The Archive Core.</strong> This zone contains the canonical copies of all institutional documents, the master key material, and the audit logs. It has the highest trust requirements. Access requires full authentication. All operations are logged. No executable code from outside Zone A runs within it. Data enters Zone A only after verification in Zone B.</p>
+
+<p><strong>Zone B -- The Working Environment.</strong> This zone is where the operator performs daily work: drafting documents, running analyses, executing maintenance tasks. It trusts data from Zone A (read access) but does not have write access to Zone A without explicit commit procedures. Zone B may contain software tools that have been verified but are more complex (and therefore more attack-surface-rich) than what runs in Zone A.</p>
+
+<p><strong>Zone C -- The Quarantine Zone.</strong> This zone is where all external material is received, inspected, and processed before it is permitted to enter Zone B or Zone A. Nothing in Zone C is trusted. Hardware in Zone C is physically separated from hardware in Zones A and B. Data moves from Zone C to Zone B only after passing the quarantine procedures defined in Domain 18.</p>
+
+<p>The boundaries between these zones may be enforced through separate physical hardware, through separate user accounts with different privilege levels, through encrypted partitions with different keys, or through a combination of these mechanisms. The enforcement mechanism may change over time. The zone model itself -- the principle that different categories of assets require different trust levels and that transitions between levels must be controlled -- is permanent.</p>
+
+<h3>4.4 The Temporal Trust Boundary (Boundary Class 4)</h3>
+<p>Time degrades trust. A cryptographic key that was strong when generated becomes weaker as computational power increases. A storage medium that was reliable when new becomes unreliable as it ages. Software that was secure when audited may contain vulnerabilities discovered after the audit. A backup that was verified last year may have suffered bit rot since then.</p>
+
+<p>The temporal trust boundary is not a fixed line. It is a gradient that the institution must actively manage. The institution defines maximum trust durations for each category of asset: cryptographic keys have rotation schedules (defined in SEC-003), storage media have replacement schedules (defined in Domain 4), software has re-verification schedules (defined in Domain 5), and backups have re-verification schedules (defined in OPS-001).</p>
+
+<p>When an asset exceeds its maximum trust duration without renewal, it crosses the temporal trust boundary and must be treated as untrusted until re-verified. This is not optional. An expired key is an untrusted key. An unverified backup is an untrusted backup. The temporal trust boundary enforces the principle that trust is not permanent -- it must be actively maintained.</p>
+
+<h3>4.5 The Succession Boundary (Boundary Class 5)</h3>
+<p>When the founding operator is replaced by a successor -- whether through planned transition or emergency succession as defined in GOV-001 -- every trust relationship involving the operator's identity must be re-established. The successor is not the founder. The successor's knowledge, habits, and trustworthiness are different. The systems must authenticate the successor independently, and the successor must demonstrate competence with institutional procedures before being granted full operational authority.</p>
+
+<p>The succession boundary is the most disruptive trust transition the institution can experience. It requires re-keying of credentials, re-verification of the successor's understanding of security procedures, and a formal handover period during which both the outgoing and incoming operators (if both are available) verify the integrity of the transition. The details of this process are defined in GOV-001, but the trust boundary itself -- the recognition that succession is a security event, not merely an administrative event -- is defined here.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-TB-01:</strong> Every trust boundary defined in this document must have at least one enforcement mechanism. A trust boundary that is defined but not enforced is worse than one that is not defined, because it creates a false sense of security.</li>
+<li><strong>R-TB-02:</strong> No data, hardware, or software may cross a trust boundary without a documented procedure for that crossing. Ad hoc boundary crossings are prohibited. If a new crossing need arises, the procedure must be defined first, reviewed against SEC-001 (Threat Model), and documented before the crossing occurs.</li>
+<li><strong>R-TB-03:</strong> Trust boundary crossings must be logged. The log must record what crossed, in which direction, at what time, and under whose authority. Logs of boundary crossings are stored in Zone A and are append-only.</li>
+<li><strong>R-TB-04:</strong> The direction of trust across each boundary must be explicitly stated. "A trusts B" does not imply "B trusts A." Every trust relationship is unidirectional unless both directions are explicitly documented.</li>
+<li><strong>R-TB-05:</strong> Trust boundaries must be reviewed whenever the threat model (SEC-001) is updated. A change in the threat landscape may require the addition of new boundaries, the strengthening of existing boundaries, or the recognition that a previously adequate boundary is no longer sufficient.</li>
+<li><strong>R-TB-06:</strong> No single mechanism may serve as the sole enforcement of a Boundary Class 1 or Boundary Class 2 crossing. Defense in depth requires that the outermost perimeter and the human-machine boundary each have at least two independent enforcement mechanisms.</li>
+<li><strong>R-TB-07:</strong> The temporal trust boundary durations defined for each asset class must be documented in a schedule that is reviewed annually. The schedule must err on the side of shorter durations rather than longer ones. When in doubt, re-verify sooner.</li>
+<li><strong>R-TB-08:</strong> During a succession event, all trust boundaries revert to their most restrictive state until the successor has completed the verification process defined in GOV-001. No expedited access is permitted. The security of the institution takes precedence over the convenience of the transition.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Boundary collapse.</strong> Two zones that should be separate are allowed to merge -- for example, quarantine material is processed on the same hardware used for the archive core. This eliminates the trust differential between the zones and exposes high-trust assets to low-trust threats. Mitigation: physical separation where possible; strict procedural separation where physical separation is not feasible; regular audits to verify that zone separation is maintained.</li>
+<li><strong>Boundary bypass.</strong> A crossing mechanism exists that is not documented -- a USB port that is not disabled, a shared filesystem that was created for convenience and forgotten, a script that copies files between zones without logging. Mitigation: periodic audits that enumerate all possible crossing mechanisms and compare them against the documented list. Any undocumented mechanism is treated as a security finding.</li>
+<li><strong>Trust inversion.</strong> A lower-trust zone gains influence over a higher-trust zone -- for example, a script in Zone B modifies configurations in Zone A, or quarantine data is processed using tools that have write access to the working environment. Mitigation: strict enforcement of the direction of trust. Higher-trust zones may read from lower-trust zones (with appropriate verification), but lower-trust zones must never write to higher-trust zones except through controlled, logged, verified procedures.</li>
+<li><strong>Temporal trust neglect.</strong> The temporal trust boundary is ignored. Keys are not rotated. Media are not replaced. Backups are not re-verified. The institution operates on stale trust that has long since expired. Mitigation: automated reminders where possible; calendar-based review schedules where automation is not available; annual audits that specifically check temporal trust compliance.</li>
+<li><strong>Succession trust vacuum.</strong> The founding operator becomes unavailable without completing the succession protocol. The successor has physical access but not authenticated access. The institution's systems are locked, and the succession boundary cannot be crossed through legitimate means. Mitigation: the emergency succession provisions in GOV-001, which include pre-positioned credentials and documented recovery procedures that allow a verified successor to cross the succession boundary without the founding operator's real-time participation.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If a boundary collapse is detected:</strong> Immediately isolate the affected zones. Determine which assets in the higher-trust zone may have been exposed to lower-trust material. If Zone A integrity cannot be verified, restore Zone A from the most recent verified backup. Document the collapse, its cause, and the remediation steps. Revise procedures to prevent recurrence.</li>
+<li><strong>If an undocumented boundary crossing is discovered:</strong> Treat it as a security incident per SEC-008. Assess the duration and scope of the undocumented crossing. Determine what data or systems may have been affected. Close the undocumented crossing. Verify the integrity of all assets that may have been exposed. Document the finding and update this article to address the gap.</li>
+<li><strong>If trust inversion is detected:</strong> Immediately revoke the lower-trust zone's access to the higher-trust zone. Audit all changes made through the inverted trust path. Restore any affected higher-trust assets from known-good sources. Investigate how the inversion occurred and implement controls to prevent it.</li>
+<li><strong>If temporal trust has lapsed:</strong> Treat all assets that have exceeded their trust duration as untrusted. Re-verify each asset before restoring trust. For cryptographic keys, this means rotation. For storage media, this means integrity verification. For backups, this means test restoration. For software, this means re-auditing or re-verification from source. Do not restore trust based on the assumption that "it was probably fine." Verify.</li>
+<li><strong>If succession trust cannot be established:</strong> Follow the emergency succession protocol in GOV-001. If the emergency protocol is insufficient, escalate to the disaster recovery procedures in Domain 12. The institution's data preservation takes precedence over operational continuity during a succession crisis.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> Establish and document all trust boundaries. Implement enforcement mechanisms for each. Conduct initial audits to verify that the documented boundaries match reality. Expect to discover undocumented crossings that were created during the institution's initial setup and must be formalized or eliminated.</li>
+<li><strong>Years 2-5:</strong> Refine zone definitions as operational patterns emerge. The initial three-zone model (Archive Core, Working Environment, Quarantine) may need subdivision as the institution's complexity grows. Add sub-zones as needed, but resist the temptation to create so many zones that the model becomes unmanageable.</li>
+<li><strong>Years 5-15:</strong> Hardware generations will change. The physical enforcement of trust boundaries will need to be re-implemented on new hardware. Each hardware transition is a trust boundary event that must be managed according to the procedures in this document. The zone model should be stable by this point; the implementations will change.</li>
+<li><strong>Years 15-30:</strong> The succession boundary will become increasingly relevant as the founding operator ages. Ensure that the succession protocol has been tested -- not just documented, but actually rehearsed -- so that the succession boundary can be crossed smoothly when the time comes.</li>
+<li><strong>Years 30-50+:</strong> The institution may have undergone one or more successions. Each succession is an opportunity to re-evaluate all trust boundaries. The trust model defined here should still be valid in its principles, even if every specific implementation has changed. If the principles themselves need revision, that revision must be conducted through the formal amendment process defined in GOV-001.</li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Trust boundaries are the skeleton of a security architecture. You can change the flesh -- swap hardware, update software, rotate keys -- but if the skeleton is wrong, nothing built on it will stand properly. I have seen systems fail not because their encryption was weak or their firewalls were misconfigured, but because nobody had clearly defined where trust began and where it ended. The quarantine zone existed in theory but not in practice. The air gap was absolute except when it was not. The backup was trusted because it had always been trusted, not because anyone had recently verified it.</p>
+
+<p>This document is an attempt to make every trust assumption visible and every trust transition deliberate. It will not prevent all breaches. But it will ensure that when a breach occurs, we can trace exactly which trust boundary was violated and why. That traceability is the difference between a security incident that teaches us something and a security incident that merely hurts us.</p>
+
+<p>Future maintainers: resist the urge to simplify trust boundaries for convenience. Every simplification is a trust assumption. Every trust assumption is an attack surface. Keep the boundaries clear, keep the crossings logged, and keep the zones separate. The inconvenience is the point.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>SEC-001 -- Threat Model and Security Philosophy (the threat model that trust boundaries are designed to address)</li>
+<li>SEC-002 -- Access Control Procedures (the mechanisms that enforce human-machine trust boundaries)</li>
+<li>SEC-003 -- Cryptographic Key Management (temporal trust boundaries for cryptographic material)</li>
+<li>SEC-004 -- Air-Gap Architecture (the physical implementation of the institutional perimeter)</li>
+<li>SEC-006 -- Physical Security Design (physical enforcement of zone boundaries)</li>
+<li>SEC-008 -- Security Audit Framework (audit procedures for trust boundary verification)</li>
+<li>GOV-001 -- Authority Model (succession protocol and the succession trust boundary)</li>
+<li>OPS-001 -- Operations Philosophy (operational procedures for trust boundary crossings)</li>
+<li>Domain 4 -- Infrastructure &amp; Power (physical implementation of zone separation)</li>
+<li>Domain 5 -- Platform &amp; Core Systems (software implementation of zone separation)</li>
+<li>Domain 18 -- Import &amp; Quarantine (procedures for crossing the institutional perimeter with external material)</li>
+</ul>
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

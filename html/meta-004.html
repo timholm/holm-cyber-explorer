@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>META-004 — Cross-Domain Consistency Enforcement - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li class="active"><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="meta-004">
+  <h1>META-004 &mdash; Cross-Domain Consistency Enforcement</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>META-004</dd>
+  <dt>Domain</dt>
+  <dd>META -- Meta-Documentation & Standards</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>META-00-ART-001 (Stage 1 Meta-Framework), META-001, GOV-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All domain index articles, all articles with cross-domain references</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution ensures that its 20 domains remain consistent with one another. A single document can be internally consistent -- its rules do not contradict each other, its terminology is uniform, its procedures are coherent. But an institution with hundreds of documents spread across 20 domains faces a harder problem: consistency across documents, across domains, and across time.</p>
+<p>Cross-domain inconsistency is the silent killer of documentation systems. When the POWR domain calls a component a "charge controller" and the INFR domain calls the same component a "battery regulator," a reader who consults both domains is confused. When the SECR domain mandates a procedure that contradicts a procedure in the OPSYS domain, the operator must choose which to follow, undermining the authority of both. When the STOR domain references a backup location that the INFR domain says was decommissioned, the reference becomes a trap.</p>
+<p>This article exists to prevent these failures. It defines the tools, procedures, and disciplines by which the institution maintains consistency across its entire corpus. It is, in effect, the quality assurance function of the documentation system -- not for individual documents (that is covered by the review workflow in META-00-ART-001) but for the relationships between documents.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong></p>
+<ul>
+<li>Terminology alignment: ensuring the same concepts are named the same way across all domains.</li>
+<li>Contradiction detection: identifying cases where two documents make incompatible claims or prescribe incompatible procedures.</li>
+<li>Reference integrity verification: ensuring all cross-references point to documents that exist and are in the correct state.</li>
+<li>The cross-domain consistency audit: a structured process for verifying consistency.</li>
+<li>Tools and procedures for maintaining consistency in a manual, air-gapped environment.</li>
+<li>The role of the institutional glossary in consistency enforcement.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+<li>Internal consistency within a single article (covered by the self-review checklist in META-00-ART-001).</li>
+<li>Voice and style consistency (covered by META-002).</li>
+<li>The documentation lifecycle (covered by META-003).</li>
+<li>The commentary system (covered by META-005).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>The holm.chat Documentation Institution spans 20 domains with an estimated 239-398 articles at maturity. These domains are not independent silos. The dependency matrix in META-00-ART-001, Section 8.2 shows that every domain depends on at least one other domain, and most domains depend on several. This web of dependencies creates a web of potential inconsistencies.</p>
+<p>Inconsistency arises from four sources. First, independent authoring: even when a single person writes all the documentation, they may use different terms or make different assumptions when writing about different domains at different times. Second, asynchronous revision: when one document is revised, related documents in other domains may not be updated simultaneously, creating temporary or permanent misalignment. Third, evolving reality: when a physical system changes, some but not all of the documents describing it may be updated. Fourth, accumulated context: over years and decades, the context in which terms are used may shift subtly, so that two documents use the same word to mean slightly different things.</p>
+<p>These sources of inconsistency are inherent in any multi-document system. They cannot be eliminated. They can only be detected and corrected through disciplined process. That process is what this article defines.</p>
+<p>The challenge is amplified by the institution's air-gapped nature. There are no automated consistency-checking tools that run against a cloud database. There is no version control system that tracks changes across documents and flags conflicts. Consistency enforcement in this institution is a manual discipline, performed by human attention with the aid of structured procedures. This makes the procedures more important, not less.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Three Layers of Consistency</h3>
+<p>Consistency operates at three layers, each requiring different verification methods:</p>
+<p><strong>Layer 1: Terminological Consistency.</strong> The same concept must be called the same thing everywhere. This is the most fundamental layer. When the institution refers to the physical structure that houses the servers, it must always use the same term. Whether that term is "server room," "data center," or "computing shelter" does not matter, as long as it is the same term in every document.</p>
+<p>Terminological consistency is enforced through the institutional glossary, maintained in the LRNG domain. The glossary is the authoritative source for all technical terms used in the institution. When a term appears in the glossary, every document must use that exact term. When a new term is needed, it must be proposed, defined, and added to the glossary before it is used in documentation.</p>
+<p><strong>Layer 2: Factual Consistency.</strong> Documents must not make contradictory factual claims. If INFR says the primary server has 64 GB of RAM and OPSYS says it has 32 GB, one of them is wrong. If both are published, a reader has no way to know which to trust.</p>
+<p>Factual consistency is verified through the cross-domain consistency audit (Section 4.3). It is also partially enforced through the dependency graph: when a document cites a factual claim from another document, the reference creates a verifiable link that can be checked.</p>
+<p><strong>Layer 3: Procedural Consistency.</strong> Procedures described in different domains must not conflict. If SECR mandates that all external media must be quarantined for 48 hours before data transfer, and STOR describes a backup import process that transfers data immediately, the procedures are in conflict. Following one requires violating the other.</p>
+<p>Procedural consistency is the hardest layer to verify because procedures interact in complex ways. A procedure in one domain may have preconditions that depend on a procedure in another domain having been completed. These dependency chains must be traceable and non-contradictory.</p>
+<h3>4.2 The Institutional Glossary</h3>
+<p>The institutional glossary is the foundation of terminological consistency. It is maintained as an article (or set of articles) in the LRNG domain and serves as the authoritative reference for all technical terms.</p>
+<p>The glossary operates under the following principles:</p>
+<p><strong>One term, one meaning.</strong> Each glossary entry defines exactly one term with exactly one meaning. If a term has multiple meanings in general usage, the glossary specifies which meaning the institution adopts and notes the existence of other meanings to prevent confusion.</p>
+<p><strong>One meaning, one term.</strong> Each concept has exactly one term in the glossary. Synonyms are listed as redirects to the canonical term, not as separate entries with identical definitions.</p>
+<p><strong>Definition at point of use.</strong> The glossary is the authoritative source, but each article must also define terms at point of first use within the article (per META-002, R-META-002-02). The article-level definition must be consistent with the glossary definition. If they diverge, the glossary prevails and the article must be corrected.</p>
+<p><strong>Living document.</strong> The glossary is revised whenever a new term is needed or an existing term's definition requires refinement. Glossary revisions are Tier 4 governance decisions (operational) unless a term change affects the meaning of existing rules or procedures, in which case the change escalates to Tier 3.</p>
+<h3>4.3 The Cross-Domain Consistency Audit</h3>
+<p>The cross-domain consistency audit is a structured process conducted annually as part of the documentation census (META-001). It verifies consistency across all three layers.</p>
+<p><strong>Audit Phase 1: Reference Integrity Check.</strong></p>
+<p>For every cross-domain reference in the corpus, verify:
+- The referenced document exists.
+- The referenced document is in Published status (or Archived, with the reference acknowledging the archival).
+- The specific claim, procedure, or specification being referenced still appears in the referenced document at the cited location.
+- The referenced content has not been revised in a way that invalidates the reference.</p>
+<p>This check produces a list of broken references, stale references, and references to archived documents that need updating.</p>
+<p><strong>Audit Phase 2: Terminology Scan.</strong></p>
+<p>For each domain, identify the key technical terms used. Compare them against the institutional glossary. Flag:
+- Terms used in documents that are not in the glossary (candidates for addition).
+- Terms used inconsistently across domains (same concept, different words).
+- Terms whose in-article definitions diverge from the glossary definition.</p>
+<p>This check produces a list of terminological inconsistencies requiring resolution.</p>
+<p><strong>Audit Phase 3: Contradiction Detection.</strong></p>
+<p>This is the most labor-intensive phase. It proceeds by examining the interfaces between domains -- the points where two domains describe the same system, process, or specification from different perspectives.</p>
+<p>For each pair of domains with a dependency relationship (as defined in META-00-ART-001, Section 8.2), identify the shared topics. For each shared topic, compare the claims, specifications, and procedures in both domains. Flag any contradictions.</p>
+<p>Common contradiction patterns:
+- Specification disagreements (different numbers for the same measurement).
+- Procedural conflicts (different sequences for the same operation).
+- Scope overlaps (two documents both claiming authority over the same topic without acknowledging the other).
+- Temporal disagreements (one document reflects a current state, another reflects a previous state).</p>
+<h3>4.4 Consistency Maintenance Tools</h3>
+<p>In an air-gapped, manual documentation system, "tools" means procedures and structures rather than software. The following tools support consistency maintenance:</p>
+<p><strong>The cross-reference register.</strong> A document (or set of documents) that lists every cross-domain reference in the corpus: source article, target article, the nature of the reference (factual claim, procedural dependency, conceptual definition), and the date the reference was last verified. This register is updated whenever a new cross-reference is created and verified during the annual audit.</p>
+<p><strong>The terminology change log.</strong> An append-only record of every change to the institutional glossary: what term was added, modified, or deprecated, when the change was made, and which articles are affected by the change. When a term changes, this log drives the updates to all affected articles.</p>
+<p><strong>The domain interface map.</strong> For each pair of domains with a dependency relationship, a documented list of the specific topics they share. This map guides the contradiction detection phase of the audit and ensures that no interface is overlooked.</p>
+<p><strong>The consistency exception register.</strong> A record of known inconsistencies that have been evaluated and accepted. Not all inconsistencies are errors. Sometimes two domains use different terms for the same concept because the different terms serve different purposes in their respective domains. The exception register documents these cases, explains why the inconsistency is acceptable, and ensures that future auditors do not flag them as problems.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ol>
+<li>
+<p><strong>R-META-004-01:</strong> Every cross-domain reference in a published article must point to an article that exists and is in Published or Archived status. References to Draft articles are not permitted in published documents.</p>
+</li>
+<li>
+<p><strong>R-META-004-02:</strong> Every technical term used in the institution's documentation must be defined in the institutional glossary maintained in the LRNG domain. New terms must be added to the glossary before or simultaneously with the publication of the article that introduces them.</p>
+</li>
+<li>
+<p><strong>R-META-004-03:</strong> When a published article is revised in a way that changes a fact, specification, or procedure that is referenced by another article, the author must identify all referencing articles and either update them or create revision tasks for them. No revision may be published in isolation if it creates a known inconsistency.</p>
+</li>
+<li>
+<p><strong>R-META-004-04:</strong> The cross-domain consistency audit must be conducted annually as part of the documentation census. The audit results must be recorded and stored as part of the self-assessment report (META-001).</p>
+</li>
+<li>
+<p><strong>R-META-004-05:</strong> Contradictions between two published documents must be resolved within 30 days of detection. The resolution must be recorded in the decision log (GOV-001) and in the Commentary sections of both affected documents.</p>
+</li>
+<li>
+<p><strong>R-META-004-06:</strong> The cross-reference register must be updated whenever a new article is published or an existing article's cross-references change. The register is not a "nice to have." It is the institution's map of its own interconnections.</p>
+</li>
+<li>
+<p><strong>R-META-004-07:</strong> Known, accepted inconsistencies must be documented in the consistency exception register with a justification for why the inconsistency is acceptable. Unjustified inconsistencies are not permitted in published documentation.</p>
+</li>
+<li>
+<p><strong>R-META-004-08:</strong> When two domains disagree about the canonical terminology for a concept, the domain that is more foundational (closer to the root of the dependency graph) has authority. If neither domain is more foundational, the LRNG domain glossary is the tiebreaker.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Audit fatigue.</strong> The cross-domain audit is thorough but time-consuming. Over time, the operator performs it less rigorously, focusing on domains they care about and neglecting others. Inconsistencies accumulate in the neglected domains. Mitigation: the audit procedure is structured to be systematic rather than intuitive, reducing the operator's ability to unconsciously skip domains.</p>
+</li>
+<li>
+<p><strong>Glossary neglect.</strong> The glossary is not updated as new terms are introduced. Over time, the glossary becomes incomplete and ceases to serve as the authoritative terminology source. Authors define their own terms ad hoc, and terminological consistency erodes. Mitigation: R-META-004-02 makes glossary inclusion a prerequisite for publication. The self-review checklist in META-00-ART-001 includes a terminology check.</p>
+</li>
+<li>
+<p><strong>Cascade avoidance.</strong> When a revision creates the need for cascade updates across multiple domains, the operator avoids making the revision because the cascade work is overwhelming. The original inaccuracy persists because fixing it is too expensive. Mitigation: R-META-004-03 requires cascade updates but does not require them to be completed simultaneously. Revision tasks can be created and scheduled.</p>
+</li>
+<li>
+<p><strong>Exception creep.</strong> The consistency exception register is used too liberally. Instead of resolving inconsistencies, the operator documents them as "acceptable" because resolution is difficult. Over time, the exception register becomes a catalog of unresolved problems. Mitigation: each exception must include a justification. The justification is reviewed during the annual audit. If the justification is weak, the exception is escalated to a consistency issue requiring resolution.</p>
+</li>
+<li>
+<p><strong>Reference rot.</strong> Cross-references degrade over time as articles are revised, archived, or reorganized. The cross-reference register is not maintained. References in published documents point to sections that no longer exist or to documents that have been substantially revised. Mitigation: the reference integrity check in the annual audit catches reference rot systematically.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If terminological inconsistency is pervasive:</strong> Conduct a full terminology audit across all domains. Rebuild the glossary from scratch if necessary. For each term, determine the canonical form, update the glossary, and create a revision task for every article that uses a non-canonical form. Prioritize by domain criticality: security and operations terminology first, then infrastructure, then everything else.</p>
+</li>
+<li>
+<p><strong>If contradictions have accumulated between domains:</strong> List every known contradiction. Prioritize by severity: safety-critical contradictions first, then procedural contradictions, then factual contradictions. Resolve the top five within 30 days. Schedule the remainder for resolution over the next quarter.</p>
+</li>
+<li>
+<p><strong>If the cross-reference register does not exist or is severely outdated:</strong> Rebuild it. This is a tedious but essential task. Read every published article and record every cross-domain reference. This is also an opportunity to detect broken references and inconsistencies.</p>
+</li>
+<li>
+<p><strong>If the consistency exception register has been abused:</strong> Review every entry. For each, re-evaluate the justification. Entries with weak justifications are reclassified as consistency issues requiring resolution. Set a deadline for resolution.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The corpus is small enough that cross-domain consistency can be maintained through the operator's memory and attention. The formal tools (glossary, cross-reference register, consistency exception register) are being established. The annual audit is quick because there are relatively few articles.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The corpus has grown to the point where memory alone is insufficient. The formal tools become essential. The annual audit becomes more time-consuming but also more valuable. Patterns of inconsistency should be identified and structural solutions implemented (e.g., template language for commonly repeated specifications).</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> A successor may be contributing. The glossary and the consistency enforcement procedures become critical training tools for the new author. The audit process may need to be expanded to accommodate a larger corpus. Consider splitting the audit into semi-annual phases (reference integrity in one half, contradiction detection in the other).</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The consistency challenge is at its most complex. Decades of articles, multiple authors, evolving terminology, and changing systems create an environment where consistency enforcement is a permanent, ongoing discipline rather than a periodic event. The tools and procedures defined here should be refined based on decades of experience.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I am writing this article at a moment when the institution has five published articles. The idea of a cross-domain consistency audit across hundreds of articles is abstract. The tools I am defining here -- the glossary, the cross-reference register, the domain interface map -- are blueprints for structures that do not yet need to exist. I am writing them now because I know, from experience with other documentation systems, that consistency problems are exponentially harder to fix than to prevent. Every article published without a glossary entry makes the eventual glossary harder to write. Every cross-reference created without a register makes the eventual register harder to compile. The discipline must start now, when it is easy, so that it is habitual when it becomes necessary.</p>
+<p>I also want to acknowledge that some inconsistency is inevitable and even healthy. When the SECR domain and the OPSYS domain describe the same system from different perspectives, minor differences in emphasis and framing are expected. Security documentation foregrounds threats and controls. Operations documentation foregrounds procedures and schedules. The same system, viewed through these two lenses, will look different. That is not inconsistency -- that is the value of having multiple domains. The inconsistencies this article targets are the harmful kind: contradictions, broken references, and terminological confusion. The productive kind -- different perspectives on shared subjects -- is what makes the multi-domain structure valuable.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>META-00-ART-001 -- Stage 1 Meta-Framework (domain structure, dependency graph, review workflow, self-review checklist)</li>
+<li>META-001 -- Documentation System Self-Assessment (annual census in which the consistency audit is embedded)</li>
+<li>META-002 -- Writing the Institution (voice consistency as distinct from content consistency)</li>
+<li>META-003 -- The Documentation Lifecycle (consistency considerations during revision)</li>
+<li>GOV-001 -- Authority Model (governance tiers for consistency decisions, decision log)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo for audit activities)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience -- consistency enforcement may be inconvenient but is required for integrity)</li>
+<li>LRNG domain -- glossary maintenance (the terminological foundation of consistency)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-013 — Data Sovereignty &amp; Node Autonomy - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li class="active"><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-013">
+  <h1>D17-013 &mdash; Data Sovereignty &amp; Node Autonomy</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-013</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling &amp; Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-001 (Federation Philosophy), D17-002 (Node Identity)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D17-008 (Distributed Governance), D17-006 (Node Withdrawal). Referenced by ETH-001 (sovereignty of the individual), Governance Domains (authority delegation).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the rights and responsibilities of each node with respect to its own data and its relationship to the federation's shared data. In a federation of sovereign nodes, the question "who owns this data?" is not academic. It determines what a node may do with content it has created, content it has received from other nodes, and content that exists in the shared federation space. It determines what a node may refuse to share, what it must share as a condition of federation, and what happens to shared data when a node withdraws.</p>
+
+<p>Data sovereignty is the data-level expression of the institutional sovereignty established in D17-001. Just as each node governs itself, each node controls its own data. But federation creates shared data -- content that has been synchronized across nodes, governance documents that all nodes have ratified, institutional memory that spans the federation. This shared data exists in a sovereignty gray zone that must be explicitly mapped.</p>
+
+<p>This article is addressed to every node operator who participates in data sharing through federation, and to governance participants who must understand the data implications of federation decisions. It is also addressed to the future operators who will inherit data with complex provenance -- content created by one node, modified by another, synchronized across several -- and must understand their rights and obligations with respect to that data.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The data sovereignty model: what data a node controls absolutely, what data is shared, and what the terms of sharing are.</li>
+<li>Data classification: categorizing all institutional data by sovereignty status.</li>
+<li>Sharing obligations: what a node must share as a condition of federation membership.</li>
+<li>Refusal rights: what a node may decline to share or receive.</li>
+<li>Data handling on node departure: what happens to shared data when a node withdraws.</li>
+<li>Provenance and attribution: how to track the origin and modification history of shared data.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The technical mechanisms of data synchronization (see D17-003, D17-007).</li>
+<li>Conflict resolution when data sovereignty claims conflict (see D17-004).</li>
+<li>Trust relationships that govern data sharing permissions (see D17-005).</li>
+<li>The governance process for changing sharing obligations (see D17-008).</li>
+<li>The withdrawal process itself (see D17-006), though this article defines the data implications of withdrawal.</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Data Ownership Problem in Federation</h3>
+<p>In a single-node institution, data ownership is simple: the operator owns everything. The operator created it, curated it, stored it, and controls it. In a federation, data ownership becomes complex. Consider a document created by Node A, synchronized to Node B, modified by Node B, and then synchronized back to Node A and onward to Node C. Who "owns" this document? Node A created the original. Node B modified it. Node C received it. All three have copies. If Node B withdraws from the federation, does it take its modifications with it? Does it lose access to the original that Node A created?</p>
+
+<p>These questions cannot be resolved by analogy to intellectual property law -- the institution is not a legal entity and operates outside conventional legal frameworks. They must be resolved by explicit agreement within the federation, documented in this article and ratified through the governance process.</p>
+
+<h3>3.2 Sovereignty as the Default</h3>
+<p>The institution's ethical foundation (ETH-001) establishes individual sovereignty as the highest principle. Applied to data, this means: data sovereignty is the default. A node controls all data in its possession unless it has explicitly agreed otherwise. Sharing is voluntary. Receiving is voluntary. Retaining is at the node's discretion unless a specific retention obligation has been agreed to.</p>
+
+<p>This default is generous toward the node and restrictive toward the federation. It is designed this way intentionally. A default of "the federation owns all shared data" would create a governance body with authority over content -- a central archive that nodes are obligated to serve. That model is incompatible with sovereign federation.</p>
+
+<h3>3.3 The Tension Between Sovereignty and Coherence</h3>
+<p>If every node can refuse to share anything, the federation has no shared content. If every node can modify shared content without regard for other nodes, the federation has no coherence. The data sovereignty model must navigate between these extremes by defining categories of data with different sovereignty rules, so that the institution can function as a coherent federation while respecting each node's ultimate authority over its own holdings.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Data Sovereignty Categories</h3>
+<p>All data in the institution falls into one of four sovereignty categories:</p>
+
+<p><strong>Category S (Sovereign).</strong> Data that belongs exclusively to the originating node. The node has full control: it may share, modify, delete, or withhold this data at its sole discretion. No federation obligation attaches to Category S data. Examples: locally created content that the operator has not designated for sharing, personal notes, local configuration, draft documents, and any content the operator explicitly classifies as sovereign.</p>
+
+<p><strong>Category F (Federated).</strong> Data that the originating node has designated for federation sharing. Once shared, the data exists on multiple nodes. Each node that receives Category F data has a local copy that it controls locally, but the originating node retains attribution rights. Category F data may be modified by any receiving node, but modifications must be tracked as separate versions attributed to the modifying node, preserving the original. The originating node may revoke the federation designation, but copies already distributed to other nodes are not recalled -- they are reclassified as Category R (Received) on those nodes.</p>
+
+<p><strong>Category R (Received).</strong> Data that was received from another node through synchronization. The receiving node holds a copy and may use it, reference it, and build upon it. The receiving node may not claim authorship. If the originating node revokes federation sharing or withdraws from the federation, the receiving node may retain its copy but must update the provenance metadata to indicate the originating node's changed status. Category R data may not be re-shared to third-party nodes without the originating node's consent (as expressed in the data's sharing policy metadata).</p>
+
+<p><strong>Category C (Constitutional).</strong> Data that belongs to the federation itself: the constitutional baseline, governance documents (proposals, votes, ratifications), shared standards, and the federation topology document. Category C data is jointly owned by all federated nodes. No single node may unilaterally modify, delete, or withhold Category C data. Changes to Category C data require the governance process (D17-008). Each node maintains a complete local copy. If a node withdraws, it retains its copy of Category C data as a historical record but is no longer bound by it.</p>
+
+<h3>4.2 Data Classification Process</h3>
+<p>Data classification occurs at the point of creation or import:</p>
+
+<ul>
+<li><strong>Locally created content</strong> defaults to Category S (Sovereign). The operator may reclassify it as Category F (Federated) at any time by marking it for federation sharing in the content metadata.</li>
+<li><strong>Content received via sync</strong> is automatically classified as Category R (Received). The provenance metadata records the originating node and the sharing terms.</li>
+<li><strong>Governance documents</strong> are automatically classified as Category C (Constitutional) when created through the governance process (D17-008).</li>
+<li><strong>Institutional memory records</strong> are classified according to their scope: local decision logs are Category S; federation-spanning decision logs are Category C; shared lessons-learned are Category F.</li>
+</ul>
+
+<h3>4.3 The Sharing Policy Metadata</h3>
+<p>Every piece of Category F (Federated) data includes sharing policy metadata that specifies:</p>
+
+<pre>
+SHARING POLICY
+==============
+Content ID:        [unique identifier]
+Originating Node:  [node identifier]
+Classification:    F (Federated)
+Sharing Terms:
+  - Re-share permitted:  [yes/no/with-attribution]
+  - Modification permitted: [yes/no/fork-only]
+  - Retention on withdrawal: [retain/delete/negotiate]
+  - Attribution required: [yes, always]
+Date classified:   [date]
+Reclassification history: [list of changes with dates and reasons]
+</pre>
+
+<p>This metadata travels with the content in sync packages and is preserved by every receiving node. It is the originating node's declaration of terms, not a negotiation. Receiving nodes that cannot accept the terms should not accept the content.</p>
+
+<h3>4.4 Data Sovereignty on Node Withdrawal</h3>
+<p>When a node withdraws from the federation (per D17-006), data is handled according to its sovereignty category:</p>
+
+<ul>
+<li><strong>Category S data:</strong> Remains entirely with the withdrawing node. No other node has copies (by definition, since it was never shared).</li>
+<li><strong>Category F data originated by the withdrawing node:</strong> The withdrawing node retains its original. Copies on other nodes are reclassified from Category R to "Category R - Origin Withdrawn" with a note that the originating node is no longer part of the federation. Other nodes may retain their copies according to the sharing policy metadata.</li>
+<li><strong>Category R data held by the withdrawing node:</strong> Handled according to the sharing policy metadata. If the policy specifies "delete on withdrawal," the withdrawing node deletes those copies. If the policy specifies "retain," the withdrawing node keeps them. If "negotiate," the withdrawal process includes a data handling negotiation between the withdrawing node and the originating nodes.</li>
+<li><strong>Category C data:</strong> The withdrawing node retains its copy as a historical record. It is no longer bound by the constitutional baseline but should preserve it for institutional memory purposes.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D17-013-01: Sovereignty Is the Default.</strong> All data on a node is Category S (Sovereign) unless explicitly reclassified by the operator. No automated process, federation agreement, or governance decision may reclassify a node's data without the operator's explicit consent. This rule cannot be overridden by governance.</p></li>
+
+<li><p><strong>R-D17-013-02: Sharing Is Voluntary.</strong> No node may be compelled to share any specific content with the federation. A node that consistently declines to share content may face social consequences (trust erosion, reduced collaboration) but may not be penalized through governance mechanisms or expelled for refusal to share alone.</p></li>
+
+<li><p><strong>R-D17-013-03: Attribution Must Be Preserved.</strong> Every piece of shared data must carry attribution to its originating node. Attribution may not be removed, altered, or obscured. Modifications by other nodes must be attributed as separate versions, not as replacements of the original. This rule protects the intellectual contribution of every participating node.</p></li>
+
+<li><p><strong>R-D17-013-04: Sharing Policy Metadata Is Binding.</strong> The sharing terms specified in Category F data's sharing policy metadata MUST be honored by all receiving nodes. A node that cannot honor the sharing terms MUST NOT accept the content. Violation of sharing terms is a trust violation (D17-005) with consequences up to trust revocation.</p></li>
+
+<li><p><strong>R-D17-013-05: Constitutional Data Cannot Be Withheld.</strong> Category C (Constitutional) data must be shared completely with all federated nodes. No node may selectively withhold governance documents, baseline components, or federation topology information. Constitutional data is the shared nervous system of the federation; withholding it is equivalent to severing communication.</p></li>
+
+<li><p><strong>R-D17-013-06: Refusal Rights Include Receiving.</strong> A node may refuse to receive specific content from another node, even if the sending node designates it as Category F. A node is not obligated to accept everything the federation offers. This right extends to governance proposals (though refusing to receive a proposal forfeits the right to vote on it) and to sync package content categories (a node may request sync packages without certain content types).</p></li>
+
+<li><p><strong>R-D17-013-07: Data Classification Is Auditable.</strong> Every node MUST maintain a classification registry that records the sovereignty category of all data holdings. This registry is subject to audit per D19 (Quality Assurance) quality audit procedures. The registry must be current -- data that has been reclassified must reflect its current classification, with reclassification history preserved.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Sovereignty erosion.</strong> Social pressure within the federation gradually shifts the norm from "sharing is voluntary" to "sharing is expected." Nodes that exercise their right not to share are subtly penalized -- excluded from conversations, given lower priority in conflict resolution, treated as less committed members. Sovereignty rights still exist on paper but are not exercisable in practice. Likelihood: medium to high as federations mature and develop social norms. Severity: high, as it undermines the fundamental architecture. Detection: periodic anonymized survey of operators about whether they feel free to exercise refusal rights; governance review of whether sharing norms have drifted.</p></li>
+
+<li><p><strong>Classification neglect.</strong> Operators fail to classify data properly. Everything defaults to Category S because the operator never bothers to reclassify content for sharing. Or the operator bulk-reclassifies everything as Category F without reviewing sharing terms. In either case, the classification system exists but provides no useful governance. Likelihood: high without reinforcement. Severity: medium. Detection: audit of classification registry; comparison of content volume against classification distribution.</p></li>
+
+<li><p><strong>Provenance loss.</strong> Data is shared, modified, re-shared, and modified again until the chain of attribution is unclear. The originating node cannot be identified with confidence. Sharing terms cannot be verified because the original sharing policy metadata has been degraded through successive sync operations. Likelihood: medium over long timescales with many sync cycles. Severity: medium to high, as it undermines the ability to enforce sharing terms. Detection: provenance integrity checks during sync processing; periodic audit of shared content attribution chains.</p></li>
+
+<li><p><strong>Withdrawal data dispute.</strong> A node withdraws and retains Category R data that the originating node expected to be deleted. Or a node withdraws and deletes Category R data that the originating node expected to be retained. The sharing policy metadata was ambiguous, the operators interpreted it differently, and now the data is either duplicated where it should not be or lost where it should not be. Likelihood: low per withdrawal event, but significant over many withdrawal events across decades. Severity: varies -- potentially high if the data is sensitive or irreplaceable. Detection: only at the time of withdrawal; mitigated by clear sharing policy terms.</p></li>
+
+<li><p><strong>Constitutional data fragmentation.</strong> Different nodes hold different versions of Category C data because sync has been inconsistent or because governance ratifications have not propagated completely. The federation's shared standards are no longer truly shared. Likelihood: medium, especially during periods of extended partition. Severity: high, as it undermines federation coherence. Detection: baseline version comparison during every governance sync (D17-008, Section 4.5).</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If sovereignty erosion is detected:</strong> The governance lead or an independent reviewer raises the issue formally through a governance proposal. The proposal does not change any rule (the rules are already correct) but triggers a federation-wide discussion about whether sharing norms have drifted beyond what the rules permit. The discussion itself is the remedy: making the erosion visible and named. If specific instances of social penalty for refusal are identified, they are recorded in institutional memory and the affected node is explicitly affirmed in its sovereignty rights.</p></li>
+
+<li><p><strong>If classification neglect is widespread:</strong> Conduct a federation-wide classification audit. Each node reviews its holdings and updates the classification registry. Provide simplified classification guidance: a one-page decision tree that helps operators classify content quickly. Consider whether the default classification should be changed (e.g., content created within certain workflows could default to Category F if the operator has opted into automatic sharing for that workflow).</p></li>
+
+<li><p><strong>If provenance has been lost for specific content:</strong> Initiate a provenance recovery effort per D20-007 (Context Recovery Procedures). Compare copies of the content across nodes. Identify the earliest version and its likely originator. If provenance cannot be fully recovered, the content is marked with a "provenance uncertain" flag and treated as Category R with the most restrictive sharing terms until the originating node can be identified and consulted.</p></li>
+
+<li><p><strong>If a withdrawal data dispute occurs:</strong> Review the sharing policy metadata for the disputed content. If the terms are clear, enforce them: the node that violated the terms must comply or accept trust consequences. If the terms are ambiguous, negotiate a resolution between the withdrawing node and the originating nodes. Record the dispute and its resolution in institutional memory as a precedent for future withdrawal events. Update the sharing policy template to address the ambiguity that caused the dispute.</p></li>
+
+<li><p><strong>If constitutional data has fragmented:</strong> Execute the baseline reconciliation procedure in D17-008, Section 4.5. Each node declares its baseline version. The most complete version is distributed as the reference. Nodes with older versions apply pending ratifications in order. Nodes with divergent versions (different governance decisions during partition) enter the Class 4 conflict resolution process.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> Data sovereignty is uncomplicated because there is little shared data. Use this period to establish the classification system, the sharing policy metadata format, and the provenance tracking infrastructure. These systems are far easier to build before the data volume grows.</p></li>
+
+<li><p><strong>Years 5-15:</strong> The first significant data sharing occurs. The first sovereignty tensions emerge: a node wants to retract something it shared, a node wants to modify another's content, a node withdraws and data handling becomes concrete. Each of these events tests and refines the sovereignty model.</p></li>
+
+<li><p><strong>Years 15-30:</strong> The provenance chain for the oldest shared content may be deep and complex. Multiple modifications, multiple sharing generations, multiple node departures. The provenance tracking system either proves its worth or reveals its deficiencies. The classification registry either remains current or has drifted into irrelevance.</p></li>
+
+<li><p><strong>Years 30-50+:</strong> Future operators inherit data whose creators are long gone. The sharing policy metadata attached to that data is the only record of the original sovereignty terms. If the metadata is intact, future operators can honor those terms. If it has degraded, they must make judgments about how to treat content with unknown provenance -- a situation this article's systems are designed to prevent.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Data sovereignty is the area where the institution's ethical commitments face their most practical test. It is easy to proclaim sovereignty when there is nothing to share. It becomes harder when a node has invested significant effort creating content that other nodes want, and those other nodes feel entitled to it by virtue of federation membership. The temptation will be to establish norms of "expected sharing" that gradually erode the voluntary nature of the sharing compact. This article is a bulwark against that erosion.</p>
+
+<p>The four-category system (Sovereign, Federated, Received, Constitutional) is deliberately simple. More granular systems with many permission levels and sharing conditions are more expressive but harder to maintain and easier to misconfigure. A node operator should be able to look at any piece of content and immediately know its sovereignty category. If the classification system requires a manual to use, it will not be used.</p>
+
+<p>I want to note the ethical dimension of Category R (Received) data. When a node receives content from another node, it receives a gift -- freely given, voluntarily shared. The sharing policy terms are the giver's conditions. Honoring those conditions is not a legal obligation but an ethical one. A federation that treats sharing terms as suggestions rather than commitments will not be a federation for long.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D17-001 -- Federation Philosophy (R-D17-01 Sovereignty Is Non-Negotiable; R-D17-07 Withdrawal Is Always Permitted)</li>
+<li>D17-002 -- Node Identity &amp; Lifecycle (node as sovereign data holder; data handling in decommissioning)</li>
+<li>D17-005 -- Trust Establishment and Verification (trust violations for sharing term breaches)</li>
+<li>D17-006 -- Node Withdrawal and Data Separation (data handling procedures on withdrawal)</li>
+<li>D17-008 -- Distributed Governance Protocol (Category C data governance; constitutional baseline management)</li>
+<li>D17-003 -- Air-Gapped Synchronization Procedures (sharing policy metadata in sync packages)</li>
+<li>D17-007 -- Sync Package Specification (metadata format for sovereignty classification)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 1: Sovereignty of the Individual)</li>
+<li>D19 -- Quality Assurance (classification registry audit procedures)</li>
+<li>D20-007 -- Context Recovery Procedures (provenance reconstruction methods)</li>
+<li>Domain 20 -- Institutional Memory (data sovereignty decisions as institutional records)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

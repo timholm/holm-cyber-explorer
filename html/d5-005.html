@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D5-005 — System Monitoring and Alerting - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li class="active"><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d5-005">
+  <h1>D5-005 &mdash; System Monitoring and Alerting</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D5-005</dd>
+  <dt>Domain</dt>
+  <dd>5 -- Platform & Core Systems</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, OPS-001, P-001, P-008, D5-003, D5-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D5-006, all Domain 10 daily operations articles, all Domain 12 disaster recovery trigger articles.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines what the institution monitors, how it monitors, what thresholds trigger alerts, and what the operator does with monitoring data. Monitoring is how the institution knows it is alive. Without monitoring, the operator is blind -- unable to distinguish a healthy system from one that is silently failing.</p>
+<p>The distinction between monitoring and alerting is important. Monitoring is the continuous observation of system state. Alerting is the notification that a monitored value has crossed a threshold that requires attention. Monitoring without alerting produces data that nobody looks at. Alerting without monitoring produces noise that cannot be investigated. Both must exist and both must be calibrated.</p>
+<p>In an air-gapped institution, monitoring has a particular character. There are no external monitoring services to call home to. There is no cloud dashboard. There are no pager integrations. The monitoring system runs entirely within the institution, and alerts are delivered to the operator through mechanisms that exist within the institution. This means the operator must be physically present or following a defined schedule to receive alerts. Monitoring is useful only if someone is looking.</p>
+<p>This article also defines the daily health check -- the specific, step-by-step procedure the operator follows every day to verify that the institution is functioning normally. The daily health check is not optional. It is the first and most important line of defense against silent failures.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>What metrics and log data are monitored across all institutional systems.</li>
+<li>How monitoring data is collected, stored, and retained.</li>
+<li>Alert thresholds for each monitored metric.</li>
+<li>Alert classification (critical, warning, informational).</li>
+<li>Dashboard design for the operator.</li>
+<li>The daily health check procedure.</li>
+<li>What "normal" looks like -- baseline definitions for all monitored values.</li>
+<li>Log aggregation for offline systems.</li>
+</ul>
+<p>This article does NOT cover:</p>
+<ul>
+<li>The configuration of individual services that produce log data (see D5-003).</li>
+<li>Network-level monitoring architecture (see D5-004, Section 4.6; this article covers the consumption of that data).</li>
+<li>The response to specific types of incidents (see SEC-001 and Domain 12 for incident response and disaster recovery).</li>
+<li>Physical environment monitoring -- temperature, humidity, power (see Domain 4).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>Monitoring is the institutional sense of sight. A system without monitoring is a system operating in the dark. The operator may believe everything is fine because nothing has obviously failed, but "nothing has obviously failed" is not the same as "everything is working correctly." Disks fill silently. Memory leaks develop over weeks. Certificate expiration dates approach. Backup jobs fail and nobody notices because the failure generates a log entry that nobody reads.</p>
+<p>The history of system failures is largely a history of monitoring failures. Not failures of the monitoring system itself, but failures of attention -- monitoring data that was collected but not reviewed, alerts that were generated but not investigated, dashboards that existed but were not consulted. This article addresses all three: what to collect, what to alert on, and what to look at.</p>
+<h3>3.1 Monitoring in an Air-Gapped Environment</h3>
+<p>An air-gapped institution has no cloud dashboards, no mobile alerts, no automated remediation. This is a simplification. The monitoring system needs to do exactly four things: collect data from all systems, store data reliably, present data clearly, and alert when something is wrong. It serves one person -- the operator -- and must be simple enough to understand, maintain, and trust.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 What to Monitor</h3>
+<p>Every institutional system is monitored across four categories:</p>
+<p><strong>Category 1: Resource Utilization</strong>
+- CPU usage: overall percentage, per-core breakdown, load average (1, 5, 15 minute).
+- Memory: total, used, available, swap usage.
+- Disk: usage percentage per mount point, I/O rates, I/O latency.
+- Network: bandwidth in/out per interface, packet error rates, packet drop rates.</p>
+<p><strong>Category 2: Service Health</strong>
+- Service status: running, stopped, failed, for every core service defined in D5-003.
+- Service responsiveness: time to respond to a health check probe.
+- Service-specific metrics: DNS query rate and resolution time, NTP offset, authentication success/failure rates, log ingestion rate.</p>
+<p><strong>Category 3: Security Indicators</strong>
+- Authentication failures: count per time period, source, account.
+- Firewall drops: count per time period, source/destination.
+- File integrity: changes to critical system files (see D5-003 configuration baselines).
+- Privileged operations: sudo usage, root logins, service account activity.</p>
+<p><strong>Category 4: System Integrity</strong>
+- SMART data from all disks: reallocated sectors, pending sectors, temperature, power-on hours.
+- Filesystem integrity: results of periodic fsck or equivalent.
+- Backup status: last successful backup time, backup size, verification result.
+- Time synchronization: NTP offset and jitter from the authoritative source.
+- Certificate expiration dates for any internal TLS certificates.</p>
+<h3>4.2 How to Monitor</h3>
+<p>Monitoring data is collected through a three-layer system:</p>
+<p><strong>Layer 1: Agent-based collection.</strong> A lightweight monitoring agent runs on every system. The agent collects resource utilization metrics, service health status, and security indicators at configurable intervals (default: 60 seconds for resource metrics, 300 seconds for service health). The agent pushes data to the central monitoring server in the Core Services segment (VLAN 10).</p>
+<p><strong>Layer 2: Log aggregation.</strong> System logs and application logs are forwarded to the central log server via the logging infrastructure described in D5-003. The monitoring system reads from the log server to identify log-based alerts (error messages, authentication failures, etc.).</p>
+<p><strong>Layer 3: Active probing.</strong> The monitoring server actively probes services at defined intervals to verify they are responsive. This is distinct from agent-reported status: the agent says "I think the service is running," while the probe verifies "I can actually reach the service and get a correct response."</p>
+<p>Monitoring data is stored on the central monitoring server. Retention: high-resolution (60-second intervals) for 7 days, medium-resolution (5-minute averages) for 90 days, low-resolution (1-hour averages) for 2 years, alert history indefinitely. Data older than its retention period is archived (not deleted) during the first five years; the policy may be revised thereafter based on storage constraints.</p>
+<h3>4.3 Alert Thresholds and Classification</h3>
+<p>Alerts are classified into three levels:</p>
+<p><strong>Critical:</strong> Requires immediate attention. The system is degraded or at risk of imminent failure. The operator should investigate within one hour of the next scheduled check, or immediately if present.</p>
+<p><strong>Warning:</strong> Requires attention at the next maintenance window. The system is functional but trending toward a problem. The operator should investigate within 24 hours.</p>
+<p><strong>Informational:</strong> No action required. Recorded for trend analysis and audit purposes. Reviewed during weekly operations.</p>
+<p>Default alert thresholds (these are starting values; operational experience will refine them):</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU load average (15 min)</td>
+<td>&gt; 80% of core count</td>
+<td>&gt; 95% of core count</td>
+</tr>
+<tr>
+<td>Memory usage</td>
+<td>&gt; 80%</td>
+<td>&gt; 95%</td>
+</tr>
+<tr>
+<td>Swap usage</td>
+<td>&gt; 20%</td>
+<td>&gt; 50%</td>
+</tr>
+<tr>
+<td>Disk usage (any mount)</td>
+<td>&gt; 75%</td>
+<td>&gt; 90%</td>
+</tr>
+<tr>
+<td>Disk I/O latency</td>
+<td>&gt; 50ms average</td>
+<td>&gt; 200ms average</td>
+</tr>
+<tr>
+<td>NTP offset</td>
+<td>&gt; 100ms</td>
+<td>&gt; 1 second</td>
+</tr>
+<tr>
+<td>Service health check failure</td>
+<td>1 consecutive failure</td>
+<td>3 consecutive failures</td>
+</tr>
+<tr>
+<td>Authentication failures</td>
+<td>&gt; 5 in 10 minutes</td>
+<td>&gt; 20 in 10 minutes</td>
+</tr>
+<tr>
+<td>SMART reallocated sectors</td>
+<td>Any non-zero increase</td>
+<td>&gt; 10 increase in 30 days</td>
+</tr>
+<tr>
+<td>Backup age</td>
+<td>&gt; 36 hours since last success</td>
+<td>&gt; 72 hours since last success</td>
+</tr>
+<tr>
+<td>Certificate expiration</td>
+<td>&lt; 30 days</td>
+<td>&lt; 7 days</td>
+</tr>
+<tr>
+<td>Disk error rate (read/write)</td>
+<td>Any non-zero</td>
+<td>&gt; 10 per hour</td>
+</tr>
+<tr>
+<td>Firewall drops (unexpected)</td>
+<td>&gt; 100 per hour from single source</td>
+<td>&gt; 1000 per hour from single source</td>
+</tr>
+</tbody>
+</table>
+<p>These thresholds must be calibrated against actual baselines. A system that normally runs at 70% CPU should have different thresholds than one that normally runs at 10%. Baseline calibration is part of the initial deployment process and is recalibrated quarterly.</p>
+<h3>4.4 Dashboard Design</h3>
+<p>The monitoring dashboard is the operator's primary interface to the institution's health. It must be designed for rapid comprehension -- the operator should be able to assess overall health in under 30 seconds.</p>
+<p>The dashboard is organized in three tiers:</p>
+<p><strong>Tier 1: Overview (the "traffic light" view).</strong>
+One line per system. Each system shows: name, segment, overall status (green/yellow/red). Green means all monitored values are within normal range. Yellow means at least one warning-level alert is active. Red means at least one critical alert is active. This view answers the question: "Is everything OK?" in under ten seconds.</p>
+<p><strong>Tier 2: System detail.</strong>
+Selected by clicking or navigating from the overview. Shows all monitored metrics for a single system, with current values, 24-hour trend graphs, and active alerts. This view answers the question: "What is wrong with this system?"</p>
+<p><strong>Tier 3: Metric detail.</strong>
+Selected from the system detail view. Shows the full history of a single metric with configurable time range, threshold lines, and annotations for maintenance events. This view answers the question: "How has this metric behaved over time?"</p>
+<p>The dashboard must be accessible from the Administration segment (VLAN 50). It should be usable from a text-based terminal if the graphical interface is unavailable. The monitoring system must not require an external browser or framework that complicates the institutional stack.</p>
+<h3>4.5 The Daily Health Check Procedure</h3>
+<p>This is the most important procedure in this article. It is performed every day, takes 15-30 minutes, and is the operator's primary mechanism for detecting problems early. The procedure is performed from the operator's workstation in the Administration segment.</p>
+<p><strong>Step 1: Dashboard Review (5 minutes).</strong>
+Open the monitoring dashboard. Review the Tier 1 overview. Confirm that all systems show green. If any system shows yellow or red, note the system and proceed to Step 2 with that system as a priority.</p>
+<p><strong>Step 2: Alert Review (5 minutes).</strong>
+Review all alerts generated since the last daily check. For each alert:
+- If it is a critical alert that has not been resolved, investigate immediately after completing the daily check.
+- If it is a warning alert, note it for investigation during this check or the next maintenance window.
+- If it is informational, note any unusual patterns.</p>
+<p><strong>Step 3: Log Scan (5 minutes).</strong>
+Review the last 24 hours of centralized logs for error-level messages. You are not reading every log line. You are scanning for patterns: repeated errors, new error types, errors from systems that do not normally produce errors. The log aggregation system should provide a summary view of error counts by system and by message type.</p>
+<p><strong>Step 4: Resource Trend Review (3 minutes).</strong>
+Check 7-day trends for disk usage across all systems. Disks are the most common resource to silently exhaust. Confirm that no disk is on a trajectory to hit 90% within the next 30 days at the current growth rate. Check memory trends for any system showing a consistent upward trend that could indicate a memory leak.</p>
+<p><strong>Step 5: Backup Verification (2 minutes).</strong>
+Confirm that the most recent backup job for every production system completed successfully. Check the backup age metric. If any backup is older than expected, note it for investigation.</p>
+<p><strong>Step 6: Time Synchronization (1 minute).</strong>
+Verify that all systems show NTP offsets within the acceptable range. Time drift affects log correlation, certificate validation, and scheduled task accuracy.</p>
+<p><strong>Step 7: Record (2 minutes).</strong>
+Record the daily check results in the operational log. If everything is normal, the entry may be brief: "Daily check completed. All systems nominal. No active alerts." If anomalies were found, record them with the planned response.</p>
+<h3>4.6 What "Normal" Looks Like</h3>
+<p>"Normal" is defined by baselines. A baseline is the range of values that a metric exhibits during typical, healthy operation. Baselines must be established during initial deployment by observing each system under typical workload for at least two weeks.</p>
+<p>Baselines are documented for every monitored metric on every system. The baseline document for each system contains:
+- The metric name.
+- The typical range (e.g., CPU load average: 0.2-0.8).
+- The typical pattern (e.g., CPU spikes to 2.0 during the daily backup window from 02:00-03:00).
+- Known exceptions (e.g., disk usage increases by approximately 500 MB per week due to log accumulation).</p>
+<p>Baselines are recalibrated:
+- After any significant configuration change.
+- After any hardware change.
+- After adding or removing a major workload.
+- At least annually, during the annual operations review.</p>
+<p>A value outside its baseline is not necessarily a problem. But a value outside its baseline that is not explained by a known exception is an anomaly worth investigating.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D5-005-01:</strong> Every institutional system must be monitored. No system may operate unmonitored.</li>
+<li><strong>R-D5-005-02:</strong> The daily health check procedure (Section 4.5) is mandatory. It is performed every day the operator is present. If the operator is absent for more than 48 hours, the first task upon return is to perform the health check and review all alerts generated during the absence.</li>
+<li><strong>R-D5-005-03:</strong> Critical alerts must be investigated within one hour of detection. Warning alerts must be investigated within 24 hours. Informational alerts are reviewed during weekly operations.</li>
+<li><strong>R-D5-005-04:</strong> Alert thresholds must be calibrated against actual baselines, not default values alone. Default values are starting points, not final values.</li>
+<li><strong>R-D5-005-05:</strong> Monitoring data retention must follow the policy in Section 4.2. Alert history is retained indefinitely.</li>
+<li><strong>R-D5-005-06:</strong> The monitoring system itself must be monitored. A meta-monitoring check verifies that the monitoring agent is reporting from every system and that the monitoring server is storing and processing data correctly.</li>
+<li><strong>R-D5-005-07:</strong> Baselines must be documented for every monitored metric and recalibrated at least annually.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Alert fatigue.</strong> Too many alerts are generated, most of them unactionable. The operator begins ignoring alerts. A genuine critical alert is missed because it is buried in noise. Mitigation: threshold calibration based on actual baselines. If an alert fires frequently without requiring action, the threshold needs adjustment, not the operator's patience.</li>
+<li><strong>Silent monitoring failure.</strong> The monitoring agent on a system crashes or stops reporting. If the monitoring system does not detect this absence, the system operates unmonitored without anyone knowing. Mitigation: the meta-monitoring check (R-D5-005-06) detects agent failures. A system that has not reported in more than twice its expected interval generates a critical alert.</li>
+<li><strong>Dashboard neglect.</strong> The dashboard exists but the operator stops looking at it. The daily health check is replaced by a quick assumption that "everything is probably fine." Mitigation: the daily check is a procedural requirement, not a suggestion. The operational log records that it was performed.</li>
+<li><strong>Baseline staleness.</strong> Baselines are established once and never updated. As the system's workload changes, the baselines become irrelevant. Alerts fire for new-normal values. The operator adjusts by loosening thresholds until they are meaningless. Mitigation: annual baseline recalibration and recalibration after significant changes.</li>
+<li><strong>Storage exhaustion of monitoring data.</strong> The monitoring system's own storage fills up, and it begins losing data or failing entirely. Mitigation: monitoring data retention is managed by the retention policy. The monitoring server's own disk usage is a monitored metric with appropriate thresholds.</li>
+<li><strong>Cargo cult checking.</strong> The operator performs the daily check but does not actually engage with the data. They go through the motions, record "all nominal" in the log, and leave. Mitigation: the daily check procedure includes specific items to look at (Step 4: disk trends, Step 6: NTP offsets). These items require reading actual values, not merely confirming the dashboard is green.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>If the monitoring system itself has failed:</strong>
+1. The monitoring server failure should be detected by the meta-monitoring mechanism (if the monitoring server is also the meta-monitor, this creates a gap -- see Commentary Section).
+2. Verify the monitoring server is operational. Check its system logs, disk space, and service status.
+3. If the monitoring server has crashed, restart it. Verify data collection resumes.
+4. If monitoring data has been lost, document the gap. Manual health checks of all systems should be performed to cover the unmonitored period.
+5. Investigate the cause of the monitoring failure to prevent recurrence.</p>
+<p><strong>If alert fatigue has developed:</strong>
+1. Review all active alerts. Classify each as: genuine alert requiring action, recurring nuisance alert, or miscalibrated threshold.
+2. For nuisance alerts, adjust the threshold or investigate the underlying cause. A threshold that fires constantly is either set wrong or revealing a chronic problem.
+3. For miscalibrated thresholds, recalibrate against current baselines.
+4. Document the recalibration in the operational log.</p>
+<p><strong>If a system has been operating unmonitored:</strong>
+1. Install or restore the monitoring agent.
+2. Perform a manual health check of the system: check resource utilization, service status, log files, and disk health.
+3. Verify the system's configuration against its baseline (D5-003, D5-006).
+4. Establish or re-establish baselines for the system.
+5. Document the period of unmonitored operation and the results of the manual health check.</p>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> Baselines are being established. Alert thresholds are being calibrated. The daily check procedure will be refined as the operator learns what matters and what is noise. Expect significant threshold adjustment during this period.</li>
+<li><strong>Years 2-5:</strong> The monitoring system should be stable and well-calibrated. The daily check should feel routine. Trending data begins to reveal long-term patterns: seasonal disk growth, hardware degradation curves, workload shifts.</li>
+<li><strong>Years 5-15:</strong> SMART data will begin to predict disk failures. Memory and CPU trends will inform capacity planning. The monitoring data archive becomes a valuable historical record of institutional health.</li>
+<li><strong>Years 15-30:</strong> The monitoring tools themselves may need replacement. When replacing the monitoring system, preserve the alert history and as much historical data as feasible. The principles -- know what normal looks like, alert on deviations, check every day -- remain constant.</li>
+<li><strong>Years 30-50+:</strong> A successor will inherit the monitoring system. The daily check procedure and the dashboard must be comprehensible without oral instruction. The baselines document and the Commentary Section provide the context the successor needs.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+There is a meta-monitoring problem that this article must be honest about: if the monitoring server is the only system that performs monitoring, then the monitoring server itself is a single point of failure for the entire monitoring function. The meta-monitoring check (R-D5-005-06) helps, but if the monitoring server is completely offline, who detects that?</p>
+<p>The practical answer for a single-operator institution is the daily health check. The operator physically looks at the dashboard every day. If the dashboard is down, the operator knows immediately. This is not a sophisticated solution. It is a human solution. And for a single-operator institution, the human is the ultimate monitoring system. The daily check is not just about looking at data. It is about confirming that the systems that collect and present data are themselves alive.</p>
+<p>The alert thresholds in Section 4.3 are deliberately conservative. It is better to start with thresholds that alert too often and tighten them over time than to start with thresholds that never alert and discover their inadequacy during a failure. Expect the first few months to require frequent threshold adjustment. This is normal. It is the calibration process, not a flaw.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 6: Honest Accounting of Limitations)</li>
+<li>OPS-001 -- Operations Philosophy (daily operations, Section 4.1)</li>
+<li>P-001 -- Platform Philosophy and Architectural Principles</li>
+<li>P-008 -- System Monitoring and Health</li>
+<li>D5-003 -- Core Service Configuration and Hardening (service health checks, logging infrastructure)</li>
+<li>D5-004 -- Network Architecture and Segmentation (network monitoring, Section 4.6)</li>
+<li>Domain 4 -- Infrastructure &amp; Power (physical environment monitoring)</li>
+<li>Domain 12 -- Disaster Recovery (alert-triggered recovery procedures)</li>
+</ul>
+
+</section>
+<section>
+<h2>---</h2>
+
+</section>
+</article>
+</main>
+</body>
+</html>

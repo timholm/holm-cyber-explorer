@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D19-003 — Documentation Testing Framework - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li class="active"><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d19-003">
+  <h1>D19-003 &mdash; Documentation Testing Framework</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D19-003</dd>
+  <dt>Domain</dt>
+  <dd>19 -- Quality Assurance</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, D19-001, D19-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D19-004, D15-004 (documentation quality validation). All domains that produce procedural documentation.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how to test whether documentation is accurate and usable. Not whether it exists. Not whether it has the right headings. Whether someone can follow it and get the expected result.</p>
+<p>Documentation that is present but unusable is worse than documentation that is absent. Absent documentation announces its own absence. The operator knows they are operating without a manual. Unusable documentation disguises its failure: the operator follows the steps, the result is wrong, and they do not know whether the fault lies in the procedure or in their execution of it. Unusable documentation erodes trust in all documentation.</p>
+<p>This article establishes four types of documentation tests, each testing a different dimension of quality. It provides the procedures for each test type, the schedule for executing them, and the scoring framework for tracking documentation quality over time. It implements the quality philosophy of D19-001 by turning the five quality dimensions (correctness, completeness, clarity, currency, durability) into testable properties with test procedures an operator can execute.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Four test types for documentation quality: accuracy verification, usability testing, procedure walkthrough, and blind execution test.</li>
+<li>Test procedures for each type: what to do, what to look for, how to record results.</li>
+<li>Testing schedule: which tests are performed at what frequency.</li>
+<li>The quality scorecard: how to score, track, and trend documentation quality.</li>
+<li>Integration with the cross-domain audit (D19-004).</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Specific quality standards for content domains (each domain defines its own standards per D19-001).</li>
+<li>The philosophy of quality (D19-001).</li>
+<li>Defect tracking mechanics (D19-002 and subsequent articles).</li>
+<li>Cross-domain audit procedures (D19-004).</li>
+<li>Quality standards for non-documentation artifacts (hardware configurations, software settings, etc.).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Documentation Needs Testing</h3>
+<p>Documentation is software for humans. Like software, documentation has bugs. A procedure that skips a step is like a program with a missing function call. A configuration reference that lists the wrong value is like a program with a hard-coded error. An explanation that is technically correct but incomprehensible is like a program that produces the right output in an unreadable format.</p>
+<p>And like software, documentation bugs are not reliably detected by the author. The person who wrote the procedure knows the steps so well that they unconsciously fill in gaps. They read what they meant to write rather than what they actually wrote. They assume context that the reader does not have. Testing by the author catches some bugs. Testing by someone who is not the author catches more. Testing by someone who has never seen the system catches the most.</p>
+<p>In a single-operator institution, the "someone who has never seen the system" is hard to find. The procedures in this article account for this constraint by defining test protocols that force the operator to engage with documentation from a fresh perspective -- following procedures literally, testing against reality rather than memory, and scoring objectively.</p>
+<h3>3.2 The Four Dimensions of Documentation Testing</h3>
+<p>Each test type addresses a different failure mode:</p>
+<p><strong>Accuracy verification</strong> tests whether the documentation matches reality. Are the configuration values correct? Do the system descriptions match the actual systems? Are the referenced files where the documentation says they are? This catches documentation that was once correct but has drifted out of date, or that was never correct due to transcription errors.</p>
+<p><strong>Usability testing</strong> tests whether the documentation communicates effectively. Can the reader find what they need? Is the structure logical? Are terms defined? Is the language clear? This catches documentation that is factually correct but practically unhelpful because the reader cannot extract the information they need.</p>
+<p><strong>Procedure walkthrough</strong> tests whether procedural documentation produces the expected result when followed step by step. This catches missing steps, ambiguous instructions, incorrect sequences, and implicit assumptions that are not stated.</p>
+<p><strong>Blind execution test</strong> is the most rigorous: the tester follows the procedure without any prior knowledge of the system, relying solely on the documentation. This catches all the failures the other tests catch, plus the unstated context that the author assumes the reader has. In a single-operator institution, a true blind test is difficult because the operator knows all their systems. The procedures below describe how to approximate it.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Test Type 1: Accuracy Verification</h3>
+<p><strong>Purpose:</strong> Confirm that every factual claim in the documentation matches the current state of reality.</p>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>
+<p>Select the document to test. Read it completely before beginning the test to understand its scope.</p>
+</li>
+<li>
+<p>Create an accuracy verification worksheet. For each factual claim in the document (configuration values, file paths, system names, version numbers, dates, measurements, references to other documents), create a row with three columns: the claim as stated, the actual value as verified, and the result (match/mismatch/unable to verify).</p>
+</li>
+<li>
+<p>Verify each claim against reality. For configuration values, check the actual configuration. For file paths, check the actual filesystem. For system descriptions, check the actual system. For references to other documents, verify the referenced document exists and contains what the reference claims.</p>
+</li>
+<li>
+<p>Record results. Every claim gets a result. "Unable to verify" is acceptable for claims about past events or future expectations, but it is not acceptable for claims about current system state. If a current-state claim cannot be verified, that is a finding -- either the claim is untestable (a documentation defect) or the system is not accessible (an operational concern).</p>
+</li>
+<li>
+<p>Calculate the accuracy score. Accuracy = (number of matching claims) / (total verifiable claims) x 100%. Record the score, the date, and any mismatches found.</p>
+</li>
+<li>
+<p>For each mismatch, create a defect record: what the documentation says, what reality shows, and the recommended correction.</p>
+</li>
+</ol>
+<p><strong>Frequency:</strong> Every document should undergo accuracy verification at least once per year. Documents covering rapidly changing systems (active configurations, hardware inventories, software versions) should be verified quarterly.</p>
+<p><strong>Quality threshold:</strong> A document with accuracy below 90% requires immediate correction. A document with accuracy between 90% and 95% should be corrected within 30 days. A document at 95% or above is acceptable.</p>
+<h3>4.2 Test Type 2: Usability Testing</h3>
+<p><strong>Purpose:</strong> Determine whether a reader can find and understand the information they need within a reasonable time.</p>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>
+<p>Select the document to test. Define three to five "retrieval tasks" that a realistic reader might need to perform using this document. Examples: "Find the procedure for X," "Determine the correct setting for Y," "Understand why decision Z was made."</p>
+</li>
+<li>
+<p>For each retrieval task, set a timer and attempt to complete the task using only the document. Record: how long it took, whether the answer was found, how many wrong sections were consulted before finding the right one, and whether the answer, once found, was immediately clear or required re-reading.</p>
+</li>
+<li>
+<p>Score each retrieval task:
+   - Found within 2 minutes and immediately clear: 3 points (Excellent).
+   - Found within 5 minutes and clear after one re-read: 2 points (Acceptable).
+   - Found within 10 minutes or required significant re-reading: 1 point (Needs improvement).
+   - Not found or found but incomprehensible: 0 points (Failure).</p>
+</li>
+<li>
+<p>Calculate the usability score: Total points earned / Total points possible (number of tasks x 3) x 100%. Record the score, the date, the specific tasks tested, and any usability defects identified.</p>
+</li>
+<li>
+<p>For each task scoring 1 or 0, create a defect record: what information was sought, where the reader looked, why it was difficult to find or understand, and the recommended improvement.</p>
+</li>
+</ol>
+<p><strong>Frequency:</strong> Usability testing should be conducted at least annually for all active documents. Documents that serve as operational references (daily-use procedures, emergency response guides) should be tested semi-annually.</p>
+<p><strong>Quality threshold:</strong> A document with a usability score below 60% requires restructuring. Between 60% and 80% requires targeted improvement. Above 80% is acceptable.</p>
+<h3>4.3 Test Type 3: Procedure Walkthrough</h3>
+<p><strong>Purpose:</strong> Verify that a procedural document produces the expected result when followed step by step.</p>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>
+<p>Select the procedural document to test. Identify the expected outcome: what should be true after the procedure is completed?</p>
+</li>
+<li>
+<p>Prepare the test environment. If the procedure modifies a system, ensure you are testing on a non-production copy or that the changes are reversible. If the procedure cannot be tested without affecting production, document this constraint and test the procedure up to the point of irreversibility, then verify the remaining steps through desk-checking rather than execution.</p>
+</li>
+<li>
+<p>Follow the procedure exactly as written. Do not fill in gaps from memory. If a step is ambiguous, follow the most literal interpretation. If a step references information not provided in the document, stop and record the missing information as a defect.</p>
+</li>
+<li>
+<p>At each step, record:
+   - Did the step produce the expected result? (Yes/No/Partially)
+   - Was any additional information needed beyond what the document provided? (If yes, what?)
+   - Was the step's instruction clear enough to follow without interpretation? (Yes/No)
+   - How long did the step take compared to any time estimate provided?</p>
+</li>
+<li>
+<p>At the conclusion, verify whether the expected outcome was achieved.</p>
+</li>
+<li>
+<p>Calculate the walkthrough score:
+   - Steps completed successfully without additional information: full credit (2 points each).
+   - Steps completed successfully but required undocumented knowledge: partial credit (1 point each).
+   - Steps that failed or could not be completed: no credit (0 points).
+   - Walkthrough score = Total points / (Number of steps x 2) x 100%.</p>
+</li>
+<li>
+<p>For each step scoring 0 or 1, create a defect record: what went wrong, what was missing, and the recommended correction.</p>
+</li>
+</ol>
+<p><strong>Frequency:</strong> Procedure walkthroughs should be conducted at least annually for critical procedures (disaster recovery, security incident response, succession procedures). Semi-annually for frequently used procedures. At creation time for new procedures.</p>
+<p><strong>Quality threshold:</strong> A procedure with a walkthrough score below 70% must not be relied upon for critical operations until corrected. Between 70% and 90% requires correction within 30 days. Above 90% is acceptable.</p>
+<h3>4.4 Test Type 4: Blind Execution Test</h3>
+<p><strong>Purpose:</strong> Determine whether a person with no prior knowledge of the system can achieve the documented outcome using only the documentation.</p>
+<p><strong>Procedure:</strong></p>
+<p>In a single-operator institution, a true blind test requires a tester who is not the operator. When this is not possible (which is the normal case), the operator approximates a blind test using the following protocol:</p>
+<ol>
+<li>
+<p>Select the document to test. Choose a procedure for a system or process the operator has not worked with recently (at least 90 days since last interaction).</p>
+</li>
+<li>
+<p>Before beginning, write down what you remember about the system or process. Seal this in an envelope (physically or in a dated, separate file). This is your "prior knowledge baseline."</p>
+</li>
+<li>
+<p>Attempt to execute the procedure using only the documentation. Physically remove or disable any notes, bookmarks, or quick-reference materials you normally use. If the procedure involves a system, approach it as if you are seeing it for the first time. Follow every instruction literally. Do not skip steps because you "already know" the outcome.</p>
+</li>
+<li>
+<p>Record every point where you need information the documentation does not provide. Record every point where you use knowledge from memory rather than from the document. Be scrupulously honest about this -- the value of the test depends on honest reporting of where documentation fails and memory fills in.</p>
+</li>
+<li>
+<p>After completing the procedure, open the prior knowledge baseline. Compare: which items from your prior knowledge were essential to completing the procedure but absent from the documentation? These are your most critical documentation gaps.</p>
+</li>
+<li>
+<p>Score the blind execution test:
+   - Procedure completed successfully with zero reliance on prior knowledge: 100% (Excellent).
+   - Procedure completed but required 1-3 instances of prior knowledge: 70-90% (Acceptable with noted gaps).
+   - Procedure completed but required 4+ instances of prior knowledge: 40-70% (Significant gaps).
+   - Procedure could not be completed from documentation alone: 0-40% (Documentation failure).</p>
+</li>
+<li>
+<p>Create defect records for every instance where prior knowledge was required. These are the gaps that would prevent a successor from executing the procedure.</p>
+</li>
+</ol>
+<p><strong>Frequency:</strong> Blind execution tests should be conducted at least annually for the institution's five most critical procedures. When a successor is designated, they should conduct blind execution tests as part of their onboarding, and the results should inform documentation priorities.</p>
+<p><strong>Quality threshold:</strong> Critical procedures (disaster recovery, succession, security incident response) must score 70% or above on blind execution. All other procedures must score 50% or above. Anything below these thresholds requires immediate documentation remediation.</p>
+<h3>4.5 The Quality Scorecard</h3>
+<p>The quality scorecard aggregates test results across all documents into a single tracking instrument.</p>
+<p><strong>Scorecard Structure:</strong></p>
+<p>For each document tested, the scorecard records:
+- Document ID and title.
+- Date of last test for each test type (accuracy, usability, walkthrough, blind execution).
+- Score for each test type at last test.
+- Trend indicator for each test type (improving, stable, declining) based on comparison with the previous test.
+- Number of open defects.
+- Overall document quality rating: the lowest score among all applicable test types. A document is only as strong as its weakest quality dimension.</p>
+<p><strong>Aggregate Metrics:</strong></p>
+<ul>
+<li>Institutional documentation quality average: the mean of all individual document quality ratings.</li>
+<li>Percentage of documents tested within the required frequency.</li>
+<li>Number of documents below quality thresholds.</li>
+<li>Total open defects by severity (critical, major, minor).</li>
+<li>Trend: quarter-over-quarter change in aggregate scores.</li>
+</ul>
+<p><strong>Scorecard Maintenance:</strong></p>
+<p>The scorecard is updated after every test. It is reviewed in full during the quarterly review (OPS-001) and the annual comprehensive review. The scorecard is a permanent record -- historical scores are retained to support trend analysis. The scorecard itself is subject to accuracy verification: the scores recorded must match the test records from which they were derived.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-DOC-TEST-01:</strong> Every active document in the institution must be tested for accuracy at least once per year. Documents covering volatile systems must be tested quarterly.</li>
+<li><strong>R-DOC-TEST-02:</strong> The five most critical institutional procedures must undergo blind execution testing at least annually. Critical procedures are defined as: disaster recovery, succession, security incident response, annual comprehensive review, and ethical review.</li>
+<li><strong>R-DOC-TEST-03:</strong> All documentation tests must produce written records including the document tested, the test type, the date, the score, and any defects found. Test records are permanent records per D20-001.</li>
+<li><strong>R-DOC-TEST-04:</strong> Documents that fall below quality thresholds must have corrective action plans created within 14 days of the test. Critical procedures below threshold must be corrected immediately -- an institution operating from unreliable procedures for critical operations is operating at unacceptable risk.</li>
+<li><strong>R-DOC-TEST-05:</strong> The quality scorecard must be updated after every test and reviewed at least quarterly. The scorecard itself must pass accuracy verification annually.</li>
+<li><strong>R-DOC-TEST-06:</strong> New procedures must undergo a procedure walkthrough test before being declared operational. A procedure that has never been tested is a hypothesis, not a procedure.</li>
+<li><strong>R-DOC-TEST-07:</strong> Test results may not be retroactively modified. If a test was scored incorrectly, the correction is recorded as a new entry referencing the original, per the append-only principle (D15-002, D20-001).</li>
+<li><strong>R-DOC-TEST-08:</strong> The operator must report honestly when prior knowledge was used during a blind execution test. Dishonest reporting undermines the entire testing framework and violates ETH-001 Principle 2 (Integrity Over Convenience).</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Testing theater.</strong> Tests are conducted on schedule but without rigor. The accuracy verification checks a few obvious facts but skips the detailed comparison. The usability test uses retrieval tasks that the operator already knows the answer to. The blind execution test is performed by someone who remembers everything about the system. Mitigation: the quarterly scorecard review should examine not just scores but the test records themselves. Are the retrieval tasks realistic? Are the accuracy checks comprehensive? Are blind test reports honest about prior knowledge usage?</li>
+<li><strong>Threshold normalization.</strong> The operator adjusts quality thresholds downward over time to avoid the burden of remediation. "90% accuracy was too strict; 80% is more realistic." Mitigation: threshold changes are Tier 2 governance decisions. They must be documented with justification and approved through the ethical review process (D15-003). If thresholds are being lowered, the quarterly ethics audit should investigate whether quality standards are eroding.</li>
+<li><strong>Defect accumulation.</strong> Tests identify defects, but defect correction is perpetually deferred. The defect list grows. Documentation quality degrades because problems are detected but never fixed. Mitigation: R-DOC-TEST-04 requires corrective action plans with deadlines. The quarterly scorecard review tracks open defects. A growing defect backlog is a finding in the cross-domain audit (D19-004).</li>
+<li><strong>Test avoidance through scope reduction.</strong> The operator avoids testing difficult documents by classifying them as inactive or non-critical. The most problematic documents are never tested because they are excluded from the testing scope. Mitigation: the cross-domain audit (D19-004) independently samples documents for testing and does not rely on the operator's scope classification.</li>
+<li><strong>Over-testing.</strong> The testing schedule consumes so much time that documentation creation and maintenance suffer. The institution has excellent test records for documentation that is out of date because all the maintenance time was spent testing rather than updating. Mitigation: proportional testing per D19-001 R-D19-04. The testing frequency should match the document's criticality and volatility. Not every document needs quarterly testing.</li>
+<li><strong>False confidence from high scores.</strong> A document scores well on accuracy and usability but has never been tested through a procedure walkthrough or blind execution. The operator believes the documentation is high-quality based on incomplete testing. Mitigation: the scorecard's overall quality rating uses the lowest score among all applicable test types. A document with 98% accuracy but no walkthrough test has an incomplete rating, not a high one.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If documentation testing has lapsed:</strong> Prioritize. Do not attempt to test all documents simultaneously. Begin with the five most critical procedures (R-DOC-TEST-02). Conduct procedure walkthroughs for each. Then expand to accuracy verification of documents covering volatile systems. Then work outward to less critical documents. The goal is to re-establish the testing habit and address the highest risks first.</p>
+</li>
+<li>
+<p><strong>If the quality scorecard has not been maintained:</strong> Reconstruct the scorecard from available test records. If test records are also missing, begin fresh -- establish a new baseline with current tests. Do not fabricate historical scores. Document the gap in the scorecard with a note explaining the reconstruction.</p>
+</li>
+<li>
+<p><strong>If a significant number of documents are below quality thresholds:</strong> Triage by impact. Correct documentation for critical procedures first. Then correct documentation that is actively used by the operator daily. Then address the remainder. Accept that full remediation will take time. Track progress on the scorecard with a remediation-in-progress status for each affected document.</p>
+</li>
+<li>
+<p><strong>If testing reveals that a critical procedure is fundamentally incorrect (not just slightly inaccurate):</strong> Stop using the procedure immediately. If the procedure has been used recently, assess whether the incorrect procedure caused any damage. Write a corrected procedure from scratch based on how the system actually works, not based on the incorrect documentation. Test the corrected procedure through a walkthrough before relying on it. Document the incident as a quality failure per D19-001 R-D19-08.</p>
+</li>
+<li>
+<p><strong>If blind execution testing consistently reveals large gaps that the operator fills from memory:</strong> This is a knowledge concentration problem (D15-004, indicator K01). The recovery is systematic documentation of the operator's tacit knowledge. Dedicate focused time -- a documentation sprint -- to converting the knowledge revealed by the blind execution gaps into explicit documentation. Re-test after the sprint to verify the gaps have been closed.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> The testing framework is being established. Initial scores will likely be low because the documentation is new and has not been tested. This is expected. The important outcome of this period is establishing the habit of testing and the mechanics of the scorecard.</li>
+<li><strong>Years 2-5:</strong> Scores should be improving as defects are found and corrected. The scorecard should have enough history to show trends. Blind execution tests should become more feasible as the operator's memory of specific system details naturally fades over time, making the "fresh perspective" more genuine.</li>
+<li><strong>Years 5-15:</strong> The testing framework should be mature and integrated into the operational tempo. The annual testing cycle should be routine. The scorecard should show stable, high scores for critical documents. If a successor is designated, their blind execution tests provide the most valuable quality data the institution has ever had.</li>
+<li><strong>Years 15-30:</strong> Succession events provide a natural blind execution test for the entire documentation corpus. The successor's experience -- where they struggle, where they succeed, where they are confused -- is the ultimate usability test. Capture this experience systematically and use it to improve the documentation for the next succession.</li>
+<li><strong>Years 30-50+:</strong> The testing framework will have evolved. New test types may be needed. The specific scoring thresholds may have been adjusted. But the core principle -- that documentation must be tested against reality, not assumed to be correct -- should be a permanent institutional practice.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The blind execution test is the most important test in this framework and the hardest to perform honestly. I know all my own systems. When I follow a procedure, I unconsciously correct for errors and fill in gaps because I know what the procedure is supposed to say even when it does not say it. The prior knowledge baseline technique -- writing down what I remember before starting the test -- is my best attempt at making this self-deception visible. But I acknowledge that it is an imperfect tool. The most valuable blind execution tests will be performed by someone other than me, which means the best testing will come during succession or when a trusted person can be brought in to test specific procedures.</p>
+<p>I am also aware that the scoring framework creates a temptation to game. It is easy to write usability test retrieval tasks that I know the answer to, giving artificially high scores. It is easy to classify documents as "inactive" to avoid testing them. These temptations are the testing equivalent of the power concentration problem in D15-004 -- the tester is the same person who would benefit from high scores. The mitigation is the same: honest self-reporting, documented records that can be reviewed later, and the cross-domain audit (D19-004) that provides an independent check.</p>
+<p>The quality threshold numbers (90% for accuracy, 80% for usability, 70% for walkthrough, 70%/50% for blind execution) are initial calibrations based on judgment, not on data. They will need adjustment as operational experience accumulates. I expect the first year of testing to produce data that informs better thresholds. I commit to adjusting them through the governance process when the data warrants it.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience -- applies to honest test reporting)</li>
+<li>CON-001 -- The Founding Mandate (the mission that documentation quality serves)</li>
+<li>GOV-001 -- Authority Model (governance process for threshold changes)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo for testing schedule integration)</li>
+<li>D15-002 -- Safeguards Architecture (append-only principle for test records)</li>
+<li>D15-004 -- Power Concentration Detection (knowledge concentration indicators validated by testing)</li>
+<li>D19-001 -- Quality Philosophy (five quality dimensions that testing operationalizes)</li>
+<li>D19-002 -- Quality Standards (specific standards tested against)</li>
+<li>D19-004 -- Cross-Domain Audit Procedures (uses testing framework at scale)</li>
+<li>D20-001 -- Institutional Memory Philosophy (test records as permanent institutional memory)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

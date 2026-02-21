@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-012 — Partition Tolerance as Default State - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li class="active"><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-012">
+  <h1>D17-012 &mdash; Partition Tolerance as Default State</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-012</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling &amp; Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-001 (Federation Philosophy), D17-002 (Node Identity)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D17-003 (Sync Protocols), D17-004 (Conflict Resolution), D17-009 (Topology Models). Referenced by D16-ART-011 (Offline Interface Behavior), Domain 12 (Disaster Recovery).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes partition tolerance -- the ability to function without contact from any other node -- as the default operational state for every node in the federation. In conventional distributed systems, partition tolerance is a property that must be engineered in; it competes with consistency and availability under the CAP theorem. In this institution, partition tolerance is not a trade-off. It is the baseline. Every node is designed to operate independently, indefinitely, without any degradation of its core institutional functions.</p>
+
+<p>The reason is simple: this is an air-gapped institution. Nodes do not have persistent network connections. Communication between nodes occurs through physical transport of media. That transport may happen weekly, monthly, annually, or never. A node that cannot function without input from another node is a node that has violated the fundamental architectural principle of this institution. Federation is an enrichment layer. Partition is the ground state.</p>
+
+<p>This article is addressed to every designer, operator, and future maintainer of the institution. It is a foundational article -- one of the three Tier 1 articles for Domain 17 -- because it defines the assumption that all other federation articles must respect. No synchronization protocol, no conflict resolution mechanism, no governance process may assume that nodes can communicate on demand. Every protocol must be designed for the case where they cannot.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition of partition as the normal operating state, not a failure mode.</li>
+<li>The design principles that follow from partition-first architecture.</li>
+<li>Local-first operation: every institutional function must be complete on a single node.</li>
+<li>The partition lifecycle: how a node enters, operates during, and exits a partitioned state.</li>
+<li>Reunion protocols: how nodes resynchronize after a partition of any duration.</li>
+<li>The psychological dimension: how operators maintain morale and purpose during extended isolation.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>Specific synchronization protocols for reunion (see D17-003).</li>
+<li>Conflict resolution during reunion (see D17-004).</li>
+<li>Trust verification after prolonged partition (see D17-005).</li>
+<li>Physical transport of sync media (see D17-014).</li>
+<li>Governance during partition (see D17-008).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The CAP Theorem and Why It Does Not Apply Directly</h3>
+<p>The CAP theorem states that a distributed system cannot simultaneously guarantee consistency (all nodes see the same data), availability (every request receives a response), and partition tolerance (the system operates despite network partitions). Most distributed systems choose two of three, treating partition tolerance as the undesirable property to be minimized.</p>
+
+<p>This institution operates under a different model. Partition tolerance is not a property to be traded off. It is the only property that is guaranteed at all times. The institution chooses partition tolerance absolutely, and then manages the consequences for consistency (through eventual consistency and conflict resolution, per D17-004) and availability (through local-first operation, which guarantees local availability even at the cost of federation-wide consistency).</p>
+
+<p>In practical terms: if you are a node operator and you have not heard from any other node in five years, nothing about your local operation should be degraded. Your search works. Your content is intact. Your institutional memory is complete (for your node). Your governance continues (for local decisions). You are a complete institution. You are simply not synchronized with other instances.</p>
+
+<h3>3.2 Partition as a Spectrum, Not a Binary</h3>
+<p>Partition is not a binary state (connected or disconnected). It is a spectrum defined by the frequency and latency of synchronization. A node that syncs monthly is partitioned from the federation most of the time. A node that syncs annually is partitioned almost all of the time. A node that has never synced (a newly commissioned node before its first federation exchange) is in permanent partition until its first sync event. The design must handle all points on this spectrum gracefully.</p>
+
+<h3>3.3 Historical Precedents</h3>
+<p>The design philosophy of this article draws from historical institutions that operated under similar constraints: monastic scriptoria that copied and distributed manuscripts with years between exchanges, colonial-era libraries that received shipments from distant continents on annual or biannual schedules, and Cold War-era continuity-of-government archives designed to operate in complete isolation after a catastrophic event. In each case, the institution's value depended on its ability to function independently, with synchronization as an enrichment rather than a requirement.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Partition State Model</h3>
+<p>Every node in the federation exists in one of three partition states:</p>
+
+<p><strong>Active Federation.</strong> The node has completed at least one successful sync exchange with at least one other node within the last two sync cycles (where a "sync cycle" is the node's expected sync frequency, as documented in the topology document per D17-009). This is the nominal state for a participating federated node. The node is synchronized within normal tolerances.</p>
+
+<p><strong>Extended Partition.</strong> The node has not completed a sync exchange for more than two sync cycles but fewer than four. This is a warning state. The node is functioning normally locally, but its federation data is becoming stale. The operator should investigate why sync exchanges have not occurred and take corrective action if possible.</p>
+
+<p><strong>Deep Partition.</strong> The node has not completed a sync exchange for more than four sync cycles, or more than twelve months, whichever is shorter. This state indicates a potentially indefinite disconnection from the federation. The node continues to function fully as a local institution. When and if a sync exchange becomes possible again, the reunion protocol (Section 4.3) must be followed.</p>
+
+<h3>4.2 Local-First Design Principles</h3>
+<p>The following principles ensure that every institutional function works without federation:</p>
+
+<p><strong>Principle 1: Complete local data.</strong> Every node stores a complete copy of all data it needs for its institutional functions. No data is referenced by pointer to another node. No data is stored "only on the federation." If a node needs data, it has the data locally.</p>
+
+<p><strong>Principle 2: No remote calls.</strong> No institutional operation -- search, retrieval, validation, governance, quality assurance -- issues a request to another node as part of its execution. All operations complete using only local resources. Sync packages are processed when they arrive, not requested on demand.</p>
+
+<p><strong>Principle 3: Local authority for local decisions.</strong> The node's operator has full authority over all local decisions. Governance decisions that require federation input (D17-008) are queued and processed when sync exchange is possible, but the absence of governance input does not prevent the node from operating.</p>
+
+<p><strong>Principle 4: Monotonic local history.</strong> The node's institutional memory, decision logs, and content archive grow monotonically. Local operations never delete, overwrite, or modify existing records based on information from another node. Sync may add new records, mark conflicts, or annotate existing records, but it does not alter the local history.</p>
+
+<p><strong>Principle 5: Graceful reunion.</strong> When a partitioned node rejoins the federation (receives a sync package), the reunion process is additive and non-destructive. The node's local state is preserved. The incoming data is processed through the standard import/quarantine pipeline (Domain 18). Conflicts are identified but not automatically resolved -- the operator reviews and resolves them according to D17-004.</p>
+
+<h3>4.3 The Reunion Protocol</h3>
+<p>Reunion after partition follows a structured sequence designed to prevent data loss and ensure the operator understands what has changed:</p>
+
+<ol>
+<li><strong>Receive sync package.</strong> The physical media arrives. It is processed through the import pipeline (Domain 18) like any incoming content.</li>
+<li><strong>Verify sender identity.</strong> The sync package's sender identity is verified against the node's trust registry (D17-005). If the sender's key has changed during the partition, additional verification is required before proceeding.</li>
+<li><strong>Assess partition duration.</strong> Compare the sync package's timestamp metadata against the last successful sync. Categorize the reunion: short (less than one sync cycle missed), medium (one to four cycles), or long (more than four cycles or more than twelve months).</li>
+<li><strong>Generate divergence report.</strong> Compare the incoming sync manifest against local records. Identify: new content on the remote node that the local node does not have, new content on the local node that was not in the remote node's view, and content that was modified independently on both nodes (conflicts).</li>
+<li><strong>Process non-conflicting content.</strong> Content that exists only on the remote node is imported through the standard pipeline. Content that exists only on the local node requires no action (it will be shared in the next outgoing sync).</li>
+<li><strong>Queue conflicts for resolution.</strong> Content modified on both nodes is flagged as conflicted and entered into the conflict resolution queue (D17-004). Conflicts are not auto-resolved. The operator reviews each one.</li>
+<li><strong>Update federation metadata.</strong> The node's partition state is updated. The topology document is refreshed with the latest federation information from the sync package. The governance baseline version is compared and reconciled if needed (D17-008).</li>
+<li><strong>Record reunion event.</strong> The reunion is recorded in institutional memory (Domain 20) with the partition duration, the number of items synced, the number of conflicts detected, and the operator's assessment of the reunion's success.</li>
+</ol>
+
+<h3>4.4 Prolonged Partition Considerations</h3>
+<p>When a partition extends beyond twelve months, additional considerations apply:</p>
+
+<ul>
+<li><strong>Trust verification.</strong> The longer the partition, the greater the risk that the remote node's trustworthiness has changed. After twelve months, the reunion protocol requires enhanced trust verification: the operator must confirm the remote node's identity through out-of-band means if possible (personal knowledge of the remote operator, physical verification of hardware, etc.).</li>
+<li><strong>Governance divergence.</strong> During extended partition, both nodes may have made local governance decisions. The constitutional baseline may have diverged. Reconciliation per D17-008 Section 4.5 is required before the nodes can synchronize governance documents.</li>
+<li><strong>Content volume.</strong> A year or more of independent content accumulation on both nodes means the reunion sync package may be very large. The operator should plan for the compute, storage, and human-attention costs of processing a large reunion. This is not a routine sync -- it is a project.</li>
+<li><strong>Emotional dimension.</strong> Extended partition can create anxiety about whether the federation still exists, whether the other nodes are still operational, and whether the work done during partition will be valued by the broader institution. The reunion event should acknowledge this emotional dimension explicitly.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D17-012-01: Partition Is Not Failure.</strong> No institutional process, document, or communication may characterize a partitioned node as "failed," "disconnected," or "degraded." A partitioned node is operating normally in its default state. Language matters: calling partition a failure creates pressure to maintain connectivity at the expense of sovereignty and air-gap integrity.</p></li>
+
+<li><p><strong>R-D17-012-02: All Functions Must Work Locally.</strong> Every institutional function -- content storage, search, retrieval, quality assurance, governance (for local decisions), institutional memory -- MUST operate fully on a single node without any input from any other node. Any function that requires federation input is a federation enhancement, not a core function, and MUST degrade gracefully to a local-only mode.</p></li>
+
+<li><p><strong>R-D17-012-03: No Sync Dependency.</strong> No node may depend on synchronization with another node for any critical function. Specifically: no data may exist only on a remote node; no operation may block waiting for remote input; no deadline may be set that assumes sync will occur by a specific date.</p></li>
+
+<li><p><strong>R-D17-012-04: Reunion Is Non-Destructive.</strong> The reunion protocol MUST NOT delete, overwrite, or modify any local data. Incoming sync data is additive. Conflicts are flagged but not auto-resolved. The local node's state before reunion is preserved and recoverable even after reunion processing is complete.</p></li>
+
+<li><p><strong>R-D17-012-05: Extended Partition Triggers Enhanced Verification.</strong> When a node has been in deep partition (more than four sync cycles or twelve months), reunion MUST include enhanced trust verification as described in Section 4.4. The standard import pipeline is not sufficient for reunion after prolonged partition; additional human judgment is required.</p></li>
+
+<li><p><strong>R-D17-012-06: Partition State Must Be Tracked.</strong> Every node MUST maintain a record of its current partition state (Active Federation, Extended Partition, or Deep Partition) for each of its federation partners. This record is updated at each sync event or at each scheduled sync that does not occur. The record is included in the node's quarterly resource report (D17-010).</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Partition anxiety.</strong> An operator perceives partition as a problem to be solved rather than a state to be accepted. They take risky actions to restore sync -- compromising the air gap, rushing reunion processing, accepting unverified sync packages -- because they feel disconnected and want to "fix" it. Likelihood: medium, especially for operators who came from connected-system backgrounds. Severity: potentially critical if air-gap compromises result. Detection: operator behavior during extended partition; review of reunion processing quality.</p></li>
+
+<li><p><strong>Reunion flood.</strong> After a prolonged partition, the reunion sync package overwhelms the receiving node. Storage is insufficient for staging. Compute is insufficient for processing. The operator's attention is insufficient for reviewing conflicts. The reunion stalls, leaving the node in a partially-merged state. Likelihood: medium for partitions exceeding twelve months. Severity: medium (the node's local data is intact; only the reunion is stalled). Detection: pre-reunion capacity assessment against the sync package manifest.</p></li>
+
+<li><p><strong>Drift without detection.</strong> Two nodes are partitioned for an extended period. During the partition, both nodes evolve their practices, data models, or governance in incompatible ways. Neither node is aware of the other's drift until reunion reveals it. The divergence may be too large to reconcile easily. Likelihood: medium to high for very long partitions. Severity: high if the divergence affects data format compatibility. Detection: only at reunion; mitigated by versioned standards in the constitutional baseline.</p></li>
+
+<li><p><strong>Permanent partition masquerading as temporary.</strong> A node is partitioned and expects reunion "soon." Months pass. Years pass. The reunion never happens because the remote node has been decommissioned, the transport route has been permanently disrupted, or the remote operator has departed without succession. The local node continues to hold the remote node's data and trust status, waiting for a reunion that will never come. Likelihood: low to medium over decades. Severity: low (the local node is unaffected operationally), but it creates organizational confusion. Detection: partition state tracking reveals deep partition beyond reasonable expectation; the five-year topology review should flag nodes in permanent deep partition.</p></li>
+
+<li><p><strong>Trust decay during partition.</strong> Trust is maintained through regular interaction and verification. During extended partition, trust cannot be maintained because no interaction occurs. A node that was fully trusted before partition may not be trustworthy after years of unsupervised operation (hardware compromise, operator change, institutional drift). Resuming full trust after reunion without verification is a security risk. Likelihood: low per partition event, but significant over many partition events across decades. Severity: potentially critical if compromised data is accepted. Detection: the enhanced verification requirement in R-D17-012-05.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If partition anxiety leads to risky behavior:</strong> Review D17-001 (Federation Philosophy) and this article with the affected operator. Reinforce that partition is normal and expected. If the operator has compromised the air gap, execute the security incident response per SEC-series articles. If unverified sync packages have been accepted, quarantine the received content and re-process it through the full import pipeline. Document the incident in institutional memory.</p></li>
+
+<li><p><strong>If reunion floods the node:</strong> Suspend reunion processing. Assess the gap between the sync package size and available capacity. If the gap is small, free capacity by archiving logs, clearing staging areas, or deferring non-essential operations. If the gap is large, process the reunion incrementally: split the sync package manifest into priority tiers and process each tier separately, starting with governance and institutional memory, then critical content, then enrichment content.</p></li>
+
+<li><p><strong>If drift is discovered at reunion:</strong> Do not attempt to force compatibility. Document the specific divergences. Determine whether the divergences are: reconcilable (one node's changes subsume the other's), complementary (both changes are valid and can coexist), or conflicting (the changes are incompatible and one must be chosen). For reconcilable and complementary divergences, merge per D17-004. For conflicting divergences, escalate to governance per D17-008.</p></li>
+
+<li><p><strong>If permanent partition is suspected:</strong> After a node has been in deep partition for more than twenty-four months with no communication, the federation should formally acknowledge the possibility of permanent partition. The partitioned node's status is changed to "presumed independent" in the topology document. Its trust entry is maintained but marked as unverifiable. If the node ever re-establishes contact, it is treated as a new node seeking federation membership per D17-006, not as a returning member.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> For a single-node institution, this article is the description of current reality: you are partitioned from everything because there is nothing to partition from. The value of this article during this period is establishing the architectural commitment to local-first design. Every system built during this period should be tested against the question: "Does this work if no sync ever happens?"</p></li>
+
+<li><p><strong>Years 5-15:</strong> The first federation experiences will test partition tolerance. The first extended partition will occur -- a transport link disrupted by weather, logistics, or human unavailability. The first reunion after extended partition will reveal whether the protocols are adequate. This article should be updated with lessons learned from each partition event.</p></li>
+
+<li><p><strong>Years 15-30:</strong> Partition tolerance is proven or not. Nodes that have survived extended partitions without degradation validate the architecture. Nodes that struggled reveal design flaws that must be corrected. The reunion protocol may need refinement based on accumulated experience with various partition durations and divergence magnitudes.</p></li>
+
+<li><p><strong>Years 30-50+:</strong> The institution has survived decades of intermittent partition. The partition tolerance architecture is not a feature -- it is the identity of the system. Future operators should understand partition not as a technical constraint but as a philosophical choice: the institution chooses independence over connectivity, sovereignty over convenience, and resilience over efficiency. These choices define what the institution is.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+This article states what should be obvious but often is not: an air-gapped system is, by definition, always partitioned. The air gap is a permanent network partition. Federation through sneakernet provides periodic, voluntary, temporary relief from that partition, but the partition is the default state and must be designed for as such.</p>
+
+<p>The temptation will be to treat sync as essential and partition as a temporary inconvenience. Resist this. Every feature that works "only when synced" is a feature that breaks under normal operation. Every workflow that assumes "we will sync before the deadline" is a workflow that will fail when the courier is sick, the road is washed out, or the transport media is damaged.</p>
+
+<p>The psychological dimension deserves attention that technical documents rarely give it. An operator who has not heard from the federation in months may feel isolated, purposeless, or anxious. The institution must provide emotional as well as technical support for partition. The operator's institutional memory, the archive they are building, the governance decisions they are making -- all of these have value whether or not any other node ever sees them. The worth of the institution does not depend on the federation. The federation depends on the worth of each independent node.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D17-001 -- Federation Philosophy (R-D17-02 Partition Is Normal; Section 4.2 Partition Tolerance as Default State)</li>
+<li>D17-002 -- Node Identity &amp; Lifecycle (node completeness requirements; independent operation)</li>
+<li>D17-003 -- Air-Gapped Synchronization Procedures (sync protocols used during reunion)</li>
+<li>D17-004 -- Conflict Resolution Between Nodes (conflict handling during reunion)</li>
+<li>D17-005 -- Trust Establishment and Verification (trust verification after extended partition)</li>
+<li>D17-006 -- Node Withdrawal and Data Separation (permanent partition as de facto withdrawal)</li>
+<li>D17-008 -- Distributed Governance Protocol (governance during and after partition; baseline reconciliation)</li>
+<li>D17-009 -- Topology Models (partition impact on topology; cascade partition)</li>
+<li>D17-010 -- Resource Allocation Framework (reunion resource costs; partition state in resource reports)</li>
+<li>Domain 18 -- Import &amp; Quarantine (reunion sync packages processed through import pipeline)</li>
+<li>Domain 20 -- Institutional Memory (partition and reunion event recording)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

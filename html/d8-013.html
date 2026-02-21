@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D8-013 — Scheduled vs. Event-Driven Automation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li class="active"><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d8-013">
+  <h1>D8-013 &mdash; Scheduled vs. Event-Driven Automation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D8-013</dd>
+  <dt>Domain</dt>
+  <dd>8 -- Automation & Agents</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D8-001, D8-002, D8-005, D8-007, D8-008, D8-009, D8-011, D8-012</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D10 operational scheduling procedures. All automations that must choose a triggering pattern. D8-009 scheduled task architecture.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article provides the decision framework for choosing between two fundamental patterns of automation execution: scheduled (time-based) and event-driven (condition-based). Every automation in the institution must be triggered by something. Either it runs because a clock says it is time to run, or it runs because a condition in the environment has changed. These two patterns have profoundly different characteristics in reliability, observability, resource consumption, failure modes, and comprehensibility -- and the wrong choice can create an automation that is fragile, wasteful, or invisible to its operator.</p>
+<p>The choice between scheduled and event-driven execution is not a technical preference. It is an architectural decision with decades-long consequences. A scheduled backup that runs every night at 3 AM is predictable, testable, and easy to verify: either it ran or it did not. An event-driven backup that triggers whenever a file changes is responsive but harder to reason about: how many times did it run today? Did it miss a change? What happens if a thousand files change at once? The scheduled approach may miss changes that happen between runs. The event-driven approach may overwhelm the system during periods of high activity.</p>
+<p>Neither pattern is inherently superior. Each has characteristics that make it appropriate for specific classes of tasks and inappropriate for others. This article provides the criteria for making that choice, the design patterns for implementing each approach correctly, and the hybrid patterns that combine elements of both when neither pure approach is adequate.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The characteristics, strengths, and weaknesses of scheduled automation.</li>
+<li>The characteristics, strengths, and weaknesses of event-driven automation.</li>
+<li>The decision matrix for choosing between them.</li>
+<li>Design patterns for reliable scheduled automation.</li>
+<li>Design patterns for reliable event-driven automation.</li>
+<li>Hybrid patterns that combine scheduled and event-driven elements.</li>
+<li>Failure mode comparison: how each pattern fails and what makes failures detectable.</li>
+<li>Power and resource implications for an off-grid institution.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The specific scheduling infrastructure (cron, systemd timers, or equivalent) -- see D8-009 for scheduled task architecture.</li>
+<li>Agent design principles beyond triggering pattern selection -- see D8-002.</li>
+<li>Task delegation decisions (whether to automate at all) -- see D8-005 and D8-001.</li>
+<li>Data integrity requirements for either pattern -- see D8-012.</li>
+<li>Monitoring and observability requirements -- see D8-008 and D8-011.</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Two Philosophies of Time</h3>
+<p>Scheduled automation embodies a philosophy of regularity. The institution imposes a rhythm on its automated work: certain things happen at certain times, regardless of whether they are needed at that moment. This rhythm is inherently wasteful -- the backup runs even if nothing changed, the integrity check runs even if no data was modified -- but the waste buys predictability. The operator knows when each automation will run, can plan around it, and can verify completion by checking a schedule against a log.</p>
+<p>Event-driven automation embodies a philosophy of responsiveness. Work happens when it is needed, not before and not on a schedule. This is inherently efficient -- no wasted cycles on unnecessary work -- but the efficiency costs predictability. The operator cannot predict when the automation will run, how often it will run, or how much system resource it will consume in a given period. The automation's behavior is determined by the environment, not by the institution's plan.</p>
+<p>In a small, off-grid, air-gapped institution, predictability is usually more valuable than efficiency. Power budgets are constrained. System resources are finite. The operator's attention is limited. Knowing that the backup runs at 3 AM is operationally simpler than knowing that the backup runs whenever something changes -- because the former can be verified with a glance at a log, while the latter requires understanding what changed, when, and whether the backup captured all of it.</p>
+
+<h3>3.2 The Comprehensibility Dimension</h3>
+<p>D8-001 establishes comprehensibility as a foundational requirement for all automation. Scheduled automation is inherently more comprehensible than event-driven automation because its behavior can be predicted from its schedule alone. A future maintainer reading a cron table can understand when every scheduled automation runs without understanding what triggers it -- because the trigger is simply the clock. A future maintainer reading an event-driven automation's configuration must understand the event source, the event conditions, the filtering logic, and the potential for event storms or missed events. The comprehension burden is higher.</p>
+<p>This does not mean event-driven automation should be avoided. It means that event-driven automation incurs a higher comprehension debt per D8-001 and must justify that debt with a correspondingly higher benefit.</p>
+
+<h3>3.3 Historical Context</h3>
+<p>The earliest automation systems were exclusively scheduled: cron jobs running at fixed times. Event-driven automation emerged as systems grew more complex and the latency between an event and the response to it became operationally important. Modern systems routinely combine both patterns. This institution's preference for simplicity (D8-001, D8-002) means that scheduled automation is the default and event-driven automation requires additional justification. But the institution acknowledges that some tasks are genuinely event-driven in nature and forcing them into a schedule creates its own problems.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Scheduled Automation: Characteristics</h3>
+<p>A scheduled automation runs at predetermined times according to a fixed schedule. The schedule may be simple (every day at 3 AM) or complex (every 15 minutes on weekdays, every hour on weekends, not during the power conservation window defined in D4-003). The trigger is always the clock.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li><strong>Predictability.</strong> The operator knows exactly when each automation will run. Resource consumption can be planned. Conflicts between automations can be resolved by scheduling them at different times.</li>
+<li><strong>Verifiability.</strong> Checking whether a scheduled automation ran is trivial: compare the schedule to the log. A missing log entry at the expected time is an immediate, obvious signal.</li>
+<li><strong>Bounded resource consumption.</strong> A scheduled automation runs at most once per schedule interval. Resource consumption is bounded and predictable. Power budgets can account for it.</li>
+<li><strong>Simplicity of implementation.</strong> The triggering mechanism (cron, systemd timer, or equivalent) is well-understood, well-tested, and universally available. No custom event infrastructure is required.</li>
+<li><strong>Independence from environment.</strong> The automation runs regardless of what else is happening in the system. It does not depend on events being generated, event queues being available, or event processing infrastructure being healthy.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li><strong>Latency.</strong> Events that occur between schedule intervals are not addressed until the next scheduled run. If the schedule is daily, the maximum latency is 24 hours. For time-sensitive tasks, this may be unacceptable.</li>
+<li><strong>Wasted work.</strong> The automation runs even if there is nothing to do. A nightly integrity check that finds no changes still consumes power, CPU time, and disk I/O.</li>
+<li><strong>Missed events.</strong> If multiple events occur between scheduled runs, the automation processes them all in a batch. Event ordering and individual event context may be lost.</li>
+<li><strong>Schedule sprawl.</strong> As automations accumulate, the schedule becomes crowded. Conflicts arise when multiple resource-intensive automations are scheduled concurrently. Managing the schedule becomes a task in itself.</li>
+</ul>
+
+<h3>4.2 Event-Driven Automation: Characteristics</h3>
+<p>An event-driven automation runs in response to a specific condition or change in the environment. The trigger is an event: a file is created, a threshold is exceeded, a service changes state, a user performs an action. The automation activates only when the event occurs.</p>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li><strong>Responsiveness.</strong> The automation reacts immediately (or near-immediately) to the triggering condition. Latency is minimal. Time-sensitive tasks are addressed promptly.</li>
+<li><strong>Efficiency.</strong> The automation runs only when needed. No wasted cycles on unnecessary execution. Power consumption correlates with actual work.</li>
+<li><strong>Event fidelity.</strong> Each event is processed individually, preserving event ordering and context. The automation can respond differently to different events.</li>
+<li><strong>Natural fit for reactive tasks.</strong> Some tasks are inherently event-driven: "when a new file arrives in the import directory, process it." Forcing such tasks into a schedule is artificial and introduces latency without benefit.</li>
+</ul>
+<p><strong>Weaknesses:</strong></p>
+<ul>
+<li><strong>Unpredictable resource consumption.</strong> The automation runs as often as events occur. During periods of high activity, it may run continuously, consuming resources that were budgeted for other purposes. Resource consumption is unbounded unless explicitly constrained.</li>
+<li><strong>Event storms.</strong> A burst of events can trigger a burst of automation executions, overwhelming the system. Without rate limiting, event-driven automation can consume all available CPU, memory, or disk I/O.</li>
+<li><strong>Silent inactivity.</strong> If no events occur, the automation does not run. The operator cannot distinguish "the automation is idle because no events occurred" from "the automation is broken and not receiving events." Verifying correctness requires verifying both the automation and the event source.</li>
+<li><strong>Infrastructure dependency.</strong> Event-driven automation requires an event delivery mechanism: filesystem watchers, message queues, signal handlers, or equivalent. This infrastructure must itself be reliable, monitored, and maintained. It is an additional dependency that scheduled automation does not have.</li>
+<li><strong>Complexity of reasoning.</strong> The automation's behavior depends on external events. Predicting what the automation will do requires predicting what events will occur. Testing requires generating realistic event sequences. Debugging requires reconstructing the event history.</li>
+</ul>
+
+<h3>4.3 The Decision Matrix</h3>
+<p>The following matrix provides criteria for choosing between scheduled and event-driven automation. Apply each criterion to the task and sum the recommendations. If the result is mixed, prefer scheduled (as the simpler, more comprehensible default per D8-001).</p>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Favors Scheduled</th>
+<th>Favors Event-Driven</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Latency tolerance</td>
+<td>Task can tolerate delays of minutes to hours between event and response.</td>
+<td>Task requires response within seconds of the triggering condition.</td>
+</tr>
+<tr>
+<td>Event frequency</td>
+<td>Events occur at predictable, moderate rates. Batching is acceptable.</td>
+<td>Events are sporadic and unpredictable. Each must be processed individually.</td>
+</tr>
+<tr>
+<td>Resource budget</td>
+<td>Power and compute budget is tight. Predictable consumption is essential.</td>
+<td>Sufficient headroom exists for variable consumption.</td>
+</tr>
+<tr>
+<td>Verification need</td>
+<td>Operator needs simple verification: did it run? Check the schedule.</td>
+<td>Operator can verify through event logs and output inspection.</td>
+</tr>
+<tr>
+<td>Task nature</td>
+<td>Task is maintenance, housekeeping, or periodic verification.</td>
+<td>Task is reactive: processing input, responding to conditions.</td>
+</tr>
+<tr>
+<td>Failure visibility</td>
+<td>A missed run is immediately visible (expected log entry absent).</td>
+<td>Acceptable if silent inactivity is addressed by independent monitoring.</td>
+</tr>
+<tr>
+<td>Comprehensibility</td>
+<td>Future maintainer can understand behavior from the schedule alone.</td>
+<td>Future maintainer must understand event sources and triggering logic.</td>
+</tr>
+<tr>
+<td>Event infrastructure</td>
+<td>No event delivery infrastructure exists or is warranted.</td>
+<td>Reliable event delivery infrastructure is already in place.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Default:</strong> When the analysis is inconclusive, use scheduled automation. The comprehensibility and verifiability advantages of scheduled automation align with the institution's restraint doctrine (D8-001). Event-driven automation should be chosen only when the latency, efficiency, or task-nature criteria strongly favor it.</p>
+
+<h3>4.4 Design Patterns for Scheduled Automation</h3>
+<p><strong>Pattern 1: Fixed-interval execution.</strong> The automation runs at a fixed interval (hourly, daily, weekly). This is the simplest and most common pattern. Use for: backups, log rotation, integrity verification, report generation, disk space monitoring. Implementation: cron or systemd timer with a single schedule entry. The automation's specification (D8-007) documents the interval and the rationale for choosing it.</p>
+<p><strong>Pattern 2: Staggered execution.</strong> Multiple automations are scheduled at different times to avoid resource contention. The institution maintains a master schedule (part of D8-009) that shows all scheduled automations and their execution windows. New scheduled automations must be placed in the master schedule without conflicting with existing ones. Use for: any environment with multiple scheduled automations, which is the normal case.</p>
+<p><strong>Pattern 3: Conditional execution within a schedule.</strong> The automation runs on schedule but checks a condition before performing work. If the condition is not met, the automation logs that no work was required and exits. This combines the verifiability of scheduled automation (the log confirms it ran) with the efficiency of event-driven automation (it does not perform unnecessary work). Use for: tasks where the condition changes infrequently but must be checked regularly. Example: a scheduled check for files in an import directory; if no files are present, log "no imports pending" and exit.</p>
+<p><strong>Pattern 4: Catch-up execution.</strong> If a scheduled automation misses its window (because the system was powered down, or the automation was disabled), it runs as soon as possible after the missed window. The automation detects missed runs by comparing the current time against the last recorded execution time. If the gap exceeds one schedule interval, it executes immediately. Use for: critical tasks where a missed run must be recovered, such as backups or integrity checks. Implementation: the automation checks its own last-execution timestamp (from its metrics file per D8-011) at startup.</p>
+
+<h3>4.5 Design Patterns for Event-Driven Automation</h3>
+<p><strong>Pattern 1: File-system watcher.</strong> The automation monitors a directory for new, modified, or deleted files. When a change is detected, the automation processes the affected file. Implementation: inotifywait (Linux), fswatch, or polling at sub-minute intervals. Use for: import processing, real-time log analysis, configuration change detection. Caution: filesystem watchers have platform-specific limitations. Some do not detect changes on network-mounted filesystems. All consume system resources proportional to the number of watched files and directories. Document these limitations in the specification.</p>
+<p><strong>Pattern 2: Threshold watcher.</strong> The automation monitors a metric (disk usage, CPU temperature, error rate) and triggers when the metric exceeds a defined threshold. Implementation: a lightweight polling loop that reads the metric at a fixed interval and compares it to the threshold. Use for: resource alerts, health checks, capacity warnings. This is technically a scheduled poll with event-driven response -- a common and effective hybrid.</p>
+<p><strong>Pattern 3: Signal-based trigger.</strong> The automation listens for an explicit signal from another automation or from the operator. Implementation: Unix signals, named pipes, flag files (a file whose presence signals the automation to act). Use for: inter-automation coordination, operator-initiated automation, post-deployment triggers. Caution: signal mechanisms must be documented in the automation's specification and in the triggering automation's specification, creating a documented dependency chain.</p>
+<p><strong>Pattern 4: Rate-limited event processing.</strong> The automation receives events but processes them at a controlled rate, queuing excess events for later processing. This prevents event storms from overwhelming the system. Implementation: an event queue (which may be as simple as a directory of pending files) with a processing loop that handles one event at a time with a configurable delay between events. Use for: any event-driven automation where the event rate may exceed the system's processing capacity.</p>
+
+<h3>4.6 Hybrid Patterns</h3>
+<p><strong>Hybrid 1: Scheduled sweep with event-driven fast path.</strong> The automation runs on a schedule to process accumulated work, but also responds to events for urgent items. The schedule ensures that nothing is missed; the event trigger ensures that urgent items are processed promptly. Example: an import processor that checks the import directory every hour (scheduled) but also responds to a flag file that signals an urgent import (event-driven). The scheduled run processes everything the event-driven path missed.</p>
+<p><strong>Hybrid 2: Event-driven with scheduled verification.</strong> The automation runs in response to events, but a separate scheduled automation verifies that the event-driven automation is functioning correctly. The verifier checks that the event source is active, that events are being generated, and that the event-driven automation is processing them. This addresses the silent inactivity failure mode. Example: a filesystem watcher processes imports as they arrive, while a nightly scheduled check verifies that the watcher is running and that no unprocessed files are languishing in the import directory.</p>
+<p><strong>Hybrid 3: Event accumulation with scheduled processing.</strong> Events are detected and logged in real time, but processing occurs on a schedule. The event detection mechanism writes events to a queue; the scheduled processor reads the queue and handles accumulated events in batch. This combines the responsiveness of event detection (nothing is missed) with the predictability of scheduled processing (resource consumption is bounded and predictable). Example: filesystem changes are logged in real time to a change journal; a nightly scheduled automation reads the journal and performs integrity verification on all changed files.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D8-13-01:</strong> Every automation's specification (D8-007) must declare its triggering pattern: scheduled, event-driven, or hybrid. The declaration must include the rationale for the choice, referencing the decision matrix criteria in Section 4.3.</li>
+<li><strong>R-D8-13-02:</strong> Scheduled automation is the institutional default. Event-driven automation requires documented justification demonstrating that the task's latency requirements, event characteristics, or inherent nature make scheduled execution inadequate.</li>
+<li><strong>R-D8-13-03:</strong> All scheduled automations must be registered in the institution's master schedule (D8-009). The master schedule must be reviewed quarterly to identify conflicts, gaps, and scheduling inefficiencies.</li>
+<li><strong>R-D8-13-04:</strong> All event-driven automations must implement rate limiting (Pattern 4 in Section 4.5, or equivalent). The maximum event processing rate must be specified in the automation's specification and must be within the system's resource capacity under worst-case conditions.</li>
+<li><strong>R-D8-13-05:</strong> All event-driven automations must have a corresponding scheduled verification mechanism (Hybrid 2 in Section 4.6, or equivalent) that confirms the event source is active, events are being delivered, and the automation is processing them. Silent inactivity must be detectable.</li>
+<li><strong>R-D8-13-06:</strong> Scheduled automations must not be scheduled during the power conservation window defined in D4-003, except for critical automations (Tier 1 data protection, security monitoring) that have explicit power budget allocations.</li>
+<li><strong>R-D8-13-07:</strong> Event-driven automations must log every received event, whether processed or deferred, per D8-011. The log must distinguish between events processed immediately, events queued for later processing, and events discarded due to rate limiting.</li>
+<li><strong>R-D8-13-08:</strong> Scheduled automations must implement the catch-up pattern (Pattern 4 in Section 4.4) for all tasks classified as critical in the automation's specification. A missed scheduled run of a critical automation must be recovered at the earliest opportunity.</li>
+<li><strong>R-D8-13-09:</strong> The choice of triggering pattern must be re-evaluated during the annual automation re-justification (D8-001, R-D8-07). If the task's characteristics have changed (event frequency has increased or decreased, latency requirements have changed, resource budget has changed), the triggering pattern must be reconsidered.</li>
+<li><strong>R-D8-13-10:</strong> Hybrid automations must document both their scheduled and event-driven components separately in the specification, including the interaction between them and the failure modes that arise from the combination.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Event storm overwhelming event-driven automation.</strong> A burst of events (thousands of file changes during a large import, a cascade of error conditions) triggers the automation faster than it can process. The system's CPU, memory, or disk I/O is exhausted. Other automations and manual operations are starved of resources. Mitigation: R-D8-13-04 mandates rate limiting. The automation queues excess events and processes them at a sustainable rate. The monitoring system (D8-008) tracks resource consumption and alerts when thresholds are approached.</p>
+</li>
+<li>
+<p><strong>Silent inactivity of event-driven automation.</strong> The event source fails (filesystem watcher crashes, signal handler is overwritten, flag file mechanism breaks). The automation sits idle, receiving no events, processing no work. No one notices because the automation does not log inactivity -- it logs nothing. Work accumulates unprocessed. Mitigation: R-D8-13-05 mandates a scheduled verification mechanism that independently checks whether the event-driven automation is functioning. The heartbeat mechanism (D8-008) detects inactivity.</p>
+</li>
+<li>
+<p><strong>Schedule drift.</strong> A scheduled automation's execution time gradually shifts due to accumulated execution time. An automation scheduled at 3:00 AM takes 5 minutes to run. The next night it takes 7 minutes. Over weeks, the completion time drifts, eventually overlapping with the next scheduled automation's window. Mitigation: the master schedule (R-D8-13-03) allocates execution windows, not points in time. Each automation has a start time and a maximum execution duration. Overlap detection is part of the quarterly schedule review.</p>
+</li>
+<li>
+<p><strong>Missed scheduled run without catch-up.</strong> The system is powered down during a scheduled automation's window. When power returns, the automation does not run because its schedule was in the past. The automation waits for the next scheduled window, leaving a gap. For critical tasks (backups, integrity checks), this gap is unacceptable. Mitigation: R-D8-13-08 mandates catch-up execution for critical automations. The automation checks its last execution time at startup and runs immediately if a window was missed.</p>
+</li>
+<li>
+<p><strong>Event ordering violation.</strong> Events arrive out of order (due to filesystem timing granularity, concurrent event sources, or event queue reordering). The automation processes them in the wrong sequence, producing incorrect results. Mitigation: event-driven automations that are sensitive to ordering must include sequence validation. Events are timestamped at creation, and the automation verifies ordering before processing. Out-of-order events are logged and either reordered or flagged for human review.</p>
+</li>
+<li>
+<p><strong>Hybrid pattern incoherence.</strong> In a hybrid automation, the scheduled and event-driven components produce conflicting results. The event-driven path processes a file; the scheduled sweep processes the same file again because it does not know the event-driven path already handled it. Mitigation: R-D8-13-10 requires documenting the interaction between components. Hybrid automations must maintain a shared state record (processed-items log) that both components consult before processing.</p>
+</li>
+<li>
+<p><strong>Triggering pattern mismatch.</strong> A task is implemented with the wrong pattern. A naturally event-driven task is forced into a daily schedule, creating unacceptable latency. Or a naturally periodic task is implemented as event-driven, creating unnecessary complexity and fragility. Mitigation: R-D8-13-09 requires annual re-evaluation of the triggering pattern. The decision matrix (Section 4.3) provides objective criteria for reassessment.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If an event storm is detected:</strong> Check whether the rate limiter is functioning. If it is, the storm is being managed -- verify that queued events are processing correctly and that the queue is not growing without bound. If the rate limiter has failed, halt the event-driven automation. Process accumulated events manually or through a controlled batch run. Investigate the event source to determine whether the event rate is genuinely high or whether the event detection mechanism is generating spurious events. Adjust the rate limit or the event filtering logic. Restart the automation with the corrected configuration.</p>
+</li>
+<li>
+<p><strong>If silent inactivity is detected by the verification mechanism:</strong> Determine whether the event source has failed, the event delivery mechanism has failed, or the automation itself has failed. Restart the failed component. Check for unprocessed events that accumulated during the inactivity period. Process them manually or through a catch-up run. Review the verification mechanism's check frequency -- if the inactivity persisted for longer than expected, the verification interval may need to be shorter.</p>
+</li>
+<li>
+<p><strong>If a missed scheduled run is discovered:</strong> For critical automations: execute the missed run immediately per the catch-up pattern. Verify that the output is consistent with what would have been produced at the scheduled time. For non-critical automations: document the miss, verify that no data was left in an inconsistent state, and allow the next scheduled run to proceed normally. Investigate why the run was missed: system downtime, scheduler failure, or automation error.</p>
+</li>
+<li>
+<p><strong>If schedule conflicts are causing resource contention:</strong> Review the master schedule. Identify overlapping execution windows. Stagger automations to eliminate overlap. If the schedule is too crowded to avoid overlap, prioritize by criticality: critical automations retain their windows, lower-priority automations are rescheduled. If no acceptable schedule exists, consider reducing automation frequency, optimizing execution duration, or deferring lower-priority automations to off-peak periods.</p>
+</li>
+<li>
+<p><strong>If a hybrid pattern produces inconsistent results:</strong> Halt both components. Determine which component's output is authoritative. Reconcile the data using the authoritative source. Fix the shared state mechanism that was supposed to prevent duplicate processing. Test the fix by simulating the condition that caused the inconsistency. Document the incident and update the specification to address the interaction failure.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The institution's automation inventory is small. Nearly all automation should be scheduled. The master schedule is easy to manage. Event-driven automation should be limited to cases with a clear, strong justification: perhaps real-time import processing or critical threshold monitoring. The priority in this period is establishing the discipline of documenting triggering patterns and maintaining the master schedule, even when the schedule is simple.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> As the automation inventory grows, the master schedule becomes more crowded. Schedule conflicts require attention. Some tasks that were originally scheduled may benefit from event-driven triggers as the institution's operational patterns become clearer. The decision matrix in Section 4.3 should be applied rigorously during the annual re-justification. Hybrid patterns may emerge for tasks that need both responsiveness and reliability.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The master schedule is a historical document: it shows how the institution's automated work has evolved over time. Schedule changes should be documented with rationale. Event-driven automations should have mature, well-tested event infrastructure. The verification mechanisms (R-D8-13-05) should have caught and prevented multiple instances of silent inactivity by this point, validating their necessity. Hardware changes may require revisiting power conservation windows and schedule timing.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> A successor inheriting the automation will find in the master schedule a complete picture of the institution's automated rhythm. The schedule is a map of what the institution does automatically and when. Event-driven automations, being less immediately visible, require their verification mechanisms and their specifications to be especially well-documented. The successor should be able to reconstruct the institution's automated behavior from the master schedule and the event-driven automation specifications without reading source code.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the institution finds itself with more event-driven automations than scheduled ones, revisit whether the institutional default (R-D8-13-02) is still appropriate. The default exists because scheduled automation is simpler and more comprehensible, but if the institution's operational reality is predominantly event-driven, the default may be creating artificial complexity by forcing event-driven tasks into schedules. Conversely, if event-driven automations are causing frequent incidents (storms, silent inactivity, ordering violations), the institution may need to convert some back to scheduled patterns with accepted latency trade-offs.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The most practical advice in this article is: when in doubt, use cron. A cron job that runs every five minutes and checks whether there is work to do is simpler, more comprehensible, and more debuggable than a filesystem watcher that triggers on inotify events. The cron job's maximum latency is five minutes. For most tasks in this institution, five minutes of latency is not a meaningful cost, and the gain in simplicity is substantial.</p>
+<p>I am particularly concerned about the silent inactivity failure mode (Section 6). In my experience, event-driven systems fail most dangerously when their event sources fail -- because the system's behavior when receiving no events is indistinguishable from its behavior when functioning correctly with no events to process. The verification requirement (R-D8-13-05) addresses this, but only if the verification mechanism itself is maintained and monitored. A verification mechanism that no one checks is not a verification mechanism.</p>
+<p>On the subject of hybrid patterns: Hybrid 3 (event accumulation with scheduled processing) is, in my judgment, the most robust pattern for tasks that seem to need event-driven responsiveness but where processing latency is tolerable. It captures events in real time so nothing is lost, but processes them on a predictable schedule so resource consumption is bounded. It is the best of both worlds at the cost of a small increase in complexity. I expect it to become the standard pattern for most tasks that outgrow pure scheduled execution.</p>
+<p>A note on power conservation (R-D8-13-06): in an off-grid institution, the power conservation window is not optional. Scheduling automations during that window is not merely inefficient -- it may deplete batteries, reduce system availability during critical hours, or force the institution to choose between automation and essential services. Respect the power budget. The automation can wait.</p>
+<p>Future maintainers: the master schedule is one of the most operationally important documents in the institution. Keep it current. Review it quarterly. When you add a new scheduled automation, check the master schedule first. When you decommission an automation, remove it from the master schedule. An accurate master schedule is a window into the institution's automated heartbeat. An inaccurate one is worse than none, because it creates false confidence.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 3: Transparency; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (comprehensibility, sustainability, institutional continuity)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (monitoring for silent failures)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first, complexity budget, operational tempo)</li>
+<li>GOV-001 -- Authority Model (approval for automation deployment decisions)</li>
+<li>D4-003 -- Power Management and Conservation (power conservation windows, power budgets)</li>
+<li>D6-001 -- Data Philosophy (data tier system; implications for scheduling data operations)</li>
+<li>D8-001 -- Automation Restraint Doctrine (comprehensibility requirement, five-part justification, annual re-justification)</li>
+<li>D8-002 -- Agent Design Principles (simplicity, single-purpose, minimal dependencies)</li>
+<li>D8-005 -- Emergency Override and Kill Switch Procedures (halting misbehaving scheduled or event-driven automation)</li>
+<li>D8-007 -- Automation Specification Language (specification format including triggering pattern declaration)</li>
+<li>D8-008 -- Monitoring Automation (heartbeat mechanism, resource consumption monitoring, alert thresholds)</li>
+<li>D8-009 -- Scheduled Task Architecture (cron infrastructure, master schedule, task orchestration)</li>
+<li>D8-011 -- Automation Observability Standards (logging format for event processing, metrics for execution frequency)</li>
+<li>D8-012 -- Automation &amp; Data Integrity Contracts (transaction boundaries affected by triggering pattern)</li>
+<li>D10 -- User Operations (operational procedures for schedule management and event source monitoring)</li>
+<li>Stage 1 Documentation Framework, Domain 8: Automation &amp; Agents</li>
+</ul>
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

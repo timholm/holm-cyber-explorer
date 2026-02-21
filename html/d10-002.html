@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D10-002 — Daily Operations Doctrine - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>User Operations</summary>
+    <ul>
+      <li class="active"><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d10-002">
+  <h1>D10-002 &mdash; Daily Operations Doctrine</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D10-002</dd>
+  <dt>Domain</dt>
+  <dd>10 -- User Operations</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D6-001, D7-001, D8-001, D9-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All procedural articles in Domain 10. Referenced by all domains that generate daily tasks.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes the doctrine for the daily operational rhythm of the holm.chat Documentation Institution. It translates the high-level operations philosophy of OPS-001 into the specific principles that govern how each day begins, proceeds, and ends. It is the doctrine of checklists, routines, and rituals -- the unsexy, repetitive, absolutely essential work that keeps an institution alive.</p>
+<p>The word "doctrine" is used rather than "procedure" because this article does not provide the specific daily checklist. That checklist is a living document derived from the requirements of all domains and will grow and change as the institution evolves. What this article provides is the philosophy that governs how checklists are designed, why routines matter, and what relationship exists between the boring consistency of daily operations and the fifty-year survival of the institution.</p>
+<p>If OPS-001 is the answer to "why does operational discipline matter?", this article is the answer to "what does operational discipline look like when you wake up on a Tuesday morning?" It is the most practical of the domain philosophy articles, the one closest to the ground, the one that touches the operator's daily life most directly. And it is, for that reason, the one most likely to be tested by reality and the one most likely to need revision as that reality reveals itself.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The philosophy of daily operational rhythm and why it matters.</li>
+<li>The principles governing checklist design and maintenance.</li>
+<li>The relationship between routine, discipline, and institutional resilience.</li>
+<li>The concept of operational rituals and their psychological function.</li>
+<li>The balance between thoroughness and sustainability in daily operations.</li>
+<li>The role of logging and recording in daily operations.</li>
+<li>The principles for handling deviations from routine.</li>
+<li>The integration of daily operations with all other domains.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The specific daily checklist items (see D10-002 supplements and domain-specific operational articles).</li>
+<li>Operational tempo beyond the daily cycle (see D10-003 for weekly, monthly, quarterly, annual).</li>
+<li>Routine maintenance schedules (see D10-004).</li>
+<li>Incident response (see D10-005).</li>
+<li>Degraded operations (see D10-010).</li>
+<li>Operator health and sustainability (see D10-012).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Institutional Day</h3>
+<p>An institution's unit of survival is the day. Every day that backup integrity goes unverified is a day silent corruption could progress. Every day system logs go unreviewed is a day an anomaly could escalate. The individual lapse is trivial. The accumulated lapse is fatal.</p>
+<p>The daily operations doctrine prevents accumulated lapse by making each day's essential work explicit, achievable, and routine. Not heroic. Not intensive. Routine. The same work, performed consistently, day after day, for decades.</p>
+<h3>3.2 Why Checklists Work</h3>
+<p>Aviation discovered decades ago that human performance in routine tasks is dramatically improved by checklists -- not because pilots are incompetent, but because human attention is unreliable. Checklists externalize memory. The operator follows with attention and honesty. A checklist followed mechanically, with boxes checked without verification, is worse than no checklist because it creates a false record of diligence. A checklist directs attention; it does not substitute for it.</p>
+<h3>3.3 The Ritual Function</h3>
+<p>Daily routines serve a psychological function: they mark the transition into operational mode, create structure, and make the infinite obligation manageable. You do not worry about fifty-year survival this morning. You follow the checklist. Faithfully followed, the fifty-year survival takes care of itself, one day at a time.</p>
+<p>The ritual function also aids succession. A new operator may not understand the institutional architecture, but they can follow a daily checklist, and in doing so begin developing the familiarity that grows into competence.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Daily Operational Cycle</h3>
+<p>The daily operational cycle has four phases:</p>
+<p><strong>Phase 1: Opening (5-10 minutes).</strong> Transition to operational mode: review overnight alerts, visual inspection of physical infrastructure, orient to today's schedule, open the operational log with date, time, and initial status.</p>
+<p><strong>Phase 2: Health Check (5-10 minutes).</strong> Rapid assessment: "Is anything obviously wrong?" Verify core systems are responsive. Review monitoring dashboards. Check storage utilization. Scan 24 hours of system logs for errors or anomalies. Verify most recent backup completed successfully.</p>
+<p><strong>Phase 3: Scheduled Work (0-15 minutes on most days).</strong> Daily maintenance tasks per D10-004. Domain-specific daily tasks. Documentation updates for yesterday's changes. Follow-up actions from previous log entries. Most days, this phase is minimal by design per OPS-001.</p>
+<p><strong>Phase 4: Closing (2-5 minutes).</strong> Summarize activities, findings, and anomalies in the operational log. Note follow-up items. Record any deviations from the checklist with explanation.</p>
+<p>Total: 15-30 minutes on routine days, aligned with OPS-001. If daily operations consistently exceed 30 minutes, the institution has grown too complex or the procedures need simplification.</p>
+<h3>4.2 Checklist Design Principles</h3>
+<p>The daily checklist is a living document, but it is governed by these design principles:</p>
+<p><strong>Principle 1: Every item must be verifiable.</strong> Each checklist item must describe an observable action with a clear success criterion. "Check the backups" is a bad checklist item. "Verify that the most recent backup completed with status OK, and that the backup size is within 10% of the previous backup" is a good checklist item. The operator must be able to determine, unambiguously, whether the item has been completed satisfactorily.</p>
+<p><strong>Principle 2: Items are ordered by criticality.</strong> The most critical items come first. If the operator is interrupted partway through the checklist, the most important checks have already been done. This means data integrity and security checks precede routine maintenance tasks, which precede documentation tasks.</p>
+<p><strong>Principle 3: The checklist must be completable.</strong> If the daily checklist cannot be consistently completed within the 15-30 minute window, it is too long. Items must be pruned, consolidated, or moved to less frequent cycles (weekly, monthly). A checklist that is too long to complete is a checklist that will not be completed, and an incomplete checklist provides false confidence.</p>
+<p><strong>Principle 4: Every item must earn its place.</strong> Checklist items are added when a genuine need is identified -- a system requires daily monitoring, a failure mode requires daily verification, a regulatory or governance requirement mandates daily documentation. Items must not be added prophylactically ("just in case") unless a specific threat model justifies the monitoring.</p>
+<p><strong>Principle 5: The checklist must be self-explanatory.</strong> A new operator on their first day should be able to follow it. Each item includes context for why it matters and what to do if the check fails.</p>
+<p><strong>Principle 6: The checklist must be iterable.</strong> Reviewed weekly and revised quarterly per OPS-001. Items with no findings are candidates for less frequent checking. Items that frequently reveal problems may need augmentation.</p>
+<h3>4.3 The Operational Log</h3>
+<p>The operational log is the institution's diary. It records what happened each day, what was checked, what was found, and what was done about it. It is a Tier 1 data artifact per D6-001 because it constitutes institutional memory -- the running record of the institution's operational life.</p>
+<p>The operational log follows these principles:</p>
+<p><strong>Append-only.</strong> Entries are never modified. Corrections are new entries referencing the original, consistent with GOV-001.</p>
+<p><strong>Dated and structured.</strong> Each entry: date, operator identifier, structured record of checks and findings. Narrative is encouraged for anomalies; routine checks use a consistent, scannable format.</p>
+<p><strong>Honest.</strong> Records what happened, not what should have. Skipped items are recorded as skipped. The log is a record, not a performance review.</p>
+<p><strong>Searchable.</strong> Structured for pattern-finding: "when did we last see this error?" Metadata standards per D6-008 apply.</p>
+<h3>4.4 Deviation Handling</h3>
+<p>The daily checklist defines the norm. Reality deviates from the norm. The doctrine for handling deviations:</p>
+<p><strong>Minor deviations that do not require immediate action:</strong> Record in the operational log. Flag for follow-up during the next weekly review per OPS-001. Continue with the daily checklist.</p>
+<p><strong>Moderate deviations that require investigation:</strong> Record in the operational log. Determine whether the deviation constitutes an incident per D10-005. If it does, invoke incident response. If it does not, schedule investigation during the next available operational period. Do not allow investigation to derail the daily checklist unless the deviation is urgent.</p>
+<p><strong>Critical deviations that require immediate action:</strong> Record in the operational log. Invoke incident response per D10-005. The daily checklist is suspended until the critical situation is resolved. The suspension and its resolution are documented in the log.</p>
+<p>The key principle is: the daily checklist is important, but it is not the most important thing. Completing the checklist while ignoring a critical anomaly because "the checklist says to keep going" is exactly the kind of mindless routine this doctrine warns against. The operator's judgment always supersedes the checklist. But that judgment must be documented.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D10-01:</strong> The daily operational cycle defined in Section 4.1 must be performed every day that the institution is operational. Exceptions must be documented in the operational log with justification.</li>
+<li><strong>R-D10-02:</strong> The daily checklist must be maintained as a living document, reviewed weekly for relevance, and revised quarterly per OPS-001.</li>
+<li><strong>R-D10-03:</strong> Every daily checklist item must be verifiable per Principle 1 in Section 4.2. Items without clear success criteria must be revised or removed.</li>
+<li><strong>R-D10-04:</strong> The daily operational cycle must be completable within 30 minutes on routine days. If it consistently exceeds this threshold, the checklist must be revised per OPS-001's sustainability requirement.</li>
+<li><strong>R-D10-05:</strong> The operational log must be updated daily. Entries must be honest, structured, and complete. A skipped checklist item must be recorded as skipped, not omitted from the log.</li>
+<li><strong>R-D10-06:</strong> The operational log is Tier 1 data per D6-001 and is subject to all Tier 1 preservation requirements.</li>
+<li><strong>R-D10-07:</strong> Deviations from the checklist must be handled per Section 4.4 and documented in the operational log. The operator's judgment in categorizing deviations is respected, but the categorization and its reasoning must be recorded.</li>
+<li><strong>R-D10-08:</strong> The daily checklist must be comprehensible to a new operator on their first day. This is the front-line implementation of D9-001's self-teaching requirement for daily operations.</li>
+<li><strong>R-D10-09:</strong> No daily checklist item may depend on institutional knowledge that is not documented. If an item requires context to perform correctly, that context must be either included in the checklist item or linked to the relevant documentation.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Checklist abandonment.</strong> The operator stops following the checklist. Problems accumulate silently. Mitigation: the checklist is deliberately light (15-30 minutes). If abandonment occurs, rebuild incrementally per OPS-001.</p>
+</li>
+<li>
+<p><strong>Checklist theater.</strong> Boxes are checked without actual verification. More dangerous than abandonment because it creates false confidence. Mitigation: verifiable success criteria per Principle 1. Periodic spot-checks during reviews.</p>
+</li>
+<li>
+<p><strong>Checklist bloat.</strong> Items accumulate, the checklist exceeds 30 minutes, and the operator starts skipping based on mood rather than criticality. Mitigation: R-D10-04 caps daily cycle at 30 minutes. Quarterly pruning per OPS-001.</p>
+</li>
+<li>
+<p><strong>Log stagnation.</strong> The log becomes rote "all checks passed" with no observations. Mitigation: record at least one genuine observation daily, even brief. "Temperature slightly high, within range, will monitor" is institutional memory. "All passed" is not.</p>
+</li>
+<li>
+<p><strong>Deviation paralysis.</strong> The operator detects an anomaly but cannot categorize it. Mitigation: D10-005 classification criteria. When in doubt, record the anomaly, continue the checklist, investigate afterward.</p>
+</li>
+<li>
+<p><strong>Isolation fatigue.</strong> The same checklist alone, day after day, erodes motivation. Mitigation: D10-012 addresses operator health. The daily cycle is deliberately brief. Governance allows revision of procedures causing harm.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If the daily checklist has been abandoned:</strong> Do not catch up. Begin today. Record the gap's duration in the log. Note any accumulated issues. If the checklist was unsustainable, revise it first, then resume.</p>
+</li>
+<li>
+<p><strong>If checklist theater is suspected:</strong> Independently verify each system's actual state against the log's claims. Revise items to require recording specific values rather than pass/fail.</p>
+</li>
+<li>
+<p><strong>If the checklist has bloated:</strong> For each item, ask when it last revealed a problem. If never, move it to a less frequent cycle. Target 15-20 minutes with a 10-minute buffer.</p>
+</li>
+<li>
+<p><strong>If the operational log has stagnated:</strong> Commit to one genuine observation daily for 30 days. The habit, once established, makes the log a living document.</p>
+</li>
+<li>
+<p><strong>If isolation fatigue has set in:</strong> Reduce to health check only (5-10 minutes). The institution is designed to survive minimal maintenance. Use that design without guilt. Rebuild gradually per OPS-001.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The daily checklist is being developed through experience. Expect frequent revisions as the operator discovers what needs daily attention and what does not. The first year's checklist will look very different from the fifth year's. Document every revision and why it was made.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The daily cycle should be stable and efficient. The operator should be able to complete it nearly on autopilot -- but the article warns against actual autopilot. The balance between efficiency and attention is the central challenge of this period. The operational log should be a rich record of institutional life by now.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> If a succession event occurs, the daily checklist is the new operator's first contact with institutional reality. Its quality -- its completeness, its clarity, its self-explanatory nature -- will determine whether the transition is smooth or chaotic. Test the checklist's comprehensibility by having someone unfamiliar with the institution attempt to follow it.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The daily checklist will have been revised many times. The operational log should span decades, providing a historical record of the institution's operational life that is valuable in its own right. The daily operations doctrine stated here should still be recognizable: the same commitment to routine, discipline, honest recording, and sustainable effort.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the daily cycle consistently feels inadequate (too much is happening that the checklist does not cover) or consistently feels excessive (the operator is going through motions that have no value), this article and the checklist need revision. The trigger is persistent misalignment between the checklist and operational reality.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I have spent more time thinking about daily operations than about any other single topic in this institution. Not because it is the most interesting -- it is arguably the least interesting -- but because it is the most important. Everything else in this documentation system is architecture. Daily operations is life.</p>
+<p>The fifteen-to-thirty-minute window is a commitment I made to myself. This institution will not consume my days. It will take a small, defined portion of each day, and in return, it will remain healthy and functional. If I find that I am spending hours on daily operations, something is wrong with the institution's design, not with my discipline.</p>
+<p>I want to address the accusation of over-formality. Writing a formal doctrine for a daily checklist may seem like using a sledgehammer to hang a picture. But I have maintained personal technology systems before, and I know what happens without formal doctrine: the checks get done when I feel like it, the log gets updated when I remember, and the whole thing slowly degrades until something breaks and I realize I have not checked it in weeks. The formality is not for the good days. It is for the bad days -- the days when I am tired, distracted, unmotivated, or unwell. On those days, the checklist does not need my enthusiasm. It needs my fifteen minutes.</p>
+<p>Future operators: if you find my checklist outdated, change it. If you find the daily cycle too long, shorten it. If you find the operational log format cumbersome, simplify it. But do not abandon the principle of a daily cycle. Something -- some structured, consistent, daily contact with the institution's vital signs -- must happen every day. That is non-negotiable. Everything else is details.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (institutional mission, documentation completeness)</li>
+<li>GOV-001 -- Authority Model (decision logging, amendment process)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (security checks in daily cycle)</li>
+<li>OPS-001 -- Operations Philosophy (daily operational tempo, documentation-first principle, sustainability requirement, complexity budget)</li>
+<li>D6-001 -- Data Philosophy (operational log as Tier 1 data, data integrity verification)</li>
+<li>D7-001 -- Intelligence Philosophy (daily observations as raw intelligence data)</li>
+<li>D8-001 -- Automation Philosophy (monitoring automated systems during daily checks)</li>
+<li>D9-001 -- Education Philosophy (daily checklist as self-teaching tool for new operators)</li>
+<li>D10-003 -- Operational Tempo &amp; Rhythm Design (weekly, monthly, quarterly, annual cycles)</li>
+<li>D10-004 -- Routine Maintenance Schedules (daily maintenance tasks feed into checklist)</li>
+<li>D10-005 -- Incident Classification &amp; Response Framework (deviation handling)</li>
+<li>D10-006 -- Operational Logging Standards (log format and structure)</li>
+<li>D10-010 -- Degraded Operations Doctrine (reduced daily operations)</li>
+<li>D10-012 -- Operator Health &amp; Sustainability (preventing burnout from daily operations)</li>
+<li>D6-008 -- Metadata Standards &amp; Cataloguing (operational log metadata)</li>
+<li>Stage 1 Documentation Framework, Domain 10: User Operations</li>
+</ul>
+<hr />
+<hr />
+<p><em>End of Stage 2 Philosophy Articles -- Batch 2</em></p>
+<p><strong>Document Total:</strong> 5 articles
+<strong>Domains Covered:</strong> D6 (Data &amp; Archives), D7 (Intelligence &amp; Analysis), D8 (Automation &amp; Agents), D9 (Education &amp; Training), D10 (User Operations)
+<strong>Combined Estimated Word Count:</strong> ~14,500 words
+<strong>Status:</strong> All five articles ratified as of 2026-02-16.
+<strong>Relationship to Core Charter:</strong> These articles derive authority from and build upon ETH-001, CON-001, GOV-001, SEC-001, and OPS-001 as established in the Stage 2 Core Charter.
+<strong>Next Stage:</strong> Domain-specific procedural and structural articles (Tier 2 and below) that implement the philosophies established here.</p>
+</section>
+</article>
+</main>
+</body>
+</html>

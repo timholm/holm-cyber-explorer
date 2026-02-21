@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D14-008 — Data Integrity in Research - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li class="active"><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d14-008">
+  <h1>D14-008 &mdash; Data Integrity in Research</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D14-008</dd>
+  <dt>Domain</dt>
+  <dd>14 -- Research & Theory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D14-001, D14-002, D14-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D14-012, D14-013. All Domain 14 articles that produce or consume research data. Referenced by Domain 6 (Data &amp; Archives) for research data storage standards. Referenced by Domain 12 (Disaster Recovery) for research data integrity methods.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how research data is collected, stored, validated, and protected from corruption throughout its lifecycle. Research conclusions are only as reliable as the data on which they are based. If the data is corrupted, lost, or of uncertain provenance, every conclusion drawn from it is suspect -- and because this institution builds operational decisions on research findings (D14-001), corrupt data can lead to operational failures.</p>
+<p>The challenge of data integrity in research is distinct from the general data integrity challenge addressed by Domain 6 (Data and Archives). Research data has specific characteristics that demand specific protections: it is often collected in real time during experiments, it may be irreproducible (the experiment cannot be rerun under identical conditions), it forms chains of derivation where later analyses depend on earlier measurements, and its evidentiary value depends entirely on its authenticity. A backup of a corrupted database is a nuisance. Corrupted experimental data is a permanent loss of knowledge.</p>
+<p>This article establishes the chain of custody for research data -- the unbroken record of how data was collected, where it was stored, who had access to it, and how it was verified. The chain of custody is what allows a future operator to trust that the data in the research archive represents what was actually observed, not what was wished for, remembered incorrectly, or accidentally modified.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- Data collection standards for research: real-time recording, format requirements, and minimum fidelity.
+- Chain of custody for research data: creation, storage, access, and verification.
+- Data storage requirements specific to research: format longevity, integrity verification, and backup.
+- Data validation procedures: checksums, cross-verification, and anomaly detection.
+- Handling of research data during and after experiments.
+- Integration with the general data integrity framework (Domain 6).
+- Protection against accidental and deliberate data modification.</p>
+<p><strong>Out of scope:</strong>
+- General data storage and backup procedures (Domain 6).
+- Security of data at rest and in transit (Domain 3).
+- Experimental methodology (D14-002, though data collection is part of methodology).
+- Knowledge classification (D14-004, though classified knowledge depends on data integrity).
+- Research archive structure and preservation (D14-013).</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Fragility of Research Data</h3>
+<p>Research data is fragile in ways that operational data is not. Operational data -- system logs, configuration files, user records -- can often be regenerated or reconstructed if lost. Research data, by contrast, is frequently a one-time observation. If the temperature measurement taken during an experiment on June 14, 2031, is lost, it cannot be recovered by rerunning the experiment, because the conditions of June 14, 2031 -- the ambient temperature, the hardware state, the software versions, the operator's skill level at that time -- cannot be recreated.</p>
+<p>This irreproducibility makes research data integrity a preservation problem as much as a technical one. The institution must protect not just the bits on the storage medium but the semantic integrity of the data: the meaning of the measurements, the context in which they were taken, and the relationship between raw observations and derived conclusions.</p>
+
+<h3>3.2 The Self-Corruption Risk</h3>
+<p>In a single-operator institution, the greatest threat to research data integrity is the operator themselves. Not through malice -- through the ordinary human tendencies to round numbers, to record from memory rather than from measurement, to "clean up" data by removing outliers that seem wrong, and to transcribe raw notes into a tidier format that inadvertently changes the content. These are not fraudulent acts. They are normal human behaviors that, in the aggregate, erode the reliability of the data archive.</p>
+<p>The protections defined in this article are designed primarily against this self-corruption risk. They create structures that make it difficult to modify data inadvertently, that preserve raw observations alongside any processed versions, and that provide audit trails that allow future operators to verify data authenticity.</p>
+
+<h3>3.3 The Chain of Custody Concept</h3>
+<p>In forensic and legal contexts, chain of custody refers to the documented history of who possessed a piece of evidence and when. The concept is adapted here for research data: the chain of custody is the documented history of how data was created, where it was stored, whether it was ever modified, and how its integrity was verified. An unbroken chain of custody means that a future operator can trace the data from its current state in the archive back to the moment it was collected, with every step documented and verified.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Data Collection Standards</h3>
+<p>Research data collection follows three principles:</p>
+<p><strong>Principle 1: Real-time recording.</strong> Data must be recorded at the time of observation, not reconstructed afterward from memory. Per D14-002, R-EXP-03, raw data that was not recorded during execution limits the experiment's maximum confidence classification. This article operationalizes that rule: the operator must have a recording mechanism (log file, notebook, automated sensor output) active during all experimental work, and the recording must capture observations as they occur.</p>
+<p><strong>Principle 2: Raw preservation.</strong> Raw data -- the unprocessed, uninterpreted measurements as they were captured -- must be preserved permanently and separately from any derived, cleaned, or processed version. When data is analyzed, the analysis operates on a copy of the raw data. The raw data itself is never modified. This ensures that future operators can re-analyze the original observations without being constrained by the original analyst's processing choices.</p>
+<p><strong>Principle 3: Contextual completeness.</strong> Data is meaningless without context. Every data collection event must record not just the measurements but the conditions under which they were taken: what hardware was used, what software was running, what the environmental conditions were, what the operator was doing before and during collection, and any anomalies observed during the process. This context is part of the data, not supplementary to it.</p>
+
+<h3>4.2 The Chain of Custody Record</h3>
+<p>Every research dataset has an associated Chain of Custody Record (COCR) containing:</p>
+<ul>
+<li><strong>Dataset ID:</strong> Format RD-YYYY-NNN (Research Data, year, sequential number).</li>
+<li><strong>Creation date and time:</strong> When the data was collected.</li>
+<li><strong>Collection method:</strong> How the data was captured (manual observation, automated logging, sensor output, etc.).</li>
+<li><strong>Collection context:</strong> Environmental conditions, hardware state, software versions.</li>
+<li><strong>Original storage location:</strong> Where the data was first stored after collection.</li>
+<li><strong>Format:</strong> The file format and any encoding details.</li>
+<li><strong>Integrity baseline:</strong> A cryptographic hash (SHA-256 minimum) of the raw data file computed immediately after creation.</li>
+<li><strong>Storage history:</strong> A log of every location where the data has been stored, including dates of transfer.</li>
+<li><strong>Access log:</strong> A record of every time the data was accessed for analysis, replication, or review.</li>
+<li><strong>Modification log:</strong> A record of any copies made for analysis, any format conversions, and any processing applied. The raw data itself must never appear in this log because it must never be modified.</li>
+<li><strong>Verification history:</strong> A record of every integrity check performed on the data, with dates and results.</li>
+<li><strong>Related experiment:</strong> Reference to the experiment log (D14-002) that produced this data.</li>
+</ul>
+
+<h3>4.3 Data Storage Requirements</h3>
+<p>Research data storage must satisfy four requirements beyond the general storage requirements of Domain 6:</p>
+<p><strong>Requirement 1: Format longevity.</strong> Research data must be stored in formats that will remain readable for the lifetime of the institution. Per the 50-year continuity rules, this means plain text (CSV, TSV, fixed-width), or widely-supported binary formats with published specifications. Proprietary formats are prohibited for primary research data storage. If data is collected in a proprietary format (e.g., by a specialized instrument), it must be converted to an open format and the conversion documented in the COCR. The proprietary original may be retained as a secondary copy.</p>
+<p><strong>Requirement 2: Integrity verification.</strong> Research data must have cryptographic hashes computed at creation and verified at least annually. Any verification failure triggers an immediate investigation: was the data corrupted, was the hash recorded incorrectly, or was the storage medium degrading? The verification results are recorded in the COCR.</p>
+<p><strong>Requirement 3: Redundant storage.</strong> Research data must be stored in at least two physically separate locations. The loss of a single storage medium must not result in the loss of any research data. This requirement applies in addition to, not instead of, the general backup requirements of Domain 6.</p>
+<p><strong>Requirement 4: Separation of raw and derived data.</strong> Raw data and any derived data (processed, cleaned, analyzed) must be stored in clearly labeled, separate locations. It must be impossible to confuse a derived dataset with the raw observations from which it was produced.</p>
+
+<h3>4.4 Data Validation Procedures</h3>
+<p>Research data is validated at three points in its lifecycle:</p>
+<p><strong>At collection:</strong> The operator performs a sanity check on the collected data before ending the collection session. Are the values within expected ranges? Are there gaps or anomalies that suggest collection errors? Does the data volume match expectations? Any anomalies are noted in the experiment log (D14-002). The integrity baseline hash is computed and recorded.</p>
+<p><strong>At analysis:</strong> Before analyzing the data, the operator verifies the integrity hash to confirm the data has not been modified since collection. The operator also reviews the COCR to confirm the chain of custody is unbroken. If the hash does not match or the chain of custody has gaps, the data's confidence level is reduced and the discrepancy is documented.</p>
+<p><strong>At archive:</strong> When the data is filed in the research archive (D14-013), a final integrity verification is performed. The COCR is completed with the archive location and a final hash verification. The archived data is the canonical version; all other copies are derivatives.</p>
+
+<h3>4.5 Protection Against Self-Corruption</h3>
+<p>The following practices protect against the operator's own tendency to inadvertently modify data:</p>
+<p><strong>Write-once storage for raw data.</strong> Where the technology permits, raw data should be stored on write-once media or in write-protected directories. The goal is to make accidental modification physically difficult, not just procedurally prohibited.</p>
+<p><strong>Separation of collection and analysis.</strong> D14-002 recommends delayed analysis (at least 48 hours between data collection and interpretation). This article extends that recommendation to the physical handling of data: the raw data file should be hashed, stored, and not opened again until analysis begins. This prevents the temptation to "just fix that one obvious error" in the raw data.</p>
+<p><strong>Analysis on copies.</strong> All analysis work is performed on copies of the raw data, never on the raw data itself. The copy is explicitly labeled as a working copy. Any modifications to the working copy (outlier removal, unit conversion, normalization) are documented in an analysis log that accompanies the working copy.</p>
+<p><strong>Outlier documentation.</strong> If the operator identifies data points that appear anomalous and chooses to exclude them from analysis, the exclusion must be documented with explicit reasoning. "This value seemed wrong" is not sufficient. "This value is 3.7 standard deviations from the mean and coincides with a noted power fluctuation at 14:23" is sufficient. The excluded data remains in the raw dataset and in the working copy (marked but not deleted).</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-DRI-01:</strong> All research data must be recorded in real time during data collection. Data reconstructed from memory after the collection session is labeled as "reconstructed" and carries a maximum confidence level of "provisional" regardless of how certain the operator feels about the reconstruction.</li>
+<li><strong>R-DRI-02:</strong> Raw research data must never be modified after initial recording. All analysis, cleaning, and processing must be performed on copies. The raw data, with its original integrity hash, is the authoritative record of what was observed.</li>
+<li><strong>R-DRI-03:</strong> Every research dataset must have a Chain of Custody Record (Section 4.2) created at the time of data collection and maintained throughout the data's lifecycle. A dataset without a COCR cannot be used as the basis for "verified" knowledge in the knowledge registry (D14-004).</li>
+<li><strong>R-DRI-04:</strong> Research data must be stored in formats compliant with the 50-year continuity rules. Proprietary formats are prohibited for primary storage. If data is collected in a proprietary format, conversion to an open format must occur within 7 days.</li>
+<li><strong>R-DRI-05:</strong> Integrity verification (hash check) must be performed on all research data at least annually. Verification failures must be investigated within 7 days and the results documented in the COCR.</li>
+<li><strong>R-DRI-06:</strong> Research data must be stored in at least two physically separate locations at all times. Single-copy research data is a critical vulnerability that must be remediated immediately upon discovery.</li>
+<li><strong>R-DRI-07:</strong> Data points excluded from analysis must be documented with explicit reasoning in the analysis log. Excluded data must remain in both the raw dataset and the working copy. Deletion of data points is prohibited.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Silent data corruption.</strong> Storage media degrades and research data is corrupted without anyone noticing, because integrity checks are not performed regularly. The corruption is discovered only when the data is needed for re-analysis or replication, at which point the data is unrecoverable. Mitigation: R-DRI-05 requires annual integrity verification. The verification schedule should be integrated into the institutional maintenance calendar.</li>
+<li><strong>Chain of custody gaps.</strong> The COCR is created at data collection but not maintained afterward. Data is moved between storage locations without logging the transfer. When a future operator attempts to verify the data's integrity, they cannot confirm its provenance. Mitigation: R-DRI-03 requires COCR maintenance throughout the lifecycle. The annual integrity check (R-DRI-05) includes a COCR review.</li>
+<li><strong>Raw data contamination.</strong> The operator accidentally modifies the raw data file instead of a working copy. The original observations are permanently altered, and the integrity hash no longer matches. Mitigation: R-DRI-02 prohibits raw data modification. Write-once storage and file permissions provide technical enforcement. The hash verification at analysis time (Section 4.4) detects modifications.</li>
+<li><strong>Format obsolescence.</strong> Research data is stored in a format that becomes unreadable as software evolves. The data exists physically but is semantically inaccessible. Mitigation: R-DRI-04 requires open formats. The format longevity assessment in D14-003 (Technology Evaluation) applies to data formats as well as software.</li>
+<li><strong>Reconstruction masquerading as observation.</strong> The operator reconstructs data from memory and fails to label it as reconstructed. The reconstructed data enters the archive as if it were a real-time observation, inflating the confidence of any conclusions drawn from it. Mitigation: R-DRI-01 requires real-time recording and explicit labeling of reconstructed data. The experiment log format (D14-002) provides a structural check -- if the raw data section is empty but conclusions were drawn, the data was reconstructed.</li>
+<li><strong>Single-copy vulnerability.</strong> Research data exists in only one location. A hardware failure, environmental event, or operator error destroys the only copy. Mitigation: R-DRI-06 requires redundant storage. The annual integrity check should verify that redundant copies exist and are current.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If data corruption is discovered:</strong> Immediately check all redundant copies. If any copy passes its integrity hash, it becomes the authoritative copy. If all copies are corrupted, document the loss in the COCR and in the experiment log. Assess the impact: what conclusions depended on this data? Downgrade affected knowledge items in the registry (D14-004) to reflect the loss of supporting evidence. If the experiment can be rerun, schedule a replication.</li>
+<li><strong>If the chain of custody has gaps:</strong> Reconstruct what can be reconstructed from storage logs, file timestamps, and operational logs. Document the gaps explicitly in the COCR. Assess whether the gaps affect the trustworthiness of the data: was the data stored in a location where it could have been accidentally modified during the gap period? If trust is compromised, note this in the COCR and reduce the confidence level of dependent knowledge items.</li>
+<li><strong>If raw data has been accidentally modified:</strong> Check all redundant copies for an unmodified version. If found, restore from that copy. If not found, the modification is permanent and must be documented in the COCR. All conclusions drawn from the modified data must be reviewed and potentially downgraded. This event is a strong argument for write-once storage.</li>
+<li><strong>If data format has become unreadable:</strong> Research format conversion tools. If the format specification is available (which it should be if R-DRI-04 was followed), write or find a converter. If the data was stored in a proprietary format in violation of R-DRI-04, the recovery may require locating legacy software. Document the format obsolescence in the COCR and convert the data to a compliant format immediately upon successful recovery.</li>
+<li><strong>If COCRs have never been created:</strong> Conduct a retroactive COCR creation sprint. For each research dataset in the archive, create a COCR with as much information as can be reconstructed. Record the reconstruction explicitly. Going forward, enforce R-DRI-03 for all new data collections. Accept that pre-COCR data carries lower evidentiary confidence.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> Data integrity practices are being established. The operator is learning the discipline of real-time recording, hash computation, and chain of custody maintenance. The early data will likely have imperfect COCRs as the process is refined. The most important habit to establish is never modifying raw data -- once that habit is ingrained, the rest follows.</li>
+<li><strong>Years 5-15:</strong> The research data archive grows. Annual integrity checks begin to reveal the realities of long-term data storage: which media degrade, which formats remain readable, which storage practices prove robust. These findings should feed back into the technology evaluation framework (D14-003) and inform storage technology decisions.</li>
+<li><strong>Years 15-30:</strong> Data collected in the founding years is now 15-30 years old. The integrity verification history in the COCRs demonstrates whether the data preservation strategy has worked. If succession occurs, the COCRs provide the successor with a complete provenance record for every dataset, enabling them to assess the trustworthiness of the institution's research data independently.</li>
+<li><strong>Years 30-50+:</strong> The research data archive spans decades. Some early data may have been through multiple format conversions, multiple storage migrations, and multiple integrity verifications. The COCR for each dataset tells the complete story of its journey from collection to the present. This history is itself valuable research data about the longevity of data preservation strategies.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I have seen what happens when research data is treated casually. Numbers get rounded. Outliers get deleted without documentation. Data gets moved between formats and something gets lost in translation. Months later, someone tries to re-analyze the original measurements and discovers that the "original" file has been modified seventeen times and nobody recorded what was changed or why.</p>
+<p>In a team environment, the damage is limited because someone else usually has a copy of the original, or the experiment can be rerun, or the team collectively remembers what happened. In a single-operator institution, there is no such safety net. If I corrupt my own data, there is no one to catch it, no external copy to restore from, and no one who remembers what the original numbers were.</p>
+<p>The chain of custody record feels like overkill for a one-person operation. It is not. It is the mechanism by which I hold myself accountable to the future. When a successor operator examines my experimental data in 2045, the COCR will tell them: this data was collected on this date, stored in this location, verified on these dates, and never modified. That trust is worth the paperwork.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting)</li>
+<li>CON-001 -- The Founding Mandate (data preservation, 50-year continuity)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (data protection at rest)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first, operational logging)</li>
+<li>D14-001 -- Research Philosophy (knowledge lifecycle, evidence-based conclusions)</li>
+<li>D14-002 -- Experimental Design (R-EXP-03: real-time data recording, experiment log format)</li>
+<li>D14-003 -- Technology Evaluation Framework (format longevity assessment)</li>
+<li>D14-004 -- Knowledge Classification (confidence levels dependent on data integrity)</li>
+<li>D14-012 -- Replication and Reproducibility Standards (data integrity as prerequisite for replication)</li>
+<li>D14-013 -- Research Archive and Knowledge Preservation (archive storage standards)</li>
+<li>Domain 6 -- Data and Archives (general data integrity framework)</li>
+<li>Domain 12 -- Disaster Recovery (research data as critical asset)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

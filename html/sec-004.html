@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-004 — Air-Gap Architecture: Theory and Implementation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li class="active"><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-004">
+  <h1>SEC-004 &mdash; Air-Gap Architecture: Theory and Implementation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-004</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security & Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, SEC-002, SEC-003</dd>
+  <dt>Depended Upon By</dt>
+  <dd>SEC-005, SEC-006, SEC-007, SEC-008, D18-001. All articles involving data transfer, external media, or boundary enforcement.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article is the complete technical specification of the air gap that defines the holm.chat Documentation Institution's primary security boundary. It defines what the air gap is in precise terms, where the boundary lies in physical and electromagnetic space, what constitutes a breach of that boundary, what controlled exceptions exist, and how the operator verifies that the gap remains intact over time.</p>
+<p>SEC-001 established the air gap as an architectural decision. SEC-002 defined access controls that assume the air gap is intact. This article specifies the air gap itself -- its theory, its implementation, its verification, and its maintenance. It is the document you consult when you need to answer the question: "Is this institution actually air-gapped, or have we been deceiving ourselves?"</p>
+<p>The air gap is not a single control. It is a composite boundary comprising physical isolation, electromagnetic containment, procedural discipline, and ongoing verification. A failure in any one of these dimensions can compromise the gap while the others appear intact. This article addresses all four dimensions with the rigor that the institution's primary security boundary demands.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers the complete air-gap architecture:</p>
+<ul>
+<li>The theoretical definition of an air gap and its security properties.</li>
+<li>Physical isolation requirements: network interface removal, cable management, room layout.</li>
+<li>Electromagnetic considerations: emanations security (TEMPEST), RF isolation, power-line leakage.</li>
+<li>The USB and removable media policy: what devices may cross the boundary, under what conditions, using what procedures.</li>
+<li>The sneakernet protocol: how data moves into and out of the institution in a controlled manner.</li>
+<li>Verification procedures: how to confirm the air gap has not been breached.</li>
+<li>Exception documentation: every authorized exception to the air gap, why it exists, and the compensating controls around it.</li>
+</ul>
+<p>This article does not cover the quarantine procedures for incoming media (see D18-001), the cryptographic protocols used to protect data in transit across the sneakernet (see SEC-005), or the physical perimeter that prevents unauthorized physical access (see SEC-006). It defines the electromagnetic and procedural boundary; those other articles define the complementary controls.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 What an Air Gap Actually Is</h3>
+<p>An air gap, in its simplest definition, is the absence of any electronic communication path between the institution's systems and any external network. No Ethernet cable. No WiFi connection. No Bluetooth pairing. No cellular modem. No infrared port. No acoustic coupling. No power-line networking. No communication path of any kind that could be exploited by an attacker who does not have physical access to the institution's hardware.</p>
+<p>This definition is more demanding than it first appears. A system that has WiFi hardware installed but "disabled in software" is not air-gapped. A system that has an Ethernet port with no cable attached but with the network interface driver loaded is not air-gapped. A system that has no network hardware but sits next to a networked system on the same power circuit may not be fully air-gapped if power-line communication is possible. The air gap must be physical, verified, and maintained -- not assumed, configured, and forgotten.</p>
+<h3>3.2 The Security Properties of an Air Gap</h3>
+<p>A properly implemented air gap provides the following security properties:</p>
+<p><strong>No remote exploitation.</strong> An attacker cannot deliver exploits over a network connection that does not exist. This eliminates the largest category of attacks against modern systems: network-based intrusion, remote code execution, phishing, drive-by downloads, and man-in-the-middle attacks.</p>
+<p><strong>No remote exfiltration.</strong> Data cannot be extracted over a network connection that does not exist. Even if an attacker somehow compromises a system within the air gap (through supply chain attack or physical access), they cannot transmit the data out without physical access to the system or to a removable media device.</p>
+<p><strong>No remote command and control.</strong> Malware that relies on communication with a command-and-control server cannot function within an air-gapped environment. It may persist on the system, but it cannot receive instructions or exfiltrate data.</p>
+<p><strong>Explicit consent for all data movement.</strong> Every piece of data that enters or leaves the institution must be physically carried across the boundary by the operator. This means the operator has the opportunity -- and the obligation -- to inspect, approve, or reject every data transfer.</p>
+<h3>3.3 The Limitations of an Air Gap</h3>
+<p>An air gap is not omnipotent. It does not protect against:</p>
+<ul>
+<li>An attacker with physical access to the hardware.</li>
+<li>Supply chain attacks that pre-install malware on hardware or software before it enters the air-gapped environment.</li>
+<li>Insider threats (in this institution, the operator themselves acting against their own interests due to coercion or compromise).</li>
+<li>Electromagnetic emanations that leak data through radio frequency emissions, acoustic signals, thermal variations, or power consumption patterns.</li>
+<li>Social engineering that causes the operator to voluntarily carry compromised media across the gap.</li>
+<li>Data destruction attacks that do not require exfiltration.</li>
+</ul>
+<p>These limitations are addressed by the complementary security articles: SEC-006 for physical security, SEC-007 for supply chain security, and the emanations controls specified in this article.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Boundary Definition</h3>
+<p>The air-gap boundary is defined as a physical perimeter enclosing all institutional computing hardware, storage media, and cabling. Everything inside this perimeter is the "clean side." Everything outside is the "dirty side." The boundary is enforced at four levels:</p>
+<p><strong>Level 1: Network Hardware Elimination.</strong>
+All wireless network interfaces (WiFi, Bluetooth, cellular, NFC, infrared) must be physically removed from institutional hardware, not merely disabled. For laptops with soldered wireless cards, the antenna leads must be physically disconnected and the wireless firmware must be removed from the operating system. For desktop systems, wireless cards must be physically removed. For any system where physical removal is impossible, the system must not be used as institutional hardware.</p>
+<p>All wired network interfaces that are not used for internal-only institutional networking (such as a local network between institutional machines that never touches the outside world) must have their Ethernet ports physically blocked or their interface hardware removed. If internal networking is used between institutional machines, those interfaces and cables must be clearly labeled and the network must be physically incapable of reaching any non-institutional device.</p>
+<p><strong>Level 2: Electromagnetic Containment.</strong>
+Institutional hardware should be positioned to minimize electromagnetic emanations that could be intercepted from outside the physical perimeter. This does not require a full TEMPEST-certified facility for most threat models, but it does require awareness of the basic principles:</p>
+<ul>
+<li>Institutional hardware should not be placed against exterior walls where emanations could be captured from outside the building.</li>
+<li>CRT monitors (if used) emit significantly stronger emanations than LCD panels and should be avoided or shielded.</li>
+<li>USB cables, HDMI cables, and power cables act as antennas. Cable runs should be minimized and cables should not exit the secure area unnecessarily.</li>
+<li>Unshielded cables running parallel to each other can create crosstalk. Separate data cables from power cables where practical.</li>
+<li>If the threat model includes a sophisticated adversary with emanations-capture capability, consider a Faraday enclosure for the most sensitive systems. For most single-operator institutions, placing hardware in an interior room with no shared walls to public spaces provides adequate protection.</li>
+</ul>
+<p><strong>Level 3: Power Isolation.</strong>
+Power-line networking and power-line data leakage are real attack vectors. Institutional hardware should be powered through an uninterruptible power supply (UPS) that provides electrical isolation from the building's main wiring. The UPS acts as a buffer that breaks the direct electrical connection between institutional hardware and the external power grid. A UPS with online (double-conversion) topology provides the best isolation because all power passes through a battery-inverter stage, eliminating high-frequency signals that could carry data.</p>
+<p>If off-grid power is used (solar, generator), the isolation is inherent -- the institution's power supply is physically separate from any external grid.</p>
+<p><strong>Level 4: Procedural Enforcement.</strong>
+The physical and electromagnetic controls above prevent electronic breaches. Procedural controls prevent human-assisted breaches. The following procedures constitute the air gap's procedural layer:</p>
+<ul>
+<li>No personal electronic devices (phones, smartwatches, wireless earbuds) may be brought within the physical perimeter during operations that involve sensitive data. These devices contain wireless radios that could be exploited as exfiltration channels.</li>
+<li>No USB device may be connected to institutional hardware without completing the sneakernet protocol defined in Section 4.3.</li>
+<li>No hardware may be added to the institutional environment without completing the supply chain verification defined in SEC-007.</li>
+<li>The operator must log every instance of a device crossing the air-gap boundary, whether inbound or outbound.</li>
+</ul>
+<h3>4.2 The USB and Removable Media Policy</h3>
+<p>USB devices are the primary authorized channel for data to cross the air-gap boundary. They are also the primary attack vector against air-gapped systems. The USB policy must balance these realities.</p>
+<p><strong>Authorized USB Devices:</strong>
+The institution maintains a registry of authorized USB storage devices. Each device is assigned a unique identifier (physically labeled on the device), a classification (inbound-only, outbound-only, or bidirectional), and a custodian. No USB storage device may be used with institutional hardware unless it appears in the registry.</p>
+<p><strong>Device Classes:</strong>
+- <em>Inbound-only devices</em> carry data into the institution. They are used to import software updates, reference data, and other material from external sources. After import, data on these devices passes through the quarantine process defined in D18-001 before touching any institutional system.
+- <em>Outbound-only devices</em> carry data out of the institution. Their use cases are limited: transferring backup verification data to a geographically separate backup site, or exporting data that the operator has deliberately chosen to share with the external world.
+- <em>Bidirectional devices</em> may carry data in both directions. Their use should be minimized because they represent the highest risk: a device that has touched the external world and then touches institutional hardware could carry contamination in either direction.</p>
+<p><strong>USB Port Control:</strong>
+Institutional systems should have only the minimum number of USB ports enabled. On Linux systems, USBGuard or equivalent tooling should be configured to whitelist only authorized device identifiers and block all others. Physical USB port blockers (plastic inserts that prevent unauthorized insertion) should be installed on all unused ports.</p>
+<p><strong>Write Protection:</strong>
+When transferring data out of the institution, use USB devices with physical write-protect switches. Enable write protection before connecting the device to any non-institutional system. This prevents the device from being contaminated during external use.</p>
+<h3>4.3 The Sneakernet Protocol</h3>
+<p>The sneakernet is the institution's controlled process for moving data across the air-gap boundary. It is called a sneakernet because data is physically carried ("by sneaker") rather than transmitted electronically.</p>
+<p><strong>Inbound Transfer (External to Institutional):</strong></p>
+<ol>
+<li>The operator identifies data that needs to be imported (software package, reference document, firmware update).</li>
+<li>On an external system (not institutional hardware), the operator downloads the data and records its cryptographic hash (SHA-256 minimum).</li>
+<li>The operator transfers the data to an inbound-only USB device.</li>
+<li>The operator physically carries the USB device to the quarantine station (a designated institutional machine used only for incoming media processing, as defined in D18-001).</li>
+<li>The quarantine station verifies the cryptographic hash against the recorded value.</li>
+<li>The quarantine station performs malware scanning and integrity checks.</li>
+<li>If the data passes quarantine, it is transferred to the institutional network. If it fails, it is logged and rejected.</li>
+<li>The USB device is securely wiped after use.</li>
+</ol>
+<p><strong>Outbound Transfer (Institutional to External):</strong></p>
+<ol>
+<li>The operator identifies data that needs to be exported and documents the justification.</li>
+<li>The data is copied to an outbound-only USB device with write protection available.</li>
+<li>The operator enables write protection on the USB device before removing it from institutional hardware.</li>
+<li>The transfer is logged, including: date, data description, destination, justification, device identifier.</li>
+<li>The USB device is securely wiped after external use, before any future institutional use.</li>
+</ol>
+<p><strong>Transfer Logging:</strong>
+Every sneakernet transfer, inbound or outbound, is recorded in the air-gap transfer log. This log is append-only and includes: date, direction (inbound/outbound), device identifier, data description, cryptographic hash, quarantine result (for inbound), justification (for outbound), and operator confirmation.</p>
+<h3>4.4 Exception Registry</h3>
+<p>No air-gap policy survives contact with reality without exceptions. The critical requirement is that every exception is documented, justified, time-bounded, and subject to compensating controls.</p>
+<p>The exception registry is a formal document that lists every authorized deviation from the air-gap architecture. Each entry includes:</p>
+<ul>
+<li><strong>Exception ID:</strong> Sequential identifier.</li>
+<li><strong>Description:</strong> What the exception permits.</li>
+<li><strong>Justification:</strong> Why the exception is necessary.</li>
+<li><strong>Duration:</strong> When the exception expires (all exceptions must be time-bounded).</li>
+<li><strong>Compensating Controls:</strong> What additional security measures are in place to mitigate the risk.</li>
+<li><strong>Review Date:</strong> When the exception will be reviewed for continued necessity.</li>
+<li><strong>Approval:</strong> Tier 2 decision per GOV-001 (architectural decision with 30-day waiting period).</li>
+</ul>
+<p>As of the institution's founding, the exception registry should be empty. If it is not empty, every entry deserves scrutiny.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-SEC04-01:</strong> No wireless network interface may exist in an enabled state on any institutional hardware. Physical removal is required where possible; physical disconnection of antenna leads where removal is impossible.</li>
+<li><strong>R-SEC04-02:</strong> All USB devices used with institutional hardware must be registered in the authorized device registry. Unregistered devices must be rejected by both procedural and technical controls (USBGuard or equivalent).</li>
+<li><strong>R-SEC04-03:</strong> Every data transfer across the air-gap boundary must be logged in the air-gap transfer log with full metadata as specified in Section 4.3.</li>
+<li><strong>R-SEC04-04:</strong> Exceptions to the air-gap architecture require Tier 2 governance approval (30-day waiting period) and must be recorded in the exception registry.</li>
+<li><strong>R-SEC04-05:</strong> The air-gap verification procedure (Section 6 recovery, and ongoing verification) must be executed at least quarterly and after any hardware change.</li>
+<li><strong>R-SEC04-06:</strong> No personal wireless device may be present within the physical perimeter during sensitive operations.</li>
+<li><strong>R-SEC04-07:</strong> Power to institutional hardware must pass through an isolating UPS or be sourced from an independent off-grid supply.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Creeping connectivity.</strong> A device with an overlooked wireless capability is introduced. A USB device with hidden wireless hardware (e.g., a USB device with an embedded cellular modem) is connected. A new piece of hardware includes a network interface the operator did not know about. Mitigation: hardware audit at acquisition (SEC-007), quarterly air-gap verification, USBGuard whitelist enforcement.</li>
+<li><strong>Procedural decay.</strong> The sneakernet protocol is followed loosely. Transfers are not logged. Quarantine is skipped "because the source is trusted." The protocol simplifies itself through laziness until it provides no security at all. Mitigation: the air-gap transfer log provides an auditable record. The security audit (SEC-008) checks for procedural adherence.</li>
+<li><strong>Emanations leakage.</strong> A change in hardware placement, cable routing, or room configuration creates an emanations path that did not previously exist. Mitigation: reassess emanations posture after any physical change to the environment. The physical security review (SEC-006) includes emanations considerations.</li>
+<li><strong>USB contamination.</strong> A USB device used for bidirectional transfer carries malware from the external environment into the institution, bypassing quarantine due to a zero-day exploit or a scanning tool that is not up to date. Mitigation: minimize bidirectional device use, maintain quarantine scanning tools, use defense in depth (even if malware enters, least-privilege access controls limit its impact).</li>
+<li><strong>False confidence.</strong> The operator believes the air gap is intact because it was configured correctly at installation, without recognizing that the gap requires ongoing verification. A firmware update re-enables a wireless interface. A hardware replacement introduces a new network capability. Mitigation: quarterly verification, post-change verification, the mindset that the air gap must be continuously proven, not assumed.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If the air gap has been breached:</strong> Immediately disconnect the breaching pathway (remove the network cable, power down the wireless device, isolate the compromised system). Assess the duration and scope of the breach. If the breach was momentary and no data transfer occurred, log the incident, restore the gap, and reinforce the control that failed. If data transfer may have occurred, treat the event as a full security incident per D10-003: isolate affected systems, perform forensic analysis, assess what data was exposed, and rebuild from known-good backups if contamination is suspected.</li>
+<li><strong>If an unauthorized USB device was connected:</strong> Remove the device immediately. Assess what the device may have introduced or extracted. If the device was connected for more than a few seconds, assume it may have delivered a payload. Scan the system. If contamination is suspected, rebuild from backup. Log the incident. Review USBGuard configuration to determine why the device was not blocked.</li>
+<li><strong>If emanations leakage is suspected:</strong> Assess the environment for changes that may have created the leakage path. Reposition hardware, reroute cables, or install shielding as appropriate. If sensitive data may have been captured through emanations, assess the impact based on the sensitivity of the data and the sophistication of the likely adversary. For most personal institutions, emanations capture requires a sophisticated and specifically targeted attacker; adjust the response to the realistic threat level.</li>
+<li><strong>If the air-gap transfer log has been neglected:</strong> Reconstruct what transfers can be reconstructed from memory and from examining the USB device registry and quarantine logs. Mark reconstructed entries as "RECONSTRUCTED." Resume disciplined logging immediately. Schedule a full security audit (SEC-008) within 30 days.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The air gap is being established for the first time. The sneakernet protocol will feel cumbersome. Resist the temptation to simplify it prematurely. Establish the logging discipline. Build the authorized device registry. Run quarterly verifications. The habits formed now define the air gap's long-term integrity.</li>
+<li><strong>Years 5-15:</strong> The air gap should be routine. The primary risk shifts from implementation errors to procedural decay. Focus on audit adherence and on updating emanations posture as hardware is replaced.</li>
+<li><strong>Years 15-30:</strong> Hardware generations will change substantially. New connectivity technologies (successors to WiFi, Bluetooth, and cellular that we cannot predict) will need to be evaluated and excluded. The principle remains the same: if it can communicate, it must be removed or disabled physically.</li>
+<li><strong>Years 30-50+:</strong> The air gap as a concept may be challenged by new paradigms. Technologies that embed networking so deeply into hardware that removal is impractical may emerge. The institution must evaluate whether the air gap can be maintained with available hardware, or whether compensating controls (such as Faraday enclosures) must become primary rather than supplementary.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The air gap is the most conspicuous security decision this institution makes, and also the most frequently misunderstood. People hear "air-gapped" and think it means "not connected to the internet." It means far more than that. It means no electronic communication path of any kind -- not through the air, not through the wires, not through the power lines, not through the USB port without explicit, logged, quarantined consent. It is a total communication boundary, not merely an internet disconnection. The day we start treating the air gap casually is the day it stops protecting us. I have written this article to make "casual" impossible, by specifying every dimension of the gap in enough detail that half-measures are recognizable as such.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 1: Sovereignty; Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (air-gap mandate, Section 3.3)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (air-gap decision, Section 3.2; trust model, Section 4.3)</li>
+<li>SEC-002 -- Access Control Procedures (physical access as first layer)</li>
+<li>SEC-003 -- Key Management (cryptographic controls for data crossing the boundary)</li>
+<li>SEC-006 -- Physical Security Design (physical perimeter that enforces the air gap)</li>
+<li>SEC-007 -- Supply Chain Security (hardware verification before entry into air-gapped environment)</li>
+<li>D18-001 -- Import &amp; Quarantine Procedures (quarantine process for inbound media)</li>
+<li>NIST SP 800-123 -- Guide to General Server Security (baseline hardening reference)</li>
+<li>Stage 1 Documentation Framework, Domain 3: Security &amp; Integrity</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

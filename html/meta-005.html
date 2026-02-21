@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>META-005 — The Commentary System: Design and Philosophy - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li class="active"><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="meta-005">
+  <h1>META-005 &mdash; The Commentary System: Design and Philosophy</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>META-005</dd>
+  <dt>Domain</dt>
+  <dd>META -- Meta-Documentation & Standards</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>META-00-ART-001 (Stage 1 Meta-Framework), ETH-001, CON-001, GOV-001, META-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All articles that use commentary sections (all articles are potential users)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article explains why the commentary system exists, how it works, and why it matters. Commentary is one of the most distinctive features of this institution's documentation architecture. Most documentation systems have one channel: the text of the document itself. This institution has two: the document body and the commentary. Understanding why both channels exist, what belongs in each, and how they interact is essential for anyone who writes or reads institutional documentation.</p>
+<p>The commentary system serves three purposes that no other part of the documentation architecture serves. First, it preserves the human voice alongside the institutional voice. The document body speaks for the institution; commentary speaks for the person. Second, it creates a temporal record of changing understanding. The document body represents the current best knowledge; commentary represents the journey of understanding over time. Third, it provides a mechanism for institutional self-reflection that does not compromise the clarity and authority of the documents themselves. Commentary is the institution's conscience -- the place where doubts, lessons, corrections of perspective, and honest reflections live.</p>
+<p>This article is addressed to every current and future contributor to the institution's documentation. It tells you what commentary is for, when to use it, how to write it, and why you should care about a system that might seem like an afterthought but is, in fact, one of the institution's most important long-term assets.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong></p>
+<ul>
+<li>The philosophy behind the commentary system: why it exists and what values it serves.</li>
+<li>The design of the commentary system: how commentary is structured, stored, and displayed.</li>
+<li>The distinction between commentary and revision: when to add a comment versus when to revise the document body.</li>
+<li>Commentary as a tool for institutional memory and generational knowledge transfer.</li>
+<li>Commentary voice and style: how commentary differs from the document body in voice and register.</li>
+<li>The long-term value of commentary: how commentary accumulates meaning over decades.</li>
+<li>Commentary ethics: honesty, permanence, and the prohibition on retroactive editing.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+<li>The technical formatting of commentary entries (covered in META-00-ART-001, Section 6).</li>
+<li>The documentation lifecycle in general (covered in META-003).</li>
+<li>Cross-domain consistency in commentary (commentary is exempt from most consistency requirements because it is reflective, not prescriptive).</li>
+<li>The annual documentation census procedures for evaluating commentary (covered in META-001).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>The commentary system was designed to solve a problem that traditional documentation ignores: the problem of institutional memory.</p>
+<p>Traditional documentation captures what is true now. When the truth changes, the documentation is revised to reflect the new truth. The old truth disappears. The chain of reasoning that led from the old truth to the new truth is lost. The failed experiments that informed the current approach are forgotten. The doubts that were overcome, the mistakes that were made, the context that made certain decisions feel urgent -- all of it vanishes with each revision.</p>
+<p>This loss is acceptable for a document that will be read and discarded. It is catastrophic for a document that is part of a fifty-year institution. Consider: in 2040, a successor will encounter a system configuration that seems suboptimal. Without commentary, they have two options: change it (risking the destruction of a configuration that was chosen for reasons they cannot see) or leave it (perpetuating a genuinely suboptimal configuration out of fear of breaking something). With commentary, they have a third option: read the commentary, understand why the configuration was chosen, evaluate whether those reasons still apply, and make an informed decision.</p>
+<p>Commentary is the institution's memory of itself. Not memory of what is true (that is what the document body provides) but memory of how the institution came to know what it knows. Memory of the journey, not just the destination.</p>
+<p>This concept draws from several traditions. Academic journals publish original articles and subsequent commentary, allowing the field's understanding to evolve publicly. Legal systems publish judicial opinions and subsequent annotations, building a body of interpretive knowledge around the letter of the law. Religious traditions maintain primary texts with centuries of commentary that provide context, interpretation, and application across different eras and cultures. In each case, the commentary does not replace the primary text. It enriches it. It creates a conversation across time.</p>
+<p>The holm.chat commentary system adapts this tradition for a self-sovereign documentation institution. The "conversation" is between the institution's past, present, and future operators. The commentary record is the mechanism by which they communicate across years and decades, sharing not just information but wisdom -- the hard-won, context-dependent, often personal understanding that cannot be captured in a procedure or a specification.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Two-Channel Architecture</h3>
+<p>Every article in the institution has two channels of content:</p>
+<p><strong>Channel 1: The Document Body.</strong> This is the authoritative text. It contains the Purpose, Scope, Background, System Model, Rules &amp; Constraints, Failure Modes, Recovery Procedures, Evolution Path, and References. The document body represents the institution's current, official position on the topic. It is written in the institutional voice (per META-002). It is revised when the truth changes. It goes through the full review and publication cycle.</p>
+<p><strong>Channel 2: The Commentary.</strong> This is the reflective record. It contains dated entries by operators past and present. Commentary represents individual perspectives, reflections, experiences, and observations. It is written in the Reflective register (per META-002, Section 4.1). It is never revised -- only appended to. It does not go through the review cycle. It is added by any operator at any time.</p>
+<p>The two channels serve different functions and operate under different rules:</p>
+<p>The document body is a map. Commentary is a journal of the journey that produced the map.</p>
+<p>The document body is prescriptive. Commentary is reflective.</p>
+<p>The document body is revised to remain current. Commentary is preserved to remain historical.</p>
+<p>The document body speaks with institutional authority. Commentary speaks with personal honesty.</p>
+<p>A reader who reads only the document body will know what to do. A reader who also reads the commentary will understand why.</p>
+<h3>4.2 When to Comment vs. When to Revise</h3>
+<p>The distinction between commentary and revision is the most important operational concept in the commentary system. Getting it wrong undermines both channels: commentary that should have been a revision leaves the document body inaccurate, while revision that should have been commentary erases institutional memory.</p>
+<p>META-00-ART-001, Section 6.1 provides the foundational rule: "Commentary is additive and reflective. Revision is corrective and structural. If a reader would be misled by reading the article without the commentary, the article needs a revision, not a comment."</p>
+<p>This article elaborates with a decision framework:</p>
+<p><strong>Use commentary when:</strong></p>
+<ul>
+<li>
+<p>You have a new observation, but the document body is still correct. ("I ran the backup procedure described in Section 7.1 today and found that it takes 20 minutes longer than estimated. The procedure itself is correct, but the time estimate should be updated in the next revision.")</p>
+</li>
+<li>
+<p>You want to preserve the reasoning behind a decision. ("We chose ZFS over Btrfs for reasons documented in the Background section. I want to add that a secondary factor was the availability of experienced ZFS administrators in the broader community, which matters for the knowledge acquisition path defined in the LRNG domain.")</p>
+</li>
+<li>
+<p>You want to flag something for future attention without triggering an immediate revision. ("The vendor of our charge controllers has been acquired. The product line will likely be discontinued within 5 years. This does not affect the current documentation, but successor equipment should be evaluated starting in 2028.")</p>
+</li>
+<li>
+<p>You want to record a lesson learned from operating the system the document describes. ("During the storm on 2027-03-15, the backup power system performed exactly as documented. The one surprise was that the transition time was 3.2 seconds rather than the documented 2 seconds. This is within acceptable tolerances but worth monitoring.")</p>
+</li>
+<li>
+<p>You want to express doubt, uncertainty, or a changed perspective. ("When I wrote this article, I was confident that RAID 6 was the right choice for our primary storage array. After two years of operation, I am less certain. The rebuild times after a disk failure are longer than I expected. I have not changed the recommendation yet, but a future operator should evaluate RAID Z3 or distributed storage approaches.")</p>
+</li>
+</ul>
+<p><strong>Use revision when:</strong></p>
+<ul>
+<li>
+<p>The document body is factually wrong. A specification has changed. A procedure has been updated. A system has been replaced.</p>
+</li>
+<li>
+<p>The document body is dangerously incomplete. A critical failure mode is not documented. A safety warning is missing. A recovery procedure is inadequate.</p>
+</li>
+<li>
+<p>A reader following the document body as written would take incorrect action. The document is not merely imprecise -- it is misleading.</p>
+</li>
+<li>
+<p>The document's scope needs to change. It covers too much, too little, or the wrong things.</p>
+</li>
+</ul>
+<h3>4.3 Commentary as Generational Bridge</h3>
+<p>The most important function of commentary may be the one that is hardest to appreciate in the present: its role as a bridge between generations of operators.</p>
+<p>When the founding operator writes a document, the reasoning behind the document is obvious to them. They lived through the decisions. They remember the alternatives that were considered and rejected. They know the context in which the choices were made. None of this needs to be in the document body because the operator carrying it in their head.</p>
+<p>But the operator who reads that document in 2045 does not have access to any of that context. They see only the decisions, not the reasoning. They see only the conclusions, not the deliberation. Without commentary, they must either trust the decisions blindly (fragile) or re-derive the reasoning from scratch (wasteful and error-prone).</p>
+<p>Commentary closes this gap. When the founding operator writes a commentary entry explaining why a particular approach was chosen, what alternatives were considered, what doubts existed, and what experiences confirmed or challenged the decision, they are creating a bridge across time. The 2045 reader can walk across that bridge, understanding not just what was decided but why, and can then make informed judgments about whether the original reasoning still applies.</p>
+<p>This bridging function compounds over time. The founding operator's commentary bridges 2026 to 2035. A successor's commentary bridges 2035 to 2045. A third operator's commentary bridges 2045 to 2055. The commentary section of a long-lived document becomes a timeline of institutional understanding, each entry a waypoint in the institution's evolving relationship with its own knowledge.</p>
+<h3>4.4 Commentary Ethics</h3>
+<p>Commentary operates under a specific ethical framework derived from ETH-001:</p>
+<p><strong>Honesty is mandatory.</strong> Commentary is the place for honest reflection, including doubt, error, and changed minds. A commentary entry that conceals a mistake or overstates confidence is worse than no entry at all. If you were wrong, say you were wrong. If you are unsure, say you are unsure. The value of commentary lies entirely in its trustworthiness.</p>
+<p><strong>Permanence is a feature.</strong> Commentary is append-only. Entries are never edited after the day they are written. Entries are never deleted. If a commentary entry is factually incorrect, a subsequent entry corrects it by reference. This permanence is not a limitation -- it is the mechanism by which commentary preserves the institution's history. An edited commentary is a rewritten history, and rewritten history is no history at all.</p>
+<p><strong>Attribution is required.</strong> Every commentary entry must identify its author and its date. In a single-operator institution, the author may seem obvious. It is documented anyway, for three reasons: succession may bring new authors, the date is as important as the author, and the habit of attribution supports the habit of accountability.</p>
+<p><strong>Proportionality is expected.</strong> Commentary should be proportional to the insight it contains. A one-sentence observation deserves one sentence of commentary. A fundamental shift in understanding deserves several paragraphs. Commentary that is routinely long and discursive trains readers to skim it, which defeats its purpose. Commentary that is routinely terse fails to capture the context that makes it valuable.</p>
+<h3>4.5 Commentary-Driven Revision Triggers</h3>
+<p>Commentary sometimes reaches a point where it signals that the document body needs revision. META-00-ART-001, Section 6.5 defines four triggers. This article elaborates on the underlying principle:</p>
+<p>When the commentary is doing the document body's job, the document body needs revision.</p>
+<p>If a reader must read the commentary to correctly understand the document, the document is deficient. The document body must be self-sufficient. Commentary enriches understanding; it must not be required for understanding. When commentary has accumulated to the point where it is functionally a supplement to the document body -- when the "real" truth lives in the commentary rather than in the document -- a revision is overdue.</p>
+<p>The practical test: read the document body without the commentary. If you would act differently after reading the commentary, the document body needs to be revised to incorporate whatever the commentary revealed.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ol>
+<li>
+<p><strong>R-META-005-01:</strong> Commentary is append-only. No commentary entry may be edited after the day it is written. No commentary entry may be deleted. Corrections to previous commentary are made through new commentary entries that reference the earlier entry by date.</p>
+</li>
+<li>
+<p><strong>R-META-005-02:</strong> Every commentary entry must include the date and the author's identifier. The date format is YYYY-MM-DD per META-00-ART-001.</p>
+</li>
+<li>
+<p><strong>R-META-005-03:</strong> Commentary entries are chronological. New entries are always appended after existing entries, never inserted between them.</p>
+</li>
+<li>
+<p><strong>R-META-005-04:</strong> Adding commentary does not change the article's version number. Commentary is metadata, not content. It does update the <code>last_modified</code> date in the front-matter.</p>
+</li>
+<li>
+<p><strong>R-META-005-05:</strong> Commentary must not contain operational instructions, rules, or specifications that are not present in the document body. If the commentary introduces new procedural guidance, that guidance must be incorporated into the document body through a formal revision.</p>
+</li>
+<li>
+<p><strong>R-META-005-06:</strong> Commentary is exempt from the formal review workflow. An operator may add commentary at any time without triggering a review cycle. This exemption exists because commentary must be low-friction to be used. If adding a commentary entry required a full review, commentary would not be written.</p>
+</li>
+<li>
+<p><strong>R-META-005-07:</strong> When three or more commentary entries on the same article address the same issue, a revision of the document body is triggered. The operator must evaluate whether the document body should be updated to reflect the accumulated commentary. This evaluation must be recorded, even if the decision is to defer revision.</p>
+</li>
+<li>
+<p><strong>R-META-005-08:</strong> When an article is revised, all existing commentary is preserved in the new version. Commentary that is no longer relevant (because the revision addressed the issue the commentary raised) is not removed. It remains as historical context.</p>
+</li>
+<li>
+<p><strong>R-META-005-09:</strong> Commentary must be written in the Reflective register as defined in META-002. The first person singular is permitted and encouraged. The voice should be personal, honest, and human.</p>
+</li>
+<li>
+<p><strong>R-META-005-10:</strong> Commentary from the founding operator and commentary from successors carry equal authority. No commentary entry is more "official" than another by virtue of its author. The value of commentary is in its content and its honesty, not in the status of its author.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Commentary drought.</strong> The operator stops writing commentary. Documents accumulate without reflective context. The institution's memory of its own reasoning begins to fade. Mitigation: the annual operations cycle includes a prompt to review each root document and add commentary if warranted. Commentary should be a habit, not a chore.</p>
+</li>
+<li>
+<p><strong>Commentary flood.</strong> The operator writes excessive commentary, turning every observation into a long entry. Readers learn to skip the commentary section because it is disproportionately long relative to its insight content. Mitigation: the proportionality ethic in Section 4.4. Not every thought warrants a commentary entry. Commentary should be meaningful, not voluminous.</p>
+</li>
+<li>
+<p><strong>Commentary as avoidance.</strong> The operator uses commentary to note problems with the document body instead of revising the document body. "This procedure is probably wrong" lives in the commentary for years while the procedure remains unchanged. Mitigation: R-META-005-07 creates a trigger for revision when commentary repeatedly addresses the same issue. The practical test in Section 4.5 catches cases where commentary is doing the document body's job.</p>
+</li>
+<li>
+<p><strong>Commentary without context.</strong> Entries are too terse to be useful. "Tested. Works." provides no future value. What was tested? Under what conditions? What observations were made? Mitigation: the proportionality ethic works in both directions. While commentary should not be excessively long, it should be long enough to convey context. The standard is: would a reader in 2045 be able to understand and benefit from this entry?</p>
+</li>
+<li>
+<p><strong>Retroactive editing.</strong> An operator edits or deletes an old commentary entry, destroying the historical record. This may be motivated by embarrassment (an old entry was wrong) or by a desire for tidiness (old entries seem irrelevant). Mitigation: R-META-005-01 is absolute. Commentary is append-only. The permanence is the value. An entry that was wrong is valuable precisely because it shows how understanding evolved.</p>
+</li>
+<li>
+<p><strong>Founder worship or dismissal.</strong> A successor treats the founding operator's commentary as sacred (never questioning it) or as irrelevant (ignoring it because "things have changed"). Mitigation: R-META-005-10 establishes that all commentary carries equal authority. The founding operator's commentary is valuable for its historical context, but it is not more authoritative than a successor's direct experience with the systems as they exist now.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If commentary has not been written for an extended period:</strong> Do not try to retroactively write commentary for the intervening period. That would be speculation, not reflection. Instead, write a single commentary entry acknowledging the gap: "No commentary was added between [date] and [date]. The reasons were [honest explanation]. Key events during this period that warrant retrospective documentation include [list]." Then resume regular commentary going forward.</p>
+</li>
+<li>
+<p><strong>If commentary has been retroactively edited or deleted:</strong> This is a violation of R-META-005-01. If the original text can be recovered from backups, restore it. If it cannot, add a commentary entry documenting the violation: "A previous commentary entry dated [date] was edited/deleted on [date]. The original content is [reconstructed as best as possible / not recoverable]. This violation of the append-only rule is acknowledged and the circumstances documented here."</p>
+</li>
+<li>
+<p><strong>If commentary has been used as a substitute for revision:</strong> Identify the documents where commentary is doing the document body's job (per the practical test in Section 4.5). Create revision tasks for each. When the revision is complete, add a commentary entry noting: "Revision [version] incorporates insights from commentary dated [dates]."</p>
+</li>
+<li>
+<p><strong>If commentary quality has degraded:</strong> Re-read this article, particularly the ethics section (4.4) and the generational bridge section (4.3). Then re-read the commentary entries in the five founding articles (ETH-001 through OPS-001) as examples of the intended quality and voice. Use those entries as calibration points for future commentary.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Commentary is sparse because the institution is new. There is little to reflect on. The founding operator is building systems and writing documentation simultaneously; commentary will be brief and focused on "why I chose this" and "what I was uncertain about." This is appropriate. Volume is not the goal. Honesty is the goal.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Commentary begins to accumulate meaningfully. Entries reflect operational experience, lessons learned, and evolving understanding. Some commentary-driven revisions will occur. The commentary sections of long-standing articles begin to show the arc of the institution's learning curve. This is the period where the value of commentary becomes concretely visible.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Commentary becomes the primary bridge between the founding operator and successors. The founding operator's commentary is now historical -- a record of what the institution's creator was thinking and why. A successor's commentary adds a second voice, a second perspective, and often a productive tension with the founding perspective. The commentary section becomes a conversation across time.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The commentary record spans decades. Articles with rich commentary histories become the institution's most valuable knowledge assets -- not because the commentary is always right, but because the commentary documents the institution's evolving understanding of itself. New operators do not just inherit a documentation system. They inherit a record of thought, reflection, and institutional self-awareness that no specification or procedure could ever capture.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+There is something paradoxical about writing the first commentary entry for an article about the commentary system. This is the snake eating its tail. But the paradox is instructive: the commentary system is self-referential by design. It is the institution's capacity for self-reflection made concrete.</p>
+<p>I designed the commentary system because I have read too many technical documents that are technically correct and completely opaque. They tell you what to do but not why. They describe the current state but not how the institution got there. When you encounter a decision you do not understand, you have no recourse. The documentation is silent about its own reasoning. I have made frustrating decisions in past roles because the reasoning behind existing configurations was lost to time. I rebuilt things that were intentionally built the way they were. I "fixed" things that were working as designed but appeared wrong because I lacked context.</p>
+<p>Commentary is my attempt to ensure that no future operator of this institution has that experience. When they encounter a decision they do not understand, there should be a commentary entry that explains the thinking. When they want to change something, there should be a commentary entry that documents why it was done this way, so they can evaluate whether those reasons still apply. And when they inevitably disagree with me -- which they should, because they will know things I do not -- the commentary system gives them a place to document their disagreement and their alternative perspective without destroying mine.</p>
+<p>The append-only rule is the heart of the system. I will be tempted to edit old entries. Every writer is. I will write something that seems brilliant today and embarrassing next year. The temptation to revise it will be real. But the value of commentary lies in its honesty, including the honesty of having been wrong. An institution that can only show its best thinking is an institution that is lying about its past. This institution does not do that. That is what the commentary system is for.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>META-00-ART-001 -- Stage 1 Meta-Framework (Section 6: Commentary Workflow -- the mechanical rules for commentary formatting, threading, and preservation)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 6: Honest Accounting of Limitations -- the ethical basis for commentary honesty; Principle 3: Transparency of Operation -- commentary as a transparency mechanism)</li>
+<li>CON-001 -- The Founding Mandate (purpose amnesia as a failure mode that commentary prevents)</li>
+<li>GOV-001 -- Authority Model (commentary's role in preserving decision context across succession)</li>
+<li>META-002 -- Writing the Institution (the Reflective register as the voice of commentary)</li>
+<li>META-003 -- The Documentation Lifecycle (commentary's role in the revision trigger mechanism)</li>
+<li>META-001 -- Documentation System Self-Assessment (commentary evaluation as part of the annual census)</li>
+</ul>
+<hr />
+<hr />
+<p><em>End of Stage 5 Meta-Documentation -- Batch 1</em></p>
+<p><strong>Document Total:</strong> 5 articles
+<strong>Article IDs:</strong> META-001, META-002, META-003, META-004, META-005
+<strong>Combined Estimated Word Count:</strong> ~14,500 words
+<strong>Status:</strong> All five articles ratified as of 2026-02-16.
+<strong>Next:</strong> Stage 5 continues with additional meta-documentation articles examining other aspects of the institution's self-awareness.</p>
+</section>
+</article>
+</main>
+</body>
+</html>

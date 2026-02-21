@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-014 — Physical Transport Protocols - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li class="active"><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-014">
+  <h1>D17-014 &mdash; Physical Transport Protocols</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-014</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling &amp; Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-003 (Air-Gapped Sync Procedures), D17-007 (Sync Package Specification)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D17-009 (Topology -- transport links), D17-010 (Resource Allocation -- transport costs). Referenced by D18 (Import &amp; Quarantine -- media integrity), Infrastructure Domains (media format standards).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article specifies the protocols for physically transporting sync packages between nodes. In the holm.chat federation, every communication between nodes is a physical event: a person carries a physical object from one location to another. This is not a metaphor. It is the literal mechanism by which the federation synchronizes. The sync package specification (D17-007) defines what the package contains. The sync protocol (D17-003) defines how the package is processed. This article defines how the package gets from one node to another -- the physical media, the labeling, the packaging, the integrity verification at each end, and the chain of custody during transit.</p>
+
+<p>Physical transport is the federation's network layer. It is slow, it is manual, it is vulnerable to physical hazards, and it is the only communication channel available. The reliability of the federation depends entirely on the reliability of this physical transport. A dropped USB drive, a mislabeled package, a courier who forgets to make a delivery -- these are the "network failures" of an air-gapped federation. They must be anticipated, prevented where possible, and handled gracefully where prevention fails.</p>
+
+<p>This article is addressed to every person who handles physical sync media: node operators who prepare and receive packages, couriers who transport them, and whoever maintains the transport schedule. It is written to be understandable by a non-technical courier who may not understand what is on the media but must understand how to handle it safely.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Approved physical media types and their characteristics.</li>
+<li>Media preparation: formatting, writing, and verifying sync packages on physical media.</li>
+<li>Labeling standards: what information must be marked on or attached to the physical media.</li>
+<li>Packaging requirements: how media is protected during transport.</li>
+<li>Chain of custody: tracking who handles the media from sending node to receiving node.</li>
+<li>Integrity verification: how the receiving node confirms the media was not corrupted or tampered with during transit.</li>
+<li>Media lifecycle: how transport media is maintained, tested, and retired.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The content or format of sync packages (see D17-007).</li>
+<li>The logical sync protocol (see D17-003).</li>
+<li>The federation topology that determines which nodes exchange with which (see D17-009).</li>
+<li>The quarantine processing of received media (see Domain 18).</li>
+<li>Cryptographic aspects of integrity verification (see Security Domains).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Sneakernet as Primary Network</h3>
+<p>The term "sneakernet" -- transferring data by physically carrying storage media between computers -- is usually used as a humorous description of a primitive or emergency method. In this institution, sneakernet is not primitive, not humorous, and not an emergency measure. It is the designed, primary, and only communication channel between federated nodes. The air gap demands it. The security model requires it. The institution's architecture embraces it.</p>
+
+<p>Taking sneakernet seriously as a protocol means applying the same rigor to physical transport that networked systems apply to packet routing. The media is the packet. The courier is the router. The labeling is the header. The integrity check is the checksum. The chain of custody is the routing table. Every concept from network engineering has a physical analog, and every analog must be specified with comparable precision.</p>
+
+<h3>3.2 The Vulnerability of Physical Media</h3>
+<p>Physical media is vulnerable in ways that network packets are not. A USB drive can be dropped, crushed, exposed to extreme temperatures, submerged in water, or lost entirely. An external hard drive can suffer head crashes from vibration during transport. An SD card can be damaged by static electricity. A printed document can become illegible from moisture or fading. These are not theoretical risks -- they are the everyday hazards of physical transport.</p>
+
+<p>The transport protocol must assume that some media will be damaged in transit and must provide mechanisms for detection and recovery. The cost of undetected corruption -- bad data entering the institution and being treated as valid -- is far higher than the cost of occasional transport failure.</p>
+
+<h3>3.3 The Human Element</h3>
+<p>Physical transport involves human beings who may be unreliable, forgetful, or unavailable. A courier who makes monthly trips between two nodes is a critical link in the federation. If that courier is ill, moves away, or loses interest, the transport link fails. The protocol must be robust against individual human unreliability while being simple enough that any willing person can serve as a courier with minimal training.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Approved Media Types</h3>
+<p>The federation approves the following physical media types for sync package transport. Other media types may be added through the governance process (D17-008, Category C).</p>
+
+<table>
+<tr><th>Media Type</th><th>Typical Capacity</th><th>Durability</th><th>Cost</th><th>Recommended Use</th></tr>
+<tr><td>USB flash drive</td><td>16 GB - 1 TB</td><td>Moderate (no moving parts, but connectors wear)</td><td>Low</td><td>Routine syncs up to 500 GB</td></tr>
+<tr><td>SD / microSD card</td><td>16 GB - 1 TB</td><td>High (very small, no moving parts, resilient)</td><td>Low</td><td>Compact transport, harsh environments</td></tr>
+<tr><td>External SSD</td><td>250 GB - 4 TB</td><td>High (no moving parts, shock resistant)</td><td>Medium</td><td>Large syncs, high reliability needed</td></tr>
+<tr><td>External HDD</td><td>1 TB - 20 TB</td><td>Low (moving parts, vibration sensitive)</td><td>Low per GB</td><td>Very large syncs where SSD is cost-prohibitive</td></tr>
+<tr><td>Optical disc (BD-R, M-DISC)</td><td>25 - 128 GB</td><td>Very high (M-DISC rated for centuries)</td><td>Medium</td><td>Archival transport, long-distance courier</td></tr>
+</table>
+
+<p>External HDDs are the least preferred option due to their vulnerability to physical shock. When HDDs must be used, they MUST be transported in padded, shock-absorbing enclosures and the package MUST be labeled "FRAGILE - VIBRATION SENSITIVE."</p>
+
+<h3>4.2 Media Preparation</h3>
+<p>The sending node prepares the transport media through the following procedure:</p>
+
+<ol>
+<li><strong>Select media.</strong> Choose an approved media type with sufficient capacity. Verify the media is in good condition (no physical damage, no prior write errors, not past its expected lifespan per D17-011).</li>
+<li><strong>Format media.</strong> Format the media with a widely-supported filesystem. Recommended: exFAT for cross-platform compatibility. FAT32 is acceptable for media under 32 GB. Filesystem choice MUST be recorded in the media label.</li>
+<li><strong>Write sync package.</strong> Copy the sync package to the media according to the directory structure specified in D17-007. The package MUST include the integrity manifest (checksums for every file).</li>
+<li><strong>Verify write.</strong> After writing, read back the entire sync package and verify all checksums against the manifest. If any checksum fails, the write is corrupted and must be repeated on new or re-formatted media. Do not ship media with known write errors.</li>
+<li><strong>Generate transport manifest.</strong> Create a plain-text file at the root of the media named <code>TRANSPORT.txt</code> containing: the sending node ID, the intended receiving node ID, the date of preparation, the sync package ID, the total file count and size, and the integrity manifest checksum (a checksum of the checksum file itself). This file is the first thing the receiving node reads and serves as the handshake between physical and logical protocols.</li>
+<li><strong>Write-protect if possible.</strong> If the media supports hardware write-protection (SD card switch, optical disc), engage it after writing. This prevents accidental modification during transit.</li>
+</ol>
+
+<h3>4.3 Labeling Standards</h3>
+<p>Every piece of transport media MUST bear a physical label (adhesive label, permanent marker, or engraved tag) with the following information:</p>
+
+<pre>
+PHYSICAL LABEL
+==============
+FROM:     [Sending node name/ID]
+TO:       [Receiving node name/ID]
+DATE:     [Preparation date, YYYY-MM-DD]
+PKG-ID:   [Sync package ID, abbreviated]
+MEDIA:    [Media type and filesystem]
+SIZE:     [Total data size]
+HANDLE:   [Special handling instructions if any]
+</pre>
+
+<p>Labels MUST be legible, durable, and securely attached. For small media (SD cards, USB drives), the label may be on a tag or pouch rather than on the media itself. The label MUST survive the expected transport conditions (rain, dust, temperature variation). Pencil on paper is preferred over ink for labels that may get wet.</p>
+
+<h3>4.4 Packaging Requirements</h3>
+<p>Transport media MUST be packaged to survive the expected transport conditions:</p>
+
+<ul>
+<li><strong>Minimum packaging:</strong> A sealed, waterproof bag (zipper-lock plastic bag is acceptable) containing the media and a printed copy of the transport manifest. The bag should be opaque or placed inside an opaque container to prevent visual identification of contents by casual observers.</li>
+<li><strong>Standard packaging:</strong> The minimum packaging, plus a rigid outer container (small box, padded mailer, or rigid envelope) that protects against crushing and impact.</li>
+<li><strong>Enhanced packaging (for HDDs or long-distance transport):</strong> Standard packaging, plus shock-absorbing padding (foam, bubble wrap), a "FRAGILE" label, and an outer container that protects against extreme temperatures (insulated bag for very hot or cold conditions).</li>
+</ul>
+
+<p>The packaging level is determined by the media type and the expected transport conditions. USB drives and SD cards transported by a courier walking between buildings need only minimum packaging. External HDDs shipped by postal service need enhanced packaging.</p>
+
+<h3>4.5 Chain of Custody</h3>
+<p>Every sync package transport event MUST be recorded in a chain-of-custody log. The log records every person who handles the media from preparation to delivery:</p>
+
+<pre>
+CHAIN OF CUSTODY LOG
+====================
+Package ID:    [Sync package ID]
+Media ID:      [Physical media serial number or assigned ID]
+
+Timestamp           | Handler        | Action           | Location        | Condition
+--------------------|----------------|------------------|-----------------|----------
+[YYYY-MM-DD HH:MM] | [Name/Role]    | Prepared         | [Node location] | Good
+[YYYY-MM-DD HH:MM] | [Name/Role]    | Dispatched       | [Node location] | Good
+[YYYY-MM-DD HH:MM] | [Name/Role]    | In transit       | [Waypoint]      | Good
+[YYYY-MM-DD HH:MM] | [Name/Role]    | Received         | [Node location] | [Assessment]
+</pre>
+
+<p>For simple courier trips (one person carries media from Node A to Node B), the log may have only two entries: dispatched and received. For complex multi-hop transport, every handler and waypoint is recorded. The chain-of-custody log is maintained on paper (traveling with the package) and digitally (entered into both nodes' institutional memory upon completion).</p>
+
+<h3>4.6 Receiving Procedure</h3>
+<p>The receiving node processes incoming transport media through the following steps:</p>
+
+<ol>
+<li><strong>Inspect physical condition.</strong> Check the packaging for damage. Check the media for visible damage. Note the condition in the chain-of-custody log.</li>
+<li><strong>Read transport manifest.</strong> Read <code>TRANSPORT.txt</code> from the media. Verify the intended recipient matches this node. Verify the sending node ID is a known federation partner.</li>
+<li><strong>Verify integrity.</strong> Compute checksums for all files on the media and compare against the integrity manifest. If any checksum fails, the media is flagged as potentially corrupted. Do not process corrupted media -- request retransmission from the sending node.</li>
+<li><strong>Transfer to quarantine.</strong> Copy the verified sync package from the transport media to the node's quarantine staging area (per Domain 18). Do not process the sync package directly from the transport media.</li>
+<li><strong>Confirm receipt.</strong> Prepare a receipt confirmation document that includes: the package ID, the receipt timestamp, the integrity verification result, and any noted condition issues. This confirmation is included in the next outgoing sync package to the sending node.</li>
+<li><strong>Return or recycle media.</strong> If the media is reusable and in good condition, it may be securely erased and returned to the sending node on the next transport opportunity. If the media is damaged or past its lifespan, it is securely destroyed per Security domain procedures.</li>
+</ol>
+
+<h3>4.7 Media Lifecycle Management</h3>
+<p>Transport media has a finite lifespan. Each piece of media is assigned an identifier (serial number or assigned tag) and tracked in the media registry:</p>
+
+<ul>
+<li><strong>Commissioning:</strong> New media is tested (full write and read-back) before first use. The media ID, type, capacity, and commissioning date are recorded.</li>
+<li><strong>Usage tracking:</strong> Each transport use is recorded: date, route, condition on arrival.</li>
+<li><strong>Health checks:</strong> Flash media and SSDs are checked for error rates at each use. HDDs are checked with SMART diagnostics. Optical discs are checked for read errors.</li>
+<li><strong>Retirement:</strong> Media is retired when it reaches its expected lifespan (per D17-011 replacement schedule), shows increasing error rates, or sustains physical damage. Retired media is securely erased and physically destroyed.</li>
+</ul>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D17-014-01: Integrity Verification Is Mandatory.</strong> The receiving node MUST verify the integrity of every incoming sync package by comparing checksums before processing. No exceptions. Unverified media MUST NOT be connected to or processed by institutional systems.</p></li>
+
+<li><p><strong>R-D17-014-02: Labels Are Mandatory.</strong> Every piece of transport media MUST bear a physical label meeting the standards in Section 4.3. Unlabeled media arriving at a node MUST be treated as unidentified and processed through the full quarantine pipeline with enhanced scrutiny.</p></li>
+
+<li><p><strong>R-D17-014-03: Chain of Custody Is Mandatory.</strong> Every transport event MUST have a chain-of-custody log. For routine courier trips, a simplified log (dispatched/received) is acceptable. For multi-hop or postal transport, every handler must be recorded. Gaps in the chain of custody are treated as potential tampering opportunities and trigger enhanced verification.</p></li>
+
+<li><p><strong>R-D17-014-04: Courier Training Is Required.</strong> Any person who transports sync media MUST understand: what they are carrying (a data package for the institution, without needing to know the contents), how to handle it (keep dry, avoid drops, maintain temperature range), what to do if something goes wrong (return to sender if delivery is impossible, report damage immediately), and what not to do (do not open sealed packaging, do not connect media to personal devices, do not leave media unattended in public).</p></li>
+
+<li><p><strong>R-D17-014-05: Media Must Be Securely Erased Before Return or Reuse.</strong> Transport media that has delivered its sync package MUST be securely erased (full overwrite, not just file deletion) before being returned to the sending node or reused for another purpose. This prevents residual data from being accessible to unauthorized parties.</p></li>
+
+<li><p><strong>R-D17-014-06: No Unprotected Media in Transit.</strong> Transport media MUST NOT be carried loose (e.g., a bare USB drive in a pocket). Minimum packaging (sealed waterproof bag) is required for all transport, even for short distances. The cost of packaging is negligible compared to the cost of data loss from a dropped or wet drive.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Media corruption in transit.</strong> The transport media is physically damaged during transit (dropped, exposed to water, magnetic interference, extreme temperatures). The data on the media is corrupted. If detected by integrity verification, the sync fails cleanly. If undetected (verification skipped or checksum error in the manifest itself), corrupted data enters the institution. Likelihood: low per trip, but significant over hundreds of trips across decades. Severity: low if detected, potentially critical if undetected. Detection: mandatory integrity verification at receipt.</p></li>
+
+<li><p><strong>Media loss.</strong> The transport media is lost in transit -- left behind, misrouted by postal service, or stolen. The sync package does not arrive. The data on the media may be accessed by an unauthorized party. Likelihood: low per trip. Severity: medium (sync failure is recoverable by retransmission; data exposure depends on whether the sync package is encrypted). Detection: expected arrival date passes without receipt; courier reports loss.</p></li>
+
+<li><p><strong>Courier failure.</strong> The designated courier is unable or unwilling to make the transport trip. The sync exchange does not occur. If the failure is temporary, the next scheduled trip compensates. If the failure is permanent (courier relocation, illness, loss of interest), the transport link is broken until a replacement courier is found. Likelihood: medium over time. Severity: depends on topology -- low if alternative paths exist, high if this is the node's only transport link. Detection: missed scheduled exchange.</p></li>
+
+<li><p><strong>Label degradation.</strong> The physical label on transport media becomes illegible due to moisture, fading, or physical wear. The receiving node cannot identify the sender, the package ID, or the handling instructions. The media must be treated as unidentified. Likelihood: medium, especially for media transported in harsh conditions. Severity: low (the media can still be processed through enhanced quarantine). Detection: inspection at receipt.</p></li>
+
+<li><p><strong>Media age-out.</strong> Transport media has been in the fleet for too long. Its error rate has increased. It fails during a critical transport. The failure is not detected until the receiving node attempts verification. Likelihood: medium without lifecycle management. Severity: low (retransmission is the remedy). Detection: health checks at each use; media lifecycle tracking.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If media corruption is detected at receipt:</strong> Reject the media. Record the failure in institutional memory with the media ID, transport route, and suspected cause. Notify the sending node via the next available transport. The sending node retransmits the sync package on fresh media. If corruption occurs repeatedly on the same route, investigate the transport conditions (temperature, handling, packaging) and upgrade packaging or change the transport method.</p></li>
+
+<li><p><strong>If media is lost:</strong> Report the loss immediately. The sending node prepares a replacement sync package on new media. If the lost media contained sensitive content, the security implications are assessed per Security domain procedures (the sync package encryption should protect the data, but the loss should be recorded). The transport route is reviewed: was the loss due to courier error, postal failure, or theft? Adjust the transport method if needed.</p></li>
+
+<li><p><strong>If a courier becomes unavailable:</strong> Identify a replacement courier. If no replacement is available locally, post a request through the next available governance sync to other federation nodes -- another node may have a contact who can serve as a courier for this route. If no courier can be found, the transport link is declared dormant and the topology is updated per D17-009. The affected nodes operate in partition mode (D17-012) until a new courier is established.</p></li>
+
+<li><p><strong>If media with degraded labels arrives:</strong> Process the media through the full quarantine pipeline with enhanced verification. Attempt to identify the sender from the transport manifest file on the media. If the sender can be identified, process normally and include a note in the receipt confirmation that the label was degraded. If the sender cannot be identified, hold the media in quarantine until the sending node can be contacted through other means.</p></li>
+
+<li><p><strong>If media fleet age-out is detected:</strong> Conduct a fleet audit. Retire all media past its expected lifespan. Procure replacement media. Update the media registry. This is a routine maintenance task that should be triggered by the annual capacity review (D17-011), not by a failure in the field.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> Transport protocols are simple because the federation is small. Use this period to establish the habits: labeling, packaging, integrity verification, chain-of-custody logging. These habits are harder to establish later when transport volume increases.</p></li>
+
+<li><p><strong>Years 5-15:</strong> Transport volume increases as the federation grows. The media fleet grows. Courier networks become more complex. The transport protocol must handle multi-hop routes, multiple couriers, and varied transport conditions. Expect to learn that some media types are more reliable than others in your specific transport conditions.</p></li>
+
+<li><p><strong>Years 15-30:</strong> The first generation of transport media has been retired. New media types may be available that did not exist when this article was written. The protocol must accommodate new media through the governance process while maintaining backward compatibility with existing verification procedures.</p></li>
+
+<li><p><strong>Years 30-50+:</strong> The physical transport protocol may be the most stable part of the federation. People have been carrying objects between locations for millennia. The specific media will change, but the act of packaging, labeling, transporting, and verifying will not. Future operators should find this protocol intuitive because it describes a fundamentally human activity: carrying something carefully from one place to another.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+There is something both ancient and radical about specifying a physical transport protocol in an era of gigabit internet. The institution is making a deliberate choice: the physical medium is the message channel, and the human courier is the network infrastructure. This choice has consequences that software engineers may find uncomfortable. The "network" is slow (days or weeks, not milliseconds). The "bandwidth" is limited by how much a person can carry. The "routing" depends on human willingness and human reliability.</p>
+
+<p>But this "network" has properties that no electronic network can match. It cannot be remotely compromised. It cannot be surveilled without physical proximity. It cannot be disrupted by software vulnerabilities. It degrades gracefully -- a courier who is late is not the same as a network that is down. And it scales with human relationships rather than with infrastructure investment.</p>
+
+<p>The chain of custody requirement may seem excessive for a USB drive carried between two rooms. It is not. The chain of custody is the transport log. It is how the federation knows that sync happened, when it happened, and who was involved. Without it, transport is invisible, and invisible transport is indistinguishable from no transport at all.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D17-003 -- Air-Gapped Synchronization Procedures (logical sync protocol that runs over physical transport)</li>
+<li>D17-007 -- Sync Package Specification (package format and directory structure on media)</li>
+<li>D17-009 -- Topology Models (transport links as topology edges; transport capacity as selection criterion)</li>
+<li>D17-010 -- Resource Allocation Framework (transport costs as federation resource; media as physical material budget)</li>
+<li>D17-011 -- Capacity Planning Over Decades (media replacement schedule; procurement lead times)</li>
+<li>D17-012 -- Partition Tolerance as Default State (transport failure causes partition; partition is normal)</li>
+<li>D17-005 -- Trust Establishment and Verification (chain of custody supports trust; tamper detection)</li>
+<li>Domain 18 -- Import &amp; Quarantine (quarantine processing of received media; D18-ART-011 Integrity Verification)</li>
+<li>Security Domains -- (media encryption; secure erasure; tamper-evident packaging)</li>
+<li>Domain 20 -- Institutional Memory (transport logs; courier records; media lifecycle history)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

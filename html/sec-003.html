@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-003 — Cryptographic Key Management - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li class="active"><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-003">
+  <h1>SEC-003 &mdash; Cryptographic Key Management</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-003</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security & Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, SEC-002, OPS-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-002, D6-003, D10-003. All articles involving encryption, authentication, or digital signatures.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the complete cryptographic key management procedures for the holm.chat Documentation Institution. It covers the lifecycle of every key the institution uses: how keys are generated, where they are stored, when they are rotated, how they are revoked, and what happens when a key is lost or compromised.</p>
+<p>Cryptographic keys are the institution's most sensitive assets. They protect the confidentiality of encrypted data, the integrity of signed documents, and the authenticity of the operator's identity. A lost key can render data permanently inaccessible. A compromised key can undermine every security guarantee the institution provides. A poorly managed key is a time bomb -- it functions perfectly until the moment it fails, and then the damage is often irreversible.</p>
+<p>This article is written for a single operator managing keys without a dedicated security team, without a hardware security module (HSM) cluster, and without the luxury of a corporate PKI. The procedures are practical, achievable, and designed for the constraints of an air-gapped, off-grid institution. They are also designed for succession -- every key management decision must be comprehensible and reproducible by a future operator who has only this document and the institution's stored artifacts to guide them.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The institution's key inventory: what categories of keys exist and what each is for.</li>
+<li>Key generation procedures: how to generate keys safely on an air-gapped system.</li>
+<li>Key storage architecture: where keys are kept, in what form, with what protections.</li>
+<li>Key rotation schedules: when keys should be replaced and how.</li>
+<li>Key revocation procedures: how to declare a key invalid and propagate that declaration.</li>
+<li>Key recovery procedures: what to do when a key is lost.</li>
+<li>Compromised key response: what to do when a key is suspected or confirmed compromised.</li>
+<li>The key ceremony: the formal process for generating, distributing, and recording high-value keys.</li>
+<li>Succession provisions: how key material is made available to a legitimate successor.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Which encryption algorithms to use (see subsequent Domain 3 implementation articles; this article is algorithm-agnostic by design, because algorithms change over decades).</li>
+<li>Full-disk encryption setup procedures (see Domain 3 implementation articles).</li>
+<li>Network authentication (not applicable; the institution is air-gapped).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Key Management Is the Hardest Part of Cryptography</h3>
+<p>The mathematics of modern cryptography are sound. The algorithms, when properly implemented, are essentially unbreakable within practical time horizons. The weakness is never the math. The weakness is always the management -- how keys are generated (insufficient randomness), how they are stored (written on a sticky note), how they are transported (sent in plaintext), how they are retired (never), and how they are recovered (they cannot be).</p>
+<p>For this institution, the key management challenge is compounded by two factors. First, the air gap means there is no online key management service. Every key management action is manual, performed by the operator, with physical media. Second, the fifty-year horizon means keys must survive hardware generations, software changes, format migrations, and operator succession. A key stored on a USB drive in 2026 must still be accessible in 2056 -- or the data it protects must be re-encrypted before the old key becomes inaccessible.</p>
+<h3>3.2 The Single-Operator Key Management Problem</h3>
+<p>In a corporate environment, key management is distributed across multiple people with multiple roles: key officers, key custodians, recovery agents. This distribution provides checks, balances, and redundancy. A single operator has none of this. They generate their own keys, store their own keys, use their own keys, and must somehow provide for the recovery of their own keys if they become incapacitated.</p>
+<p>This article addresses the single-operator problem through three mechanisms: rigorous procedure (compensating for the lack of peer review with documented, verifiable steps), redundant storage (compensating for single-point-of-failure risk with multiple independent copies), and succession provisioning (ensuring that keys outlive the operator who created them).</p>
+<h3>3.3 Key Categories in This Institution</h3>
+<p>The institution uses keys for four purposes, each with different management requirements:</p>
+<ul>
+<li><strong>Disk encryption keys:</strong> Protect data at rest on the institution's storage devices. Loss means permanent data inaccessibility. Compromise means an attacker with physical access can read the data.</li>
+<li><strong>Authentication keys:</strong> Prove the identity of the operator to the system (SSH keys, login credentials). Loss means temporary lockout. Compromise means unauthorized access.</li>
+<li><strong>Signing keys:</strong> Prove the integrity and authorship of documents and backups. Loss means inability to sign new material. Compromise means an attacker can forge the operator's identity.</li>
+<li><strong>Backup encryption keys:</strong> Protect backup media that may be stored at geographically remote locations. Loss means backup data is inaccessible. Compromise means backup data is exposed.</li>
+</ul>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Key Inventory</h3>
+<p>The institution maintains a key inventory -- a document that records every active key, its purpose, its creation date, its rotation schedule, and the location of all copies. The key inventory is itself a Tier 1 document per D6-001, but it does not contain the keys themselves. It contains metadata about the keys: identifiers, fingerprints, purposes, and locations.</p>
+<p>The key inventory is stored in the documentation corpus and reviewed during every quarterly access audit per SEC-002.</p>
+<p>Each entry in the key inventory contains:
+- <strong>Key ID:</strong> A unique identifier for the key.
+- <strong>Key Type:</strong> Disk encryption, authentication, signing, or backup encryption.
+- <strong>Algorithm and Key Length:</strong> What algorithm and key size the key uses.
+- <strong>Creation Date:</strong> When the key was generated.
+- <strong>Rotation Date:</strong> When the key is next due for rotation.
+- <strong>Expiration Date:</strong> When the key must be retired regardless of rotation status.
+- <strong>Primary Storage Location:</strong> Where the active copy of the key resides.
+- <strong>Backup Storage Locations:</strong> Where backup copies are stored.
+- <strong>Fingerprint/Hash:</strong> A hash of the key for verification without exposing the key itself.
+- <strong>Associated Data:</strong> What data or systems the key protects.
+- <strong>Succession Provisions:</strong> Whether and how this key is included in the succession packet.</p>
+<h3>4.2 Key Generation Procedures</h3>
+<p>All key generation must occur on the institution's air-gapped systems. Keys are never generated on connected systems and imported.</p>
+<p><strong>Step-by-step procedure for generating a new key:</strong></p>
+<ol>
+<li>Log in to the administrative account per SEC-002.</li>
+<li>Open a terminal session. Verify you are on the air-gapped system (no network interfaces active): <code>ip link show</code> -- all interfaces should be DOWN or absent.</li>
+<li>Verify the system's random number generator is functioning: <code>cat /proc/sys/kernel/random/entropy_avail</code> -- the value should be at least 256. If it is lower, generate entropy by performing disk I/O, moving the mouse, or using a hardware random number generator if available.</li>
+<li>Generate the key using the appropriate tool for the key type:
+   - For disk encryption (LUKS): <code>cryptsetup luksFormat [device]</code> -- the passphrase is the key. Alternatively, use a keyfile: <code>dd if=/dev/urandom of=/path/to/keyfile bs=4096 count=1</code>
+   - For SSH authentication keys: <code>ssh-keygen -t ed25519 -C "[key_purpose]@holm.chat [date]"</code>
+   - For GPG signing/encryption keys: <code>gpg --full-generate-key</code> -- select appropriate algorithm and key size.
+   - For backup encryption: <code>gpg --full-generate-key</code> with a dedicated key for backup purposes, or generate a symmetric key: <code>dd if=/dev/urandom of=/path/to/backup-key bs=32 count=1</code></li>
+<li>Immediately record the key in the key inventory with all required fields.</li>
+<li>Create backup copies per Section 4.3.</li>
+<li>Verify the key works by performing a test operation (encrypt and decrypt a test file, sign and verify a test document, authenticate a test session).</li>
+<li>Record the key generation in the operational log, including the key ID and fingerprint (not the key itself).</li>
+</ol>
+<p><strong>Critical: never record the actual key material in the operational log, the decision log, or the documentation corpus. Only record identifiers and fingerprints.</strong></p>
+<h3>4.3 Key Storage Architecture</h3>
+<p>Keys are stored in a three-tier architecture, each tier providing a different balance of accessibility and security:</p>
+<p><strong>Tier A: Active Storage.</strong>
+The key as used by the running system. For disk encryption, this is the passphrase or keyfile that unlocks the volume at boot. For SSH keys, this is the private key in the user's <code>.ssh</code> directory. For GPG keys, this is the key in the user's GPG keyring.</p>
+<p>Security: Protected by the system's access controls per SEC-002. The disk encryption key protects the other keys at rest (the SSH and GPG keys are on an encrypted volume).</p>
+<p><strong>Tier B: Local Backup.</strong>
+A copy of the key stored on separate physical media in the equipment zone (Zone 1 per SEC-002). This media is encrypted with a separate passphrase known only to the operator. For physical media: a USB drive stored in a locked container within Zone 1.</p>
+<p>Procedure for creating Tier B backups:
+1. Prepare a USB drive. Format it and create a LUKS-encrypted partition with a strong, unique passphrase.
+2. Mount the encrypted partition.
+3. Copy all key material to the encrypted drive: keyfiles, exported GPG keys (<code>gpg --export-secret-keys --armor &gt; keys.asc</code>), SSH private keys.
+4. Include a plain-text file named <code>INVENTORY.txt</code> that lists what keys are on this drive, their key IDs, and what they are for.
+5. Unmount and close the encrypted partition.
+6. Label the physical drive clearly: "KEY BACKUP -- TIER B -- [date]"
+7. Store in the locked container in Zone 1.</p>
+<p><strong>Tier C: Off-site Backup.</strong>
+A copy of the key stored at a geographically separate location (Zone 3 per SEC-002). This copy is encrypted and stored with the succession packet or in a safe deposit box or other secure off-site location.</p>
+<p>Procedure for creating Tier C backups:
+1. Prepare a USB drive. Encrypt it as with Tier B, but use a different passphrase from Tier B.
+2. Copy all key material as with Tier B.
+3. Include <code>INVENTORY.txt</code> as with Tier B.
+4. Also include a printed sheet in a sealed envelope alongside the USB drive that contains: the drive's encryption passphrase, the list of key IDs and their purposes, and basic instructions for accessing the keys. This printed sheet is the succession document for key recovery.
+5. Transport the drive and envelope to the off-site location.
+6. Record the off-site location in the key inventory.</p>
+<h3>4.4 Key Rotation Schedule</h3>
+<p>Key rotation limits the exposure window if a key is compromised without the operator's knowledge. Different key types have different rotation schedules:</p>
+<ul>
+<li><strong>Disk encryption keys:</strong> Rotate every 5 years or when the encryption algorithm is superseded. Rotation requires re-encrypting the volume with a new key, which is a major operation. Schedule it during the annual operations cycle.</li>
+<li><strong>Authentication keys (SSH):</strong> Rotate every 2 years. Generate a new key, deploy it, verify access, then remove the old key.</li>
+<li><strong>Signing keys (GPG):</strong> Rotate every 3 years. Generate a new key, publish the new fingerprint in the documentation, sign new material with the new key, retain the old key (in revoked state) for verification of previously signed material.</li>
+<li><strong>Backup encryption keys:</strong> Rotate every 2 years. After rotation, do not destroy the old key immediately -- existing backups encrypted with the old key must remain decryptable. Retain old backup keys in the key inventory with status "RETIRED -- RETAINED FOR DECRYPTION" until all backups encrypted with that key have been either re-encrypted or aged out of the retention schedule.</li>
+</ul>
+<p><strong>Step-by-step rotation procedure:</strong>
+1. Generate the new key per Section 4.2.
+2. Create Tier B and Tier C backups of the new key per Section 4.3.
+3. Deploy the new key: install it in the active location, configure the relevant system to use it.
+4. Test the new key: verify it works for its intended purpose.
+5. If the old key protected existing data (disk encryption, backup encryption): plan and execute the data re-encryption or establish a documented retention of the old key.
+6. Update the key inventory: mark the old key as ROTATED with the date and the new key's ID. Add the new key with all required fields.
+7. Update the Tier B and Tier C backups to include the new key.
+8. Record the rotation in the operational log and the decision log.</p>
+<h3>4.5 Key Revocation</h3>
+<p>A key is revoked when it is known or suspected to be compromised, or when the person it authenticates is no longer authorized.</p>
+<p><strong>Immediate revocation procedure:</strong>
+1. Generate a replacement key per Section 4.2 (do this first, so you have a working key before revoking the old one).
+2. Revoke the old key:
+   - For SSH keys: remove the public key from all <code>authorized_keys</code> files. Remove the private key from the user's <code>.ssh</code> directory.
+   - For GPG keys: generate a revocation certificate (<code>gpg --gen-revoke [key_id]</code>), import it to the keyring, and export the revoked public key for distribution.
+   - For disk encryption keys: change the LUKS passphrase (<code>cryptsetup luksChangeKey [device]</code>) or remove the compromised keyslot.
+   - For backup encryption keys: this is complex. Existing backups remain encrypted with the old key. They cannot be retroactively re-encrypted. Flag all backups encrypted with the revoked key as "ENCRYPTED WITH REVOKED KEY" in the backup inventory. Prioritize re-creating critical backups with the new key.
+3. Deploy the replacement key per Section 4.4 step 3.
+4. Update the key inventory: mark the old key as REVOKED with the date and reason.
+5. Update all backup copies (Tier B and Tier C) to remove the revoked key and include the replacement.
+6. Document the revocation in the operational log, the decision log, and the key inventory.</p>
+<h3>4.6 The Key Ceremony</h3>
+<p>A key ceremony is a formal procedure for generating high-value keys -- specifically, the master disk encryption key and the primary signing key. The ceremony provides a structured, documented process that ensures the key is generated securely and that all backup and succession provisions are established from the beginning.</p>
+<p><strong>The key ceremony procedure:</strong></p>
+<ol>
+<li>
+<p><strong>Preparation (the day before):</strong>
+   - Clear the schedule. No other operational work on ceremony day.
+   - Prepare all media: USB drives for Tier B and Tier C backups, formatted and ready for encryption.
+   - Prepare printed forms: key inventory entries, succession documents.
+   - Verify the system's random number generator.</p>
+</li>
+<li>
+<p><strong>Generation (ceremony day, step 1):</strong>
+   - Log in to the administrative account.
+   - Verify air-gap integrity: no network interfaces active.
+   - Generate the key per Section 4.2.
+   - Record the key fingerprint on the printed form.</p>
+</li>
+<li>
+<p><strong>Backup (ceremony day, step 2):</strong>
+   - Create Tier B backup per Section 4.3.
+   - Create Tier C backup per Section 4.3.
+   - Verify both backups by mounting and confirming the key material is present and readable.</p>
+</li>
+<li>
+<p><strong>Verification (ceremony day, step 3):</strong>
+   - Use the key for its intended purpose on a test target.
+   - Use the Tier B backup copy to perform the same test (proving the backup is functional).</p>
+</li>
+<li>
+<p><strong>Documentation (ceremony day, step 4):</strong>
+   - Complete the key inventory entry.
+   - Record the ceremony in the operational log with: date, key ID, fingerprint, key type, all storage locations, and a statement that verification succeeded.
+   - Record in the decision log as a Tier 2 decision.</p>
+</li>
+<li>
+<p><strong>Succession (ceremony day, step 5):</strong>
+   - Update the succession packet with the new key's existence and the Tier C backup location.
+   - Seal the Tier C backup and succession documents in the envelope.</p>
+</li>
+<li>
+<p><strong>Transport (within 7 days):</strong>
+   - Deliver the Tier C backup to the off-site location.
+   - Record the delivery date in the key inventory.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-SEC3-01:</strong> All key generation must occur on the institution's air-gapped systems. No exceptions.</li>
+<li><strong>R-SEC3-02:</strong> Every key must exist in at least three copies: active, Tier B backup, and Tier C backup. No key may exist in only one copy.</li>
+<li><strong>R-SEC3-03:</strong> The key inventory must be maintained as a Tier 1 document per D6-001. It must be accurate at all times. Discrepancies between the inventory and reality are security incidents.</li>
+<li><strong>R-SEC3-04:</strong> Key material must never appear in the operational log, the decision log, the documentation corpus, or any other document. Only key identifiers and fingerprints may be recorded in documents.</li>
+<li><strong>R-SEC3-05:</strong> Key rotation schedules must be followed. Overdue rotations must be flagged during the quarterly access audit per SEC-002 and remediated within 30 days.</li>
+<li><strong>R-SEC3-06:</strong> Old keys protecting existing data must be retained in RETIRED status until all data they protect has been re-encrypted or aged out of the retention schedule. Retired keys are stored in the key archive (a designated section of the Tier B and Tier C backups).</li>
+<li><strong>R-SEC3-07:</strong> The succession packet must contain sufficient information for a successor to access all Tier C key backups and all encrypted institutional data. This packet must be tested annually.</li>
+<li><strong>R-SEC3-08:</strong> Compromised keys must be revoked within 24 hours of the compromise being detected. The revocation procedure in Section 4.5 is mandatory.</li>
+<li><strong>R-SEC3-09:</strong> The key ceremony procedure (Section 4.6) must be used for all master disk encryption keys and primary signing keys. Lesser keys may use the simplified generation procedure in Section 4.2.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Key loss.</strong> The active key and all backups are lost or destroyed. Encrypted data protected by the lost key is permanently inaccessible. This is the most catastrophic key management failure. Mitigation: the three-copy rule (R-SEC3-02), geographic separation of Tier C backups, and regular backup verification.</p>
+</li>
+<li>
+<p><strong>Key compromise without detection.</strong> An attacker obtains a copy of a key without the operator's knowledge. The attacker can access encrypted data or forge signatures indefinitely. Mitigation: physical security per SEC-002, key rotation (which limits the window of undetected compromise), and integrity verification per D6-003 (which may detect unauthorized access).</p>
+</li>
+<li>
+<p><strong>Rotation procrastination.</strong> Key rotation is always scheduled for next month. Years pass. Keys become ancient, algorithms become deprecated, and the institution's cryptographic foundation grows brittle. Mitigation: the quarterly audit per SEC-002 flags overdue rotations. The rotation schedule is in the key inventory, which is reviewed quarterly.</p>
+</li>
+<li>
+<p><strong>Succession packet decay.</strong> The succession packet is prepared once and never updated. Keys are rotated but the succession packet still contains the old keys. When the succession event occurs, the successor cannot decrypt the data. Mitigation: every key rotation must include updating the succession packet. R-SEC3-07 requires annual testing.</p>
+</li>
+<li>
+<p><strong>Passphrase amnesia.</strong> The operator forgets the passphrase for the Tier B or Tier C backup media. The backup keys are inaccessible. Mitigation: passphrases for backup media are recorded in the sealed succession envelope at the off-site location. The operator should also consider a password manager database (itself encrypted) on the air-gapped system for day-to-day passphrase management.</p>
+</li>
+<li>
+<p><strong>Algorithm obsolescence.</strong> The cryptographic algorithm used to generate keys becomes deprecated or broken. Keys generated with the old algorithm are no longer trustworthy. Mitigation: the rotation schedule forces periodic key regeneration, which naturally migrates to current algorithms. The annual security review per OPS-001 should assess algorithm health.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>7.1 If an active key is lost but backups exist:</strong>
+1. Retrieve the Tier B backup from Zone 1.
+2. Decrypt the backup media using the Tier B passphrase.
+3. Copy the lost key to the appropriate active location.
+4. Test the recovered key.
+5. Generate a new Tier B backup to replace the one you just opened (the passphrase is now "used" and should be considered less secure).
+6. Document the recovery in the operational log.
+7. Investigate how the active key was lost and implement preventive measures.</p>
+<p><strong>7.2 If active and Tier B keys are lost but Tier C exists:</strong>
+1. Retrieve the Tier C backup from the off-site location.
+2. Open the sealed envelope to obtain the decryption passphrase.
+3. Decrypt the backup media.
+4. Copy the keys to the appropriate active locations.
+5. Test all recovered keys.
+6. Immediately create new Tier B and Tier C backups with new passphrases.
+7. Investigate the loss. This is a serious incident per D10-003.
+8. Document everything in the operational log and the decision log.</p>
+<p><strong>7.3 If all copies of a key are lost:</strong>
+1. Accept that data encrypted with the lost key is permanently inaccessible. This cannot be reversed.
+2. Document the loss: what key was lost, what data it protected, and the scope of the impact.
+3. Assess the damage: list all data that is now inaccessible.
+4. Generate new keys for all future use.
+5. Create new backups at all tiers.
+6. Review and revise key management procedures to prevent recurrence.
+7. Record this as a catastrophic incident in the decision log (Tier 2 decision to acknowledge and respond to the loss).</p>
+<p><strong>7.4 If a key is suspected compromised:</strong>
+1. Immediately generate a replacement key per Section 4.2.
+2. Revoke the compromised key per Section 4.5.
+3. Assess what data or systems the compromised key protected.
+4. For disk encryption: assume data may have been copied. Assess the physical access history. If physical access was not compromised, the encrypted data at rest is still protected (the attacker needs the key AND physical access to the media).
+5. For signing keys: assess what was signed with the compromised key. Notify (through documentation) that signatures from the compromised key should not be trusted after the suspected compromise date.
+6. For backup encryption: assess which backups are encrypted with the compromised key. Prioritize re-creating critical backups with the new key.
+7. Document the incident fully in the operational log and follow D10-003 incident response procedures.</p>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The key management infrastructure is being established. Perform the key ceremony for the initial master keys. Establish the rotation schedule. Build the habit of quarterly key inventory review. This is the foundation period -- get it right now and the next decades are manageable.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The first key rotations occur. This is the first real test of the rotation procedures. The Tier C backups should have been verified multiple times. The succession packet should have been tested. Cryptographic algorithm assessments during annual reviews may begin to flag the first algorithm changes.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Hardware generations will have changed. The USB drives used for Tier B and Tier C backups may need to be migrated to new media types. The algorithms used at founding may be approaching end of life. Plan and execute cryptographic migrations proactively, before the old algorithms are considered broken.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> Multiple key generations will have occurred. The key inventory's history section becomes a record of the institution's cryptographic evolution. A successor inheriting the institution should be able to trace the full key lineage from founding to present.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Key management is the one area where I am most tempted to cut corners and most afraid of the consequences. The three-copy rule feels excessive for a single person. The key ceremony feels theatrical. The rotation schedules feel premature when the keys are brand new.</p>
+<p>But I have seen what happens when key management is casual. I have seen organizations locked out of their own data because the one person who knew the passphrase left and nobody thought to ask. I have seen backup tapes sitting in a vault for a decade, perfectly preserved, perfectly encrypted, perfectly inaccessible because the decryption key was on a server that was decommissioned five years ago.</p>
+<p>The key ceremony is not theater. It is a forcing function. It forces me to create backups before I need them, to document before I forget, and to plan for succession before succession is urgent. The day I generate a master key is the day I am most focused on that key's lifecycle. The ceremony captures that focus and turns it into procedure.</p>
+<p>One note for future operators: the specific algorithms and tools referenced in this article will almost certainly be outdated by the time you read it. <code>ed25519</code> may have been superseded. <code>gpg</code> may have been replaced. The procedures -- generate securely, store redundantly, rotate regularly, revoke promptly, document everything -- will not be outdated. Adapt the tools. Keep the procedures.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (data sovereignty, self-contained operation)</li>
+<li>GOV-001 -- Authority Model (succession protocol, decision tiers)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (encryption mandate R-SEC-02, key storage R-SEC-04)</li>
+<li>SEC-002 -- Access Control Procedures (account architecture, physical zones, quarterly audits)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo for key rotation, annual security review)</li>
+<li>D6-001 -- Data Philosophy (key inventory as Tier 1 data, data tier system)</li>
+<li>D6-002 -- Backup Doctrine (backup encryption key management)</li>
+<li>D6-003 -- Data Integrity Verification (detecting unauthorized access via integrity checks)</li>
+<li>D10-003 -- Incident Response Procedures (compromised key response)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

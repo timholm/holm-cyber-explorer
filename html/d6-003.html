@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D6-003 — Data Integrity Verification - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li class="active"><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d6-003">
+  <h1>D6-003 &mdash; Data Integrity Verification</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D6-003</dd>
+  <dt>Domain</dt>
+  <dd>6 -- Data & Archives</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D10-003. All articles involving data storage, archival, or verification.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the procedures for verifying that the data stored by the holm.chat Documentation Institution has not been corrupted, tampered with, or silently degraded. It answers the question that every backup strategy leaves open: how do you know that the data you have right now is still the data you think it is?</p>
+<p>Backups protect against data loss. Integrity verification protects against data corruption -- the silent, insidious degradation that can occur without any visible sign of failure. A file can be corrupted and still be present, still be the right size, still have the right name and modification date. Only a content-level check -- comparing the file's actual content against a known-good reference -- can detect silent corruption.</p>
+<p>This article provides specific tools, commands, and procedures for generating integrity baselines, performing periodic verification scans, detecting corruption, and responding when corruption is found. It is a manual for the operator who needs to trust their data over decades.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The theory and practice of data integrity verification.</li>
+<li>Checksum generation: creating integrity baselines for all data.</li>
+<li>Periodic integrity scanning: scheduled verification against baselines.</li>
+<li>Real-time integrity monitoring: filesystem-level protections.</li>
+<li>Corruption detection: what to do when a checksum mismatch is found.</li>
+<li>Integrity verification for backup media.</li>
+<li>Tools and commands for each procedure.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Backup creation procedures (see D6-002).</li>
+<li>Cryptographic signing for authorship verification (see SEC-003 for key management).</li>
+<li>Filesystem selection and configuration (see subsequent Domain 6 implementation articles).</li>
+<li>Data format verification (see D6-001 for format philosophy).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Silent Corruption Problem</h3>
+<p>Data corruption comes in two forms. Loud corruption is obvious: a disk fails, a file becomes unreadable, an application crashes. The operator knows immediately that something is wrong. Silent corruption is invisible: a bit flips in a stored file due to cosmic radiation, media degradation, or a controller error. The file is still readable. It opens without error. But its content has changed. A digit in a spreadsheet is wrong. A word in a document has been altered. A byte in an archive is different, and the archive may or may not decompress correctly depending on where the corruption occurred.</p>
+<p>Silent corruption is particularly dangerous for a long-lived institution because it compounds over time. A single bit flip today may not be noticed for years. If backups are made after the corruption occurs, the corruption propagates to the backups. By the time the corruption is detected, there may be no uncorrupted copy left anywhere.</p>
+<h3>3.2 The Checksum Solution</h3>
+<p>A checksum is a mathematical fingerprint of a file's content. If even a single bit of the file changes, the checksum changes. By computing checksums when data is known to be good and then periodically recomputing and comparing, the institution can detect corruption that would otherwise be invisible.</p>
+<p>The choice of checksum algorithm matters. Simple checksums (CRC32) can miss certain corruption patterns. Cryptographic hashes (SHA-256) are computationally more expensive but detect any change with overwhelming probability. For an institution that prioritizes integrity over convenience (ETH-001 Principle 2), SHA-256 or equivalent is the standard.</p>
+<h3>3.3 Integrity Verification as Continuous Practice</h3>
+<p>Integrity verification is not something you do once. It is a continuous practice -- a regular, scheduled activity that builds confidence in the institution's data over time. Each successful verification is evidence that the data remains intact. Each failed verification is an early warning that allows recovery before the corruption becomes irrecoverable.</p>
+<p>The procedures in this article integrate with the operational tempo defined in OPS-001: daily spot-checks during the daily health check, weekly targeted scans during weekly operations, monthly comprehensive scans during the monthly backup verification, and annual full-corpus verification during the annual operations cycle.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Integrity Baseline</h3>
+<p>The integrity baseline is a complete manifest of checksums for every file in the institution's data store. It is the reference against which all future verification compares. If the baseline is wrong -- if it is computed from already-corrupted data -- the verification will miss the corruption. Therefore, the baseline must be established with care.</p>
+<p><strong>Step-by-step procedure for creating the initial baseline:</strong></p>
+<ol>
+<li>Ensure the data is in a known-good state. For the initial baseline, this means the data was recently created, recently imported through the quarantine process per SEC-001, or recently restored from a verified backup.</li>
+<li>Generate checksums for all files, organized by data tier:
+   <code>find /path/to/tier1-data/ -type f -exec sha256sum {} \; &gt; \
+     /path/to/integrity/baselines/tier1-baseline-$(date +%Y-%m-%d).sha256</code>
+   Repeat for Tier 2 and Tier 3 data.</li>
+<li>Generate a checksum of each baseline file itself (a meta-checksum):
+   <code>sha256sum /path/to/integrity/baselines/tier1-baseline-$(date +%Y-%m-%d).sha256 &gt; \
+     /path/to/integrity/baselines/tier1-baseline-$(date +%Y-%m-%d).sha256.meta</code></li>
+<li>Store the baseline files in the integrity baselines directory, which is itself Tier 1 data per D6-001.</li>
+<li>Create a backup copy of the baseline on Location A per D6-002.</li>
+<li>Record the baseline creation in the operational log: date, file count, total data size, time taken.</li>
+</ol>
+<p><strong>Updating the baseline:</strong>
+The baseline must be updated whenever data legitimately changes -- when files are added, modified, or deleted as part of normal operations. There are two approaches:</p>
+<ul>
+<li><strong>Incremental update:</strong> After making changes, regenerate checksums only for the changed files and merge them into the baseline.
+   <code>sha256sum /path/to/changed-file &gt; /tmp/new-checksum.txt
+   # Manually replace the old checksum line in the baseline file</code></li>
+<li><strong>Periodic full regeneration:</strong> On a scheduled basis (monthly is recommended for active data), regenerate the entire baseline. This catches any changes the incremental process may have missed.
+   <code>find /path/to/tier1-data/ -type f -exec sha256sum {} \; &gt; \
+     /path/to/integrity/baselines/tier1-baseline-$(date +%Y-%m-%d).sha256</code></li>
+</ul>
+<p>The recommended practice is incremental updates during daily operations and full regeneration monthly.</p>
+<h3>4.2 Periodic Integrity Scanning</h3>
+<p>Integrity scanning compares current file checksums against the baseline. Mismatches indicate either legitimate changes that were not recorded in the baseline (a process error) or corruption (a data integrity event).</p>
+<p><strong>Daily spot-check (during daily operations, 2-3 minutes):</strong>
+Select a small random sample of files from Tier 1 data and verify their checksums:
+```</p>
+<h1>Select 10 random files from the Tier 1 baseline</h1>
+<p>shuf -n 10 /path/to/integrity/baselines/tier1-baseline-current.sha256 &gt; /tmp/daily-check.sha256
+sha256sum -c /tmp/daily-check.sha256
+```
+If all checks pass, record "Daily integrity spot-check: PASS (10 files)" in the operational log.
+If any check fails, investigate immediately per Section 4.4.</p>
+<p><strong>Weekly targeted scan (during weekly operations, 15-30 minutes):</strong>
+Verify all Tier 1 data:
+<code>sha256sum -c /path/to/integrity/baselines/tier1-baseline-current.sha256</code>
+Record the results in the operational log. Note any mismatches and their resolution.</p>
+<p><strong>Monthly comprehensive scan (during monthly operations, 1-2 hours):</strong>
+Verify all Tier 1 and Tier 2 data:
+<code>sha256sum -c /path/to/integrity/baselines/tier1-baseline-current.sha256
+sha256sum -c /path/to/integrity/baselines/tier2-baseline-current.sha256</code>
+Also verify the integrity of the most recent backup per D6-002 Section 4.4.</p>
+<p><strong>Annual full-corpus verification (during annual operations, half day or more):</strong>
+Verify all data across all tiers:
+<code>sha256sum -c /path/to/integrity/baselines/tier1-baseline-current.sha256
+sha256sum -c /path/to/integrity/baselines/tier2-baseline-current.sha256
+sha256sum -c /path/to/integrity/baselines/tier3-baseline-current.sha256</code>
+Regenerate the baselines after successful verification to create a fresh reference point.</p>
+<h3>4.3 Filesystem-Level Integrity</h3>
+<p>Beyond manual checksum verification, the institution should use a filesystem that provides built-in integrity checking. The recommended approach is to use a copy-on-write filesystem with built-in checksumming (such as ZFS or Btrfs). These filesystems compute checksums for every data block and verify them on every read, detecting silent corruption in real time rather than waiting for a scheduled scan.</p>
+<p><strong>If using ZFS:</strong>
+- Enable checksums (enabled by default): <code>zfs get checksum [pool/dataset]</code>
+- Perform a scrub monthly (this verifies all data on the pool against stored checksums):
+   <code>zpool scrub [pool_name]</code>
+- Check scrub results:
+   <code>zpool status [pool_name]</code>
+   Look for "errors: No known data errors" on a healthy pool, or specific error counts if corruption was found.
+- ZFS scrubs should be part of the monthly operations cycle per OPS-001.</p>
+<p><strong>If using Btrfs:</strong>
+- Perform a scrub monthly:
+   <code>btrfs scrub start /path/to/mount</code>
+- Check scrub results:
+   <code>btrfs scrub status /path/to/mount</code></p>
+<p><strong>If using a filesystem without built-in integrity (ext4, XFS):</strong>
+Manual checksum verification per Section 4.2 is the only defense. Consider migrating to a checksumming filesystem when a suitable opportunity arises (Tier 2 decision per GOV-001).</p>
+<h3>4.4 Corruption Detection and Response</h3>
+<p>When a checksum mismatch is detected, follow this procedure:</p>
+<p><strong>Step 1: Confirm the mismatch.</strong>
+Re-run the checksum on the flagged file:
+<code>sha256sum /path/to/flagged-file</code>
+Compare against the baseline. If the checksum now matches, the first result was a transient error (rare but possible). Record the incident and monitor for recurrence.</p>
+<p><strong>Step 2: Determine if the change is legitimate.</strong>
+Check whether the file was intentionally modified since the baseline was created. Consult the operational log: was this file edited as part of a documented change? Check the file's modification timestamp against the baseline creation date.</p>
+<p>If the change is legitimate: update the baseline with the new checksum. Record the update in the operational log.</p>
+<p><strong>Step 3: If the change is not legitimate (corruption confirmed):</strong>
+1. Do not modify the corrupted file. Leave it in place for analysis.
+2. Record the corruption in the operational log: file path, expected checksum, actual checksum, file size, modification date.
+3. Classify the corruption severity:
+   - <strong>Single file, Tier 3 or Tier 4:</strong> Low severity. Restore from the most recent good backup.
+   - <strong>Single file, Tier 1 or Tier 2:</strong> Medium severity. Restore from backup and investigate the cause.
+   - <strong>Multiple files:</strong> High severity. This may indicate a media failure, filesystem corruption, or something more serious. Escalate per D10-003.
+   - <strong>Corruption in both primary and backup copies:</strong> Critical severity. The corruption predates the backups. Search for an older uncorrupted backup. If found, restore from it. If not found, document the permanent data loss.
+4. Restore the uncorrupted version from the most recent backup that predates the corruption:
+   <code>cp /path/to/backup/copy/of/file /path/to/original/location/</code>
+5. Verify the restored file:
+   <code>sha256sum /path/to/original/location/file</code>
+   Compare against the baseline.
+6. Investigate the cause: check filesystem health, storage device SMART data, system logs for I/O errors.
+7. If the cause is media degradation, plan media replacement per the evolution path in this article.</p>
+<h3>4.5 Integrity Verification for Backup Media</h3>
+<p>Backup media is subject to the same corruption risks as primary storage. The procedures in D6-002 Section 4.4 verify backups at creation. This section addresses ongoing integrity verification of stored backups.</p>
+<p><strong>Monthly: verify most recent Location A backup:</strong>
+<code>sha256sum -c /path/to/backup-location-a/tier1/manifests/most-recent.sha256</code></p>
+<p><strong>Quarterly: verify a randomly selected Location B backup:</strong>
+Select one of the Location B archival media. Mount it. Verify the archives:
+<code>sha256sum -c /path/to/location-b/manifest.sha256</code></p>
+<p><strong>Annually: verify the off-site backup (Location C):</strong>
+During the annual operations cycle, retrieve or visit the off-site location. Mount the off-site backup media. Verify the checksums. Return the media.</p>
+<p>If backup media fails verification, the backup is unreliable and must be replaced per D6-002 recovery procedures.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D6I-01:</strong> An integrity baseline must exist for all Tier 1 and Tier 2 data. The baseline must be stored as Tier 1 data per D6-001.</li>
+<li><strong>R-D6I-02:</strong> Daily spot-checks of Tier 1 data integrity must be performed as part of the daily operations cycle per D10-002.</li>
+<li><strong>R-D6I-03:</strong> Weekly full verification of Tier 1 data must be performed during the weekly operations cycle.</li>
+<li><strong>R-D6I-04:</strong> Monthly comprehensive verification of Tier 1 and Tier 2 data must be performed during the monthly operations cycle.</li>
+<li><strong>R-D6I-05:</strong> Annual full-corpus verification of all tiers must be performed during the annual operations cycle.</li>
+<li><strong>R-D6I-06:</strong> All checksum computations must use SHA-256 or a stronger algorithm. Weaker algorithms (MD5, CRC32) are not sufficient for integrity verification.</li>
+<li><strong>R-D6I-07:</strong> When corruption is detected, the response procedure in Section 4.4 must be followed. Corruption must not be ignored or dismissed without investigation.</li>
+<li><strong>R-D6I-08:</strong> If a copy-on-write filesystem with built-in checksumming is used, filesystem scrubs must be performed at least monthly.</li>
+<li><strong>R-D6I-09:</strong> Integrity verification results must be recorded in the operational log. Both successes and failures are recorded.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Baseline drift.</strong> The baseline is not updated when files legitimately change. Over time, every file mismatches because the baseline is outdated. The operator starts ignoring mismatches because "they are all expected." Real corruption hides in the noise of expected mismatches. Mitigation: the incremental update procedure and monthly full regeneration. Mismatches due to baseline drift are a process failure, not a data failure, but they undermine the verification system just as effectively.</p>
+</li>
+<li>
+<p><strong>Verification theater.</strong> The scans run but the results are not reviewed. The operator sees a wall of "OK" lines and does not notice the three "FAILED" lines buried among them. Mitigation: pipe verification output through a filter that highlights only failures:
+   <code>sha256sum -c baseline.sha256 2&gt;&amp;1 | grep -v ': OK$'</code>
+   If this command produces no output, all checks passed. Any output means a failure that requires attention.</p>
+</li>
+<li>
+<p><strong>Corrupted baseline.</strong> The baseline file itself is corrupted, leading to false positives or false negatives. Mitigation: the meta-checksum (a checksum of the baseline file) in Section 4.1 step 3. Verify the baseline's own integrity before using it for verification.</p>
+</li>
+<li>
+<p><strong>Media-class failure.</strong> An entire class of storage media fails simultaneously (a manufacturing defect, a bad batch of drives). If all copies of the data are on the same media class, all copies may be corrupted. Mitigation: the two-media-type requirement in D6-002 (the 3-2-1 rule). The annual verification of all tiers catches cross-media issues.</p>
+</li>
+<li>
+<p><strong>Verification too infrequent.</strong> Corruption occurs but is not detected until long after the event. By the time it is detected, the corruption has propagated to all backups. Mitigation: the tiered verification schedule (daily spot-checks, weekly full Tier 1, monthly comprehensive) is designed to catch corruption before it propagates to all backup generations.</p>
+</li>
+<li>
+<p><strong>False sense of security from filesystem scrubs.</strong> The operator relies on ZFS or Btrfs scrubs and stops performing manual checksum verification. The filesystem catches block-level corruption but may not catch application-level corruption (e.g., a bug that writes incorrect data to a file). Mitigation: filesystem scrubs and manual checksum verification serve different purposes. Both are necessary. Neither replaces the other.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>7.1 If baseline drift has made integrity scanning useless:</strong>
+1. Stop relying on the outdated baseline.
+2. Assess the current state of the data: is there any reason to believe the data is corrupted?
+3. If the data is believed to be good (no errors reported, no anomalies observed): regenerate the baseline from the current data. This is a new starting point. Accept that you cannot detect corruption that occurred between the old baseline and now.
+4. If the data's integrity is uncertain: restore from the most recent verified backup, then regenerate the baseline from the restored data.
+5. Implement the incremental update procedure to prevent future drift.
+6. Document the incident in the operational log.</p>
+<p><strong>7.2 If corruption is found in both primary data and backups:</strong>
+1. This is a critical event. Record it in the operational log and the decision log.
+2. Determine when the corruption occurred by checking historical baselines and backup manifests. Find the oldest backup that still has the corrupted checksum and the newest backup that has the correct checksum.
+3. Restore from the newest backup with the correct checksum.
+4. If no uncorrupted backup exists: the data is permanently corrupted. Document the loss per D6-001 Recovery Procedure 5.
+5. Investigate the cause thoroughly. If the cause is a software bug, assess what other data may be affected.
+6. Escalate per D10-003.</p>
+<p><strong>7.3 If the integrity verification system itself has been neglected:</strong>
+1. Start with the daily spot-check. Run it today.
+2. Within the current week, run a full Tier 1 verification.
+3. Within the current month, run a comprehensive Tier 1 and Tier 2 verification.
+4. If significant corruption is found, follow Section 4.4.
+5. If no corruption is found, consider yourself fortunate and resume the scheduled verification cycle.
+6. Document the gap in the operational log.</p>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The integrity verification system is being established. Create the initial baselines. Build the habit of daily spot-checks and weekly scans. Learn the tools. Discover the operational rhythm. The first years will also reveal whether the chosen filesystem's built-in integrity features are sufficient or whether additional measures are needed.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The verification system should be routine. The baselines have been regenerated many times. The monthly and annual scans should have a history of results in the operational log. This history itself is valuable: it reveals patterns of media degradation, filesystem behavior, and data growth.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Storage technology transitions will require rebuilding baselines on new media. The transition is an opportunity: when data is migrated to new storage, verify every file during the migration. The migration checksum verification serves double duty as an integrity check and a migration validation.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> Decades of integrity verification data in the operational log. The institution should be able to point to a continuous chain of verification results that demonstrate data integrity across its entire lifetime. This chain is one of the institution's most valuable artifacts.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The daily spot-check -- ten random files, two minutes -- is the procedure I am most proud of in this article. Not because it is technically sophisticated (it is trivially simple) but because it is sustainable. I can do it when I am tired. I can do it when I am busy. I can do it when I have spent the day dealing with a crisis and have nothing left. Ten files. Two minutes. And those two minutes, repeated every day for decades, build a continuous chain of evidence that the institution's most critical data is intact.</p>
+<p>The danger I fear most is not catastrophic disk failure. That is dramatic and obvious and triggers immediate response. The danger I fear most is the single bit flip in a file I do not check for three years, which propagates through five backup generations, and which I discover only when I try to open a document that has become subtly, silently wrong. The verification schedule in this article is designed to catch that bit flip before it can hide.</p>
+<p>I want to be honest: I will sometimes find the weekly Tier 1 scan tedious. It takes time. It produces the same "all OK" result week after week. And then one week it will not. That is the week that justifies every scan that preceded it.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (data sovereignty, preservation mandate)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (Category 2: Data Integrity Threats, bit rot)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo for verification cycles)</li>
+<li>D6-001 -- Data Philosophy (data tier system, integrity as institutional priority)</li>
+<li>D6-002 -- Backup Doctrine (backup verification, complementary protection)</li>
+<li>SEC-003 -- Cryptographic Key Management (hash algorithms for checksums)</li>
+<li>D10-002 -- Daily Operations Doctrine (daily spot-check in operational cycle)</li>
+<li>D10-003 -- Incident Response Procedures (escalation for corruption events)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D14-007 — Research Prioritization and Resource Allocation - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li class="active"><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d14-007">
+  <h1>D14-007 &mdash; Research Prioritization and Resource Allocation</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D14-007</dd>
+  <dt>Domain</dt>
+  <dd>14 -- Research & Theory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, D14-001, D14-002, D14-011, D11-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D14-003, D14-006. All Domain 14 articles that consume allocated resources. Referenced by D11-001 (Administration) for budget integration. Referenced by Domain 13 (Evolution) for research-informed evolution priorities.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution decides what to research and how to allocate its finite resources -- time, equipment, energy, and attention -- across competing research demands. In a well-funded research laboratory with dozens of staff, resource allocation is a management problem. In a single-operator institution running on solar power behind an air gap, resource allocation is a survival problem. Every hour spent on research is an hour not spent on operations, maintenance, or rest. Every piece of equipment used for experimentation is equipment not available for production. Every watt of power consumed by a test rig is a watt not available for the systems that keep the institution running.</p>
+<p>The purpose of this article is not to discourage research. D14-001 establishes that research is mandatory -- at least two formal investigations per year (R-RES-06). The purpose is to ensure that the research conducted is the research that matters most, that the resources allocated are proportional to the expected value, and that the institution does not starve its operational functions to feed its intellectual curiosity.</p>
+<p>This article also addresses the tension between curiosity-driven research (investigating something because it is interesting) and mission-critical research (investigating something because the institution needs the answer). Both have value. Neither should monopolize the research budget. The prioritization framework provides a structured way to balance them.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The research prioritization framework: criteria for evaluating and ranking research proposals.
+- The research budget: how time, equipment, and energy are allocated to research activities.
+- The annual research plan: the process for establishing the year's research priorities.
+- Balancing curiosity-driven and mission-critical research.
+- Emergency research provisions: how to handle urgent research needs that arise outside the annual planning cycle.
+- The relationship between research resource allocation and administration (D11-001).
+- The research proposal format: how to propose, document, and approve new research programs.</p>
+<p><strong>Out of scope:</strong>
+- Specific experimental methodology (D14-002).
+- Specific technology evaluation processes (D14-003).
+- Knowledge classification (D14-004).
+- General administrative budgeting and resource management (D11-001, though research resource allocation feeds into it).
+- Research ethics constraints on permissible research (D14-011).</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Scarcity Problem</h3>
+<p>Every institution has finite resources. This institution has especially finite resources. The operator's time is divided among operations, maintenance, administration, research, documentation, and personal well-being. There is no separate research staff. There is no research budget funded by grants or revenue. The research function competes directly with every other function for the same pool of time and energy.</p>
+<p>This scarcity is not a deficiency to be overcome but a constraint to be managed. The institution that tries to research everything will research nothing well. The institution that refuses to prioritize will scatter its limited resources across too many investigations, completing none of them thoroughly. Prioritization is not a bureaucratic overhead -- it is the mechanism that converts scattered effort into focused impact.</p>
+
+<h3>3.2 The Curiosity-Mission Tension</h3>
+<p>There are two legitimate motivations for research in this institution. The first is mission-critical need: the backup system seems unreliable, and the institution needs to know whether to replace it. The second is curiosity: a new filesystem has emerged that seems interesting, and the operator wants to understand how it works even though there is no immediate need to adopt it.</p>
+<p>Both motivations are valid. Mission-critical research keeps the institution functioning. Curiosity-driven research keeps it intellectually alive and prevents the stagnation that D14-001 identifies as a primary failure mode. An institution that only researches immediate needs will never discover improvements it did not know it needed. An institution that only follows curiosity will neglect the problems that threaten its operational stability.</p>
+<p>The prioritization framework must balance these motivations, reserving dedicated capacity for both.</p>
+
+<h3>3.3 The Urgency Trap</h3>
+<p>In any prioritization system, urgent tasks tend to crowd out important ones. A failing disk requires immediate investigation (urgent and important). A study of long-term storage format durability is important but never urgent -- until the formats become unreadable. Without explicit protection for non-urgent research, the research program will be consumed entirely by firefighting, and the slow-moving risks will accumulate unaddressed until they become emergencies.</p>
+<p>The prioritization framework addresses this by reserving a fixed allocation for non-urgent, strategic research. This allocation is not discretionary. It is a structural commitment that prevents the research program from degenerating into reactive troubleshooting.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Research Budget</h3>
+<p>The research budget is expressed in time, not money. The primary constraint is operator time. Equipment and energy are secondary constraints that are tracked but rarely limiting compared to the operator's hours.</p>
+<p>The annual research budget allocates a fixed percentage of the operator's working time to research activities. The recommended allocation is 15-20% of productive working hours -- approximately 6-8 hours per week in a 40-hour working week. This allocation is a guideline, not a rigid rule, and may be adjusted based on operational demands. However, it must not fall below 10% (approximately 4 hours per week) in any quarter, because below that threshold the research program cannot maintain the minimum two formal investigations per year required by D14-001, R-RES-06.</p>
+<p>The budget is divided into three pools:</p>
+<p><strong>Pool 1: Mission-Critical Research (50% of research time).</strong> Research driven by identified operational needs, technology evaluation requirements, or problem diagnosis. This pool funds investigations where the institution needs answers to specific questions. Examples: evaluating a replacement for failing hardware, investigating an unexplained system behavior, testing a new backup strategy. Mission-critical research is prioritized by operational impact.</p>
+<p><strong>Pool 2: Strategic Research (30% of research time).</strong> Research that addresses long-term risks, explores future options, or builds foundational knowledge. This pool is explicitly protected from being raided by mission-critical needs. Examples: studying long-term storage format viability, evaluating emerging technologies years before adoption would be necessary, investigating whether current assumptions about system longevity are still valid. Strategic research is prioritized by time-horizon value.</p>
+<p><strong>Pool 3: Curiosity-Driven Research (20% of research time).</strong> Research motivated by the operator's intellectual interest, without an immediate operational or strategic justification. This pool exists because curiosity is the engine of discovery and because restricting research to only predefined categories guarantees the institution will never learn anything it did not already know to ask about. Curiosity-driven research is not subject to the formal prioritization criteria -- the operator may pursue whatever interests them within this allocation. However, it must still follow the experimental methodology (D14-002) and be documented in the research archive.</p>
+
+<h3>4.2 The Prioritization Framework</h3>
+<p>Research proposals competing for Pool 1 (Mission-Critical) and Pool 2 (Strategic) allocation are evaluated against five criteria:</p>
+<p><strong>Criterion 1: Operational Impact (weight 3x).</strong> How significantly would the research outcome affect institutional operations? An investigation into a potentially failing critical system scores higher than an investigation into optimizing an already-functional system. Impact is assessed not by the probability of a positive result but by the magnitude of the consequence if the question goes unanswered.</p>
+<p><strong>Criterion 2: Time Sensitivity (weight 2x).</strong> How quickly is the answer needed? An investigation into a system showing early signs of failure is more time-sensitive than one into a technology that might be useful in five years. Time sensitivity is assessed against the window of opportunity: if the investigation is deferred, will the opportunity to act on the results be lost?</p>
+<p><strong>Criterion 3: Resource Efficiency (weight 2x).</strong> How much research time, equipment, and energy does the investigation require relative to its expected value? A quick experiment that could resolve a significant question scores higher than a months-long study that addresses a minor one. Resource efficiency is not about minimizing cost -- it is about maximizing the return on scarce resources.</p>
+<p><strong>Criterion 4: Knowledge Gap Severity (weight 2x).</strong> How critical is the gap in institutional knowledge that this investigation would fill? A question about which the institution currently has no knowledge at all is more severe than one where the institution has partial or provisional knowledge. This criterion also considers the consequences of acting on the current knowledge gap: if the institution is currently making decisions based on incomplete understanding, the gap is more severe.</p>
+<p><strong>Criterion 5: Dependency (weight 1x).</strong> Does other research or operational activity depend on the outcome of this investigation? An investigation whose results are prerequisites for three other planned investigations scores higher than one with no downstream dependencies.</p>
+<p>Each criterion is scored on a five-point scale (1-5), and the weighted total produces a priority score out of 50. Proposals are ranked by score and funded in order until the pool is exhausted. Ties are resolved by the operator's judgment, documented in the annual research plan.</p>
+
+<h3>4.3 The Annual Research Plan</h3>
+<p>At the beginning of each calendar year, the operator produces an Annual Research Plan (ARP) containing:</p>
+<ul>
+<li><strong>Budget allocation:</strong> The total hours allocated to research for the year, divided into the three pools.</li>
+<li><strong>Carryover items:</strong> Research programs continuing from the prior year, with updated status and remaining resource requirements.</li>
+<li><strong>New proposals:</strong> Research proposals for the year, scored against the prioritization criteria and ranked.</li>
+<li><strong>Funded list:</strong> The proposals that fit within the available budget, in priority order.</li>
+<li><strong>Wait list:</strong> Proposals that scored well but could not be funded within the budget. These are first in line if additional capacity becomes available.</li>
+<li><strong>Open questions review:</strong> A review of the open questions registry (D14-006, LRSD Section 2) to determine whether any have become urgent enough to warrant investigation this year.</li>
+<li><strong>Negative results check:</strong> A review of the negative results registry (D14-005) to ensure planned investigations do not duplicate prior failures.</li>
+</ul>
+<p>The ARP is a living document. It is updated quarterly to reflect changes in priorities, unexpected research needs, and actual time spent versus planned.</p>
+
+<h3>4.4 The Research Proposal Format</h3>
+<p>Every formal research proposal -- whether for a new investigation or a significant expansion of an existing one -- is documented with the following fields:</p>
+<ul>
+<li><strong>Proposal ID:</strong> Format RP-YYYY-NNN.</li>
+<li><strong>Title:</strong> Descriptive title for the proposed investigation.</li>
+<li><strong>Pool:</strong> Mission-Critical, Strategic, or Curiosity-Driven.</li>
+<li><strong>Question:</strong> The specific question the investigation would answer.</li>
+<li><strong>Justification:</strong> Why this question matters to the institution.</li>
+<li><strong>Prioritization scores:</strong> Scores for each of the five criteria (Pool 1 and Pool 2 only).</li>
+<li><strong>Resource estimate:</strong> Estimated hours, equipment requirements, and energy impact.</li>
+<li><strong>Duration estimate:</strong> Expected time from start to completion.</li>
+<li><strong>Dependencies:</strong> What this investigation depends on and what depends on it.</li>
+<li><strong>Negative results check:</strong> Results of the registry search per D14-005.</li>
+<li><strong>Methodology outline:</strong> Brief description of the planned approach per D14-002.</li>
+<li><strong>Decision:</strong> Funded, Wait-listed, or Declined (with reasoning).</li>
+</ul>
+
+<h3>4.5 Emergency Research Provisions</h3>
+<p>Urgent research needs that arise outside the annual planning cycle are handled through an emergency research provision. If an operational situation requires immediate investigation -- a system exhibiting unexplained behavior, a security concern requiring analysis, a critical component showing signs of failure -- the operator may initiate an investigation without going through the annual prioritization process. Emergency research draws from Pool 1 (Mission-Critical) first. If Pool 1 is exhausted, it may draw from Pool 2 (Strategic), but the displaced strategic research must be rescheduled, not silently abandoned.</p>
+<p>Emergency research must be documented retroactively with a research proposal filed within 14 days of initiation. This ensures the emergency is recorded in the research plan and its resource consumption is tracked.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-RPA-01:</strong> The research time allocation must not fall below 10% of productive working hours in any quarter. If operational demands threaten to reduce research below this threshold, the operator must document the situation, identify what research is being deferred, and schedule catch-up time in the following quarter.</li>
+<li><strong>R-RPA-02:</strong> The Annual Research Plan must be produced by February 1 of each year and updated quarterly. The plan must be filed in the research archive.</li>
+<li><strong>R-RPA-03:</strong> Pool 2 (Strategic Research) allocation may not be redirected to Pool 1 (Mission-Critical) except in documented emergency situations. The structural protection of strategic research is the mechanism that prevents the research program from degenerating into reactive troubleshooting.</li>
+<li><strong>R-RPA-04:</strong> Pool 3 (Curiosity-Driven Research) may not be eliminated entirely. A minimum of 10% of total research time must remain available for curiosity-driven work, because the institution cannot predict in advance which undirected investigations will produce the most valuable discoveries.</li>
+<li><strong>R-RPA-05:</strong> All formal research proposals must include a negative results registry search (D14-005) before being approved. Proposals that duplicate prior failed work without addressing why conditions have changed must be returned for revision.</li>
+<li><strong>R-RPA-06:</strong> Emergency research must be documented retroactively with a research proposal within 14 days of initiation. Undocumented emergency research is invisible to the prioritization system and distorts resource tracking.</li>
+<li><strong>R-RPA-07:</strong> The prioritization criteria (Section 4.2) must be applied consistently. The operator may override a prioritization score, but the override must be documented with explicit reasoning. "I felt like this was more important" is not sufficient reasoning; "this investigation is prerequisite for a migration that must complete before hardware end-of-life in Q3" is.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Research starvation.</strong> Operational demands consume all available time, and research falls below the minimum threshold. The institution stops learning and begins ossifying. Mitigation: R-RPA-01 establishes a hard floor. The quarterly ARP update provides early warning when research time is being squeezed.</li>
+<li><strong>Strategic research raiding.</strong> Every urgent need is treated as an emergency, and Pool 2 is chronically emptied to fund Pool 1 overruns. The institution becomes purely reactive, never addressing long-term risks. Mitigation: R-RPA-03 protects Pool 2 allocation. The quarterly ARP review tracks whether strategic research is actually being conducted.</li>
+<li><strong>Curiosity guilt.</strong> The operator feels that curiosity-driven research is self-indulgent and consistently redirects Pool 3 time to "more productive" uses. The research program loses its serendipity function. Mitigation: R-RPA-04 protects minimum curiosity allocation. D14-001 explicitly values curiosity as the engine of discovery.</li>
+<li><strong>Planning theater.</strong> The ARP is produced annually as a formality but not actually used to guide research decisions. Research is conducted ad hoc, and the plan is retroactively adjusted to match. Mitigation: quarterly ARP updates compare planned versus actual work. Significant discrepancies must be explained.</li>
+<li><strong>Prioritization gaming.</strong> The operator unconsciously inflates scores for investigations they find interesting and deflates scores for investigations they find boring. The prioritization framework becomes a rationalization tool rather than an evaluation tool. Mitigation: R-RPA-07 requires documented reasoning for score overrides. The adversarial review discipline from D14-001 applies to prioritization as well.</li>
+<li><strong>Emergency overuse.</strong> The emergency research provision is used routinely for investigations that are not genuinely urgent, bypassing the annual prioritization process. Mitigation: R-RPA-06 requires retroactive documentation. The quarterly ARP review should flag quarters where emergency research consumed more than 25% of total research time.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If research has fallen below the minimum threshold:</strong> Conduct an immediate time audit. Identify what consumed the research allocation. If operational demands were genuinely overwhelming, document the situation and schedule double research allocation for the following quarter. If the research time was simply lost to poor time management, establish a protected research block in the weekly schedule -- a specific day or half-day that is reserved for research and not available for other tasks.</li>
+<li><strong>If strategic research has been neglected:</strong> Review the wait list from the current ARP. Identify the highest-priority strategic investigation and begin it immediately, even if it means deferring a lower-priority mission-critical investigation. The goal is to re-establish the practice of strategic research, not to produce a major result immediately.</li>
+<li><strong>If the ARP has not been produced or updated:</strong> Produce one immediately, even if the year is partially elapsed. Survey all current and planned research activities. Score them against the prioritization criteria. Establish allocations for the remainder of the year. File the ARP in the research archive. The value of the ARP increases over time as the history of research plans becomes a record of institutional research priorities.</li>
+<li><strong>If prioritization has been gamed or ignored:</strong> Re-score all current research proposals using the criteria in Section 4.2 with explicit attention to the adversarial review discipline. For each score, ask: am I scoring this based on the criteria, or based on my personal preference? Document the re-scoring and any changes to the funded list.</li>
+<li><strong>If emergency research has become the norm:</strong> Review all emergency research from the past year. For each, ask: was this genuinely urgent, or was it a routine investigation that bypassed the planning process because it was easier? Reclassify non-emergencies retroactively and adjust Pool 1 allocation accounting. Establish clearer criteria for what constitutes a genuine research emergency.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The prioritization framework is being calibrated. The first ARPs will likely be crude -- rough time estimates, untested prioritization weights, and an uncertain balance between the three pools. This is expected. The value of the early ARPs is in establishing the discipline of planned, prioritized research. The pool ratios (50/30/20) may need adjustment based on actual experience.</li>
+<li><strong>Years 5-15:</strong> The ARP history provides data on research productivity. Which pool generated the most operationally valuable results? Was the 50/30/20 split appropriate, or should strategic research receive more allocation? Has curiosity-driven research produced unexpected breakthroughs that justify its allocation? These questions can now be answered empirically.</li>
+<li><strong>Years 15-30:</strong> If succession occurs, the ARP history gives the successor a clear picture of the institution's research priorities over time. The successor may have different priorities -- that is their prerogative -- but they can see how their predecessor allocated research resources and what the results were. The Research Continuity Confirmation (D14-006) should address the successor's intended changes to the prioritization framework.</li>
+<li><strong>Years 30-50+:</strong> The cumulative ARP archive tells the story of the institution's intellectual priorities across decades. It reveals which research programs were funded consistently, which were deferred repeatedly, and which emerged unexpectedly. This history informs not just future research planning but the institution's understanding of its own intellectual character.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The hardest part of research prioritization in a one-person institution is that the person doing the prioritizing is also the person doing the research. There is no manager to say "that investigation can wait" and no board to say "this question is more important." Every prioritization decision is a conversation with myself, and I am an unreliable interlocutor because I have preferences, enthusiasms, and aversions that I do not always recognize.</p>
+<p>The framework in this article is my attempt to create a structure that compensates for that unreliability. The three pools exist because I know that left to my own devices, I would spend all my research time on whatever is most interesting (Pool 3 behavior applied to the entire budget) and none on the boring but important investigations that keep the institution healthy. The prioritization criteria exist because I know that "this feels important" is not the same as "this is important," and I need a rubric to tell me the difference.</p>
+<p>I am most worried about strategic research starvation. There will always be an operational fire to investigate. The temptation to raid Pool 2 will be constant. I have written R-RPA-03 as a commitment to my future self: the strategic research allocation is not optional, even when operational demands are intense. The fires will always be there. The long-term risks will become fires themselves if I do not investigate them before they ignite.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (resource constraints, lifetime operation, self-containment)</li>
+<li>GOV-001 -- Authority Model (decision tiers for research resource allocation)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first, operational tempo, sustainability)</li>
+<li>D14-001 -- Research Philosophy (R-RES-06: minimum research activity, anti-stagnation mandate)</li>
+<li>D14-002 -- Experimental Design for Solo Researchers (methodology for funded investigations)</li>
+<li>D14-003 -- Technology Evaluation Framework (primary consumer of Pool 1 and Pool 2 research)</li>
+<li>D14-005 -- Negative Results Registry (mandatory pre-proposal search)</li>
+<li>D14-006 -- Multi-Generational Research Continuity (LRSD open questions, ARP as succession resource)</li>
+<li>D14-011 -- Research Ethics and Permissible Experimentation (ethical constraints on research scope)</li>
+<li>D11-001 -- Administration Philosophy (budget integration, scheduling)</li>
+<li>D13-001 -- Evolution Philosophy (research as input to evolution priorities)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

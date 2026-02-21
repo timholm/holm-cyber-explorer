@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D6-004 — Archive Management Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li class="active"><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d6-004">
+  <h1>D6-004 &mdash; Archive Management Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D6-004</dd>
+  <dt>Domain</dt>
+  <dd>6 -- Data & Archives</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-002, D6-003, D6-007</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-005, D6-006, D6-008, D6-009, D6-011, D6-014. All articles involving data storage, retrieval, or audit.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how archives are organized, maintained, accessed, and audited within the holm.chat Documentation Institution. An archive is not merely a collection of old files. It is the physical and logical embodiment of the institution's memory -- the structure through which decades of data remain findable, readable, and meaningful long after the person who created them has forgotten the context or is no longer present to explain it.</p>
+<p>The distinction between "storing data" and "maintaining an archive" is the distinction between a box of unsorted papers in an attic and a library with a catalogue. Both contain information. Only one allows retrieval. This institution is designed to persist for fifty years or more. Without disciplined archive management, data accumulates into an undifferentiated mass that grows less useful with every passing year. With disciplined archive management, data becomes more valuable over time because the archive structure itself encodes relationships, context, and retrievability.</p>
+<p>This article provides the directory structures, naming conventions, metadata requirements, access procedures, and audit schedules that transform raw storage into a functioning archive. It implements the principles of data stewardship established in D6-001 and the metadata standards defined in D6-007. Every procedure here serves one goal: any competent person with access to the archive and this document should be able to find, understand, and use any piece of data the institution has preserved, without needing to ask anyone for help.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The canonical directory structure for all institutional archives.</li>
+<li>Naming conventions for directories, files, and archive bundles.</li>
+<li>Metadata requirements for archived items, implementing D6-007 at the archive level.</li>
+<li>Access and retrieval procedures: how to find data in the archive and how to extract it for use.</li>
+<li>The archive audit: what is checked, how often, and what to do when problems are found.</li>
+<li>The transition process: how data moves from active storage to the archive.</li>
+<li>Archive integrity verification as it relates to the broader integrity framework in D6-006.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophy of what to keep and why (see D6-001).</li>
+<li>Specific file formats for archival storage (see D6-003).</li>
+<li>Backup procedures for the archive itself (see D6-006).</li>
+<li>Metadata field definitions and controlled vocabularies (see D6-007).</li>
+<li>Storage media selection and health monitoring (see D6-008).</li>
+<li>Retention schedules and disposal procedures (see D6-011).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Structure Matters More Than Storage</h3>
+<p>Storage is cheap and getting cheaper. Structure is expensive and getting more expensive, because it requires human judgment. An institution that buys more disks when storage fills is spending money. An institution that maintains a coherent archive structure as data grows is spending discipline. Over fifty years, the disciplined institution will be able to find a specific document in minutes. The undisciplined institution will have petabytes of data and no idea what is in them.</p>
+<p>The history of digital archives is a history of structural failure. Organizations that stored everything without organizing it discovered, years later, that their data was functionally inaccessible -- not because the bits had degraded, but because nobody could determine what was where or what it meant. The physical media were intact. The logical structure was absent. This article exists to prevent that outcome.</p>
+<h3>3.2 The Air-Gap Archival Constraint</h3>
+<p>In an internet-connected environment, search engines and indexing services compensate for poor archive structure. You can find a needle in a haystack if you have a sufficiently powerful magnet. In an air-gapped institution, the archive structure is the search engine. There is no external indexing service. There is no cloud-based full-text search. The directory hierarchy, the naming conventions, and the metadata catalogue are the only tools available for locating data. They must be good enough to work without computational brute force.</p>
+<h3>3.3 Archives as Institutional Infrastructure</h3>
+<p>The archive is not a passive repository. It is active infrastructure. The governance system references archived decisions. The intelligence function queries archived assessments. The training system draws on archived materials. The operational logs form an archived record of institutional activity. Every domain in this institution depends on the archive functioning correctly. Archive management is therefore not a maintenance task relegated to spare time. It is core infrastructure maintenance, equivalent in importance to keeping the servers running.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Canonical Directory Structure</h3>
+<p>All institutional data resides within a single root archive path. Below this root, the structure is organized by tier, then by domain, then by year, then by category. The structure is:</p>
+<p><code>/archive/
+  tier1-institutional/
+    governance/
+      decisions/
+        YYYY/
+      amendments/
+        YYYY/
+      reviews/
+        YYYY/
+    documentation/
+      domain-NN/
+        YYYY/
+    logs/
+      operational/
+        YYYY/
+        YYYY-MM/
+      security/
+        YYYY/
+      system/
+        YYYY/
+  tier2-operational/
+    projects/
+      [project-name]/
+        YYYY/
+    configurations/
+      [system-name]/
+        current/
+        history/
+          YYYY/
+    maintenance/
+      YYYY/
+  tier3-reference/
+    research/
+      [topic]/
+    imported/
+      YYYY/
+      YYYY-MM/
+    media/
+      [collection]/
+  tier4-transient/
+    scratch/
+    drafts/
+    temp/</code></p>
+<p>Rules governing this structure:</p>
+<ul>
+<li><strong>The root path is a configuration parameter.</strong> It is documented in the system configuration and may differ between machines. All procedures reference <code>$ARCHIVE_ROOT</code> rather than a hardcoded path.</li>
+<li><strong>Year directories use four-digit years.</strong> No two-digit year abbreviations. No ambiguity about century.</li>
+<li><strong>Month directories, where used, use YYYY-MM format.</strong> Never month names. Never locale-dependent abbreviations.</li>
+<li><strong>Domain directories use the domain number with zero-padding.</strong> Domain 6 is <code>domain-06</code>, not <code>domain-6</code>. This ensures correct lexicographic sorting.</li>
+<li><strong>Project and topic directories use lowercase kebab-case.</strong> Spaces, uppercase letters, and special characters other than hyphens are prohibited in directory names.</li>
+<li><strong>No directory shall exceed 1,000 immediate children.</strong> If a directory approaches this limit, subdivide it by adding a layer of categorization. An overfull directory is as useless as an unstructured one.</li>
+</ul>
+<h3>4.2 Naming Conventions</h3>
+<p>Every file in the archive follows a naming pattern that encodes essential context without requiring the catalogue to be consulted:</p>
+<p><strong>Pattern:</strong> <code>YYYY-MM-DD_[source]_[descriptor]_v[version].[ext]</code></p>
+<ul>
+<li><strong>YYYY-MM-DD:</strong> The date the content was created (not the date it was archived).</li>
+<li><strong>source:</strong> The originating entity, system, or process. For operator-created documents: <code>op</code>. For system-generated data: the system name. For imported data: the external source abbreviated to a maximum of 12 characters.</li>
+<li><strong>descriptor:</strong> A brief, human-readable description of the content. Maximum 50 characters. Lowercase kebab-case. Must be meaningful to someone who has never seen the file. <code>meeting-notes</code> is acceptable. <code>mn</code> is not. <code>untitled</code> is never acceptable.</li>
+<li><strong>v[version]:</strong> The version number. For documents that do not have formal versioning, use <code>v1</code>. For documents that are updated, increment the version. The archive retains all versions; it does not overwrite.</li>
+<li><strong>[ext]:</strong> The file extension matching the format. Must correspond to an approved format per D6-003.</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><code>2026-02-15_op_quarterly-archive-audit-report_v1.md</code></li>
+<li><code>2026-01-10_syslog_primary-server-january_v1.txt</code></li>
+<li><code>2025-12-01_imported_solar-panel-specifications_v1.pdf</code></li>
+</ul>
+<p><strong>Prohibited naming practices:</strong></p>
+<ul>
+<li>Spaces in filenames. Use hyphens.</li>
+<li>Uppercase letters in filenames. Use lowercase exclusively.</li>
+<li>Characters outside ASCII alphanumerics, hyphens, underscores, and periods.</li>
+<li>Generic names: <code>data</code>, <code>file</code>, <code>backup</code>, <code>new</code>, <code>old</code>, <code>test</code>, <code>final</code>, <code>final-v2</code>.</li>
+<li>Date formats other than ISO 8601 (YYYY-MM-DD).</li>
+</ul>
+<h3>4.3 The Archive Transition Process</h3>
+<p>Data moves from active storage to the archive when its active use frequency declines. The transition process is:</p>
+<ol>
+<li>
+<p><strong>Identify candidates.</strong> During the monthly archive review (see Section 4.5), identify data in active storage that has not been accessed or modified in 90 days (Tier 2 data) or 30 days (Tier 4 data). Tier 1 data is archived on creation. Tier 3 data follows the 90-day rule.</p>
+</li>
+<li>
+<p><strong>Verify classification.</strong> Confirm that the data's tier classification per D6-001 is still correct. Data that was Tier 2 when created may now be Tier 3. Reclassify if necessary and document the change.</p>
+</li>
+<li>
+<p><strong>Verify metadata.</strong> Confirm that all required metadata fields per D6-007 are populated. Missing metadata must be filled before archival. If metadata cannot be determined, document this explicitly in a companion <code>.meta</code> file.</p>
+</li>
+<li>
+<p><strong>Verify format.</strong> Confirm that the data is stored in an approved archival format per D6-003. If not, convert it before archiving. The active-format version may be discarded after successful conversion and verification.</p>
+</li>
+<li>
+<p><strong>Generate integrity checksums.</strong> Compute SHA-256 checksums for every file being archived. Record the checksums in the archive's integrity manifest (see Section 4.4).</p>
+</li>
+<li>
+<p><strong>Move to archive location.</strong> Place the files in the correct location within the canonical directory structure. Do not copy -- move. Active storage should not retain copies of archived data unless the data is also needed for active operations.</p>
+</li>
+<li>
+<p><strong>Update the catalogue.</strong> Add entries to the metadata catalogue per D6-007. The catalogue entry must include the archive path, the checksum, the archive date, and the tier classification.</p>
+</li>
+<li>
+<p><strong>Verify placement.</strong> Confirm that the files are accessible at their archive location, that the checksums match, and that the catalogue entry is correct.</p>
+</li>
+</ol>
+<h3>4.4 The Integrity Manifest</h3>
+<p>Every directory in the archive at the year level or below contains a file named <code>MANIFEST.sha256</code> that lists the SHA-256 checksum of every file in that directory. The manifest format is one line per file:</p>
+<p><code>[checksum]  [filename]</code></p>
+<p>This is the standard output format of <code>sha256sum</code> and can be verified with <code>sha256sum -c MANIFEST.sha256</code>.</p>
+<p>Manifests are regenerated whenever files are added to a directory. Manifests are verified during every archive audit. A manifest that does not match the actual files indicates either corruption, unauthorized modification, or an incomplete archive transition. All three are incidents that require investigation.</p>
+<h3>4.5 Retrieval Procedures</h3>
+<p>To retrieve data from the archive:</p>
+<ol>
+<li>
+<p><strong>Identify the target.</strong> Use the metadata catalogue (per D6-007) to locate the data. Search by date, source, descriptor, tier, or any metadata field. If the catalogue is unavailable, navigate the directory structure using the tier and date hierarchy.</p>
+</li>
+<li>
+<p><strong>Verify integrity before extraction.</strong> Run <code>sha256sum -c MANIFEST.sha256</code> in the directory containing the target file. If the checksum fails, do not use the file. Initiate the corruption response per Section 7.2.</p>
+</li>
+<li>
+<p><strong>Copy, do not move.</strong> Extract data from the archive by copying it to a working location. Never modify files in the archive directly. The archive is immutable after the transition is complete.</p>
+</li>
+<li>
+<p><strong>Record the retrieval.</strong> Log the retrieval in the operational log: what was retrieved, from where, by whom, for what purpose. This is not bureaucracy. It is the mechanism by which the institution knows which archived data is still being used, which informs retention decisions per D6-011.</p>
+</li>
+<li>
+<p><strong>Return modified versions.</strong> If the retrieved data is modified and the modification has archival value, archive the new version as a separate file with an incremented version number. The original remains untouched.</p>
+</li>
+</ol>
+<h3>4.6 The Archive Audit</h3>
+<p>The archive audit is the periodic verification that the archive is intact, organized, and accessible. It occurs at three frequencies:</p>
+<p><strong>Monthly Quick Audit (30 minutes):</strong>
+- Verify that the archive root is accessible and mounted correctly.
+- Spot-check five randomly selected manifest files by running <code>sha256sum -c</code> on each.
+- Review the archive transition log for the past month: were all transitions completed correctly?
+- Check that no files exist outside the canonical directory structure (orphaned files).</p>
+<p><strong>Quarterly Comprehensive Audit (2-4 hours):</strong>
+- Verify all manifests in the Tier 1 archive by running full checksum verification.
+- Spot-check 20% of manifests in Tier 2 and Tier 3 archives.
+- Verify that the metadata catalogue is consistent with the actual archive contents: every catalogued item exists, and every archived item is catalogued.
+- Review the archive's storage consumption. Project growth rates. Flag if any storage tier is above 80% capacity.
+- Verify that naming conventions are being followed. Flag and correct violations.
+- Document audit results in the operational log.</p>
+<p><strong>Annual Deep Audit (1-2 days):</strong>
+- Verify every manifest in the entire archive. This is the full integrity sweep.
+- Verify that every archived file can be opened and read with currently available tools. This catches format rot before it becomes data loss.
+- Review the directory structure for organizational problems: directories that are too full, categories that no longer make sense, structural improvements needed.
+- Reconcile the archive inventory with the metadata catalogue. Resolve all discrepancies.
+- Produce an annual archive health report documenting: total data volume by tier, growth trends, integrity verification results, format health, and any corrective actions taken.
+- The annual audit report is itself archived as Tier 1 data.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D6-004-01:</strong> All archived data must reside within the canonical directory structure defined in Section 4.1. Data stored outside this structure is undiscoverable and effectively lost.</li>
+<li><strong>R-D6-004-02:</strong> All archived files must follow the naming convention defined in Section 4.2. Files that do not conform must be renamed before archival.</li>
+<li><strong>R-D6-004-03:</strong> Every archive directory at the year level or below must contain a valid <code>MANIFEST.sha256</code> file. Directories without manifests are considered unverified.</li>
+<li><strong>R-D6-004-04:</strong> Archived data is immutable. Files in the archive may not be modified after the transition is complete. Corrections are made by archiving a new version, not by editing the existing file.</li>
+<li><strong>R-D6-004-05:</strong> The monthly quick audit, quarterly comprehensive audit, and annual deep audit must be performed on schedule. Deferred audits are recorded as operational incidents.</li>
+<li><strong>R-D6-004-06:</strong> No file may be archived without all required metadata fields per D6-007 being populated.</li>
+<li><strong>R-D6-004-07:</strong> Retrievals from the archive must be logged. Unlogged retrievals defeat the usage-tracking that informs retention decisions.</li>
+<li><strong>R-D6-004-08:</strong> The archive structure may be modified only through the GOV-001 Tier 3 decision process. Ad hoc structural changes create inconsistencies that compound over decades.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Structural drift.</strong> The operator begins placing files outside the canonical structure -- "just temporarily" -- and the temporary locations become permanent. Over years, a shadow archive grows alongside the real one. Data in the shadow archive is unaudited, uncatalogued, and effectively invisible. Mitigation: the monthly audit checks for orphaned files. R-D6-004-01 is absolute.</p>
+</li>
+<li>
+<p><strong>Naming convention erosion.</strong> Under time pressure, the operator stops following naming conventions. Files accumulate with names like <code>backup-old-2.tar.gz</code> and <code>stuff-from-january</code>. Years later, these names are meaningless. Mitigation: the quarterly audit verifies naming compliance. R-D6-004-02 requires correction before archival.</p>
+</li>
+<li>
+<p><strong>Manifest staleness.</strong> Manifests are not updated when files are added. The manifest says the directory contains ten files; it actually contains twelve. The audit cannot detect corruption in the unmanifested files. Mitigation: the archive transition process (Section 4.3) requires manifest regeneration. The audit verifies manifest completeness.</p>
+</li>
+<li>
+<p><strong>Catalogue-archive divergence.</strong> The metadata catalogue says a file exists at a location where it does not, or files exist in the archive that the catalogue does not reference. Mitigation: the quarterly audit includes a reconciliation step. The annual audit performs full reconciliation.</p>
+</li>
+<li>
+<p><strong>Retrieval without logging.</strong> The operator copies files from the archive without recording the retrieval. The institution loses visibility into which archived data is still relevant. Retention decisions are made blind. Mitigation: R-D6-004-07. The operational discipline established in OPS-001 reinforces this as habit.</p>
+</li>
+<li>
+<p><strong>Archive growth exceeding storage.</strong> The archive grows faster than storage capacity. The institution faces a choice between triage and expansion. Mitigation: the quarterly audit tracks storage consumption and projects growth. D6-008 governs storage lifecycle and procurement planning.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>7.1 If structural drift is discovered:</strong>
+1. Identify all files outside the canonical structure. Use a filesystem scan comparing actual paths against the expected structure.
+2. For each orphaned file, determine its correct location in the canonical structure based on its tier, domain, date, and content.
+3. Verify the file's metadata. If metadata is missing, reconstruct it to the extent possible using filesystem timestamps, file content, and the operational log.
+4. Move the file to its correct location. Update the manifest and the catalogue.
+5. Document the incident: how many files were orphaned, for how long, and what corrective steps were taken.
+6. Review why the drift occurred. Adjust operational procedures to prevent recurrence.</p>
+<p><strong>7.2 If integrity verification fails:</strong>
+1. Identify the specific files whose checksums do not match.
+2. Do not delete or overwrite the corrupted files. They may be partially recoverable.
+3. Check whether backup copies of the affected files exist per D6-006. If so, restore from the most recent verified backup.
+4. If no backup copy exists, attempt to open and read the corrupted files. Assess what data can be salvaged.
+5. Document the corruption: which files, when detected, probable cause (media degradation, incomplete write, hardware error), and the outcome of recovery attempts.
+6. If the corruption indicates media degradation, escalate to D6-008 storage lifecycle procedures.</p>
+<p><strong>7.3 If the catalogue is lost or corrupted:</strong>
+1. The archive itself is the primary record. The catalogue is a derived index, not the source of truth.
+2. Rebuild the catalogue by walking the archive directory structure and reading the metadata files and manifest files in each directory.
+3. This is labor-intensive but not data-threatening. The data is intact; only the index is lost.
+4. Prioritize rebuilding the Tier 1 catalogue entries first.
+5. Document the incident and investigate the cause. Ensure the catalogue itself is backed up per D6-006 and stored as Tier 1 data.</p>
+<p><strong>7.4 If the archive becomes inaccessible due to media failure:</strong>
+1. Invoke D6-008 media failure procedures.
+2. Restore from backup per D6-006.
+3. After restoration, run a full integrity verification (annual deep audit scope) on the restored archive.
+4. Document the failure and the recovery in the operational log and the annual archive health report.</p>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The archive structure is being established. Expect the category system to require refinement as real data reveals gaps in the initial taxonomy. Document every structural decision and the reasoning behind it. The first annual deep audit will likely reveal organizational problems that need correction.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The archive structure should be stable. The primary challenges will be maintaining discipline as the archive grows from gigabytes to terabytes, and managing the first wave of storage media transitions per D6-008. The quarterly audits become increasingly important as the archive grows beyond the size where the operator can hold its structure in memory.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The archive may contain data from multiple hardware generations, multiple storage media types, and potentially multiple operators. The directory structure's consistency across these transitions is its most important quality. The naming conventions and metadata standards prove their worth as the oldest data ages beyond anyone's direct memory.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The archive is now a historical record spanning decades. Its value increases with age, but so does the maintenance burden. The annual deep audit may take several days. Consider whether automation can assist with integrity verification while maintaining the human-in-the-loop requirement for structural decisions.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the canonical directory structure consistently fails to accommodate new types of data, or if the archive has grown so large that the audit schedules are impractical, this article should be revised through the GOV-001 Tier 3 decision process.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The hardest part of archive management is not the technical structure. It is the discipline. Every single time I save a file, I must ask: does this follow the naming convention? Is the metadata complete? Is it going to the right directory? And every single time I am in a hurry or tired, the temptation is to dump the file somewhere convenient and "fix it later." Later never comes. The shadow archive grows. This is how digital entropy wins.</p>
+<p>The canonical directory structure in Section 4.1 is deliberately simple -- three levels of hierarchy before you reach the year directory. More levels would allow finer categorization but would create more opportunities for misplacement and more cognitive overhead for every file operation. If future operators find they need more depth, they should add it within the existing structure rather than creating parallel structures. One tree, well-maintained, is worth more than a forest of abandoned filing systems.</p>
+<p>The immutability rule (R-D6-004-04) will feel excessive at first. "Why can't I just fix the typo in the archived file?" Because the moment you allow modification of archived files, you lose the ability to trust that the archive reflects what actually happened. The archive is a record, not a living document. Living documents live in active storage. Records live in the archive. This distinction is the foundation of institutional memory.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (documentation completeness, institutional continuity)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (data integrity threats)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle, operational tempo, audit schedules)</li>
+<li>D6-001 -- Data Philosophy (four-tier data hierarchy, data lifecycle, data stewardship ethic)</li>
+<li>D6-002 -- The Canonical Data Model (entity types and relationships that the archive must accommodate)</li>
+<li>D6-003 -- Format Longevity Doctrine (approved archival formats)</li>
+<li>D6-006 -- Backup Verification and Test Restoration (backup of the archive; integrity verification)</li>
+<li>D6-007 -- Metadata Standards and Procedures (required metadata fields for all archived items)</li>
+<li>D6-008 -- Storage Lifecycle Management (media health monitoring for archive storage)</li>
+<li>D6-011 -- Retention Schedules &amp; Disposal Policy (when archived data may be disposed)</li>
+<li>D6-014 -- Data Ingest Procedures (data entering the institution before archival)</li>
+<li>GOV-001 -- Authority Model (decision tiers for structural changes)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

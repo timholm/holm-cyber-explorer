@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D14-010 — Integration of Research into Operational Practice - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li class="active"><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d14-010">
+  <h1>D14-010 &mdash; Integration of Research into Operational Practice</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D14-010</dd>
+  <dt>Domain</dt>
+  <dd>14 -- Research & Theory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, D14-001, D14-004, D14-009, D13-001, D11-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All domains that modify operational procedures based on research findings. Referenced by Domain 13 (Evolution) for research-driven migration triggers. Referenced by Domain 11 (Administration) for operational change management.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how validated research findings are translated into changes in operational procedures, system designs, or institutional policies. It addresses the gap between knowing something and doing something about it -- the distance between "our research shows that approach A is superior to approach B" and actually switching from B to A in production.</p>
+<p>This gap is wider than it appears. Research produces knowledge. Operations requires action. The translation from knowledge to action involves risk assessment (what could go wrong during the transition?), resource planning (what does the change cost in time and effort?), dependency analysis (what else is affected by this change?), and timing (when is the right moment to make the change?). These are not research questions -- they are operational and evolutionary questions that fall at the boundary between Domain 14 (Research), Domain 13 (Evolution), and the operational domains.</p>
+<p>D14-001, R-RES-05 establishes that research results do not automatically become operational practice. This article defines the controlled pathway by which validated findings cross from the research domain into the operational domain, ensuring that good research is not wasted through inaction and that incomplete research is not prematurely deployed through enthusiasm.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The integration assessment process: evaluating whether a research finding should trigger an operational change.
+- The Integration Decision Record (IDR): documentation format for integration decisions.
+- The handoff from research to evolution: how validated findings are transferred to Domain 13 for migration planning.
+- Integration urgency classification: how quickly an operational change should be implemented.
+- Monitoring post-integration outcomes: verifying that the change produced the expected result.
+- The integration backlog: managing findings that are validated but not yet integrated.</p>
+<p><strong>Out of scope:</strong>
+- The research process itself (D14-001 through D14-009).
+- The evolution and migration framework (Domain 13, though integration triggers evolution processes).
+- Specific operational procedures in individual domains.
+- General change management (GOV-001, OPS-001).</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Know-Do Gap</h3>
+<p>Institutions routinely know more than they do. Research findings sit in archives, validated and classified, while the operational practices they could improve continue unchanged. This happens for understandable reasons: operational changes carry risk, the current practice works well enough, the change requires effort that competes with other priorities, and nobody has time to plan the transition. Each reason is individually rational. Collectively, they produce an institution that learns but does not act on its learning.</p>
+<p>This is a form of institutional waste. The resources spent on research are justified by the improvements that research enables. If the improvements are never implemented, the research was an academic exercise -- and D14-001 explicitly states that this institution's research is not academic. It is operational. It exists to improve the institution's functioning. If validated findings are not considered for integration, the research function is not fulfilling its purpose.</p>
+
+<h3>3.2 The Premature Integration Danger</h3>
+<p>The opposite failure is equally dangerous: implementing research findings before they are adequately validated. Enthusiasm for a promising result, pressure to show that research time was well-spent, or urgency to fix a known problem can all drive premature integration. The result is operational changes based on insufficient evidence, which may introduce new failures that are harder to diagnose because they were introduced intentionally based on "research."</p>
+<p>D14-001, R-RES-05 is the safeguard: research findings must go through the validation process (D14-009) and the evolution framework (Domain 13) before operational procedures are modified. This article provides the structured pathway that makes R-RES-05 practical.</p>
+
+<h3>3.3 The Integration as Experiment</h3>
+<p>Every operational change based on research is, in a sense, another experiment. The research demonstrated that approach A works in the test environment under controlled conditions. The integration deploys approach A in the production environment under real conditions. These conditions may differ in ways that the research did not anticipate. The integration process must therefore include monitoring and rollback provisions -- the ability to detect whether the change is producing the expected result and to reverse it if it is not.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Integration Assessment</h3>
+<p>When a research finding is classified as "verified" or "provisional" in the knowledge registry (D14-004), an integration assessment is triggered. The assessment asks five questions:</p>
+<p><strong>Question 1: Does this finding have operational implications?</strong> Not all research findings require operational changes. A finding that "our hardware performs within manufacturer specifications under sustained load" confirms existing practice but does not change it. If the finding has no operational implications, the assessment is complete and the finding remains in the knowledge registry as institutional knowledge without triggering further action.</p>
+<p><strong>Question 2: What operational change would this finding support?</strong> If the finding has operational implications, the specific change must be described. Vague implications ("we should probably update our backup strategy") are not actionable. Specific implications ("the research shows that incremental backups with weekly full backups provide equivalent data protection to our current daily full backups at 40% of the storage cost") are actionable.</p>
+<p><strong>Question 3: What is the confidence level of the finding relative to the risk of the change?</strong> A high-risk operational change (e.g., changing the filesystem on the primary storage system) requires "verified" confidence. A low-risk operational change (e.g., adjusting a monitoring threshold) may be implemented on "provisional" confidence. The integration assessment explicitly evaluates this ratio: is the evidence strong enough to justify the risk?</p>
+<p><strong>Question 4: What is the urgency?</strong> Integration urgency is classified into three levels: Critical (the current practice is causing active harm or risk; change should be implemented within 30 days), Standard (the current practice is functional but suboptimal; change should be implemented within the next planning cycle), and Deferred (the finding is valuable but the change is not needed immediately; add to the integration backlog for future implementation).</p>
+<p><strong>Question 5: Does this change require the evolution framework?</strong> Changes that affect system architecture, technology stack, or institutional infrastructure must go through Domain 13 (Evolution). Changes that are limited to procedure adjustments within an existing system may be implemented directly through the relevant domain's change management process. The boundary is defined by reversibility: if the change can be reversed in under one hour with no data loss, it may bypass the evolution framework. If not, it goes through Domain 13.</p>
+
+<h3>4.2 The Integration Decision Record (IDR)</h3>
+<p>Every integration assessment produces an IDR containing:</p>
+<ul>
+<li><strong>IDR ID:</strong> Format IDR-YYYY-NNN.</li>
+<li><strong>Date:</strong> Date of the integration decision.</li>
+<li><strong>Research reference:</strong> Knowledge registry ID and experiment/TDR references.</li>
+<li><strong>Finding summary:</strong> One-paragraph summary of the research finding.</li>
+<li><strong>Operational implication:</strong> The specific operational change supported by the finding.</li>
+<li><strong>Confidence assessment:</strong> The confidence level of the finding and its adequacy for the proposed change.</li>
+<li><strong>Risk assessment:</strong> What could go wrong during or after integration. What is the worst case?</li>
+<li><strong>Urgency classification:</strong> Critical, Standard, or Deferred, with rationale.</li>
+<li><strong>Evolution framework requirement:</strong> Whether Domain 13 involvement is needed, with rationale.</li>
+<li><strong>Decision:</strong> Integrate, Defer, or Decline (with reasoning).</li>
+<li><strong>Implementation plan reference:</strong> If integrating, reference to the implementation plan or evolution proposal.</li>
+<li><strong>Monitoring plan:</strong> How the post-integration outcome will be monitored and evaluated.</li>
+<li><strong>Rollback plan:</strong> How to reverse the change if it does not produce the expected result.</li>
+<li><strong>Review date:</strong> When the integration outcome will be formally assessed.</li>
+</ul>
+
+<h3>4.3 Post-Integration Monitoring</h3>
+<p>Every integrated change is monitored for a defined period after implementation. The monitoring plan, established in the IDR, defines what metrics will be tracked, what the expected values are (based on the research findings), and what deviations would trigger a rollback or further investigation.</p>
+<p>The monitoring period depends on the nature of the change:</p>
+<ul>
+<li><strong>Procedural changes:</strong> Minimum 90 days of monitoring. The operator executes the new procedure multiple times and records whether it performs as the research predicted.</li>
+<li><strong>System configuration changes:</strong> Minimum 180 days of monitoring. System performance, stability, and error rates are tracked and compared against pre-change baselines.</li>
+<li><strong>Technology adoptions:</strong> Minimum 365 days of monitoring, aligned with the technology review cycle established in D14-003.</li>
+</ul>
+<p>At the end of the monitoring period, a Post-Integration Assessment is conducted and filed with the IDR. The assessment answers: did the change produce the expected result? Were there unexpected consequences? Should the change be made permanent, modified, or reversed? The assessment feeds back into the knowledge registry, either confirming the original finding or contributing new evidence that may modify its classification.</p>
+
+<h3>4.4 The Integration Backlog</h3>
+<p>Findings that are validated and have operational implications but are deferred for implementation form the integration backlog. The backlog is maintained as part of the Living Research State Document (D14-006) and reviewed quarterly as part of the Annual Research Plan update (D14-007).</p>
+<p>The backlog prevents validated research from being forgotten. Each backlog item includes: the IDR reference, the reason for deferral, the conditions under which implementation should be reconsidered, and the estimated resources needed for implementation. Items that have been on the backlog for more than two years without implementation must be reviewed: has the finding been superseded? Have conditions changed? Is the finding still operationally relevant?</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-RPI-01:</strong> Every research finding classified as "verified" must have an integration assessment completed within 90 days of classification. The assessment may conclude that no operational change is needed, but the assessment itself is mandatory.</li>
+<li><strong>R-RPI-02:</strong> No operational change based on research findings may be implemented without a completed Integration Decision Record. Emergency changes may proceed with a preliminary IDR, but the full IDR must be completed within 30 days.</li>
+<li><strong>R-RPI-03:</strong> Operational changes based on "provisional" findings must be explicitly labeled as provisional and must include enhanced monitoring and readily available rollback procedures. The IDR must document why provisional confidence is sufficient for this particular change.</li>
+<li><strong>R-RPI-04:</strong> All integrated changes must have post-integration monitoring plans. The monitoring period may not be shortened without documented justification. Failure to monitor an integrated change is a validation failure -- the institution cannot know whether the research finding held up in practice.</li>
+<li><strong>R-RPI-05:</strong> The integration backlog must be reviewed quarterly. Items older than two years must be explicitly re-evaluated for continued relevance. Stale backlog items that are no longer relevant must be closed with documentation of why.</li>
+<li><strong>R-RPI-06:</strong> Operational changes that affect system architecture or cannot be reversed within one hour must go through the evolution framework (Domain 13). The integration process does not authorize infrastructure-level changes -- it identifies the need and hands off to the appropriate change management process.</li>
+<li><strong>R-RPI-07:</strong> Post-integration assessments must feed back into the knowledge registry (D14-004). If the operational experience confirms the research finding, the finding's confidence may be strengthened. If the operational experience contradicts the finding, the finding must be reviewed and potentially downgraded or deprecated.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Research-practice disconnect.</strong> The institution produces validated research findings that never make it into operational practice. The knowledge registry grows while operational procedures remain unchanged. Mitigation: R-RPI-01 makes integration assessment mandatory for all verified findings. The quarterly backlog review prevents findings from being forgotten.</li>
+<li><strong>Premature integration.</strong> Findings are integrated before adequate validation, based on enthusiasm or urgency rather than evidence. The change introduces problems that were not anticipated because the research was not complete. Mitigation: R-RPI-02 requires an IDR. R-RPI-03 adds safeguards for provisional-confidence changes. D14-001, R-RES-05 establishes the principle that research does not automatically become practice.</li>
+<li><strong>Monitoring neglect.</strong> Changes are integrated and then forgotten. No one checks whether they produced the expected result. The institution accumulates changes whose effects are unknown. Mitigation: R-RPI-04 makes monitoring mandatory. The IDR includes a review date that triggers the post-integration assessment.</li>
+<li><strong>Backlog rot.</strong> The integration backlog grows indefinitely. Items are never implemented and never removed. The backlog becomes a graveyard of good intentions. Mitigation: R-RPI-05 requires quarterly review and forces two-year-old items to be re-evaluated or closed.</li>
+<li><strong>Evolution bypass.</strong> Significant infrastructure changes are implemented through the research integration pathway instead of through the evolution framework, bypassing the safeguards of Domain 13. Mitigation: R-RPI-06 defines the boundary between integration-level changes and evolution-level changes. The reversibility test (one hour, no data loss) is the decision criterion.</li>
+<li><strong>Feedback loop failure.</strong> Post-integration experience contradicts the research finding, but the contradiction is not fed back into the knowledge registry. The registry continues to show the finding as "verified" despite operational evidence to the contrary. Mitigation: R-RPI-07 requires feedback into the registry. The post-integration assessment is the mechanism for this feedback.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If research findings have accumulated without integration assessment:</strong> Conduct an integration assessment sprint. Review all "verified" findings in the knowledge registry that lack IDRs. Produce assessments for each. Many will conclude that no operational change is needed -- that is fine. The point is that the assessment was conducted and the decision was made consciously.</li>
+<li><strong>If changes have been integrated without monitoring:</strong> Establish monitoring retroactively for all unmonitored changes. For each, define what metrics indicate success or failure and begin tracking them. Accept that the baseline comparison may be lost if pre-change data was not collected, and document this limitation.</li>
+<li><strong>If the integration backlog has rotted:</strong> Review every item on the backlog. For each, ask: is this still relevant? Has the finding been superseded? Have conditions changed? Close items that are no longer relevant with documentation. Re-prioritize remaining items and schedule the most impactful for implementation.</li>
+<li><strong>If operational changes have contradicted research findings without registry feedback:</strong> Identify all changes where post-integration experience differed from research predictions. For each, create or update the knowledge registry entry to reflect the operational evidence. Downgrade findings that are not supported by operational experience. This recovery may reveal systemic issues with the research methodology that should be addressed.</li>
+<li><strong>If the evolution framework has been bypassed:</strong> Review all changes implemented through the integration pathway. Identify any that should have gone through Domain 13 (i.e., they affect architecture or are not quickly reversible). For those that have already been implemented, file retroactive evolution documentation. For those in progress, halt and route through Domain 13.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The integration process is new. The first few IDRs establish the format and calibrate the assessment criteria. The operator is learning to balance the urgency of applying new knowledge against the risk of premature action. The most valuable lesson in this period is that not every research finding requires an operational change, and that the assessment process itself has value even when the answer is "no change needed."</li>
+<li><strong>Years 5-15:</strong> The IDR archive grows. Post-integration assessments begin to reveal how well research predictions hold up in practice. Some findings that seemed solid in the lab prove less robust in production. Others prove more robust than expected. This feedback loop improves both the research methodology and the integration assessment criteria.</li>
+<li><strong>Years 15-30:</strong> The institution has a track record of research-driven operational changes. It can assess: which types of research findings translate most reliably into operational improvements? Which types require more caution? This meta-knowledge improves the integration process and the research prioritization framework (D14-007).</li>
+<li><strong>Years 30-50+:</strong> The integration archive tells the story of how research shaped the institution's operational evolution over decades. It shows which changes lasted, which were reversed, and which led to further research. This archive is a bridge between the research domain and the operational domains -- evidence that the institution's research function is not academic but practical.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The gap between knowing and doing is one of the oldest problems in human institutions. Libraries are full of research that was never applied. Archives contain recommendations that were never implemented. The know-do gap is not a failure of research -- it is a failure of integration.</p>
+<p>I am building the integration process now, before I have many research findings to integrate, because I want the habit to be established before the pressure mounts. If I wait until I have a dozen validated findings competing for implementation, I will be overwhelmed and will start making integration decisions informally -- which means I will integrate the changes I am excited about and defer the ones I find boring, regardless of their operational importance.</p>
+<p>The IDR format is deliberately comprehensive because I want to force myself to think through the full implications of every change. "Let us just switch to the new backup format" sounds simple until you consider: what happens to the old backups? What if the new format has an undiscovered bug? How will I know if the new format is actually more reliable, or if I just think it is because the research said so? The IDR makes me answer these questions before I act. That is its value.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (operational continuity, risk management)</li>
+<li>GOV-001 -- Authority Model (decision tiers for operational changes)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first, operational stability)</li>
+<li>D14-001 -- Research Philosophy (R-RES-05: research does not automatically become practice)</li>
+<li>D14-004 -- Knowledge Classification (confidence levels as integration prerequisites)</li>
+<li>D14-006 -- Multi-Generational Research Continuity (LRSD integration backlog section)</li>
+<li>D14-007 -- Research Prioritization (quarterly backlog review alignment)</li>
+<li>D14-009 -- Peer Review and Validation (validation as prerequisite for integration)</li>
+<li>D13-001 -- Evolution Philosophy (evolution framework for infrastructure-level changes)</li>
+<li>D11-001 -- Administration Philosophy (operational change management, scheduling)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

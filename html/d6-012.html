@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D6-012 — Data Classification and Handling Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li class="active"><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d6-012">
+  <h1>D6-012 &mdash; Data Classification and Handling Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D6-012</dd>
+  <dt>Domain</dt>
+  <dd>6 -- Data & Archives</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D6-001, D6-003, D6-006, D6-008, D6-010, D6-011</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-013, D6-014, all Domain 10 daily operational procedures, all Domain 9 training materials involving data handling, SEC-002 access control procedures.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the detailed classification system for all data within the institution, the specific handling requirements for each classification level, and the procedures for labeling, storing, transmitting, and destroying classified data. D6-001 established the four-tier data hierarchy (Institutional Memory, Operational Data, Reference Data, Transient Data) and the philosophical basis for data stewardship. This article translates that philosophy into a complete, actionable classification and handling system.</p>
+<p>Classification without handling procedures is an academic exercise. It is not enough to know that a document is Tier 1 (Institutional Memory) if the institution does not specify exactly what that means for how the document is stored, how it is backed up, how it is labeled, who may access it, how it may be transferred, and how it is destroyed when destruction is warranted. This article provides that specificity. It is the document that an operator opens when holding a piece of data and needing to know: what do I do with this?</p>
+<p>The classification system serves three purposes. First, it enables triage -- when resources are scarce, classification tells the operator what to save and what to sacrifice. Second, it enables proportional security -- sensitive data receives more protection than routine data, avoiding both the risk of under-protection and the operational cost of over-protection. Third, it enables succession -- a future operator encountering data they did not create can understand its importance and its handling requirements from its classification alone.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The full data classification taxonomy, extending the four-tier system of D6-001 with sensitivity sub-classifications.</li>
+<li>Handling requirements for each classification level: storage, backup, access, transmission, and destruction.</li>
+<li>The labeling system: how classification is indicated on files, directories, and media.</li>
+<li>The classification decision procedure: how to classify data that does not fit neatly into the taxonomy.</li>
+<li>The classification audit: how the institution verifies that data is correctly classified and handled.</li>
+<li>Reclassification procedures: how data moves between classification levels.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The philosophical basis for why certain data is more important (see D6-001).</li>
+<li>Specific file format requirements (see D6-010).</li>
+<li>Specific backup schedules and procedures (see D6-006; this article defines which backup tier applies per classification).</li>
+<li>Cryptographic methods for data protection (see SEC-003).</li>
+<li>Physical security of storage locations (see SEC-001 and SEC-002).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Classification Is Not Optional</h3>
+<p>Every institution that manages information must classify it. The question is whether the classification is explicit or implicit. Implicit classification means that the operator "just knows" which data is important -- it lives in their head, in their habits, in the way they organize their directories. Implicit classification works well enough for a single person managing a small amount of data. It fails catastrophically under three conditions: when the data volume grows beyond what one person can hold in their head, when the operator changes and the new operator does not share the predecessor's implicit knowledge, and when a crisis demands rapid triage of what to save and what to abandon.</p>
+<p>This institution is designed to persist for fifty years. All three conditions will occur. Explicit classification, recorded in metadata and enforced by procedure, is the only approach that survives the transition from one operator to the next and the transition from calm to crisis.</p>
+<h3>3.2 The Two-Axis Classification Model</h3>
+<p>D6-001 established a single axis of classification: the four tiers based on data importance (Institutional Memory, Operational, Reference, Transient). This article adds a second axis: sensitivity. A piece of data may be critically important but not sensitive (the institution's public-facing documentation) or relatively unimportant but highly sensitive (a temporary file containing cryptographic material). The full classification requires both axes.</p>
+<p>The importance axis determines preservation priority -- how many copies, how durable the media, how frequently verified. The sensitivity axis determines access control and handling restrictions -- who may access it, how it may be transmitted, how it must be destroyed.</p>
+<h3>3.3 The Labeling Problem</h3>
+<p>A classification system is only useful if the classification is visible when it matters. A file classified as Tier 1, High Sensitivity is indistinguishable from a file classified as Tier 4, Low Sensitivity if neither is labeled. Labeling must be built into the data lifecycle -- applied at creation or ingest, visible during use, and preserved through archival and migration. This article defines the labeling system that makes classification actionable rather than theoretical.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Classification Taxonomy</h3>
+<p>Every piece of institutional data receives a two-part classification: an importance tier and a sensitivity level.</p>
+<p><strong>Importance Tiers (from D6-001, operationalized here):</strong></p>
+<p><strong>Tier 1: Institutional Memory.</strong> The documentation corpus, governance records, decision logs, commentary sections, foundational policies, and the accumulated record of institutional reasoning. This data defines what the institution is. Loss is institutional death.
+- Minimum copies: 3 (per R-D6-02), recommended 5 for core documents.
+- Media types: At least 2 distinct types (per R-D6-02). Primary on ZFS (D6-009), backup on HDD and M-DISC (D6-011).
+- Verification frequency: Monthly integrity check, quarterly full read verification.
+- Retention: Permanent. No disposal without GOV-001 Tier 1 governance process.</p>
+<p><strong>Tier 2: Operational Data.</strong> System configurations, maintenance logs, active project files, correspondence, operational procedures, and working documents that support daily institutional function.
+- Minimum copies: 3.
+- Media types: At least 2 distinct types.
+- Verification frequency: Quarterly integrity check.
+- Retention: Duration of operational relevance plus 5-year archive period. Some Tier 2 data may be reclassified to Tier 1 if it acquires historical significance.</p>
+<p><strong>Tier 3: Reference Data.</strong> Research materials, archived external publications, historical records, media collections, and reference libraries. Enriches the institution but is not essential.
+- Minimum copies: 2.
+- Media types: 1 type is acceptable (HDD backup sufficient).
+- Verification frequency: Semi-annual integrity check.
+- Retention: As long as storage permits. Subject to triage when storage is constrained. Reviewed annually for continued relevance.</p>
+<p><strong>Tier 4: Transient Data.</strong> Working copies, temporary files, scratch data, intermediate calculations, cached content. Has no long-term value.
+- Minimum copies: 1 (the working copy; no backup required).
+- Media types: Any.
+- Verification frequency: None.
+- Retention: Maximum 90 days unless reclassified. Automated disposal recommended. Disposed first during any triage event.</p>
+<p><strong>Sensitivity Levels:</strong></p>
+<p><strong>S1: Open.</strong> Data that carries no sensitivity. Its exposure would cause no harm. Examples: public-facing documentation, published articles, reference materials that are themselves publicly available.
+- Access: Any institutional account.
+- Transmission: May be transmitted across the air gap on any clean media.
+- Destruction: Standard file deletion plus single-pass overwrite. No special procedures.</p>
+<p><strong>S2: Internal.</strong> Data that is not sensitive individually but whose aggregate could reveal institutional patterns, capabilities, or vulnerabilities. The default classification for most operational data. Examples: operational logs, maintenance schedules, system configurations (without credentials), project working files.
+- Access: Operator and administrative accounts only. Not accessible to service accounts unless specifically authorized.
+- Transmission: Transmitted on dedicated media that is tracked. Media is wiped after transfer.
+- Destruction: Single-pass overwrite, verified. File deletion alone is insufficient.</p>
+<p><strong>S3: Sensitive.</strong> Data whose exposure would cause meaningful harm to the institution or its operator. Examples: personal information, financial records, security audit results, detailed infrastructure documentation, intelligence assessments.
+- Access: Operator account only. Administrative account with explicit per-access authorization.
+- Transmission: Encrypted before transfer. Transfer media is encrypted. Media is securely wiped after transfer per SEC-003.
+- Destruction: Multi-pass overwrite per SEC-003 or physical destruction of media.</p>
+<p><strong>S4: Critical.</strong> Data whose exposure would cause severe harm. This is the highest sensitivity level. Examples: cryptographic keys, authentication credentials, master passwords, encryption passphrases, the succession packet, security vulnerability assessments of the institution's own systems.
+- Access: Root account or designated secure process only. Accessed only when operationally necessary.
+- Transmission: Encrypted with the institution's strongest available encryption. Transfer media is physically controlled at all times during transfer. Media is physically destroyed after transfer unless it is a designated secure storage device.
+- Destruction: Physical destruction of media. Degaussing (for magnetic media) plus physical destruction. Multi-pass overwrite is insufficient for S4 data -- physical media destruction is the only acceptable method.
+- Storage: S4 data at rest must be encrypted at all times per SEC-003. S4 data must never exist unencrypted on any medium except during active use in volatile memory.</p>
+<h3>4.2 The Classification Matrix</h3>
+<p>The full classification of any data item is expressed as <code>T[tier]-S[sensitivity]</code>. For example: <code>T1-S2</code> means Tier 1 importance (Institutional Memory) with Internal sensitivity. <code>T4-S4</code> means Tier 4 importance (Transient) with Critical sensitivity -- an unusual combination that might apply to a temporary file containing a decrypted key during a key rotation operation.</p>
+<p>The handling requirements are the union of the tier requirements and the sensitivity requirements. The more protective requirement prevails. A T1-S3 document receives the preservation requirements of Tier 1 AND the access and transmission requirements of S3.</p>
+<p>Common classifications at founding:</p>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Classification</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documentation corpus (this article, etc.)</td>
+<td>T1-S2</td>
+<td>Irreplaceable institutional memory. Not individually sensitive but reveals institutional architecture.</td>
+</tr>
+<tr>
+<td>Governance decision logs</td>
+<td>T1-S2</td>
+<td>Institutional memory. Internal sensitivity.</td>
+</tr>
+<tr>
+<td>Cryptographic keys</td>
+<td>T2-S4</td>
+<td>Operationally essential. Highest sensitivity.</td>
+</tr>
+<tr>
+<td>System configuration files</td>
+<td>T2-S3</td>
+<td>Operational necessity. Contain infrastructure details.</td>
+</tr>
+<tr>
+<td>Operator's personal notes and drafts</td>
+<td>T3-S2</td>
+<td>Reference value. Internal sensitivity.</td>
+</tr>
+<tr>
+<td>Archived external publications</td>
+<td>T3-S1</td>
+<td>Reference value. Publicly available content.</td>
+</tr>
+<tr>
+<td>Temporary working files</td>
+<td>T4-S1</td>
+<td>No long-term value. No sensitivity.</td>
+</tr>
+<tr>
+<td>Succession packet</td>
+<td>T1-S4</td>
+<td>Irreplaceable. Highest sensitivity.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 The Labeling System</h3>
+<p>Classification labels are applied at three levels:</p>
+<p><strong>File-level labeling.</strong> Every file's classification is recorded in the file catalogue per D6-008. For text-based files (Markdown, plain text, source code), the classification is also included in a header or front-matter block within the file itself. For binary files where embedding text is impractical, the classification exists only in the catalogue.</p>
+<p>File-level label format for text files:
+<code>Classification: T[tier]-S[sensitivity]
+Classified: [date]
+Classified-By: [operator identifier]</code></p>
+<p><strong>Directory-level labeling.</strong> Directories are organized by classification when practical. The directory structure per D6-004 includes classification-aware organization. A directory inherits the highest classification of any file it contains. If a directory contains a mix of T1-S3 and T3-S1 files, the directory is treated as T1-S3 for access control purposes. This is a simplification that favors security over precision. If the simplification causes operational inconvenience, the solution is to reorganize files, not to weaken the directory's classification.</p>
+<p><strong>Media-level labeling.</strong> Physical backup media (HDDs, M-DISCs, SSDs, tapes) are labeled with the highest classification of data they contain. Labels are physically applied to the media or its case. The label includes: media identifier, date of last write, highest classification, and a brief content description.</p>
+<p>Media label format:
+<code>ID: [unique media identifier]
+Written: [date]
+Classification: T[tier]-S[sensitivity]
+Contents: [brief description]</code></p>
+<h3>4.4 The Classification Decision Procedure</h3>
+<p>When classifying new data, the operator follows this decision tree:</p>
+<p><strong>Step 1: Determine importance tier.</strong>
+- If loss would constitute institutional death or irrecoverable loss of institutional knowledge: Tier 1.
+- If loss would significantly disrupt operations and require substantial effort to reconstruct: Tier 2.
+- If loss would be regrettable but the institution would continue functioning: Tier 3.
+- If the data has no value beyond its current temporary use: Tier 4.
+- When in doubt between two tiers, classify at the higher tier. Overclassification wastes resources but underclassification risks data loss.</p>
+<p><strong>Step 2: Determine sensitivity level.</strong>
+- If exposure would cause no harm: S1.
+- If exposure of individual items is harmless but aggregate exposure reveals institutional patterns: S2.
+- If exposure would cause meaningful harm (personal, financial, security): S3.
+- If exposure would cause severe harm (compromise of security infrastructure, cryptographic material, succession): S4.
+- When in doubt between two levels, classify at the higher level.</p>
+<p><strong>Step 3: Record the classification.</strong>
+- Apply the file-level label.
+- Update the file catalogue per D6-008.
+- Ensure the file is stored in a location consistent with its classification.</p>
+<p><strong>Step 4: If the data does not fit neatly into the taxonomy.</strong> Document the classification reasoning in the operational log. Include what the data is, why the standard categories are inadequate, and what classification was assigned despite the imperfect fit. Flag the data for review at the next classification audit. If imperfect fits accumulate, this may indicate that the taxonomy needs expansion -- see Evolution Path.</p>
+<h3>4.5 The Classification Audit</h3>
+<p>A classification audit verifies that data is correctly classified and that handling requirements are being followed. Audits are conducted on two schedules:</p>
+<p><strong>Quarterly spot audit.</strong> The operator selects a random sample of 20 files (5 from each tier) and verifies: Is the classification label present and correct? Is the file stored in a location consistent with its classification? Does the file catalogue entry match the file's actual classification? Are the backup copies consistent with the tier's requirements? For S3 and S4 data, is the access control consistent with the sensitivity level?</p>
+<p><strong>Annual comprehensive audit.</strong> The operator reviews the entire file catalogue for: files without classification labels; files whose classification may have changed due to changing circumstances (e.g., a draft that has been finalized should be reclassified from Tier 4 to its appropriate permanent tier); accumulations of Tier 4 data that have exceeded the 90-day retention limit; S4 data that is stored outside of encrypted containers; media labels that are missing, damaged, or inconsistent with the catalogue.</p>
+<p>Audit findings are documented in the operational log. Discrepancies are corrected immediately if they involve security (S3/S4 mishandling) or within 30 days for other classification issues.</p>
+<h3>4.6 Reclassification Procedures</h3>
+<p>Data may be reclassified under the following conditions:</p>
+<p><strong>Upgrade (increase in tier or sensitivity):</strong> May be performed by the operator at any time. The new classification is applied immediately. Storage and handling are upgraded to meet the new requirements. The reclassification is recorded in the file catalogue with the date, the old classification, the new classification, and the reason.</p>
+<p><strong>Downgrade (decrease in tier or sensitivity):</strong> Requires a documented justification. The operator records why the data no longer warrants its current classification. For downgrades from S4 or S3, a 30-day waiting period applies -- the downgrade takes effect 30 days after the decision, allowing time for reconsideration. This prevents impulsive declassification of sensitive data. For tier downgrades from Tier 1, the GOV-001 governance process applies -- Tier 1 data is not downgraded casually.</p>
+<p><strong>Automatic reclassification:</strong> Tier 4 data that exceeds its 90-day retention without being reclassified or disposed is flagged automatically. The operator must either reclassify it to a higher tier (with justification) or dispose of it. This prevents Tier 4 from becoming a permanent dumping ground.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D6-12-01:</strong> All data must be classified within 48 hours of creation or ingest. Unclassified data must not persist beyond 7 days.</li>
+<li><strong>R-D6-12-02:</strong> Classification labels must be present at the file level (in the file catalogue at minimum; in the file header for text-based files) and at the media level (physical label on backup media).</li>
+<li><strong>R-D6-12-03:</strong> S4 data must be encrypted at rest at all times. Unencrypted S4 data on any persistent storage medium is a security incident.</li>
+<li><strong>R-D6-12-04:</strong> Data handling must meet or exceed the requirements of its classification. Handling data below its classification requirements is a procedural violation. Handling data above its classification requirements is permitted but not required.</li>
+<li><strong>R-D6-12-05:</strong> Reclassification must be documented. Downgrades from S4 or S3 require the 30-day waiting period. Downgrades from Tier 1 require GOV-001 governance process.</li>
+<li><strong>R-D6-12-06:</strong> Quarterly spot audits and annual comprehensive audits must be completed on schedule. Missed audits are documented as incidents.</li>
+<li><strong>R-D6-12-07:</strong> When in doubt, classify higher. The cost of overclassification (extra backup copies, stricter handling) is always less than the cost of underclassification (potential data loss or exposure).</li>
+<li><strong>R-D6-12-08:</strong> Tier 4 data must not persist beyond 90 days without reclassification or disposal. Automated enforcement is preferred.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Classification drift.</strong> Over time, the operator becomes less rigorous about classifying new data. Files accumulate without classification. When triage is needed, unclassified data cannot be prioritized and critical data may be lost while trivial data is preserved. Mitigation: R-D6-12-01 sets a hard deadline. The quarterly audit catches drift. The 48-hour classification window is short enough to prevent significant accumulation.</p>
+</li>
+<li>
+<p><strong>Sensitivity underestimation.</strong> The operator classifies sensitive data at too low a sensitivity level, resulting in inadequate access control, encryption, or destruction procedures. The data is exposed through a handling procedure that would have been appropriate for its assigned classification but not for its actual sensitivity. Mitigation: R-D6-12-07 establishes the "when in doubt, classify higher" principle. The classification decision procedure (Section 4.4) provides structured guidance. The audit process catches systematic underestimation.</p>
+</li>
+<li>
+<p><strong>Classification inflation.</strong> Everything is classified Tier 1, S4. The institution cannot distinguish its truly critical data from routine data because everything is labeled critical. Handling requirements become so onerous that the operator begins ignoring them, which is worse than having no classification at all. Mitigation: The classification decision procedure provides objective criteria. The quarterly audit reviews whether classifications are proportionate. If more than 30% of data is classified Tier 1, the operator should investigate whether the criteria are being applied too loosely.</p>
+</li>
+<li>
+<p><strong>Label loss.</strong> File catalogue corruption or metadata loss removes classification labels. Files become unclassified in effect even though they were classified at creation. Mitigation: Classification is recorded in multiple locations (file header, file catalogue, media label). Loss of one source does not lose the classification. The file catalogue itself is Tier 1 data and receives the associated preservation treatment.</p>
+</li>
+<li>
+<p><strong>Destruction failure.</strong> S4 data is not destroyed according to procedure. Sensitive data persists on media that the operator believes has been wiped. Mitigation: Destruction procedures are explicit and tiered by sensitivity level. For S4, physical destruction is required, which is unambiguous -- the media either exists physically or it does not. Destruction events are logged.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a large volume of unclassified data is discovered.</strong> Declare a classification sprint per D6-001 Recovery Procedure 1. Halt non-critical data ingest. Work through the unclassified data systematically, applying the classification decision procedure in Section 4.4 to each item. If the volume is too large for manual classification of every item, classify directories as units (assign the directory the highest classification that any contained file would warrant). Flag the classified data for individual review at the next annual audit.</p>
+</li>
+<li>
+<p><strong>If the file catalogue is lost or corrupted.</strong> Recover the catalogue from backup per D6-006. If no backup is available, rebuild the catalogue from the data itself -- this is why file-level labeling (headers in text files) and media-level labeling exist. They provide a secondary source of classification information that survives catalogue loss. Rebuilding the catalogue is a Tier 1 priority because the catalogue is itself Tier 1 data. Document the incident and the reconstruction process.</p>
+</li>
+<li>
+<p><strong>If S4 data is discovered unencrypted on persistent media.</strong> Encrypt the data immediately per SEC-003. Investigate how the data came to be unencrypted -- was encryption never applied (classification failure) or was encryption removed or bypassed (potential security incident)? If the media has been outside institutional control during the period of exposure, treat it as a compromise and invoke SEC-001 incident response. If the media was always within institutional control, document the incident, apply corrective measures, and reinforce the S4 handling requirements.</p>
+</li>
+<li>
+<p><strong>If classification inflation is detected (too much data at Tier 1 or S4).</strong> Review the inflated classifications against the criteria in Section 4.1. Reclassify data that does not meet the criteria for its current level. This is a downgrade, so R-D6-12-05 applies -- document the reasoning and observe the waiting period for sensitivity downgrades. Investigate why inflation occurred -- is the operator risk-averse, or are the criteria unclear? Adjust training or criteria as needed.</p>
+</li>
+<li>
+<p><strong>If a classification audit reveals systematic handling violations.</strong> Identify the specific violations and their scope. Correct the handling of all affected data to meet its classification requirements. Investigate the root cause: are the requirements impractical? Is the operator undertrained? Are the procedures poorly documented? Address the root cause before resuming normal operations. If the requirements are genuinely impractical, propose amendments to this article through GOV-001 rather than silently ignoring them.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The classification system is being applied for the first time. The most common challenge will be edge cases -- data that does not fit neatly into the taxonomy. Document every edge case. If patterns emerge (a category of data that consistently defies classification), consider adding a sub-tier or additional sensitivity level. Resist adding complexity until the need is demonstrated by repeated edge cases, not by theoretical concerns.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The classification system should be stable. The main challenge shifts to maintaining discipline. Classification is a daily habit, and habits erode without reinforcement. The quarterly audit is the reinforcement mechanism. If audits consistently find good classification hygiene, the system is working. If audits consistently find problems, the system needs adjustment -- not harder enforcement of bad procedures but better procedures that are natural to follow.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> A successor operator may assume responsibility. The classification system must be intuitive enough that a new operator can classify data correctly without extensive training. The two-axis model (importance and sensitivity) is designed for this intuitive clarity. If the successor finds the system confusing, that is a signal that it has become too complex and should be simplified.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The classification criteria may need updating to reflect changed institutional priorities, changed threat models, or changed data types that did not exist at founding. The criteria should evolve, but the fundamental structure (importance tiers and sensitivity levels) should remain stable unless a compelling reason for change is documented.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the classification taxonomy requires more than five minutes of deliberation for routine data, it is too complex. If the quarterly audit consistently finds more than 10% of sampled files misclassified, the criteria need clarification or the operator needs additional training. If the institution begins handling data types not contemplated at founding (biometric data, financial instruments, legal documents with specific regulatory requirements), the sensitivity levels may need expansion.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I debated whether to combine importance and sensitivity into a single axis. Many classification systems do this -- they have "Confidential," "Secret," "Top Secret," and the classification implicitly carries both importance and sensitivity. I decided against it because importance and sensitivity are genuinely orthogonal. The institution's founding documents are the most important data we have (Tier 1) but are not particularly sensitive (S2) because their exposure would not cause harm -- they describe how the institution works, and transparency is a value. Conversely, cryptographic keys are operationally important (Tier 2) but maximally sensitive (S4). Collapsing these into a single axis would either under-protect the keys or over-restrict access to the documentation.</p>
+<p>The 90-day limit on Tier 4 data is deliberately aggressive. I know from personal experience that "temporary" files become permanent the moment you stop paying attention to them. A 90-day hard limit forces regular cleanup. Some operators may find this annoying. The alternative -- unbounded accumulation of unreviewed data -- is worse.</p>
+<p>The "when in doubt, classify higher" rule will occasionally result in overclassification. I am comfortable with that. The cost of an extra backup copy or an unnecessarily strict access control is measured in minutes of labor. The cost of a misclassified document that is lost in triage or exposed through inadequate handling is potentially irreversible. The asymmetry is overwhelming.</p>
+<p>One thing I want future operators to understand: classification is not bureaucracy. It is triage preparation. When the crisis comes -- and over fifty years, crises will come -- the classification system is what enables rational, principled decisions about what to save. Without it, every decision in a crisis is emotional and improvised. With it, the decisions are still hard, but the framework for making them already exists.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 1: Sovereignty; Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (data sovereignty)</li>
+<li>GOV-001 -- Authority Model (governance process for Tier 1 reclassification, amendment procedures)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (data integrity threats, incident response)</li>
+<li>SEC-002 -- Access Control Procedures (account architecture, permission model)</li>
+<li>SEC-003 -- Cryptographic Key Management (encryption requirements for S3/S4 data, secure destruction procedures)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle, operational tempo)</li>
+<li>D6-001 -- Data Philosophy (four-tier hierarchy, R-D6-02 redundancy, triage framework)</li>
+<li>D6-003 -- Format Longevity Doctrine (format constraints on classified data)</li>
+<li>D6-006 -- Backup Doctrine (backup requirements per tier)</li>
+<li>D6-008 -- Metadata Standards &amp; Cataloguing (file catalogue, metadata requirements)</li>
+<li>D6-010 -- Digital Preservation: Formats That Survive (format requirements for archived classified data)</li>
+<li>D6-011 -- Physical Backup Media (media labeling, media-level classification)</li>
+<li>D6-014 -- Data Ingest Procedures (classification at ingest)</li>
+<li>ISO 27001:2022, Information security management systems (classification framework concepts, archived locally)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

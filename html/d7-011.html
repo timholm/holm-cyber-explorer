@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D7-011 — Estimative Language &amp; Uncertainty Communication - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li class="active"><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d7-011">
+  <h1>D7-011 &mdash; Estimative Language &amp; Uncertainty Communication</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D7-011</dd>
+  <dt>Domain</dt>
+  <dd>7 -- Intelligence & Analysis</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D7-001, D7-002, D7-004, D7-005, D7-008, ETH-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All Domain 7 articles that produce analytical products. D7-008, D7-010, D7-012, D7-013.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines a precise, standardized vocabulary for communicating probability, confidence, and uncertainty in all intelligence products produced by the holm.chat Documentation Institution. It establishes the estimative language system that every analyst must use when expressing how likely something is, how confident they are in their assessment, and what the limits of their knowledge are.</p>
+
+<p>The problem this article solves is as old as intelligence analysis itself: words like "likely," "probable," "possible," and "might" mean different things to different people. When an analyst writes "the drive will probably fail," does "probably" mean a 60% chance or a 90% chance? The decision-maker who reads that sentence has no way to know. If they interpret "probably" as 60% and the analyst meant 90%, the decision-maker may defer replacement when the analyst would have urged immediate action. This ambiguity has caused intelligence failures in organizations of every size. This article eliminates it -- or at least reduces it to the maximum extent possible -- by mapping specific words to specific probability ranges and requiring their consistent use.</p>
+
+<p>The estimative language system also serves the calibration function established in D7-001. When the analyst says "we assess with moderate confidence that X will occur," the institution can later determine whether X did in fact occur and track the analyst's calibration over time. Are events assessed as "likely" actually happening 55-80% of the time, as the language table specifies? If not, either the analyst's judgment or the language calibration needs adjustment. Without standardized language, this calibration is impossible because there is no consistent baseline to measure against.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The probability language scale: a mapping of specific terms to specific probability ranges.</li>
+<li>The confidence scale: a system for expressing how much the analyst trusts their own assessment, independent of the probability being assessed.</li>
+<li>The distinction between probability and confidence: two different dimensions of uncertainty that are often confused.</li>
+<li>Calibration exercises: procedures for testing and improving the analyst's accuracy in using estimative language.</li>
+<li>The calibration register: a record of past assessments and their outcomes that reveals systematic biases.</li>
+<li>Rules for using estimative language in intelligence products per D7-008.</li>
+</ul>
+
+<p>This article does not cover:</p>
+<ul>
+<li>The epistemic hierarchy that frames the institution's relationship with knowledge (see D7-001 Section 4.1).</li>
+<li>The analytical methods used to arrive at probability judgments (see D7-004).</li>
+<li>The cognitive biases that can distort probability assessment (see D7-005).</li>
+<li>The product formats in which estimative language is used (see D7-008).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Language Problem</h3>
+<p>In 1964, Sherman Kent, the father of American intelligence analysis, published a study showing that intelligence professionals interpreted the phrase "serious possibility" as meaning anywhere from 20% to 80% probable -- a range so wide as to be meaningless. The problem has never been fully solved in any intelligence organization, because natural language is inherently imprecise about probability. People use the same words to mean very different things, and they often do not realize they are doing so.</p>
+
+<p>This institution faces the same problem in a more concentrated form. In a large intelligence organization, ambiguous language is moderated by discussion -- the analyst can explain what they meant, and the decision-maker can ask questions. In a single-analyst institution, the product is the only communication. If the product says "likely" and the reader (even if the same person, reading it months later) interprets "likely" differently from how the writer meant it, there is no opportunity for clarification. The language must be its own clarification.</p>
+
+<h3>3.2 Probability Versus Confidence</h3>
+<p>These are two different questions:</p>
+
+<p><strong>Probability:</strong> "How likely is this event or condition?" This is a statement about the world. "There is a 70% probability that this drive will fail within the next year" is a probability statement. It says something about the drive, not about the analyst.</p>
+
+<p><strong>Confidence:</strong> "How much do I trust my own probability assessment?" This is a statement about the analyst's epistemic state. "I assess with high confidence that the probability of drive failure is approximately 70%" means the analyst believes their estimate is well-supported by evidence and sound methodology. "I assess with low confidence that the probability of drive failure is approximately 70%" means the analyst thinks 70% is their best guess but the evidence is thin or the methodology is uncertain.</p>
+
+<p>A probability without a confidence level is incomplete. Knowing that the analyst says "likely" (55-80%) is useful. Knowing whether they say it with high confidence (strong evidence, sound method) or low confidence (limited data, rough estimate) determines how much weight the decision-maker should place on the assessment.</p>
+
+<h3>3.3 The Calibration Imperative</h3>
+<p>Estimative language is only useful if it is calibrated -- if events the analyst calls "likely" actually happen about 55-80% of the time, and events the analyst calls "unlikely" actually happen about 5-20% of the time. Without calibration, the language is theater: it looks precise but conveys no real information.</p>
+
+<p>Calibration is also the institution's primary tool for detecting systematic bias. If the analyst discovers that events they called "likely" actually happened 95% of the time, they are systematically underestimating probability -- they say "likely" when they should say "almost certain." If events they called "unlikely" happened 40% of the time, they are systematically overestimating the improbability of events. These discoveries are invaluable for improving analytical accuracy over time.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Probability Language Scale</h3>
+<p>The following table defines the institution's official probability terms. These terms and only these terms may be used to express probability in finished intelligence products per D7-008.</p>
+
+<table>
+<thead>
+<tr><th>Term</th><th>Probability Range</th><th>Verbal Shorthand</th><th>Usage Example</th></tr>
+</thead>
+<tbody>
+<tr><td>Almost Certain</td><td>93-99%</td><td>"We are almost certain that..."</td><td>"We are almost certain that this backup media will remain readable for at least five additional years."</td></tr>
+<tr><td>Very Likely</td><td>80-92%</td><td>"It is very likely that..."</td><td>"It is very likely that the replacement hardware will be available at current prices through next year."</td></tr>
+<tr><td>Likely</td><td>55-79%</td><td>"It is likely that..."</td><td>"It is likely that the encryption library will receive a security update within the next import cycle."</td></tr>
+<tr><td>Roughly Even Chance</td><td>40-54%</td><td>"There is roughly an even chance that..."</td><td>"There is roughly an even chance that the drive will develop read errors within the assessment period."</td></tr>
+<tr><td>Unlikely</td><td>21-39%</td><td>"It is unlikely that..."</td><td>"It is unlikely that a physical security breach will occur in the next year."</td></tr>
+<tr><td>Very Unlikely</td><td>8-20%</td><td>"It is very unlikely that..."</td><td>"It is very unlikely that the operating system will reach end-of-life before 2030."</td></tr>
+<tr><td>Remote</td><td>1-7%</td><td>"There is a remote chance that..."</td><td>"There is a remote chance of catastrophic facility damage from seismic activity."</td></tr>
+</tbody>
+</table>
+
+<p>Terms that are NOT used in finished products: "possible" (too vague -- everything is possible), "probable" (ambiguous -- use "likely" or "very likely"), "certain" (per D7-001 R-D7-07, no assessment may claim certainty), "impossible" (excluded for the same reason), "maybe" and "might" (informal and uncalibrated).</p>
+
+<h3>4.2 The Confidence Scale</h3>
+<p>Every probability statement must be accompanied by a confidence modifier. The confidence scale has three levels:</p>
+
+<table>
+<thead>
+<tr><th>Confidence Level</th><th>Definition</th><th>Criteria</th></tr>
+</thead>
+<tbody>
+<tr><td>High Confidence</td><td>The assessment is well-supported by evidence and sound analytical methodology. The evidence is from reliable sources, and there is little ambiguity in interpretation.</td><td>Multiple corroborating sources or direct observation; methodology is well-established and appropriate; assumptions are well-supported; analyst has relevant domain expertise.</td></tr>
+<tr><td>Moderate Confidence</td><td>The assessment is supported by evidence but with meaningful gaps, ambiguities, or methodological limitations. The analyst believes the assessment is more likely right than wrong but acknowledges significant uncertainty.</td><td>Some corroboration but not from multiple independent sources; methodology is appropriate but data is incomplete; some assumptions are unsupported; the analyst has some but not deep domain expertise.</td></tr>
+<tr><td>Low Confidence</td><td>The assessment is the analyst's best judgment based on limited evidence, analogical reasoning, or professional intuition. The evidence base is thin and the analyst would not be surprised if the assessment proved wrong.</td><td>Single source or no direct evidence; methodology is approximative; key assumptions are speculative; the analyst is operating outside their primary expertise.</td></tr>
+</tbody>
+</table>
+
+<h3>4.3 Combined Expression</h3>
+<p>In finished intelligence products, probability and confidence are expressed together. The standard format is:</p>
+
+<blockquote>"We assess with [confidence level] confidence that [subject] is [probability term] to [outcome]."</blockquote>
+
+<p>Examples:</p>
+<ul>
+<li>"We assess with high confidence that it is very likely the primary storage array will require replacement within three years."</li>
+<li>"We assess with moderate confidence that there is roughly an even chance of significant price increases for our preferred storage media within the next 18 months."</li>
+<li>"We assess with low confidence that it is unlikely the local regulatory environment will change in ways affecting the institution's operations."</li>
+</ul>
+
+<p>The decision-maker should interpret these combinations as follows: high-confidence assessments warrant action. Moderate-confidence assessments warrant attention and further collection to improve confidence. Low-confidence assessments warrant awareness and monitoring but should not alone drive major resource commitments.</p>
+
+<h3>4.4 The Calibration Register</h3>
+<p>The calibration register is the record that enables the institution to assess how accurately the analyst uses estimative language. For every assessment that can be verified (that is, where the predicted event either occurred or did not occur within the assessment period), the register tracks:</p>
+
+<table>
+<thead>
+<tr><th>Entry ID</th><th>Product ID</th><th>Date</th><th>Assessment</th><th>Probability Term</th><th>Confidence</th><th>Outcome</th><th>Accurate?</th></tr>
+</thead>
+<tbody>
+<tr><td>[CR-NNN]</td><td>[Product ID]</td><td>[Date of assessment]</td><td>[What was predicted]</td><td>[Term used]</td><td>[H/M/L]</td><td>[What actually happened]</td><td>[Yes/No/Partial]</td></tr>
+</tbody>
+</table>
+
+<p>The register is reviewed at least annually as part of the calibration exercise. The analysis examines:</p>
+
+<ul>
+<li><strong>Overall calibration:</strong> Of all assessments labeled "likely," what percentage actually occurred? The expected range is 55-79%. If the actual rate is outside this range, the analyst is miscalibrated in that probability band.</li>
+<li><strong>Directional bias:</strong> Does the analyst systematically overestimate or underestimate probability? If events called "likely" happen 90% of the time, the analyst is underestimating probability. If they happen 40% of the time, the analyst is overestimating.</li>
+<li><strong>Confidence calibration:</strong> Do high-confidence assessments prove accurate more often than low-confidence assessments? If not, the analyst's confidence is not tracking their actual accuracy -- they do not know when they know.</li>
+<li><strong>Domain-specific patterns:</strong> Is the analyst better calibrated in some domains (e.g., technical threats) than others (e.g., environmental conditions)? Domain-specific miscalibration suggests the analyst should adjust their confidence level or seek additional information in weak domains.</li>
+</ul>
+
+<h3>4.5 Calibration Exercises</h3>
+<p>Calibration exercises are structured activities designed to test and improve the analyst's use of estimative language. They are conducted semiannually per the Domain 7 maintenance plan.</p>
+
+<p><strong>Exercise 1: Register Review.</strong> Review the calibration register for the past 12 months. Calculate actual occurrence rates for each probability band. Compare against the defined ranges. Document findings and identify any systematic biases.</p>
+
+<p><strong>Exercise 2: Retrospective Reassessment.</strong> Select five past assessments. For each, review the evidence that was available at the time and the probability term that was assigned. Without looking at the outcome, re-assess the probability. Compare the re-assessment with both the original assessment and the outcome. This reveals whether the analyst's judgment has shifted over time and whether the shift represents improvement or drift.</p>
+
+<p><strong>Exercise 3: Blind Calibration.</strong> Generate ten factual questions with objective, verifiable answers that the analyst does not know off the top of their head (these can be drawn from archived reference materials). For each, assign a probability to each possible answer. Check the answers. Assess: are events assigned 80% probability actually correct 80% of the time? This exercise tests raw calibration ability independent of any institutional context.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D7-11-01:</strong> All finished intelligence products per D7-008 must use the probability language scale in Section 4.1 when expressing probability. Informal probability expressions ("possible," "probable," "maybe," "might") are not acceptable in finished products.</li>
+<li><strong>R-D7-11-02:</strong> Every probability statement in a finished product must be accompanied by a confidence level per Section 4.2. A probability without a confidence level is an incomplete statement.</li>
+<li><strong>R-D7-11-03:</strong> The terms "certain" and "impossible" may not be used in finished intelligence products per D7-001 R-D7-07. The maximum probability term is "almost certain" (93-99%) and the minimum is "remote" (1-7%).</li>
+<li><strong>R-D7-11-04:</strong> The calibration register per Section 4.4 must be maintained for all verifiable assessments. Entries must be added within 30 days of the assessment being produced. Outcomes must be recorded when they become known.</li>
+<li><strong>R-D7-11-05:</strong> Calibration exercises per Section 4.5 must be conducted at least semiannually. The results must be documented in an Intelligence Update per D7-008 and reviewed for systematic biases.</li>
+<li><strong>R-D7-11-06:</strong> If calibration exercises reveal systematic bias (actual occurrence rates consistently outside the defined probability ranges for any term), the analyst must implement corrective measures: adjusting their assessment habits, seeking additional evidence before committing to assessments in the miscalibrated range, or requesting external review of assessments in the affected domain.</li>
+<li><strong>R-D7-11-07:</strong> Draft and preliminary products per D7-008 R-D7-08-07 may use informal language but must be updated to use formal estimative language before the draft is finalized.</li>
+<li><strong>R-D7-11-08:</strong> When a product references or quotes another product's probability assessment, the original probability term and confidence level must be preserved. The referencing product may add its own assessment but must not restate the original in different language.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Mechanical compliance without internalization.</strong> The analyst uses the correct terms but does not genuinely calibrate their internal sense of probability to the defined ranges. "Likely" is used because it sounds about right, not because the analyst has seriously estimated a 55-79% probability. Mitigation: the calibration exercises in Section 4.5 test whether the analyst's internal sense matches the scale. The calibration register reveals systematic discrepancies. Over time, deliberate practice with the scale should align the analyst's intuition with the defined ranges.</p>
+</li>
+<li>
+<p><strong>Confidence inflation.</strong> The analyst routinely claims high confidence because low confidence feels like admitting inadequacy. Products sound authoritative but the authority is not warranted by the evidence. Mitigation: the calibration register tracks confidence calibration separately from probability calibration. If high-confidence assessments are no more accurate than moderate-confidence assessments, confidence inflation is occurring. The analyst must honest acknowledge that knowing the limits of one's knowledge is a sign of competence, not weakness.</p>
+</li>
+<li>
+<p><strong>Central tendency bias.</strong> The analyst avoids the extremes of the scale, clustering most assessments around "likely" and "unlikely" rather than using "almost certain," "very likely," "very unlikely," or "remote" when warranted. This compresses the effective range of the scale and reduces its utility. Mitigation: the calibration register will show clustering. The analyst should periodically review their distribution of probability terms and compare it against what a well-calibrated distribution would look like given the types of assessments being made.</p>
+</li>
+<li>
+<p><strong>Calibration register neglect.</strong> Assessments are produced but outcomes are not recorded. The calibration function atrophies because there is no data to calibrate against. Mitigation: R-D7-11-04 mandates register maintenance. The semiannual calibration exercise will immediately reveal if the register is incomplete because there will be insufficient data to analyze.</p>
+</li>
+<li>
+<p><strong>Language rigidity.</strong> The estimative language system becomes so rigid that it interferes with clear communication. The analyst contorts sentences to fit the required format, producing products that are technically compliant but awkward and hard to read. Mitigation: the language scale is a framework, not a straitjacket. The required elements are the probability term and the confidence level. The sentence structure around them can vary for readability, as long as the meaning is unambiguous.</p>
+</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If calibration reveals systematic overestimation of probability:</strong> The analyst is saying things are more likely than they turn out to be. Review recent products and identify which types of assessments are overestimated. Implement a "discount rule" for the affected category: before assigning a probability term, the analyst asks "what if this is one level less likely than my instinct says?" Apply this correction for 6 months and then recalibrate.</p>
+</li>
+<li>
+<p><strong>If calibration reveals systematic underestimation of probability:</strong> The analyst is saying things are less likely than they turn out to be. This is often caused by excessive epistemic caution -- the analyst is so committed to avoiding certainty per D7-001 that they understate probability. Implement the opposite correction: before assigning a probability term, ask "what if this is one level more likely than my instinct says?" The institutional commitment to uncertainty must not distort probability assessment.</p>
+</li>
+<li>
+<p><strong>If confidence calibration fails (high-confidence assessments are no more accurate than low-confidence ones):</strong> The analyst does not know when they know. This is a serious analytical weakness. Review the criteria for assigning confidence levels in Section 4.2. Are the criteria too vague? Too easy to meet? Consider implementing a checklist: to assign high confidence, the analyst must check boxes for multiple corroborating sources, appropriate methodology, and well-supported assumptions. If the boxes cannot be checked, the confidence level must be lower, regardless of how the analyst feels.</p>
+</li>
+<li>
+<p><strong>If the calibration register has been neglected:</strong> Conduct an immediate retroactive update. Review all verifiable assessments from the past 12 months and record their outcomes. If outcomes cannot be determined, record "UNKNOWN" and establish monitoring to determine outcomes going forward. Set a monthly reminder to update the register rather than relying on the 30-day rule alone.</p>
+</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The calibration register will be sparse and the calibration data insufficient for robust analysis. This is expected. The value of the estimative language system in the early years is disciplinary, not statistical: it forces the analyst to think explicitly about probability and confidence, which is valuable even before the calibration data matures. By year 3-5, enough assessments should have accumulated to begin meaningful calibration analysis.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The calibration register should contain several hundred entries, enough to identify systematic patterns. The analyst should know their strengths and weaknesses: which domains they are well-calibrated in, which they consistently overestimate or underestimate, and whether their confidence levels track their actual accuracy. These insights are among the most valuable products of the intelligence function because they directly improve the quality of future analysis.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> If succession occurs, the calibration register enables the successor to understand how the predecessor used language, how accurate they were, and what biases they exhibited. This is invaluable context for interpreting the intelligence archive. The successor also begins building their own calibration record, which will differ from the predecessor's because different analysts have different calibration profiles.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The calibration archive across multiple analysts or across decades of a single analyst's career becomes a meta-analytical resource. Long-term calibration trends reveal whether the institution's analytical quality is improving, stable, or degrading. The probability language scale itself should remain stable to enable longitudinal comparison, though the calibration exercises may evolve as new techniques become available.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the calibration analysis consistently shows that the probability ranges in the language scale do not correspond to any analyst's natural usage -- if no one can consistently calibrate to the defined ranges even after extended practice -- the ranges may need adjustment. But adjust cautiously: changing the scale invalidates the calibration history. A new scale starts the calibration clock from zero.</p>
+</li>
+</ul>
+</section>
+
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I modeled the probability scale after the systems used by the U.S. National Intelligence Council and the IPCC (Intergovernmental Panel on Climate Change), adapted for this institution's context. The ranges are not arbitrary -- they are designed to have clear separation between levels. The gap between "likely" (55-79%) and "very likely" (80-92%) is meaningful: it is the difference between "more often than not" and "most of the time." These distinctions matter for decision-making.</p>
+
+<p>The hardest part of this system will be avoiding the word "possible." In natural language, "possible" is the default qualifier for anything uncertain. It is also completely uninformative -- it applies to any event with a probability between 1% and 99%. Banning it from finished products will feel unnatural, but the discipline of choosing between "likely" and "unlikely" forces a commitment that "possible" avoids. The analyst who writes "it is possible that the drive will fail" has said nothing useful. The analyst who writes "it is likely that the drive will fail" has made a claim that can be evaluated and calibrated.</p>
+
+<p>I am genuinely uncertain whether the calibration exercises will work for a single analyst. Calibration research has mostly been conducted in group settings where social feedback accelerates learning. A solitary analyst calibrating against their own register may improve more slowly. But the alternative -- not calibrating at all -- guarantees that the language system remains cosmetic. Even slow improvement is better than none.</p>
+</section>
+
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 6: Honest Accounting of Limitations)</li>
+<li>D7-001 -- Intelligence Philosophy (epistemic hierarchy, R-D7-07 prohibition on certainty claims, calibration tracking defense)</li>
+<li>D7-002 -- The Intelligence Cycle (production standards requiring estimative language)</li>
+<li>D7-004 -- Analytical Frameworks and Methods (structured techniques that produce probability judgments)</li>
+<li>D7-005 -- Cognitive Bias and Epistemic Hygiene (overconfidence bias, anchoring bias, and other biases affecting probability judgment)</li>
+<li>D7-008 -- Intelligence Product Standards (product formats requiring estimative language, quality criteria)</li>
+<li>D7-010 -- Decision Support Doctrine (how estimative language affects decision-making)</li>
+<li>D7-012 -- Intelligence Failure: Detection, Response, Learning (calibration failure as an intelligence failure type)</li>
+<li>D7-013 -- Single-Analyst Resilience Protocols (calibration as a self-check tool for solitary analysts)</li>
+<li>Stage 1 Documentation Framework, Domain 7: Intelligence &amp; Analysis</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

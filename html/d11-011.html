@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D11-011 — Administrative Continuity During Personnel Loss - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li class="active"><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="D11-011">
+  <h1>D11-011 &mdash; Administrative Continuity During Personnel Loss</h1>
+
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D11-011</dd>
+  <dt>Domain</dt>
+  <dd>11 &mdash; Administration</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Draft</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+<p>This article defines how the institution's administrative functions survive the temporary or permanent loss of key personnel, including the worst case: the loss of all current administrators. Personnel loss is the single most dangerous failure mode for a single-operator institution, because when the operator is absent, the institution has no one to maintain it, no one to respond to events, and no one to make decisions. Every other failure mode &mdash; hardware failure, security breach, supply chain disruption &mdash; presumes that someone is present to detect and respond to the problem. Personnel loss removes the responder.</p>
+<p>This article does not attempt to prevent personnel loss; that is outside the scope of any administrative framework. Instead, it establishes the structures, documentation, and procedures that maximize the probability that administrative functions can continue (or be resumed) when personnel are lost. It defines the administrative continuity package, the automated systems that operate without human supervision, the succession activation process, and the graceful degradation modes that keep the institution alive when full operation is impossible.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+<p><strong>In scope:</strong></p>
+<ul>
+  <li>Scenarios of personnel loss: temporary absence, prolonged incapacity, permanent departure, sudden death.</li>
+  <li>The Administrative Continuity Package: what a successor needs to find and understand.</li>
+  <li>Automated and passive systems that operate without human intervention.</li>
+  <li>Succession activation: how a designated successor takes over administrative functions.</li>
+  <li>Graceful degradation: what functions are shed first when operator capacity is reduced.</li>
+  <li>The 72-hour, 30-day, and 6-month continuity horizons.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+  <li>Personnel administration under normal conditions (D11-006).</li>
+  <li>Technical disaster recovery (Domain 12, though there is significant overlap).</li>
+  <li>Legal and estate planning for the operator (outside institutional scope, though the institution should encourage it).</li>
+  <li>Psychological support for operators facing personnel loss (important but outside administrative scope).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+<h3>The Single Point of Human Failure</h3>
+<p>In reliability engineering, a single point of failure (SPOF) is a component whose failure causes the entire system to fail. In this institution, the single operator is the SPOF. Hardware SPOFs can be addressed through redundancy &mdash; two drives instead of one, two power supplies instead of one. Human SPOFs cannot be addressed through redundancy in the same way, because "having two operators" is not merely a procurement decision; it requires a relationship, shared knowledge, trust, and ongoing coordination.</p>
+<p>The institution's approach to the human SPOF is therefore not redundancy but resilience: designing the institution so that it can survive personnel loss through documentation, automation, and graceful degradation. The goal is not to eliminate the risk (which is impossible) but to extend the survival window &mdash; the time between personnel loss and institutional failure &mdash; long enough for recovery to occur.</p>
+
+<h3>Categories of Personnel Loss</h3>
+<p>Personnel loss is not a single scenario; it is a spectrum:</p>
+<ul>
+  <li><strong>Temporary absence (hours to days):</strong> The operator is traveling, ill, or temporarily unavailable. Automated systems continue operating. No administrative action is needed unless the absence extends beyond expected duration.</li>
+  <li><strong>Extended absence (weeks to months):</strong> The operator is seriously ill, injured, or dealing with a personal crisis. Administrative functions degrade because no one is performing them. Maintenance is deferred, procurement is delayed, records are not updated.</li>
+  <li><strong>Permanent departure (planned):</strong> The operator is retiring, relocating, or choosing to end their involvement. A planned departure allows full succession planning and knowledge transfer (D11-006 offboarding procedures).</li>
+  <li><strong>Sudden permanent loss:</strong> The operator dies, becomes permanently incapacitated, or disappears without warning. No knowledge transfer occurs. The institution must survive on its documentation and automated systems alone until a successor (if any) takes over.</li>
+</ul>
+<p>Each scenario requires different preparations. This article focuses primarily on the most challenging scenario &mdash; sudden permanent loss &mdash; because preparations adequate for that scenario automatically address the less severe cases.</p>
+
+<h3>Historical Lessons</h3>
+<p>History offers many examples of institutions that failed to survive their founders. Small businesses, artisan workshops, family farms, and personal libraries are routinely lost when the founding operator dies or becomes incapacitated, because the knowledge needed to operate them was never externalized. The most common finding in post-mortem analyses is not that the institution was technically unrecoverable but that no one could find the information needed to recover it: passwords were in the founder's head, procedures were undocumented, and the organizational logic was implicit.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+<h3>The Administrative Continuity Package</h3>
+<p>The Administrative Continuity Package (ACP) is a self-contained set of documents and materials that enables a successor to take over administrative functions without any oral knowledge transfer. The ACP must be:</p>
+<ul>
+  <li>Physically accessible without digital systems (printed or stored on a self-contained device).</li>
+  <li>Understandable by someone with general technical competence but no prior knowledge of this specific institution.</li>
+  <li>Current (updated at least annually and after any significant change).</li>
+  <li>Stored in at least two locations, at least one of which is physically separate from the institutional site.</li>
+</ul>
+<p>The ACP contains:</p>
+<ol>
+  <li><strong>Institutional Overview:</strong> What this institution is, what it does, and why it exists. References to CON-001 and ETH-001. A physical map of the institutional site showing all systems, storage locations, and utilities.</li>
+  <li><strong>Access Credentials:</strong> All passwords, encryption keys, and access codes needed to operate institutional systems. Stored encrypted with a passphrase known to the designated successor. Physical backup keys stored in a sealed envelope at the off-site location.</li>
+  <li><strong>Emergency Procedures:</strong> What to do in the first 72 hours. How to verify system health. What not to touch. Who to contact (if any external contacts exist). How to safely shut down systems if continued operation is not possible.</li>
+  <li><strong>Administrative Quick Reference:</strong> Summary of all administrative processes with references to the full articles. Current budget status. Current asset registry summary. Current maintenance schedule. Succession plan with designated successor contact information.</li>
+  <li><strong>Document Index:</strong> Location of all institutional documentation, both digital and physical. How to access the documentation corpus. Where the administrative records are stored. Where the backup media is located.</li>
+</ol>
+
+<h3>Continuity Horizons</h3>
+<p>The institution's continuity planning addresses three time horizons:</p>
+<ul>
+  <li><strong>72-Hour Horizon:</strong> The institution must survive 72 hours without any human intervention. This is achieved through automated systems: battery backup, automated monitoring (if configured), and passive environmental controls. No administrative action is needed during this window. The ACP's Emergency Procedures section is designed for someone arriving after the 72-hour mark.</li>
+  <li><strong>30-Day Horizon:</strong> Within 30 days, a successor (or the returning operator) must be able to assess institutional health, perform critical maintenance, and stabilize operations. The ACP provides the information needed for this stabilization. Non-critical functions (procurement planning, documentation review, budget reconciliation) are deferred. The priority is: are the systems running? Is the data safe? Are the environmental controls functional?</li>
+  <li><strong>6-Month Horizon:</strong> Within six months, administrative functions must be fully resumed, either by the returning operator, a trained successor, or a new operator who has completed the onboarding process (D11-006). If no successor emerges within six months, the institution enters long-term preservation mode: systems are safely shut down, data is preserved in the most durable available format, and the institution is documented for potential future reactivation.</li>
+</ul>
+
+<h3>Graceful Degradation</h3>
+<p>When operator capacity is reduced (due to illness, aging, or other constraints) but not eliminated, the institution sheds administrative functions in a defined order to preserve what matters most:</p>
+<ol>
+  <li><strong>Shed first:</strong> Enhancement activities (Tier 5), strategic investments (Tier 4), forms and template maintenance, non-critical record updates.</li>
+  <li><strong>Shed second:</strong> Scheduled reviews that are not safety-critical, documentation updates, procurement of non-critical items, detailed reporting.</li>
+  <li><strong>Shed third:</strong> Procurement planning, budget forecasting, personnel planning (if single-operator). Maintain only reactive procurement.</li>
+  <li><strong>Shed last:</strong> Core system monitoring, critical maintenance, data backup verification, asset registry updates for changes. These are the minimum administrative functions required to keep the institution alive.</li>
+  <li><strong>Never shed:</strong> Data backup execution. If the institution can only do one thing, it must back up its data. Everything else can be rebuilt; lost data cannot.</li>
+</ol>
+
+<h3>Succession Activation</h3>
+<p>When personnel loss is detected (by the successor, by a dead-man's-switch notification, or by the operator's own recognition of declining capacity), the succession activation process begins:</p>
+<ol>
+  <li><strong>Locate the ACP.</strong> The designated successor retrieves the Administrative Continuity Package from its known location.</li>
+  <li><strong>Follow the Emergency Procedures.</strong> Assess system health. Verify data integrity. Ensure environmental controls are functional. Do not make changes to running systems without understanding them first.</li>
+  <li><strong>Establish communication.</strong> If external contacts exist (other community members, technical advisors), notify them of the transition.</li>
+  <li><strong>Begin onboarding.</strong> The successor follows the onboarding framework (D11-006), accelerated as necessary but not skipped. Understanding must precede action.</li>
+  <li><strong>Resume administrative functions.</strong> Beginning with the "shed last" functions and working upward through the degradation hierarchy, restore administrative capability as the successor's understanding grows.</li>
+</ol>
+</section>
+
+<section>
+<h2>Rules and Constraints</h2>
+<ul>
+  <li><strong>R-ACP-01:</strong> An Administrative Continuity Package must exist at all times. An institution without an ACP is in administrative emergency. The ACP must be reviewed and updated at least annually and after any significant change to systems, access credentials, or succession planning.</li>
+  <li><strong>R-ACP-02:</strong> The ACP must be stored in at least two physically separate locations. At least one location must be accessible to the designated successor without requiring the current operator's assistance.</li>
+  <li><strong>R-ACP-03:</strong> Access credentials in the ACP must be current. Whenever a password or key is changed, the ACP must be updated within one week. Stale credentials are the most common reason succession attempts fail.</li>
+  <li><strong>R-ACP-04:</strong> A designated successor must be identified at all times. If no individual is available, the ACP must include instructions for the institution's safe preservation (long-term preservation mode) rather than continued operation.</li>
+  <li><strong>R-ACP-05:</strong> The graceful degradation order is mandatory, not advisory. When shedding functions due to reduced capacity, the order defined in this article must be followed. Shedding critical functions while maintaining enhancements is an administrative failure.</li>
+  <li><strong>R-ACP-06:</strong> The ACP must be testable. At least once every two years, the operator (or the designated successor, if available) should attempt to use the ACP to perform basic administrative functions as a drill. Any gaps or ambiguities discovered are corrected immediately.</li>
+  <li><strong>R-ACP-07:</strong> Long-term preservation mode is a legitimate institutional state, not a failure. If no successor is available within six months of total personnel loss, preserving the institution's data and documentation for potential future use is a success, not an abandonment.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+<ul>
+  <li><strong>ACP staleness.</strong> The ACP was created and never updated. Passwords have changed, systems have been reconfigured, the physical layout has been modified. The successor arrives with a guide that describes an institution that no longer exists. Mitigation: R-ACP-01 requires annual review. R-ACP-03 requires credential updates within one week. The ACP update should be on the annual calendar (D11-005).</li>
+  <li><strong>Successor unreachability.</strong> The designated successor cannot be reached, has moved, is unwilling to serve, or is also incapacitated. No one comes to take over. Mitigation: R-ACP-04 requires a designated successor at all times. The succession plan should include secondary and tertiary candidates where possible. Even if the successor cannot maintain the institution, they can execute long-term preservation mode.</li>
+  <li><strong>Knowledge-documentation gap.</strong> The operator believes the documentation is sufficient for succession, but critical knowledge was never externalized. The successor can follow procedures but does not understand why they exist and cannot handle situations not covered by the procedures. Mitigation: the ACP drill (R-ACP-06) tests the documentation's sufficiency. D11-006 R-PER-04 requires that documentation be sufficient for Competent-level operation.</li>
+  <li><strong>Premature action by successor.</strong> The successor, unfamiliar with the institution, makes changes to running systems before understanding them. Data is lost, configurations are corrupted, or security is compromised. Mitigation: the Emergency Procedures in the ACP explicitly instruct the successor not to make changes until systems are understood. The onboarding framework (D11-006) structures the learning progression.</li>
+  <li><strong>Denial of declining capacity.</strong> The operator's capacity is declining (aging, chronic illness) but they refuse to activate graceful degradation or accelerate succession planning. Administrative functions erode haphazardly rather than shedding in the defined order. Mitigation: R-ACP-05 makes the degradation order mandatory. D11-006 R-PER-08 requires honest capacity assessment. The annual institutional health report (D11-008) should include a self-assessment of operator capacity.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+<ol>
+  <li><strong>If the ACP does not exist:</strong> Create one immediately. Start with the Emergency Procedures section (what a newcomer needs for the first 72 hours) and the Access Credentials. These two sections alone dramatically improve continuity prospects. Add the remaining sections over the following month. Store copies in two locations.</li>
+  <li><strong>If the ACP is stale:</strong> Conduct a full review. Update all credentials, system descriptions, and contact information. Walk through the ACP as if you were a stranger encountering the institution for the first time. Flag everything that assumes prior knowledge and either explain it or reference the relevant documentation.</li>
+  <li><strong>If no successor is designated:</strong> Identify a candidate. This does not require a formal agreement or training; it requires identifying a person who could be contacted if needed, informing them of the institution's existence and the location of the ACP, and giving them enough context to understand what they would be asked to do. Even a reluctant successor who executes long-term preservation mode is better than no successor.</li>
+  <li><strong>If a succession attempt has failed (successor unable to operate the institution):</strong> Assess what went wrong. Was the ACP insufficient? Were credentials stale? Was the successor's skill level inadequate? Correct the specific failure. If the successor is still available, conduct additional training. If they are not, designate a new successor and improve the ACP based on lessons learned.</li>
+  <li><strong>If the operator is in declining capacity but denial:</strong> The reporting framework (D11-008) and the annual self-audit (D11-013) include capacity assessment questions. If these are answered honestly, they will flag the decline. If they are not answered honestly, this is an ETH-001 violation. There is no procedural substitute for honesty &mdash; only the pre-commitment, made here, that capacity decline is not shameful and that acknowledging it is an act of institutional stewardship.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+<ul>
+  <li><strong>Years 0-5:</strong> The ACP is created and the succession plan is established. The operator is young and healthy; the ACP feels like a theoretical exercise. This is the easiest time to create it precisely because it is the least urgent. The drill (R-ACP-06) is performed at least once, revealing gaps that are corrected.</li>
+  <li><strong>Years 5-15:</strong> The ACP has been updated several times. The designated successor may have changed. The institution's complexity has grown, requiring a more detailed ACP. If a multi-operator state has been achieved, continuity risk is significantly reduced but not eliminated (both operators could be lost simultaneously).</li>
+  <li><strong>Years 15-30:</strong> Personnel transitions are increasingly likely. The ACP and succession plan are no longer theoretical; they are practical tools that may be activated. The graceful degradation model may be partially activated as the operator's priorities or capacity shift.</li>
+  <li><strong>Years 30-50+:</strong> The institution has likely undergone at least one personnel transition. The continuity framework has been tested in practice. The lessons from actual transitions are incorporated into the ACP and the succession plan. The institution has demonstrated that it can survive the loss of its founding operator &mdash; the ultimate test of institutional design.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 &mdash; Founding Entry:</strong>
+This is the hardest article in the entire domain to write, because it requires me to imagine my own absence. Not as a vacation or a break, but as a permanent condition. What happens to this institution when I am not here? If the answer is "it dies," then all the documentation, all the hardware, all the careful planning in every other article is ultimately futile. The institution exists only as long as I do, which means it is not really an institution &mdash; it is a hobby with pretensions. The ACP is my attempt to make this institution something more than an extension of myself. If a stranger can find the package, read the instructions, and keep the systems running long enough to learn the rest, then the institution has achieved a degree of independence from its creator. That independence is the difference between a project and an institution. I do not know if I will succeed. But the attempt is the minimum I owe to the work I have invested here.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+<ul>
+  <li>D11-001 &mdash; Administration Philosophy (administrative functions, coordination, stewardship)</li>
+  <li>D11-006 &mdash; Personnel Administration (succession planning, onboarding framework, offboarding, skills inventory)</li>
+  <li>D11-008 &mdash; Reporting Structures (annual capacity self-assessment in institutional health report)</li>
+  <li>D11-010 &mdash; Resource Conflict Resolution (priority tiers used in graceful degradation)</li>
+  <li>D11-013 &mdash; Administrative Self-Audit (capacity assessment in audit process)</li>
+  <li>CON-001 &mdash; The Founding Mandate (institution must be transferable through documentation)</li>
+  <li>ETH-001 &mdash; Ethical Foundations (Principle 6: honest accounting of limitations)</li>
+  <li>GOV-001 &mdash; Authority Model (governance during succession)</li>
+  <li>Domain 3 &mdash; Security (credential management, access control during succession)</li>
+  <li>Domain 12 &mdash; Disaster Recovery (DR-009 continuity planning, mutual dependency)</li>
+</ul>
+</section>
+
+</article>
+</main>
+</body>
+</html>

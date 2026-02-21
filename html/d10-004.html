@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D10-004 — Routine Maintenance Schedules - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li class="active"><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d10-004">
+  <h1>D10-004 &mdash; Routine Maintenance Schedules</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D10-004</dd>
+  <dt>Domain</dt>
+  <dd>10 -- User Operations</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>OPS-001, D10-002, D10-003, D4-001, D4-002, D5-002, D6-001, D6-005, D8-006</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D10-002 (daily checklist items), D10-007 (workload planning), D10-011 (seasonal adjustments), all domains with maintainable systems.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article establishes the master maintenance schedule for the holm.chat Documentation Institution. It consolidates the maintenance requirements from every domain into a single, authoritative reference that tells the operator what must be maintained, how often, by what procedure, and to what standard of acceptance.</p>
+
+<p>Maintenance is the institution's immune system. A machine that is never inspected degrades silently. A storage medium that is never verified develops bit rot. A backup that is never tested may not restore. The purpose of this article is to make the invisible visible -- to transform the slow, silent accumulation of degradation into a set of scheduled, verifiable, documented actions that keep every component of the institution within its operating parameters.</p>
+
+<p>This is a living document in the truest sense. As the institution acquires new systems, retires old ones, and learns from operational experience, the maintenance schedule will grow, shrink, and evolve. The framework described here governs how that evolution occurs. The specific entries in the schedule are a snapshot; the principles that govern them are durable.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The philosophy of preventive maintenance and why it dominates corrective maintenance in a long-lived institution.</li>
+<li>The master maintenance schedule framework: frequency tiers, task structure, acceptance criteria.</li>
+<li>Maintenance categories: hardware, software, data, documentation, security, and environmental.</li>
+<li>The relationship between maintenance tasks and the daily checklist (D10-002).</li>
+<li>Procedures for adding, modifying, and retiring maintenance tasks.</li>
+<li>Tools and supplies required for maintenance activities.</li>
+<li>Record-keeping requirements for maintenance activities.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Emergency repairs or incident-driven maintenance (see D10-003).</li>
+<li>The design or architecture of systems being maintained (see Domains 4, 5, 6, 8).</li>
+<li>The daily operational cycle itself (see D10-002); this article feeds tasks into that cycle.</li>
+<li>Strategic decisions about system replacement or upgrade (see D13 articles).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Preventive vs. Corrective Maintenance</h3>
+<p>There are two philosophies of maintenance. Corrective maintenance waits for something to break and then fixes it. Preventive maintenance performs regular inspections and servicing to prevent breakage. In a consumer context, corrective maintenance is often rational: the cost of prevention exceeds the cost of replacement. In an institutional context with a fifty-year horizon, the calculus inverts entirely.</p>
+
+<p>A failed disk in a consumer laptop means buying a new disk. A failed disk in an institution holding irreplaceable archival data means potential permanent loss. The cost of monthly SMART monitoring is minutes. The cost of undetected disk degradation is potentially catastrophic. Preventive maintenance is not optional in this institution. It is the primary defense against the slow, silent failures that destroy long-lived systems.</p>
+
+<h3>3.2 The Maintenance Pyramid</h3>
+<p>Maintenance tasks form a pyramid. At the base are frequent, lightweight tasks: daily health checks, weekly log reviews. In the middle are periodic, moderate tasks: monthly integrity scans, quarterly hardware inspections. At the top are infrequent, intensive tasks: annual security audits, biennial hardware lifecycle assessments. The pyramid ensures that the most common failure modes are caught quickly while deeper inspections occur at sustainable intervals.</p>
+
+<p>The pyramid also serves a cognitive function. Daily tasks keep the operator in contact with the institution's vital signs. Weekly tasks provide a broader view. Monthly and quarterly tasks force the operator to step back and assess the whole system. Without this layered structure, maintenance is either too shallow (daily checks that miss slow degradation) or too burdensome (comprehensive audits every day that cause burnout).</p>
+
+<h3>3.3 The Living Schedule</h3>
+<p>The maintenance schedule is not a static document created once and followed forever. It grows when new systems are added. It shrinks when systems are retired. It adjusts when operational experience reveals that a task is too frequent (never finding problems) or too infrequent (always finding problems that have been developing undetected). The schedule is reviewed quarterly per OPS-001 and revised as needed. Every revision is documented with rationale.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Frequency Tiers</h3>
+<p>Every maintenance task belongs to exactly one frequency tier:</p>
+
+<table>
+<thead>
+<tr><th>Tier</th><th>Frequency</th><th>Typical Duration</th><th>Integrated Into</th></tr>
+</thead>
+<tbody>
+<tr><td>T-Daily</td><td>Every operational day</td><td>Included in 15-30 min daily cycle</td><td>D10-002 daily checklist</td></tr>
+<tr><td>T-Weekly</td><td>Once per week</td><td>Included in 1-2 hour weekly cycle</td><td>OPS-001 weekly operations</td></tr>
+<tr><td>T-Monthly</td><td>Once per month</td><td>Included in half-day monthly cycle</td><td>OPS-001 monthly operations</td></tr>
+<tr><td>T-Quarterly</td><td>Once per quarter</td><td>Included in full-day quarterly cycle</td><td>OPS-001 quarterly operations</td></tr>
+<tr><td>T-Semiannual</td><td>Twice per year</td><td>2-4 hours dedicated</td><td>Scheduled independently</td></tr>
+<tr><td>T-Annual</td><td>Once per year</td><td>Included in 2-3 day annual cycle</td><td>OPS-001 annual operations</td></tr>
+<tr><td>T-Biennial</td><td>Once every two years</td><td>Variable, typically half day</td><td>Scheduled independently</td></tr>
+<tr><td>T-Quinquennial</td><td>Once every five years</td><td>Variable, may require days</td><td>Aligned with hardware lifecycle</td></tr>
+</tbody>
+</table>
+
+<h3>4.2 Task Structure</h3>
+<p>Every maintenance task in the schedule is defined by the following fields:</p>
+<ul>
+<li><strong>Task ID:</strong> A unique identifier in the format MT-[Category]-[Number] (e.g., MT-HW-001 for the first hardware maintenance task).</li>
+<li><strong>Description:</strong> A clear, imperative statement of what must be done.</li>
+<li><strong>Frequency Tier:</strong> One of the tiers defined in Section 4.1.</li>
+<li><strong>Category:</strong> Hardware (HW), Software (SW), Data (DA), Documentation (DOC), Security (SEC), or Environmental (ENV).</li>
+<li><strong>System/Component:</strong> The specific system or component being maintained.</li>
+<li><strong>Procedure:</strong> Step-by-step instructions or a reference to the relevant domain article.</li>
+<li><strong>Acceptance Criteria:</strong> How to determine that the maintenance was performed successfully.</li>
+<li><strong>Tools Required:</strong> Any specific tools, software, or supplies needed.</li>
+<li><strong>Estimated Duration:</strong> Realistic time estimate for the task.</li>
+<li><strong>Source Authority:</strong> The domain article that mandates this maintenance.</li>
+<li><strong>Last Performed:</strong> Date of most recent completion.</li>
+<li><strong>Next Due:</strong> Date of next scheduled performance.</li>
+</ul>
+
+<h3>4.3 Master Schedule Categories</h3>
+
+<p><strong>Hardware Maintenance (HW).</strong> Physical inspection and servicing of all computing equipment, storage media, power systems, cooling systems, and network infrastructure. Includes visual inspection for physical damage, dust accumulation, cable integrity, and environmental conditions. Includes SMART monitoring for storage devices. Includes UPS battery testing. Governed primarily by Domain 4 requirements.</p>
+
+<p><strong>Software Maintenance (SW).</strong> Verification that all software systems are functioning correctly, that configurations have not drifted from documented baselines, that services are running and responsive. Includes log rotation verification, service health checks, and configuration audits. Does not include software upgrades (those are governed by change management per GOV-001). Governed primarily by Domain 5 requirements.</p>
+
+<p><strong>Data Maintenance (DA).</strong> Integrity verification of stored data through checksum validation, backup verification through test restores, storage utilization monitoring, and media health assessment. The most critical category for a documentation institution. Governed primarily by Domain 6 requirements, especially D6-002 (Backup Doctrine) and D6-003 (Data Integrity Verification).</p>
+
+<p><strong>Documentation Maintenance (DOC).</strong> Verification that all system documentation is current, that procedures match reality, that the article index is accurate, and that cross-references are valid. Governed by OPS-001 (documentation-first principle) and CON-001 (documentation completeness mandate).</p>
+
+<p><strong>Security Maintenance (SEC).</strong> Verification of access controls, key integrity, physical security measures, and audit log review. Governed by Domain 3 requirements, especially SEC-001, SEC-002, and SEC-003.</p>
+
+<p><strong>Environmental Maintenance (ENV).</strong> Monitoring and maintenance of the physical environment: temperature, humidity, dust levels, pest control, and physical access barriers. Governed by Domain 4 environmental requirements.</p>
+
+<h3>4.4 Maintenance Record Format</h3>
+<p>Every maintenance activity is recorded in the maintenance log, which is a structured supplement to the operational log. Each entry contains:</p>
+<ul>
+<li>Date and time of performance.</li>
+<li>Task ID of the maintenance task performed.</li>
+<li>Result: Pass (acceptance criteria met), Fail (criteria not met, action required), or Deferred (with justification).</li>
+<li>Observations: anything noteworthy, even if the task passed.</li>
+<li>Follow-up actions: if the task failed or observations warrant investigation.</li>
+</ul>
+<p>The maintenance log is a Tier 2 data artifact per D6-001. It is preserved as part of the institution's operational history and is invaluable for trend analysis during quarterly and annual reviews.</p>
+
+<h3>4.5 Adding, Modifying, and Retiring Tasks</h3>
+<p><strong>Adding a task:</strong> When a new system is deployed or a new maintenance requirement is identified, a new task entry is created using the structure in Section 4.2. The addition is recorded in the maintenance log with rationale. New tasks default to a higher frequency tier; they may be moved to a lower tier after operational experience demonstrates that less frequent maintenance is adequate.</p>
+
+<p><strong>Modifying a task:</strong> When operational experience reveals that a task's frequency, procedure, or acceptance criteria need adjustment, the task is modified with documented rationale. Frequency changes are reviewed during the quarterly operations cycle per OPS-001. A task that has never found a problem over four consecutive cycles at its current frequency is a candidate for reduction to the next lower tier. A task that frequently finds problems may need elevation to a higher tier.</p>
+
+<p><strong>Retiring a task:</strong> When the system or component being maintained is decommissioned, the associated maintenance tasks are retired. Retired tasks are not deleted; they are marked as retired with the date and reason, preserving the institutional record of what was once maintained and why it no longer is.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D10M-01:</strong> Every system, component, and data store in the institution must have at least one associated maintenance task in the master schedule. A system with no maintenance schedule is an unmonitored system, and unmonitored systems degrade silently.</li>
+<li><strong>R-D10M-02:</strong> All maintenance tasks must have verifiable acceptance criteria per D10-002 Principle 1. "Check the system" is not a maintenance task. "Verify that the system responds to a health check query within 5 seconds and returns status OK" is a maintenance task.</li>
+<li><strong>R-D10M-03:</strong> Maintenance tasks at T-Daily and T-Weekly frequency must be integrated into the D10-002 daily checklist and OPS-001 weekly operations cycle respectively. They must not exist as standalone obligations that the operator must remember independently.</li>
+<li><strong>R-D10M-04:</strong> The total maintenance workload at each frequency tier must be sustainable within the time allocations defined by OPS-001. If daily maintenance tasks exceed the daily cycle allocation, tasks must be redistributed to lower-frequency tiers or the allocation must be renegotiated through a Tier 3 governance decision.</li>
+<li><strong>R-D10M-05:</strong> Every maintenance activity must be recorded in the maintenance log. Unrecorded maintenance is indistinguishable from unmaintained systems.</li>
+<li><strong>R-D10M-06:</strong> The master maintenance schedule must be reviewed quarterly during the OPS-001 quarterly operations cycle. Tasks that have never found a problem over four consecutive cycles are candidates for frequency reduction.</li>
+<li><strong>R-D10M-07:</strong> Deferred maintenance must be explicitly recorded with justification and a rescheduled date. Maintenance that is repeatedly deferred without resolution triggers a review of whether the task is necessary (if not, retire it) or whether the operator is overloaded (if so, address workload per D10-007).</li>
+<li><strong>R-D10M-08:</strong> Tools and supplies required for maintenance must be inventoried and their availability verified during the annual operations cycle. A maintenance task that cannot be performed because the required tool is unavailable is a planning failure.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Schedule bloat.</strong> Maintenance tasks accumulate as new systems are added but are never retired when systems are removed. The schedule becomes unmanageable. The operator begins skipping tasks selectively, based on intuition rather than priority. Mitigation: R-D10M-06 quarterly review. R-D10M-04 sustainability constraint. Active retirement of tasks for decommissioned systems.</p>
+</li>
+<li>
+<p><strong>Maintenance theater.</strong> Tasks are performed and recorded as "Pass" without genuine verification. The maintenance log shows a perfect record while systems silently degrade. Mitigation: acceptance criteria must be specific and verifiable (R-D10M-02). Periodic spot-checks during quarterly reviews: re-perform a randomly selected task and compare the result with the most recent log entry.</p>
+</li>
+<li>
+<p><strong>Frequency mismatch.</strong> A task is performed too frequently (wasting operator time on checks that never find anything) or too infrequently (problems develop between checks). Mitigation: the four-cycle review rule in R-D10M-06 adjusts frequency based on observed yield. Incidents that reveal undetected degradation trigger a review of the associated maintenance frequency.</p>
+</li>
+<li>
+<p><strong>Tools unavailable.</strong> A maintenance task requires a specific tool or supply (cleaning materials, replacement cables, calibration equipment) that is not on hand when needed. The task is deferred. Mitigation: R-D10M-08 annual tools inventory. Maintenance tasks should specify tools required, and those tools should be part of the institution's operational kit.</p>
+</li>
+<li>
+<p><strong>Orphaned systems.</strong> A new system is deployed without creating maintenance tasks for it. It operates without scheduled monitoring until it fails. Mitigation: R-D10M-01 requires every system to have maintenance tasks. The documentation-first principle (OPS-001 R-OPS-02) means a system is not operational until its maintenance schedule exists.</p>
+</li>
+<li>
+<p><strong>Maintenance-induced failure.</strong> The maintenance activity itself causes a problem: a firmware update that fails, a cleaning procedure that damages a component, a test restore that overwrites production data. Mitigation: maintenance procedures must be reviewed for risk. High-risk maintenance (firmware updates, test restores) must include rollback procedures and must never operate on the only copy of data.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If the maintenance schedule has been neglected:</strong> Do not attempt to catch up on all overdue tasks simultaneously. Triage: identify the highest-risk items (data integrity verification, backup testing, hardware health checks). Perform those first. Then work through the remaining overdue items over the next several operational cycles. Record the gap and its resolution in the maintenance log.</p>
+</li>
+<li>
+<p><strong>If maintenance theater is suspected:</strong> Select ten maintenance tasks at random from the last quarter's log. Re-perform each one independently. Compare results. If discrepancies are found, the maintenance log's reliability is compromised. Conduct a comprehensive system health assessment, prioritizing data integrity and hardware health. Revise acceptance criteria to require recording specific measured values rather than simple pass/fail.</p>
+</li>
+<li>
+<p><strong>If a maintenance activity causes a failure:</strong> Invoke D10-003 incident response. The maintenance activity is the cause of the incident. Document it honestly. The post-incident review should examine whether the maintenance procedure was flawed, whether the procedure was followed incorrectly, or whether an unforeseeable interaction occurred. Revise the maintenance procedure accordingly.</p>
+</li>
+<li>
+<p><strong>If the schedule has bloated past sustainability:</strong> Perform a zero-based review. For each task, ask: what is the specific failure mode this task prevents? How likely is that failure mode? What is the consequence if it occurs undetected? Tasks that prevent unlikely, low-consequence failures are candidates for retirement or frequency reduction. The goal is to return the schedule to sustainability within OPS-001 time allocations.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The maintenance schedule is being built from operational experience. The initial schedule is based on manufacturer recommendations, domain article requirements, and best practices. Over five years of operation, the schedule will be refined as the operator learns which tasks are valuable and which are merely procedural. Expect significant revision during quarterly reviews. The maintenance log from this period will establish the baselines against which future trends are measured.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The schedule should be stable and well-calibrated. Frequency tiers should reflect observed failure rates rather than theoretical estimates. The maintenance log should contain enough history to identify long-term trends: components that degrade predictably, seasonal patterns in environmental conditions, and the typical lifespan of each hardware generation. This historical data is invaluable for planning replacements before failures occur.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Hardware generations will have changed at least twice. Each transition requires creating new maintenance tasks for new equipment and retiring tasks for decommissioned equipment. The maintenance framework (frequency tiers, task structure, recording format) should remain stable even as the specific tasks change completely. A successor should be able to read the maintenance schedule and understand what needs to be maintained and how, without requiring the founder's institutional memory.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The maintenance log spanning decades is an institutional treasure. It contains the operational biography of every system the institution has ever run. Patterns visible only over decades may emerge: the true lifespan of storage media under actual conditions, the long-term reliability of different hardware platforms, the real-world maintenance burden of different system architectures. This data informs not just maintenance but strategic decisions about the institution's future infrastructure.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I have maintained personal technology systems for years, and the pattern is always the same. I set up a system, I use it, I neglect it, and eventually something breaks. The break is always preceded by months of silent degradation that I would have caught if I had been looking. I was not looking because there was no schedule telling me to look.</p>
+
+<p>This article is my answer to that pattern. The maintenance schedule is not aspirational. It is a minimum. Every task in it exists because I can identify a specific failure mode it prevents. If I cannot identify the failure mode, the task does not belong in the schedule.</p>
+
+<p>The hardest part of writing this article was accepting that the schedule will be incomplete on day one. I do not yet know all the failure modes. I will discover them through operation. Each discovery will add a task to the schedule. That is the correct process. A schedule built entirely from theory, without operational experience, will be both too large (including theoretical tasks that never prove useful) and too small (missing the practical tasks that only experience reveals).</p>
+
+<p>Future operators: the specific tasks in this schedule are less important than the framework. Systems will change. Tasks will change. But the principle -- that every system requires scheduled, documented, verified maintenance -- must not change. When you add a new system, add its maintenance tasks. When you retire a system, retire its tasks. Keep the schedule honest and keep it current. That is all this article asks.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>OPS-001 -- Operations Philosophy (operational tempo, documentation-first principle, complexity budget, sustainability requirement)</li>
+<li>D10-002 -- Daily Operations Doctrine (daily checklist integration, checklist design principles)</li>
+<li>D10-003 -- Incident Response Procedures (incident-driven maintenance, maintenance-induced failures)</li>
+<li>D10-007 -- Duty Structures &amp; Workload Management (maintenance workload planning)</li>
+<li>D10-011 -- Seasonal &amp; Cyclical Operations Guide (seasonal maintenance adjustments)</li>
+<li>D4-001 -- Infrastructure Philosophy (hardware maintenance requirements)</li>
+<li>D4-002 -- Hardware Specifications (component-specific maintenance procedures)</li>
+<li>D5-002 -- Software Architecture (software maintenance requirements)</li>
+<li>D6-001 -- Data Philosophy (data tier system, maintenance log as Tier 2 data)</li>
+<li>D6-002 -- Backup Doctrine (backup verification tasks)</li>
+<li>D6-003 -- Data Integrity Verification (checksum verification tasks)</li>
+<li>D6-005 -- Media Management (storage media maintenance)</li>
+<li>D8-006 -- Agent Lifecycle Management (automation maintenance tasks)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (security maintenance requirements)</li>
+<li>SEC-002 -- Access Control Procedures (access control verification tasks)</li>
+<li>GOV-001 -- Authority Model (governance tier for schedule changes)</li>
+<li>CON-001 -- The Founding Mandate (documentation completeness mandate)</li>
+</ul>
+
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-011 — Incident Response Framework - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li class="active"><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-011">
+  <h1>SEC-011 &mdash; Incident Response Framework</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-011</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security &amp; Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>SEC-001 (Threat Model), SEC-008 (Security Audit Framework), GOV-001 (Authority Model)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All operational security procedures. Domain 12 (Disaster Recovery).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the holm.chat Documentation Institution detects, classifies, responds to, contains, eradicates, recovers from, and learns from security incidents. A security incident is any event that violates or threatens to violate the security policies defined in Domain 3 -- whether that event is a detected intrusion, a hardware failure, a procedural error, a suspected compromise, or any other occurrence that puts the institution's integrity, confidentiality, or availability at risk.</p>
+
+<p>The purpose of an incident response framework is not merely to describe what to do when something goes wrong. Its deeper purpose is to ensure that the operator can act with clarity and discipline under stress. Security incidents are, by their nature, stressful. They create urgency, uncertainty, and the temptation to act before thinking. A well-defined incident response framework replaces panic with procedure. It does not eliminate the stress, but it channels it into productive action.</p>
+
+<p>This document is written for the operator who has just discovered something alarming and needs to know, in that moment, exactly what to do next. The procedures here are designed to be followed sequentially, without improvisation, until the immediate crisis is contained. Only after containment does the framework permit the operator to step back and analyze the situation with the full resources of rational thought.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition and classification of security incidents by severity.</li>
+<li>Detection mechanisms: how incidents are discovered.</li>
+<li>The six phases of incident response: detection, classification, containment, eradication, recovery, and lessons learned.</li>
+<li>Communication protocols during and after an incident.</li>
+<li>Evidence preservation requirements.</li>
+<li>Post-incident review procedures.</li>
+<li>The relationship between incident response and disaster recovery.</li>
+</ul>
+
+<p>This article does not cover the routine audit procedures that may detect incidents (those are in SEC-008), the specific technical details of forensic analysis (those belong in operational procedures derived from this framework), or disaster recovery procedures for catastrophic events (those are in Domain 12). This article defines the framework; operational runbooks derived from it will contain step-by-step technical instructions.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why a Single-Operator Institution Needs Incident Response</h3>
+<p>The objection arises: incident response frameworks are designed for teams. They describe roles, escalation paths, and communication channels between multiple responders. In a single-operator institution, there is only one person. What is the point?</p>
+
+<p>The point is that the single operator is still multiple roles. During an incident, the operator must simultaneously be the detector, the analyst, the responder, and the decision-maker. Without a framework, these roles collapse into each other, and the operator is likely to make decisions before completing analysis, or to begin remediation before completing containment. The framework forces the operator to move through phases in order, fulfilling each role before moving to the next.</p>
+
+<p>Furthermore, incidents do not always happen when the operator is at peak mental capacity. They may be discovered late at night, or during a period of personal stress, or after a long gap between operational sessions. The framework serves as an external mind -- a set of procedures that compensates for the operator's temporary cognitive limitations.</p>
+
+<h3>3.2 The Air Gap as Incident Filter</h3>
+<p>The institution's air-gapped architecture dramatically reduces the surface area for certain classes of incidents. Remote intrusion, network-based attacks, and automated exploitation are effectively eliminated. However, the air gap does not prevent physical incidents (hardware failure, theft, environmental damage), supply chain incidents (compromised media or hardware introduced through the quarantine process), operational incidents (human error, procedural deviation), or integrity incidents (data corruption, bit rot, software bugs).</p>
+
+<p>The incident response framework must address all of these categories. An overemphasis on network-based incidents -- the most common type in connected environments -- would leave the institution unprepared for the incident types that actually threaten it.</p>
+
+<h3>3.3 The Value of the Post-Incident Review</h3>
+<p>Every incident, no matter how minor, is an opportunity to learn. The post-incident review (often called a "lessons learned" or "post-mortem" process) is not optional and is not a formality. It is the mechanism by which the institution converts painful experience into improved resilience. An institution that responds to incidents but never learns from them will face the same incidents repeatedly. An institution that conducts rigorous post-incident reviews becomes progressively harder to harm.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Incident Classification</h3>
+<p>All security events are classified on a four-level severity scale upon detection. The classification may be revised as more information becomes available, but the initial classification determines the urgency and scope of the response.</p>
+
+<p><strong>Severity 1 -- Critical.</strong> The incident threatens the existence or fundamental integrity of the institution. Examples: total loss of a storage location, evidence of active compromise of the archive core (Zone A), loss of master encryption keys, physical theft of institutional hardware, discovery of deliberate data tampering. Response: immediate. All other operations cease. The operator focuses exclusively on the incident until containment is achieved.</p>
+
+<p><strong>Severity 2 -- High.</strong> The incident compromises a significant security control or threatens data that can be recovered but at significant cost. Examples: failure of a backup verification, discovery of an undocumented trust boundary crossing, hardware failure in a non-redundant component, detection of unauthorized modifications to the working environment (Zone B). Response: within the same operational session. Other non-critical operations may continue in parallel, but the incident takes priority.</p>
+
+<p><strong>Severity 3 -- Medium.</strong> The incident represents a procedural deviation or a detected anomaly that does not immediately threaten data or systems but indicates a potential weakness. Examples: a missed audit schedule, detection of unexpected file modifications that are likely benign but unexplained, discovery of a minor deviation from documented procedures. Response: within 48 hours. Document the finding immediately; investigation and remediation may proceed at a measured pace.</p>
+
+<p><strong>Severity 4 -- Low.</strong> The incident is an observation that should be recorded for trend analysis but does not require immediate action. Examples: a minor hardware anomaly (unusual noise, slightly elevated temperature), a software warning that does not indicate data risk, a procedural observation during routine operations. Response: document at next scheduled operational session. Review during the next regular audit cycle.</p>
+
+<h3>4.2 The Six Phases of Incident Response</h3>
+
+<p><strong>Phase 1: Detection.</strong> An incident must be detected before it can be responded to. Detection occurs through three channels: routine audits and integrity checks (proactive detection), direct observation by the operator during normal operations (real-time detection), or discovery during investigation of another issue (incidental detection). The audit framework defined in SEC-008 is the primary proactive detection mechanism. The operator's vigilance during daily operations is the primary real-time mechanism. All detection events, regardless of channel, enter the same classification and response pipeline.</p>
+
+<p><strong>Phase 2: Classification.</strong> Upon detection, the operator classifies the incident using the severity scale defined in Section 4.1. Classification must be performed before any response action is taken. The natural impulse is to begin fixing the problem immediately. This impulse must be resisted. Misclassification leads to either over-response (wasting resources on a minor issue) or under-response (treating a critical threat as routine). Take the time to classify correctly. If uncertain, classify at the higher severity level and downgrade later if warranted.</p>
+
+<p><strong>Phase 3: Containment.</strong> The goal of containment is to prevent the incident from spreading or worsening. Containment is not remediation. It is stabilization. For a hardware failure, containment means isolating the failed component so that it does not corrupt other systems. For a suspected data compromise, containment means isolating the affected zone so that the compromise does not spread. For an integrity failure, containment means ceasing all write operations to the affected storage until the scope of corruption is determined. Containment actions must be documented as they are performed. Do not rely on memory. Write down what you did, when you did it, and why.</p>
+
+<p><strong>Phase 4: Eradication.</strong> Once the incident is contained, the root cause must be identified and eliminated. For a hardware failure, this means replacing the failed component. For a data integrity issue, this means identifying and correcting the corrupted data from known-good sources. For a procedural failure, this means identifying the procedure that was violated or proved inadequate and correcting it. Eradication must address the root cause, not merely the symptom. If the cause cannot be identified with certainty, document that uncertainty and implement additional monitoring to detect recurrence.</p>
+
+<p><strong>Phase 5: Recovery.</strong> Recovery restores the institution to normal operational status. This may involve restoring data from backups, rebuilding a system from known-good media, re-verifying the integrity of affected zones, or re-establishing trust boundaries that were temporarily modified during containment. Recovery must include verification: after restoration, the operator must confirm that the restored systems and data are in the expected state. Trust is not restored by default. It must be re-earned through verification.</p>
+
+<p><strong>Phase 6: Lessons Learned.</strong> Within fourteen days of recovery, the operator must conduct a post-incident review. This review produces a written report that documents: what happened, when it was detected, how it was classified, what containment and eradication actions were taken, what the root cause was (or the best hypothesis if the root cause is uncertain), what the impact was, what worked well in the response, what did not work well, and what changes to procedures, configurations, or documentation are required to prevent recurrence or improve future response. The lessons-learned report is stored in Zone A as part of the institutional record.</p>
+
+<h3>4.3 Evidence Preservation</h3>
+<p>During any Severity 1 or Severity 2 incident, the operator must preserve evidence before beginning eradication. Evidence includes: system logs, filesystem metadata (timestamps, permissions, file sizes), the state of the affected hardware or media, any error messages or anomalous output, and the operator's contemporaneous notes. Evidence must not be modified during collection. If the affected system must be taken offline for containment, create a forensic image of the storage media before proceeding. If imaging is not possible, document why and record as much state information as can be captured without modifying the evidence.</p>
+
+<p>Evidence preservation serves two purposes: it enables a thorough post-incident investigation, and it provides a historical record that may be relevant to future incidents. A pattern of seemingly unrelated minor incidents may reveal a systemic vulnerability only when the evidence from multiple incidents is analyzed together.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-IR-01:</strong> Every security event that meets the definition of an incident (any event that violates or threatens to violate security policies) must be documented, regardless of severity. Undocumented incidents do not exist in the institutional record and therefore cannot inform future decision-making.</li>
+<li><strong>R-IR-02:</strong> Classification must precede response. No remediation action may be taken until the incident has been classified. The sole exception is an immediate physical threat to hardware (e.g., fire, flooding), where physical safety actions may precede formal classification.</li>
+<li><strong>R-IR-03:</strong> Containment must precede eradication. The operator must not attempt to fix the root cause until the incident is contained and not spreading. Premature eradication attempts may worsen the incident or destroy evidence.</li>
+<li><strong>R-IR-04:</strong> Evidence must be preserved before eradication for all Severity 1 and Severity 2 incidents. This requirement may not be waived for convenience or urgency. If evidence cannot be preserved due to the nature of the incident, the impossibility must be documented.</li>
+<li><strong>R-IR-05:</strong> A post-incident review must be completed within fourteen days of recovery for all Severity 1, 2, and 3 incidents. The review must produce a written report stored in Zone A. Severity 4 incidents are reviewed in aggregate during the next scheduled audit cycle.</li>
+<li><strong>R-IR-06:</strong> Post-incident reviews must result in at least one of the following: a confirmed procedure change, a confirmed configuration change, a confirmed documentation update, or a written determination that no changes are required with reasoning. A review that produces no output is incomplete.</li>
+<li><strong>R-IR-07:</strong> The incident response framework itself must be tested through tabletop exercises at least annually. The exercise must simulate a Severity 1 incident and walk through all six phases. Deficiencies discovered during exercises are treated as Severity 3 findings.</li>
+<li><strong>R-IR-08:</strong> During a Severity 1 incident, no changes to institutional documentation or security policies may be made until the recovery phase is complete. Policy changes made under crisis pressure are likely to be poorly considered. The lessons-learned phase is the appropriate time for policy revision.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Detection failure.</strong> An incident occurs but is not detected. This is the most dangerous failure mode because it means the incident continues to cause harm invisibly. Mitigation: the audit framework in SEC-008 provides multiple independent detection channels. Regular integrity checks, log reviews, and hardware health monitoring reduce the probability of prolonged undetected incidents. But no detection system is perfect. The operator must accept that some incidents will have a detection latency and design containment procedures to handle belated discovery.</li>
+<li><strong>Classification paralysis.</strong> The operator cannot determine the severity of an incident and delays response while trying to classify it precisely. Mitigation: R-IR-02 requires classification before response, but classification does not require certainty. If the severity is unclear, classify at the higher level. It is better to over-respond to a minor incident than to under-respond to a critical one. Reclassification is always permitted as more information becomes available.</li>
+<li><strong>Containment breach.</strong> The containment actions are insufficient, and the incident spreads beyond the initially affected scope. Mitigation: containment should err on the side of isolation. It is better to isolate more than necessary and restore connectivity later than to isolate too little and allow the incident to spread. If initial containment fails, escalate the severity classification and implement broader containment.</li>
+<li><strong>Evidence destruction.</strong> In the urgency to fix the problem, the operator destroys evidence that would have been critical for the post-incident review. Mitigation: R-IR-04 mandates evidence preservation before eradication. The operator must internalize the discipline that fixing the problem is secondary to understanding the problem. A fix without understanding is a fix that may not prevent recurrence.</li>
+<li><strong>Lessons-learned fatigue.</strong> Over time, post-incident reviews become perfunctory. The reports are written but not read. The recommendations are recorded but not implemented. Mitigation: R-IR-06 requires every review to produce a concrete output. The annual tabletop exercise (R-IR-07) provides a checkpoint to verify that lessons from previous incidents have actually been incorporated into procedures and configurations.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If detection has failed and a prolonged incident is discovered:</strong> Classify the incident based on the total scope of potential impact, not the current observed impact. Assume the worst case for the period during which the incident was undetected. Expand the containment perimeter to include all systems that may have been affected during the undetected period. Preserve evidence across the expanded scope. Conduct a thorough investigation to determine the actual impact before beginning recovery. Update the audit framework to address the detection gap.</li>
+<li><strong>If containment has failed:</strong> Escalate the severity classification by one level. Expand containment to the next broader zone boundary. If the incident has crossed from Zone B to Zone A, treat it as a Severity 1 incident regardless of its initial classification. Halt all operations until containment is re-established. Verify the integrity of all zones after re-containment.</li>
+<li><strong>If evidence has been accidentally destroyed:</strong> Document what evidence was destroyed and how. Proceed with eradication and recovery using the remaining available information. In the post-incident review, specifically address the evidence destruction: what was lost, how it affects the investigation's conclusions, and what procedural changes will prevent recurrence.</li>
+<li><strong>If the root cause cannot be identified:</strong> Document the investigation's findings and the hypotheses that were considered. Implement enhanced monitoring for the symptoms that were observed, so that recurrence can be detected more quickly. Do not close the incident as fully resolved; mark it as "resolved with unknown root cause" and schedule a follow-up review in 90 days to reassess whether additional information has become available.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> Establish the incident response framework. Conduct at least two tabletop exercises. Expect the first real incidents to be procedural errors and hardware issues rather than security breaches. Use these early incidents to calibrate the classification scale and refine the response procedures. The framework will need adjustment based on operational experience; be prepared to revise it.</li>
+<li><strong>Years 2-5:</strong> The framework should be stabilized. The operator should have enough incident experience to move through the six phases with confidence. Focus on improving detection capabilities and reducing detection latency. Build a library of lessons-learned reports that can be referenced during future incidents.</li>
+<li><strong>Years 5-15:</strong> As the institution matures, the incident types may shift. Hardware aging will become a more frequent source of incidents. The operator's experience will make some procedures feel unnecessary -- resist the temptation to skip them. The framework exists precisely for the incidents that are unlike previous ones, where experience alone is insufficient.</li>
+<li><strong>Years 15-30:</strong> The institution may undergo succession. The successor must be trained on the incident response framework before assuming operational authority. The library of lessons-learned reports is the successor's most valuable training resource -- it contains not just procedures but the institutional memory of what has gone wrong and how it was addressed.</li>
+<li><strong>Years 30-50+:</strong> The fundamental principles of incident response -- detect, classify, contain, eradicate, recover, learn -- will not have changed. The specific procedures will have been revised many times. Ensure that each revision is documented so that the evolution of the framework itself is part of the institutional record.</li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The hardest discipline in incident response is not the technical work. It is the emotional discipline to follow the framework when your instincts are screaming at you to just fix it now. I have watched experienced engineers -- people who know better -- skip classification, skip containment, and jump straight to remediation because the urgency felt overwhelming. Half the time, they made the situation worse. The other half, they fixed the immediate problem but never understood the root cause, so it happened again three months later.</p>
+
+<p>This framework is designed to be a governor on the operator's impulses during a crisis. It forces you to stop and classify before you act. It forces you to contain before you fix. It forces you to document before you move on. Every one of these forced pauses will feel like wasted time in the moment. None of them are. The time spent classifying correctly saves hours of misdirected response. The time spent on containment prevents a minor incident from becoming a major one. The time spent documenting is the investment that makes you better prepared for the next incident.</p>
+
+<p>Future maintainers: follow the framework. Even when it feels slow. Especially when it feels slow. Speed is the enemy of good incident response.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>SEC-001 -- Threat Model and Security Philosophy (the threat categories that incidents may represent)</li>
+<li>SEC-002 -- Access Control Procedures (authentication and authorization during incident response)</li>
+<li>SEC-008 -- Security Audit Framework (the primary proactive detection mechanism)</li>
+<li>SEC-009 -- Trust Boundary Definitions (incidents often involve trust boundary violations)</li>
+<li>SEC-013 -- Insider Threat Considerations (incidents caused by authorized users)</li>
+<li>GOV-001 -- Authority Model (authority for incident response decisions)</li>
+<li>OPS-001 -- Operations Philosophy (operational context for incident response)</li>
+<li>Domain 12 -- Disaster Recovery (escalation path for catastrophic incidents)</li>
+<li>Domain 18 -- Import &amp; Quarantine (incident detection during import processes)</li>
+</ul>
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

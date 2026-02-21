@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D6-014 — Data Ingest Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li class="active"><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d6-014">
+  <h1>D6-014 &mdash; Data Ingest Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D6-014</dd>
+  <dt>Domain</dt>
+  <dd>6 -- Data &amp; Archives</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-003, D6-007, D6-008, D6-010, D6-012</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-013 (disaster recovery references ingest quarantine), D6-015 (print backup selection depends on ingest classification). All Domain 7 intelligence collection articles. Domain 10 daily operational workflows.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the procedures by which new data enters the holm.chat Documentation Institution. Every piece of data that the institution stores -- whether created internally by the operator, generated by automated systems, or imported from external sources -- must pass through a defined ingest process. The ingest process is the institution's front gate. It is where data is examined, classified, validated, converted if necessary, assigned metadata, and placed into the correct location within the institutional storage architecture.</p>
+<p>Without a defined ingest process, data accumulates in an undifferentiated mass. Files arrive in unknown formats, without metadata, without classification, and without any record of their provenance. Over time the institution cannot distinguish its most critical records from its transient scratch files. The storage system fills with unclassified material that nobody can evaluate because nobody recorded what it was or why it was kept. This is not a hypothetical failure. It is the default outcome when ingest is treated as an afterthought.</p>
+<p>D6-001 establishes the data philosophy: the four-tier classification system and the principle that every piece of data must be classified at the point of creation or ingest. D6-007 defines the metadata standards that make data findable and meaningful. D6-010 defines the approved formats for long-term preservation. D6-012 defines the classification and sensitivity levels that govern handling. This article takes all of those requirements and weaves them into a single operational procedure -- the step-by-step process that the operator or an automated agent follows every time new data is introduced to the institution.</p>
+<p>The ingest process is deliberately designed to impose friction. It takes longer to ingest data properly than to simply copy a file into a directory. That friction is the price of institutional memory. Every minute spent classifying, tagging, and validating data at ingest saves hours of confusion, misidentification, and recovery effort in the future. Over a fifty-year operational lifespan, the cumulative cost of skipping ingest procedures is institutional amnesia -- a system that contains vast quantities of data it cannot understand, navigate, or trust.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The definition of a data ingest event and the triggers that initiate the ingest process.</li>
+<li>The quarantine stage: how external data is isolated and examined before admission to institutional storage.</li>
+<li>The validation stage: verifying that data is complete, uncorrupted, and in a readable format.</li>
+<li>The format evaluation and conversion stage: assessing whether the data's format meets the institution's longevity requirements and converting when it does not.</li>
+<li>The classification stage: assigning the data a tier classification (per D6-001) and a sensitivity level (per D6-012).</li>
+<li>The metadata application stage: creating the catalogue entry and applying all required metadata fields (per D6-007).</li>
+<li>The placement stage: moving the validated, classified, and tagged data to its correct location within the storage architecture (per D6-004 and D6-009).</li>
+<li>The verification stage: confirming successful ingest and generating the initial integrity baseline (per D6-003).</li>
+<li>Procedures for bulk ingest when large quantities of data must be processed.</li>
+<li>Procedures for automated ingest by Domain 8 agents.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The security quarantine for potentially hostile media (see SEC-001 for the threat model and SEC-004 for quarantine network architecture). This article addresses data-level quarantine -- format and content evaluation -- not malware scanning or hardware-level isolation.</li>
+<li>The intelligence collection decisions that determine what external data is worth importing (see Domain 7). This article handles the data after the collection decision has been made.</li>
+<li>The daily operational schedule for ingest activities (see Domain 10). This article defines what must happen during ingest; Domain 10 defines when and how often.</li>
+<li>The specific approved file formats and their evaluation criteria (see D6-010). This article references the format whitelist; D6-010 defines and maintains it.</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Two Sources of Institutional Data</h3>
+<p>Data enters the institution from exactly two sources, and each requires different ingest handling.</p>
+<p><strong>Internal creation.</strong> The operator writes a document, creates a configuration file, generates a report, or triggers an automated process that produces output. This data is born inside the institution's security boundary. It does not require security quarantine. It does require classification, metadata application, format verification, and proper placement. The temptation with internally created data is to skip the ingest process entirely -- the operator knows what they just created, so why bother classifying and tagging it? The answer is that the operator will not always be the one looking for this data. Future operators, successor stewards, and the operator themselves years later will need to find, understand, and evaluate this data without the context that existed at creation. Metadata and classification applied at ingest are a gift to the future.</p>
+<p><strong>External import.</strong> Data crosses the air gap from the outside world. This is a fundamentally different event. External data may be in proprietary formats. It may contain embedded content that the institution cannot verify. It may be corrupted during transfer. It may be in a format that looks readable today but will become unreadable within a decade. External import requires the full ingest pipeline: security quarantine (per SEC-001), format evaluation and potential conversion, classification, metadata application, and placement. The air-gap architecture described in SEC-001 means that external import is a deliberate, physical act -- data crosses the boundary on a transport device that the operator physically carries. This physical step creates a natural moment for the ingest process to occur.</p>
+
+<h3>3.2 The Cost of Deferred Ingest</h3>
+<p>Every institution that handles data faces the temptation to "ingest later." The data arrives, it gets copied to a temporary directory, and the operator promises to classify and tag it when they have time. This is the single most common data management failure, and over decades it is devastating. Temporary directories become permanent dumping grounds. Files lose their context as the operator's memory of why they were imported fades. Classification decisions that would have taken seconds at ingest require minutes or hours months later, because the operator must re-examine data they no longer remember. The quarantine zone fills with unprocessed data that nobody can evaluate.</p>
+<p>The ingest procedures in this article are designed to be completable in a single session for typical data volumes. A single file can be ingested in under five minutes. A batch of a dozen files can be processed in under an hour. The time investment is modest when performed at the right moment and enormous when deferred.</p>
+
+<h3>3.3 The Role of Automation in Ingest</h3>
+<p>Domain 8 defines automated agents that generate data as part of their operation -- log files, monitoring reports, processed outputs, and derived datasets. These agents can perform many ingest steps automatically: they can assign preliminary classifications, apply standard metadata templates, verify format compliance, and place data in the correct storage location. However, per D8-003 (Human-in-the-Loop Doctrine), automated agents must not make final classification decisions for Tier 1 data, must not override human classification decisions, and must flag any data that does not match expected patterns for human review. Automation accelerates ingest; it does not replace human judgment for consequential decisions.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Ingest Pipeline</h3>
+<p>Every ingest event follows a seven-stage pipeline. The stages must be completed in order. No stage may be skipped. If a stage fails, the data does not advance to the next stage until the failure is resolved.</p>
+<p><strong>Stage 1: Quarantine.</strong> Data arriving from external sources is placed in the quarantine zone -- a designated area of storage that is logically separated from the institutional data stores. The quarantine zone is not backed up as part of the regular backup cycle (per D6-002) because its contents are unverified and potentially hostile. Data remains in quarantine until it passes Stage 2 and Stage 3. For internally created data, quarantine is not required, but the data is placed in a designated ingest staging area rather than directly into the institutional stores.</p>
+<p><strong>Stage 2: Validation.</strong> The operator examines the data to confirm:
+- The data is what it is expected to be. If the operator imported a specific document, is this that document?
+- The data is complete. If the import involved multiple files, are all files present? If the data is a structured document, are all sections intact?
+- The data is uncorrupted. File sizes are reasonable. Text files are readable. Binary files open in appropriate tools. If checksums were provided by the source, they are verified.
+- The data is not duplicative. Does this data already exist in the institutional stores? If so, is the new copy a different version, or a true duplicate?</p>
+<p><strong>Stage 3: Format Evaluation.</strong> The operator evaluates the data's file format against the institutional format whitelist maintained in D6-010.
+- If the format is on the whitelist: proceed to Stage 4.
+- If the format is not on the whitelist but has a documented conversion path to a whitelisted format: convert the data and verify the conversion. Record the original format and the conversion in the metadata.
+- If the format is not on the whitelist and has no documented conversion path: evaluate the format using the criteria in D6-010. If the format meets the institution's longevity requirements, propose adding it to the whitelist through the GOV-001 Tier 3 process. If it does not, the data must be converted to an acceptable format or rejected. Rejection is documented in the ingest log with the reason.</p>
+<p><strong>Stage 4: Classification.</strong> The operator assigns:
+- A data tier (Tier 1 through Tier 4) per the criteria in D6-001 Section 4.1.
+- A sensitivity level (S1 through S4) per the criteria in D6-012.
+- A retention category per D6-011, which determines how long the data will be kept and under what conditions it may be disposed of.
+For automated ingest, the agent assigns a preliminary classification based on rules defined in its configuration. Data classified as Tier 1 or sensitivity S3/S4 by an agent must be confirmed by a human operator within 72 hours.</p>
+<p><strong>Stage 5: Metadata Application.</strong> The operator creates the catalogue entry per D6-007. The minimum required metadata fields are:
+- Unique identifier (generated per the naming scheme in D6-009).
+- Title or descriptive name.
+- Data tier and sensitivity level (from Stage 4).
+- Creation date (the date the data was originally created, not the ingest date).
+- Ingest date (the date the data entered the institution).
+- Source (internal creation, or external source identity).
+- Format (the file format after any conversion in Stage 3).
+- Original format (if conversion occurred in Stage 3).
+- Description (a human-readable summary of what the data contains and why it was ingested).
+- Relationships (links to related data already in the institutional stores).
+- Retention category (from Stage 4).
+- Checksum (SHA-256 of the ingested file).</p>
+<p><strong>Stage 6: Placement.</strong> The data is moved from the quarantine zone or ingest staging area to its permanent location within the institutional storage architecture. The placement is determined by:
+- The data tier: Tier 1 data goes to the highest-redundancy storage pool. Tier 4 data goes to the transient storage area.
+- The storage topology defined in D6-004 and D6-009: the file is placed in the correct directory within the appropriate ZFS dataset or filesystem.
+- The backup inclusion rules: upon placement, the data becomes part of the regular backup cycle per D6-002.</p>
+<p><strong>Stage 7: Verification.</strong> After placement, the operator confirms:
+- The file exists at its intended location.
+- The file's checksum at the destination matches the checksum recorded in the metadata.
+- The catalogue entry is complete and correct.
+- The file is readable at its destination (open it, inspect it, confirm it displays correctly).
+- The ingest log entry is complete.
+Upon successful verification, the quarantine copy (if any) is deleted. The ingest event is closed.</p>
+
+<h3>4.2 The Ingest Log</h3>
+<p>Every ingest event -- whether a single file or a bulk batch -- is recorded in the ingest log. The ingest log is itself a Tier 2 operational data asset, stored per D6-001 and backed up per D6-002. The log serves three purposes: it provides an audit trail of what data entered the institution and when; it provides provenance records that future operators can use to understand where data came from; and it provides the basis for identifying ingest failures or patterns that require process improvement.</p>
+<p>Each ingest log entry records: a timestamp, the operator or agent performing the ingest, the source of the data, the number of items ingested, any format conversions performed, any data rejected and the reasons for rejection, any anomalies encountered, and the time taken to complete the ingest. The log is maintained as a structured text file (one entry per line, fields separated by a defined delimiter) so that it can be processed by automated tools for reporting and analysis.</p>
+
+<h3>4.3 Bulk Ingest Procedures</h3>
+<p>When the operator must ingest a large volume of data at once -- importing a reference library, processing a batch of intelligence collection, or integrating a new data source -- the standard pipeline is modified for efficiency without sacrificing rigor.</p>
+<p><strong>Pre-screening.</strong> Before beginning bulk ingest, the operator reviews the entire batch to identify: common formats (to batch the format evaluation), likely classification patterns (to prepare classification templates), and obvious rejects (data that clearly does not meet ingest criteria). This pre-screening prevents the operator from investing time in items that will ultimately be rejected.</p>
+<p><strong>Template-based classification.</strong> For batches where most items share the same tier, sensitivity level, and retention category, the operator creates a classification template and applies it to qualifying items rather than making individual decisions for each. Items that do not fit the template are classified individually.</p>
+<p><strong>Batch metadata.</strong> The operator creates a batch metadata record that captures the common attributes of the batch (source, import date, general description, format) and then creates individual records for each item that capture the item-specific attributes (title, unique identifier, individual description). This reduces per-item metadata effort while maintaining catalogue completeness.</p>
+<p><strong>Sampling verification.</strong> For large batches (more than 50 items), the operator may verify a random sample of 10% of items (minimum 5 items) rather than verifying every item individually. If any sampled item fails verification, the entire batch is verified individually. If all sampled items pass, the batch is accepted. The sampling rate and threshold are recorded in the ingest log.</p>
+
+<h3>4.4 Automated Ingest</h3>
+<p>Domain 8 agents that produce data regularly -- monitoring daemons, log rotation scripts, scheduled report generators -- can be configured to perform automated ingest. An automated ingest agent must be explicitly authorized per D8-003 and must operate within the following constraints:</p>
+<ul>
+<li>The agent must have a defined ingest profile that specifies: which stages it may perform autonomously, what classification template it uses, what metadata template it applies, and where it places the ingested data.</li>
+<li>The agent must not classify data above Tier 2 or above sensitivity S2 without human confirmation.</li>
+<li>The agent must write to the ingest log for every item it processes.</li>
+<li>The agent must flag items that do not match its expected patterns (unexpected formats, unexpected sizes, unexpected content types) for human review rather than rejecting or accepting them autonomously.</li>
+<li>The agent's ingest profile must be reviewed every 12 months to confirm that its classification and metadata templates remain appropriate.</li>
+</ul>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D6-14-01:</strong> All data entering the institutional stores must pass through the seven-stage ingest pipeline defined in Section 4.1. No exceptions. Data that bypasses the pipeline -- files copied directly to institutional storage without ingest -- must be identified and retroactively processed through the pipeline within 7 days of discovery.</li>
+<li><strong>R-D6-14-02:</strong> External data must remain in quarantine until it has passed Stages 2 and 3 (validation and format evaluation). The maximum quarantine period is 90 days. Data that has not been processed within 90 days of entering quarantine is flagged for review and may be disposed of if the operator determines it is no longer needed.</li>
+<li><strong>R-D6-14-03:</strong> Format conversion during ingest must preserve the original file alongside the converted version until the operator has verified that the conversion is faithful and complete. The original may then be disposed of or retained per the operator's judgment, but the conversion verification must be documented in the metadata.</li>
+<li><strong>R-D6-14-04:</strong> Every ingested item must have a complete metadata record per Stage 5 before it is placed in institutional storage. Incomplete metadata records are a blocking condition -- the item remains in the staging area until metadata is complete.</li>
+<li><strong>R-D6-14-05:</strong> The ingest log must be maintained for the life of the institution. It is classified as Tier 2 data. Entries must not be modified or deleted after creation, except to append correction notes. The log is append-only.</li>
+<li><strong>R-D6-14-06:</strong> Automated ingest agents must operate within the constraints defined in Section 4.4. An agent that violates its ingest profile must be suspended pending review. The suspension is logged and the agent's recent ingest activity is audited.</li>
+<li><strong>R-D6-14-07:</strong> Rejected data -- data that fails validation, format evaluation, or that the operator determines is not worth ingesting -- must be logged with the reason for rejection before being deleted from quarantine. The rejection record is part of the ingest log and provides institutional memory of what was considered and refused.</li>
+<li><strong>R-D6-14-08:</strong> Bulk ingest sampling (Section 4.3) must not be used for Tier 1 data. Every Tier 1 item must be individually verified regardless of batch size.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Quarantine overflow.</strong> External data accumulates in quarantine faster than the operator processes it. The quarantine zone fills with unprocessed imports. The operator cannot distinguish urgent imports from low-priority ones. Storage allocated to quarantine crowds out operational storage. Mitigation: R-D6-14-02 imposes a 90-day maximum quarantine period. The operator should schedule regular ingest sessions (per Domain 10 operational schedules) rather than allowing quarantine to accumulate. If the ingest rate consistently exceeds the operator's capacity, the collection rate (Domain 7) must be reduced.</p>
+</li>
+<li>
+<p><strong>Classification drift.</strong> Over time, the operator's classification decisions become inconsistent. Similar data is classified at different tiers by different ingest sessions. The tier system loses its discriminating value. Mitigation: the ingest log provides an audit trail of past classification decisions. Periodic review (every 12 months) of recent ingest decisions should check for consistency. When drift is detected, the operator should review the D6-001 tier definitions and recalibrate.</p>
+</li>
+<li>
+<p><strong>Metadata minimalism.</strong> The operator, under time pressure, fills metadata fields with minimal or perfunctory content. Descriptions are one word. Relationships are left blank. The catalogue becomes technically complete but practically useless -- every field has a value, but the values do not help anyone find or understand the data. Mitigation: metadata quality should be assessed during the periodic ingest review. The Description field is the most critical and the most vulnerable to minimalism. If descriptions consistently fail to explain what the data is and why it was ingested, this is a process failure that must be addressed.</p>
+</li>
+<li>
+<p><strong>Format conversion loss.</strong> During Stage 3, the operator converts a file from a non-whitelisted format to a whitelisted format, but the conversion is lossy. Formatting, embedded data, comments, or structural elements are lost in conversion. The operator does not notice because verification was cursory. The original is deleted. The institutional copy is degraded without anyone knowing. Mitigation: R-D6-14-03 requires retaining the original until conversion is verified. Verification must include a meaningful comparison -- not just confirming the converted file opens, but confirming its content is equivalent to the original.</p>
+</li>
+<li>
+<p><strong>Pipeline bypass.</strong> The operator, in a hurry, copies files directly to institutional storage without going through the ingest pipeline. The files have no metadata, no classification, no checksum baseline, and no ingest log entry. They are invisible to the catalogue. Mitigation: R-D6-14-01 requires retroactive processing of bypassed data. Automated monitoring (per Domain 8) can detect new files in institutional storage that do not have corresponding catalogue entries and flag them for ingest processing.</p>
+</li>
+<li>
+<p><strong>Automated agent misconfiguration.</strong> An automated ingest agent is configured with an incorrect classification template, and it systematically misclassifies data for an extended period before the error is detected. Data intended as Tier 2 is classified as Tier 4 and disposed of during routine cleanup. Mitigation: agent ingest profiles are reviewed every 12 months (Section 4.4). Additionally, the D6-011 retention and disposal process should include a cross-check that flags recent ingest when data is being disposed of earlier than expected for its apparent content.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If unprocessed data has accumulated in quarantine beyond 90 days:</strong> Declare an ingest sprint. Halt non-critical data collection. Review all quarantine contents. For each item, make a rapid triage decision: ingest (proceed through the pipeline), defer (assign a specific date for processing within the next 30 days), or reject (document the reason and delete). Do not extend the quarantine period as a permanent accommodation -- it must return to manageable levels. If the backlog is the result of excessive collection rate, report the capacity gap to the governance process per GOV-001 for a decision on collection volume.</p>
+</li>
+<li>
+<p><strong>If classification inconsistencies are discovered:</strong> Pull the ingest log for the affected period. Identify the inconsistent decisions. Determine the correct classification for each affected item by reviewing the data against D6-001 tier definitions. Update the metadata records to reflect the correct classification. If the misclassification caused data to be stored in the wrong location or backed up at the wrong frequency, correct the placement and backup status. Document the corrections in the ingest log.</p>
+</li>
+<li>
+<p><strong>If files are discovered in institutional storage without catalogue entries (pipeline bypass):</strong> Quarantine the files in place -- do not move or delete them, but flag them as unprocessed. Process each file through the full ingest pipeline, starting at Stage 2 (validation). If the file's provenance can be determined (the operator remembers importing it, or the file's creation date and content make its origin clear), record the provenance in the metadata. If provenance cannot be determined, record "Provenance unknown -- discovered in institutional storage on [date], processed through retroactive ingest." Classify as Tier 3 (reference) by default unless evidence supports a different classification.</p>
+</li>
+<li>
+<p><strong>If a format conversion is discovered to have been lossy after the original was deleted:</strong> Check the backup archives (D6-002) for the original file before conversion. The quarantine zone is not backed up, but the operator may have retained the original on the transport media. If the original can be recovered, re-perform the conversion with greater care. If the original cannot be recovered, document the loss in the metadata: "Converted from [original format] on [date]. Original not retained. Conversion may have been lossy. Fields potentially affected: [list]." This note alerts future users that the data may be incomplete.</p>
+</li>
+<li>
+<p><strong>If an automated ingest agent has been misconfigured:</strong> Suspend the agent immediately per R-D6-14-06. Audit all data ingested by the agent during the misconfigured period by reviewing the ingest log entries tagged with the agent's identifier. For each item, verify that the classification, metadata, and placement are correct. Correct any errors. Determine how the misconfiguration occurred, correct the agent's profile, and test the corrected profile against sample data before reactivating. Document the incident, the scope of affected data, and the corrections applied.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The ingest pipeline is new and the operator is the only user. Expect the process to feel cumbersome initially as the operator builds the habit of following all seven stages. The metadata templates and classification decisions will become faster with practice. The primary risk in this period is pipeline bypass -- the temptation to skip ingest "just this once" because the operator already knows what the data is. Resist this temptation rigorously. The habits formed in the first five years determine the data hygiene of the next forty-five.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Automated ingest agents should be handling routine data (logs, monitoring reports, scheduled outputs). The operator's ingest effort should be focused on external imports and internally created Tier 1 and Tier 2 content. The ingest log should be substantial enough to reveal patterns -- common sources, common format issues, common classification questions. Use these patterns to refine the pipeline. If a particular format conversion is performed repeatedly, automate it. If a particular classification question arises often, add guidance to this article.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The institution may have a successor operator or multiple contributors. The ingest procedures must be documented clearly enough that a person who did not design them can follow them. The ingest log serves as a training resource -- new operators can review past ingest decisions to understand how classifications are made. If the approved format list (D6-010) has changed significantly, the format evaluation stage must be updated to reflect the current whitelist.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The ingest log is itself a historical record of what the institution collected, when, from where, and in what formats. It has value as institutional memory beyond its operational function. Future operators may review decades of ingest patterns to understand how the institution's data collection priorities evolved. The pipeline structure should be stable; the specific formats, tools, and classification criteria will have evolved through the review process.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the average time to ingest a single item exceeds 15 minutes for routine data, the pipeline has become too heavy and should be streamlined. If the ingest log shows that more than 20% of ingested items require reclassification within 12 months, the classification criteria or training need improvement. If automated agents are flagging more than 30% of their ingest items for human review, their profiles are too conservative and should be broadened, or the data patterns have changed and the profiles need updating.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The ingest pipeline is the least glamorous part of the data architecture and the most important operational discipline. Every other Domain 6 article assumes that data has been properly classified, tagged, and placed. This article is the one that makes those assumptions true. If this article fails -- if the ingest discipline breaks down -- then every other article fails with it. Unclassified data cannot be triaged. Untagged data cannot be found. Data in the wrong format cannot be preserved. Data without checksums cannot be verified. The ingest pipeline is the foundation of data hygiene.</p>
+<p>I want to acknowledge the tension between thoroughness and practicality. The seven-stage pipeline, performed meticulously for every file, would consume an impractical amount of time if the institution had high data volumes. The bulk ingest and automated ingest provisions are designed to manage that tension. But the core principle is non-negotiable: no data enters the institutional stores without classification and metadata. The amount of effort spent on each item can scale, but the minimum requirements cannot be reduced to zero.</p>
+<p>The quarantine zone deserves special attention. It is psychologically easy to treat quarantine as "storage where things wait." It is not storage. It is a holding pen. Data in quarantine is not backed up. It is not catalogued. It does not appear in the institutional index. If the quarantine drive fails, everything in quarantine is lost -- and that is by design. The quarantine zone is intentionally impermanent to create urgency around processing its contents. Treat quarantine like a desk that needs to be cleared, not a drawer where things are filed.</p>
+<p>One final note on rejection. Rejecting data is a positive act, not a failure. Every item rejected during ingest is an item that would have consumed storage, backup bandwidth, and future attention without contributing to the institution's mission. The ingest log's rejection records are as valuable as its acceptance records -- they document what the institution chose not to keep, which over decades becomes an important part of understanding what the institution valued.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (institutional mission, air-gap mandate, data sovereignty)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (air-gap boundary, security quarantine for external media)</li>
+<li>SEC-004 -- Quarantine Network Architecture (physical isolation during security screening)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle, operational tempo)</li>
+<li>GOV-001 -- Authority Model (Tier 3 process for format whitelist additions, capacity decisions)</li>
+<li>D6-001 -- Data Philosophy: What We Keep and Why (four-tier classification, R-D6-01 classification requirement)</li>
+<li>D6-002 -- Backup Doctrine (backup cycle inclusion upon placement, quarantine exclusion from backup)</li>
+<li>D6-003 -- Data Integrity Verification (checksum generation at ingest, integrity baseline)</li>
+<li>D6-004 -- Archive Management Procedures (archival placement rules)</li>
+<li>D6-007 -- Metadata Standards and Procedures (required metadata fields, catalogue system)</li>
+<li>D6-009 -- File System Architecture for Longevity (naming scheme, directory structure, ZFS dataset placement)</li>
+<li>D6-010 -- Digital Preservation: Formats That Survive (format whitelist, format evaluation criteria, conversion procedures)</li>
+<li>D6-011 -- Physical Backup Media: Selection and Rotation (retention categories referenced during classification)</li>
+<li>D6-012 -- Data Classification and Handling Procedures (sensitivity levels S1-S4, handling requirements per level)</li>
+<li>D6-013 -- Disaster Data Recovery (references ingest quarantine for externally recovered data)</li>
+<li>D8-003 -- Human-in-the-Loop Doctrine (constraints on automated classification and ingest)</li>
+<li>Stage 1 Documentation Framework, Domain 6: Data &amp; Archives</li>
+</ul>
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D19-010 — Federation-Level Quality Assurance - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li class="active"><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d19-010">
+  <h1>D19-010 &mdash; Federation-Level Quality Assurance</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D19-010</dd>
+  <dt>Domain</dt>
+  <dd>19 -- Quality Assurance</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D19-002 (Audit Procedures), D19-004 (Cross-Domain Audit), D19-012 (QA Independence). D17-001 (Federation Philosophy), D17-010 (Data Sovereignty).</dd>
+  <dt>Depended Upon By</dt>
+  <dd>Referenced by D17-013 (Federation Health Monitoring) and all federation-level quality processes.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how quality assurance operates when the institution spans multiple federated nodes. Federation introduces quality challenges that do not exist in a single-node institution: different nodes may interpret quality standards differently, content that meets standards at one node may not meet standards at another, quality audits cannot be conducted in real-time across air-gapped nodes, and the tension between node autonomy and institutional coherence manifests directly in quality disputes.</p>
+<p>Quality assurance across a federation must balance two competing values. The first is consistency: users and operators should be able to trust that content meeting quality standards at one node meets those standards at any node. The second is autonomy: each node has the right to manage its own quality processes, and a centralized QA authority that can override local decisions undermines the federation's distributed nature.</p>
+<p>This article is addressed to the QA function at each federated node, to federation governance, and to any person involved in content synchronization between nodes.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The quality assurance model for federated institutions.</li>
+<li>The distinction between federation-wide quality standards and node-local quality standards.</li>
+<li>Quality verification procedures for content received from other nodes.</li>
+<li>Quality dispute resolution between nodes.</li>
+<li>Federation-level quality metrics and monitoring.</li>
+<li>The role and authority of federation-level QA coordination.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Single-node quality assurance (see other D19 articles).</li>
+<li>The federation topology itself (see D17-003).</li>
+<li>The synchronization protocol for transferring content between nodes (see D17-004).</li>
+<li>The import quarantine process for content arriving from other nodes (see D18-010).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Federation Quality Problem</h3>
+<p>In a single-node institution, quality standards are defined once and applied uniformly. In a federation, each node begins as an independent entity that has adopted the institution's founding documents. Over time, nodes will diverge in how they interpret and apply quality standards. This divergence is natural and, within bounds, healthy -- different nodes serve different communities and may legitimately have different quality emphases. But unchecked divergence eventually means that the quality label "this meets institutional standards" no longer means the same thing across nodes, and trust in inter-node content erodes.</p>
+
+<h3>3.2 Air-Gapped QA Challenges</h3>
+<p>In a connected federation, quality disputes can be resolved through real-time communication. In an air-gapped federation, synchronization is intermittent and communication is slow. A quality defect discovered in content received from another node cannot be reported back immediately. Quality standards updated at one node will not reach other nodes until the next synchronization. This latency means that federation-level QA must be tolerant of temporary inconsistency while working toward eventual convergence.</p>
+
+<h3>3.3 The Autonomy Constraint</h3>
+<p>Per D17-010 (Data Sovereignty &amp; Node Autonomy), each node controls its own quality processes. No external node or federation authority can compel a node to change its quality standards unilaterally. This means federation-level QA operates through consensus, not command. Quality standards that apply across the federation must be adopted voluntarily by each node. The mechanism for achieving this is the Federation Quality Compact -- a set of minimum quality standards that each node agrees to uphold as a condition of federation membership.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Three Tiers of Quality Standards</h3>
+<p>In a federated institution, quality standards exist at three tiers:</p>
+<ul>
+<li><strong>Federation Compact Standards.</strong> The minimum quality standards that all nodes agree to uphold. These are defined by federation governance and adopted by each node upon joining. They cover: template compliance for core articles, metadata completeness, cross-reference integrity, and minimum review gate requirements. These standards are deliberately minimal -- they represent the floor, not the ceiling.</li>
+<li><strong>Node Standards.</strong> Quality standards specific to a node. A node may set higher standards than the federation compact requires. A node may not set lower standards for content that will be shared with the federation.</li>
+<li><strong>Local Standards.</strong> Quality standards for content that is node-local (not shared across the federation). Nodes have full autonomy over local standards.</li>
+</ul>
+
+<h3>4.2 Quality Verification at Receipt</h3>
+<p>When a node receives content from another node through the synchronization process, the content passes through the import quarantine (D18-010) and is subject to quality verification:</p>
+<ol>
+<li><strong>Federation Compact Check.</strong> The receiving node verifies that the content meets the Federation Compact Standards. This check is non-negotiable. Content that fails the compact check is quarantined and flagged for the sending node.</li>
+<li><strong>Node Standards Check.</strong> The receiving node may optionally check the content against its own node standards. Content that passes the compact check but fails node standards is admitted but flagged as "below local standards" for local review.</li>
+<li><strong>Acceptance or Dispute.</strong> Content that passes the compact check is accepted into the receiving node's corpus. Content that fails triggers the dispute resolution process.</li>
+</ol>
+
+<h3>4.3 Quality Dispute Resolution</h3>
+<p>When a node rejects content from another node on quality grounds, the following resolution process applies:</p>
+<ol>
+<li><strong>Documentation.</strong> The rejecting node documents the specific quality failure, citing the specific Federation Compact Standard that was not met.</li>
+<li><strong>Notification.</strong> At the next synchronization opportunity, the rejection and its documentation are transmitted to the sending node.</li>
+<li><strong>Response.</strong> The sending node reviews the rejection. It may: correct the defect and resend, dispute the finding with specific counter-arguments, or withdraw the content.</li>
+<li><strong>Escalation.</strong> If the dispute is not resolved bilaterally, it is escalated to federation governance per D17-008 (Distributed Governance Model). Federation governance may: uphold the rejection, overrule the rejection, or call for a revision of the relevant compact standard.</li>
+</ol>
+
+<h3>4.4 Federation Quality Coordinator</h3>
+<p>The federation designates a Federation Quality Coordinator role. This is not a permanent position at any one node but a rotating responsibility. The coordinator:</p>
+<ul>
+<li>Maintains the Federation Quality Compact document.</li>
+<li>Collects quality metrics from each node at each synchronization event.</li>
+<li>Identifies quality divergence trends across nodes.</li>
+<li>Facilitates dispute resolution.</li>
+<li>Proposes compact revisions when warranted by experience.</li>
+</ul>
+<p>The coordinator has advisory authority only. They cannot compel any node to change its quality processes. Their power derives from visibility and facilitation, not from command.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><p><strong>R-D19-10-01: Federation Compact Standards Are Mandatory for Shared Content.</strong> Content shared across the federation MUST meet the Federation Quality Compact Standards. A node may not share content that does not meet the compact, even if the content meets local standards.</p></li>
+<li><p><strong>R-D19-10-02: Nodes May Exceed but Not Lower Compact Standards.</strong> A node may apply higher quality standards than the compact requires. A node may not adopt standards lower than the compact for shared content. For local-only content, the node has full autonomy.</p></li>
+<li><p><strong>R-D19-10-03: Rejections Must Cite Specific Standards.</strong> A node rejecting content from another node must cite the specific compact standard that was not met. Rejections based on subjective quality preferences or node-local standards that exceed the compact are not valid grounds for rejection.</p></li>
+<li><p><strong>R-D19-10-04: Quality Metrics Must Be Shared.</strong> At each synchronization event, each node must include a quality summary report covering: defect counts by severity, compliance assessment results, and any quality disputes pending. These reports enable federation-level trend monitoring.</p></li>
+<li><p><strong>R-D19-10-05: Compact Revisions Require Node Consensus.</strong> Changes to the Federation Quality Compact require the agreement of all member nodes per D17-008. No single node or authority may unilaterally change compact standards.</p></li>
+<li><p><strong>R-D19-10-06: Quality Autonomy Is Preserved.</strong> Per D17-010, this article does not grant any federation-level authority the right to dictate internal quality processes at any node. Federation QA applies only to shared content and federation-level processes.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Quality fragmentation.</strong> Nodes diverge so far in their quality practices that content from one node is routinely rejected by others. The federation becomes fragmented into quality clusters that do not share content effectively. Likelihood: moderate over long timeframes. Severity: high. Detection: rising rejection rates during synchronization; increasing quality dispute escalations.</p></li>
+<li><p><strong>Compact standard stagnation.</strong> The federation compact standards are never updated because consensus is hard to achieve. Standards become outdated while practice evolves. Likelihood: moderate. Severity: moderate. Detection: when nodes consistently exceed compact standards by wide margins, the compact is likely too low. When compact standards no longer correspond to actual quality failures, they are likely outdated.</p></li>
+<li><p><strong>Quality imperialism.</strong> A large or influential node uses the quality dispute process to impose its preferences on smaller nodes, disguising preferences as quality objections. Likelihood: low but high-impact. Severity: high. Detection: pattern analysis of disputes. If one node is the source of most rejections, and the rejections are frequently overturned on appeal, quality imperialism may be occurring.</p></li>
+<li><p><strong>Quality coordination vacancy.</strong> The federation quality coordinator role goes unfilled for extended periods. Quality metrics are not collected. Disputes are not facilitated. Quality divergence proceeds undetected. Likelihood: moderate. Severity: moderate. Detection: absence of quality summary reports in synchronization packages.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If quality fragmentation has occurred:</strong> Convene a federation quality summit (which, in an air-gapped federation, may be a multi-round written exchange). Identify the specific standards on which nodes have diverged. For each, determine whether the compact standard is clear, whether the divergence reflects genuine differences in quality needs, or whether it reflects misinterpretation. Revise compact standards for clarity. If genuine differences exist, consider whether the compact standard should be narrowed to the truly essential minimum.</p></li>
+<li><p><strong>If compact standards have stagnated:</strong> The federation quality coordinator proposes a compact review, circulating a draft revision to all nodes. Nodes provide feedback through the next synchronization cycle. The revision process may take multiple sync cycles -- this latency is inherent to air-gapped governance and must be accepted.</p></li>
+<li><p><strong>If quality imperialism is suspected:</strong> The affected node raises the concern through federation governance (D17-008). The governance process examines the pattern of rejections from the accused node. If the pattern is confirmed, the governance body may: require the rejecting node to apply the compact standards more strictly (rather than adding its own preferences), or censure repeated bad-faith rejections.</p></li>
+<li><p><strong>If the coordinator role is vacant:</strong> Any node may nominate a candidate for the coordinator role. If no node volunteers, the coordinator duties default to the node that most recently held the role until a replacement is found. The vacancy must be treated as a defect per D19-008 and tracked to resolution.</p></li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Pre-Federation (Years 0-5):</strong> This article exists as a plan. The institution is a single node. The value of this article during the pre-federation period is that it establishes the principle that quality standards must be federation-ready: designed to be interpretable and enforceable by autonomous nodes, not dependent on centralized authority.</p></li>
+<li><p><strong>Early Federation (Years 5-15):</strong> The first federated nodes adopt this framework. The Federation Quality Compact is drafted based on the single-node quality standards, selecting the subset that is essential for inter-node trust. Expect the first quality disputes during this period. They will be messy and slow. That is normal.</p></li>
+<li><p><strong>Mature Federation (Years 15-30):</strong> Dispute resolution processes are established and tested. Quality metrics comparison across nodes reveals patterns -- some nodes consistently produce higher-quality content, others consistently struggle with specific quality dimensions. This data should inform targeted support, not rankings or penalties.</p></li>
+<li><p><strong>Long-Term Federation (Years 30-50+):</strong> The federation quality compact has been revised multiple times. The quality coordinator role has rotated through multiple nodes. The key measure of success is: can content flow between nodes with trust? If yes, federation QA is working. If nodes routinely reject each other's content, federation QA has failed regardless of how well any individual node's quality processes work.</p></li>
+</ul>
+</section>
+
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+Federation-level QA is the hardest form of quality assurance because it operates under the most constraints: no real-time communication, no centralized authority, no ability to compel compliance. It works only if nodes trust each other. Trust comes from two sources: consistent adherence to shared standards, and honest communication when standards are not met. The Federation Quality Compact should be kept small and clear. A compact that tries to standardize everything will be ignored. A compact that standardizes only the essentials will be followed, because the essentials are genuinely essential.</p>
+</section>
+
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D19-001 -- Quality Philosophy (foundational quality principles)</li>
+<li>D19-002 -- Audit Procedures (audit methodology used at each node)</li>
+<li>D19-004 -- Cross-Domain Audit Protocols (cross-domain audits within a node)</li>
+<li>D19-012 -- QA Independence &amp; Accountability (QA authority boundaries)</li>
+<li>D17-001 -- Federation Philosophy &amp; Core Principles</li>
+<li>D17-004 -- Synchronization Protocols for Air-Gapped Nodes</li>
+<li>D17-008 -- Distributed Governance Model (dispute escalation)</li>
+<li>D17-010 -- Data Sovereignty &amp; Node Autonomy (autonomy constraints on QA)</li>
+<li>D17-013 -- Federation Health Monitoring (quality metrics as health indicators)</li>
+<li>D18-010 -- Inter-Node Import Specialization (quality check at import)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

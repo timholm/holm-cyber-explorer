@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D8-003 — Human-in-the-Loop Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li class="active"><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d8-003">
+  <h1>D8-003 &mdash; Human-in-the-Loop Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D8-003</dd>
+  <dt>Domain</dt>
+  <dd>8 -- Automation & Agents</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D8-001, D8-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D8-004, D8-005, D8-006, D6-001 (R-D6-06), D10-002. All articles involving automation oversight or automated data modification.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the procedures for human oversight of automation. It specifies how the operator monitors, approves, intervenes in, and overrides automated processes. It establishes the approval workflows, monitoring requirements, intervention procedures, escalation matrix, and override protocols that ensure no automation operates beyond the boundaries of human understanding and human authority.</p>
+<p>D8-001 establishes that automation is a servant, never a master. This article operationalizes that principle. In a single-operator institution, "human-in-the-loop" means one person who has other responsibilities and cannot watch automation continuously. These procedures define when to look, what to look for, and what to do when something is wrong.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Oversight requirements for each automation level defined in D8-001 Section 4.2.</li>
+<li>Approval workflows for automation requiring human authorization.</li>
+<li>Monitoring requirements: what to monitor, when, and how.</li>
+<li>The escalation matrix for classifying anomalies.</li>
+<li>Override procedures for superseding automation decisions.</li>
+<li>Monitoring dashboard design principles.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Automation design (see D8-002).</li>
+<li>Annual re-justification (see D8-004).</li>
+<li>Emergency shutdown (see D8-005).</li>
+<li>Legacy automation assessment (see D8-006).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Single-Operator Oversight Problem</h3>
+<p>In a staffed operations center, someone is always watching. In a single-operator institution, nobody is always watching. The operator sleeps, eats, works on other tasks, and leaves the premises. Automation that runs during these periods runs without real-time human oversight.</p>
+<p>This is not a violation of the human-in-the-loop principle. The principle does not require continuous real-time monitoring of every automation. It requires that the human is never removed from the oversight process -- that the operator reviews what automation has done, approves what it proposes to do, and retains the ability to intervene at any time. The distinction is between synchronous oversight (approval before action) and asynchronous oversight (review after action). Both are valid. The choice depends on the automation level and the consequences of the actions involved.</p>
+<h3>3.2 Oversight by Automation Level</h3>
+<ul>
+<li>Level 0 (Fully Manual) and Level 1 (Assisted): oversight is inherent in the process.</li>
+<li>Level 2 (Supervised Autonomous): the automation proposes, the human approves. Synchronous oversight.</li>
+<li>Level 3 (Monitored Autonomous): the automation acts, the human reviews afterward. Asynchronous oversight.</li>
+<li>Level 4 (Fully Autonomous): the automation self-monitors, the human is notified only of anomalies. Exception-based oversight.</li>
+</ul>
+<h3>3.3 Structured Versus Unstructured Oversight</h3>
+<p>Unstructured oversight means glancing at logs when you remember to, approving requests without reading them, and assuming everything is fine because no alarms have sounded. Structured oversight means checking specific things at specific times, approving requests only after reviewing specific information, and verifying outcomes against specific expectations. The difference is the difference between a pilot's casual awareness and a pilot's checklist. This article provides the checklist.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Level 2 Approval Workflow</h3>
+<p><strong>The Approval Sequence:</strong></p>
+<p>Step 1: The automation writes a proposal to the approval queue containing: agent ID, timestamp, plain-language description of the proposed action, affected data/systems, whether the action is reversible, and estimated execution time.</p>
+<p>Step 2: The automation enters a wait state. If it has a defined timeout, it logs a timeout event and halts cleanly if the operator does not respond.</p>
+<p>Step 3: The operator reviews the proposal, confirming: the action matches documented purpose, affected systems are correct, no unexpected changes are proposed, and timing is appropriate.</p>
+<p>Step 4: The operator approves (automation proceeds, approval logged), modifies (parameters adjusted, both logged), or rejects (automation halts, reason logged).</p>
+<p>Step 5: After execution, the automation logs results for the next review cycle.</p>
+<p><strong>Implementation:</strong> The approval queue is a directory of plain-text files or entries in a structured log. The mechanism is intentionally simple -- no database, no web interface. The operator checks the queue as part of daily operations per D10-002.</p>
+<h3>4.2 Level 3 Monitoring Requirements</h3>
+<p><strong>Daily Review:</strong> As part of D10-002, review logs of all Level 3 automation from the previous 24 hours. Check: did it run as scheduled, did it complete successfully, were there errors or anomalies, are outputs consistent with expectations, was execution time normal?</p>
+<p><strong>Weekly Summary:</strong> Examine trends: increasing error rates, growing execution times, unfamiliar log patterns, missed schedule intervals.</p>
+<p><strong>Monthly Verification:</strong> Independently verify output by manually performing a sample of automated tasks and comparing results. This catches silent failure -- the automation reporting success while producing wrong results.</p>
+<p><strong>The Monitoring Dashboard:</strong> A plain-text document showing each active agent's ID, level, last run time and result, next scheduled run, current status, error counts (7-day and 30-day), and date of last manual verification. Updated automatically by a Level 3 agent (itself subject to these monitoring requirements) or maintained manually. Reviewed as the first daily operations item.</p>
+<h3>4.3 Level 4 Exception Handling</h3>
+<p>Level 4 automation must generate alerts for: any execution failure, results outside expected range, resource consumption exceeding thresholds, unavailable dependencies, excessive execution duration, and inability to write to its own log. Alerts are delivered through a mechanism independent of the automation itself. The alert mechanism is tested monthly.</p>
+<p><strong>Additional Level 4 Audit Requirements:</strong> Quarterly deep log review (full logs, not just exceptions). Semi-annual manual execution of the automated task. Annual re-justification per D8-004 with heightened scrutiny.</p>
+<h3>4.4 The Escalation Matrix</h3>
+<p><strong>Severity 1 -- Informational.</strong> Unusual but harmless log entry. Response: note in operational log, monitor for recurrence.</p>
+<p><strong>Severity 2 -- Degraded.</strong> Task completed with errors or partial failures. Response: investigate within 24 hours. Pause automation if the issue is persistent.</p>
+<p><strong>Severity 3 -- Failed.</strong> Task did not complete. Response: investigate immediately. Execute manual fallback. Repair before next scheduled run or keep paused and operate manually.</p>
+<p><strong>Severity 4 -- Dangerous.</strong> Automation took an incorrect action causing or risking harm. Response: halt immediately per ASD Section E or D8-005. Assess and reverse damage. Treat as a security incident per D10-003 if Tier 1 data or security configurations are affected.</p>
+<h3>4.5 Override Procedures</h3>
+<p>The operator may override any automation at any time:</p>
+<ul>
+<li><strong>Parameter Override:</strong> Changing inputs for a specific run. Both original and override logged.</li>
+<li><strong>Skip Override:</strong> Preventing the next scheduled run. Skip and reason logged.</li>
+<li><strong>Result Override:</strong> Discarding output and substituting a manual result. Both results logged.</li>
+<li><strong>Behavioral Override:</strong> Changing automation logic. Requires source code and ASD update per D8-002. If it persists beyond one cycle, it is a modification, not an override.</li>
+</ul>
+<p>Every override is recorded in the operational log with date, agent ID, type, reason, operator identity, and expected return to normal. Overrides are reviewed weekly and during annual audit per D8-004.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D8-03-01:</strong> Level 2 automation must not proceed without documented operator approval including identity and timestamp.</li>
+<li><strong>R-D8-03-02:</strong> Level 3 logs must be reviewed daily per D10-002. Missed reviews must be documented and the missed logs reviewed within 48 hours.</li>
+<li><strong>R-D8-03-03:</strong> All Level 3 and Level 4 automation must be independently verified through manual execution at least monthly.</li>
+<li><strong>R-D8-03-04:</strong> Level 4 alert mechanisms must be tested monthly. Failed alert tests result in downgrade to Level 3 until repaired.</li>
+<li><strong>R-D8-03-05:</strong> No automation at any level may modify or delete Tier 1 data without Level 2 synchronous approval. This overrides the automation's normal level.</li>
+<li><strong>R-D8-03-06:</strong> Every override must be documented. Undocumented overrides are operational discipline violations.</li>
+<li><strong>R-D8-03-07:</strong> The monitoring dashboard must be maintained and reviewed daily.</li>
+<li><strong>R-D8-03-08:</strong> Severity 3 or 4 anomalies must not be downgraded without documented justification.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Approval fatigue.</strong> The operator rubber-stamps Level 2 approvals because they are always the same. Mitigation: clear proposal formatting; periodic variation testing (deliberately submitting unusual parameters to test attention).</p>
+</li>
+<li>
+<p><strong>Monitoring decay.</strong> Daily review becomes a glance. Mitigation: monthly manual verification catches divergence; weekly trend review catches accumulating patterns.</p>
+</li>
+<li>
+<p><strong>Dashboard blindness.</strong> "All green" for so long that changes are not noticed. Mitigation: daily review requires writing the dashboard state in the operational log -- a deliberate act distinct from not looking.</p>
+</li>
+<li>
+<p><strong>Bootstrap paradox.</strong> The monitoring dashboard automation itself fails. Mitigation: daily review includes a manual check that the dashboard timestamp is current.</p>
+</li>
+<li>
+<p><strong>Override normalization.</strong> Overrides become routine instead of exceptional. Mitigation: weekly override review. An automation requiring frequent overrides needs repair, level reduction, or decommissioning.</p>
+</li>
+<li>
+<p><strong>Alert flood.</strong> Excessive Level 4 alerts cause the operator to stop reading them. The signal is lost in the noise. Mitigation: if an automation generates more than three alerts per week under normal conditions, its alert thresholds must be recalibrated. Alerts must be meaningful. An alert that fires constantly is worse than no alert.</p>
+</li>
+<li>
+<p><strong>Oversight as overhead.</strong> The operator begins to see monitoring as bureaucratic overhead rather than a necessary function. Corners are cut. Reviews are skipped. The oversight structure becomes a fiction maintained in documentation but not in practice. Mitigation: the procedures are designed for efficiency -- twenty minutes per day, not hours. If they take more than thirty minutes, the process or the estate needs streamlining, not the oversight.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If Level 2 approvals have been rubber-stamped:</strong> Stop all Level 2 automation. Review the last 30 days of approvals for incorrect grants. Perform one genuine review cycle for each. Improve proposal formats if the operator cannot distinguish normal from abnormal.</p>
+</li>
+<li>
+<p><strong>If daily monitoring has lapsed:</strong> Review all missed logs immediately. Manually verify all Level 3/4 automation for the lapsed period. Document the lapse and address the root cause.</p>
+</li>
+<li>
+<p><strong>If the monitoring dashboard has failed silently:</strong> Manually review all logs for the period since the last dashboard update. Repair the dashboard. Improve its monitoring.</p>
+</li>
+<li>
+<p><strong>If alert fatigue has developed:</strong> Audit all alerts. Recalibrate or remove those that are not useful. Target zero false alarms, not zero alarms.</p>
+</li>
+<li>
+<p><strong>If override normalization has occurred:</strong> List overrides from the last 90 days. Any agent overridden more than three times must be repaired, reduced in level, or decommissioned.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Tune the balance between thoroughness and practicality. Too thorough and monitoring costs more than automation saves. Too light and oversight is meaningless.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Accumulated baseline data -- what "normal" looks like for each agent -- makes anomaly detection meaningful. Without baselines, every observation is just a number.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> If succession occurs, the new operator must learn not just procedures but baselines. Consider adding baseline profiles to ASDs.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The human-in-the-loop principle endures even as technology makes deeper automation tempting. Tools may change. The principle does not.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If daily monitoring consistently exceeds 30 minutes, the process needs streamlining or the automation estate needs reduction.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The honest challenge of human-in-the-loop in a single-operator institution is that the human has limited attention and unlimited responsibilities. These procedures are designed for a person with twenty minutes a day for automation monitoring, not a person with nothing else to do.</p>
+<p>The most important safeguard is not the daily log review. It is the monthly manual verification. That is where you discover the automation has been producing subtly wrong results for three weeks while the logs showed only success. Logs tell you what the automation thinks happened. Manual verification tells you what actually happened.</p>
+<p>I have deliberately made the approval workflow low-technology -- text files, not a web application. The approval mechanism should be simpler and more reliable than the automation it oversees. If the approval system is itself complex and fragile, you have traded one problem for two.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience; Principle 3: Transparency)</li>
+<li>CON-001 -- The Founding Mandate (human authority over institutional systems)</li>
+<li>GOV-001 -- Authority Model (Tier 3 approval for Level 3/4 automation)</li>
+<li>SEC-001 -- Threat Model (Pillar 3: The Human Is the System)</li>
+<li>OPS-001 -- Operations Philosophy (daily/weekly/monthly review cycles)</li>
+<li>D6-001 -- Data Philosophy (R-D6-06: no automated deletion of Tier 1/2 data without human authorization)</li>
+<li>D8-001 -- Automation Philosophy: The Restraint Doctrine (automation spectrum, servant principle)</li>
+<li>D8-002 -- Agent Design Principles and Standards (ASD template, kill procedures, manual fallback)</li>
+<li>D8-004 -- Automation Audit and Annual Re-justification (annual review of overrides)</li>
+<li>D8-005 -- Emergency Override and Kill Switch Procedures (emergency response beyond routine intervention)</li>
+<li>D10-002 -- Daily Operations Doctrine (integration of monitoring into daily checklist)</li>
+<li>D10-003 -- Incident Response Procedures (Severity 4 escalation)</li>
+<li>Stage 1 Documentation Framework, Domain 8: Automation &amp; Agents</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D10-013 — Post-Incident Review Process - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li class="active"><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d10-013">
+  <h1>D10-013 &mdash; Post-Incident Review Process</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D10-013</dd>
+  <dt>Domain</dt>
+  <dd>10 -- User Operations</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>OPS-001, D10-003, D10-005, D10-006, GOV-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D10-005 (aggregate incident analysis), all domain articles that reference learning from incidents.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the detailed procedures for learning from incidents after they have been resolved. While D10-003 Section 4.5 introduced the post-incident review (PIR) concept and its basic structure, this article expands the PIR into a comprehensive institutional learning process. It provides the methodology for root cause analysis, the framework for generating and tracking corrective actions, the procedures for disseminating lessons learned, and the mechanisms for ensuring that institutional change actually occurs as a result of incidents.</p>
+
+<p>The post-incident review is the institution's learning engine. Without it, every incident is an isolated event -- a problem that was fixed and forgotten. With it, every incident becomes a lesson that improves the institution's resilience. Over decades, the accumulated wisdom from hundreds of PIRs transforms the institution from a collection of systems into an organism that adapts, strengthens, and evolves in response to its own failures.</p>
+
+<p>The central principle of the PIR process is blame-free analysis. In a single-operator institution, blame is not just unhelpful -- it is nonsensical. There is no one to blame but yourself, and self-blame produces shame, not improvement. The PIR asks "what happened?" and "what should change?", never "who is at fault?"</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The complete PIR procedure, expanding on D10-003 Section 4.5.</li>
+<li>Root cause analysis methodology: the "five whys" and contributing factor analysis.</li>
+<li>Corrective action generation, classification, and tracking.</li>
+<li>The PIR report format and its relationship to the incident log.</li>
+<li>Dissemination of lessons learned across the institution.</li>
+<li>PIR quality assessment: ensuring that reviews produce genuine insight rather than perfunctory reports.</li>
+<li>Aggregate PIR analysis: identifying systemic patterns across multiple incidents.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The incident response procedure itself (see D10-003).</li>
+<li>The incident classification framework (see D10-005).</li>
+<li>Specific technical remediation procedures (see domain-specific articles).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Incidents Recur</h3>
+<p>The most common reason incidents recur is that the response addressed the symptom but not the cause. A disk fails and is replaced, but the root cause -- inadequate SMART monitoring -- is never addressed. The same class of failure occurs again on a different disk, and the operator is surprised. They should not be. Incident response without root cause analysis is a game of perpetual catch-up.</p>
+
+<p>The PIR breaks this cycle by requiring that every incident be traced to its root cause and that corrective actions address the root cause rather than the symptom. The corrective actions are tracked to completion, and their effectiveness is verified. If the same class of incident recurs despite corrective actions, the PIR for the new incident examines why the previous corrective actions were insufficient.</p>
+
+<h3>3.2 The Single-Operator PIR Challenge</h3>
+<p>In a team environment, the PIR benefits from multiple perspectives. Different team members may have observed different aspects of the incident, and the group discussion often surfaces insights that no individual would reach alone. A single operator lacks this benefit. They are the sole investigator, reviewer, and action owner.</p>
+
+<p>The mitigation is structure. The PIR procedure in this article provides a rigid framework that forces the operator to examine the incident from multiple angles, even though they are the only person doing so. The "five whys" methodology, the contributing factor analysis, and the structured report format all serve to prevent the operator from reaching a quick, superficial conclusion and moving on.</p>
+
+<h3>3.3 From Review to Change</h3>
+<p>A PIR that produces a report but no change is a waste of time. The PIR process must have teeth: it must generate specific, actionable corrective actions, assign those actions deadlines, track them to completion, and verify their effectiveness. The mechanism for this is the corrective action register, a tracking document that lives alongside the incident log and is reviewed during every quarterly operations cycle.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 PIR Timing</h3>
+<p>Per D10-003 Section 4.5, PIR timing depends on severity:</p>
+<ul>
+<li>S1 incidents: PIR within 48 hours of incident closure.</li>
+<li>S2 incidents: PIR within 7 days of incident closure.</li>
+<li>S3 incidents: PIR within 30 days, or during the next monthly operations cycle.</li>
+<li>S4 incidents: PIR may be consolidated into a batch review during the quarterly cycle.</li>
+</ul>
+<p>Extended degradation events (D10-010, lasting more than 7 days) also receive a PIR regardless of whether a discrete incident triggered them.</p>
+
+<h3>4.2 The PIR Procedure</h3>
+
+<p><strong>Step 1: Preparation (10-15 minutes).</strong></p>
+<ul>
+<li>Re-read the entire incident log entry from detection through closure.</li>
+<li>Gather any supplementary information: system logs from the incident period, monitoring data, change log entries from the days preceding the incident.</li>
+<li>Set aside sufficient uninterrupted time for the review. An S1/S2 PIR may take 1-2 hours. An S3 PIR may take 30 minutes. An S4 batch review may take 15-30 minutes for the batch.</li>
+</ul>
+
+<p><strong>Step 2: Root Cause Analysis (20-60 minutes for S1/S2).</strong></p>
+<p>Apply the "five whys" methodology: starting from the incident, ask "why did this happen?" and continue asking "why?" for each answer until a systemic cause is reached.</p>
+<p>Then conduct a contributing factor analysis: beyond the root cause, what other factors contributed to the incident or made it worse?</p>
+<ul>
+<li>Were monitoring or detection mechanisms adequate? If the incident was detected by accident, detection is a contributing factor.</li>
+<li>Were response procedures adequate? If the response was delayed or incorrect, procedures are a contributing factor.</li>
+<li>Were documentation or training adequate? If the operator had to improvise because documentation was missing or unclear, documentation is a contributing factor.</li>
+<li>Were environmental or external factors involved? If seasonal conditions, power issues, or other external factors contributed, they are contributing factors.</li>
+</ul>
+
+<p><strong>Step 3: Impact Assessment (10-15 minutes).</strong></p>
+<ul>
+<li>What was lost? (Data, time, capability, confidence.)</li>
+<li>What was the operational downtime?</li>
+<li>What was the recovery cost (time spent responding and remediating)?</li>
+<li>Were any cross-domain impacts? (e.g., a data incident that also raised security concerns.)</li>
+</ul>
+
+<p><strong>Step 4: Corrective Action Generation (15-30 minutes).</strong></p>
+<p>For each root cause and each contributing factor, generate one or more corrective actions. Each corrective action must be:</p>
+<ul>
+<li><strong>Specific:</strong> not "improve monitoring" but "add SMART health check for disk /dev/sdb to the daily checklist with alert threshold of 5 reallocated sectors."</li>
+<li><strong>Achievable:</strong> within the operator's capability and the institution's resources.</li>
+<li><strong>Scheduled:</strong> with a deadline for implementation.</li>
+<li><strong>Verifiable:</strong> with a criterion for confirming that the action was implemented and effective.</li>
+<li><strong>Classified:</strong> by governance tier per GOV-001 (most corrective actions are Tier 1 or Tier 2).</li>
+</ul>
+
+<p><strong>Step 5: Report Writing (15-30 minutes).</strong></p>
+<p>Write the PIR report using the format in Section 4.3. Append it to the incident log entry.</p>
+
+<p><strong>Step 6: Action Registration (5 minutes).</strong></p>
+<p>Enter all corrective actions into the corrective action register (Section 4.4).</p>
+
+<h3>4.3 PIR Report Format</h3>
+<ul>
+<li><strong>Incident reference:</strong> Incident ID per D10-003.</li>
+<li><strong>PIR date.</strong></li>
+<li><strong>Summary:</strong> One-paragraph description of the incident.</li>
+<li><strong>Root cause:</strong> The result of the five-whys analysis, stated as a systemic issue.</li>
+<li><strong>Contributing factors:</strong> Additional factors that enabled or worsened the incident.</li>
+<li><strong>Impact assessment:</strong> What was lost, how long the incident lasted, recovery cost.</li>
+<li><strong>Corrective actions:</strong> Numbered list with specifics, deadlines, and governance tier.</li>
+<li><strong>Lessons learned:</strong> What the institution now knows that it did not know before the incident.</li>
+<li><strong>Open questions:</strong> Anything that remains uncertain or requires further investigation.</li>
+</ul>
+
+<h3>4.4 The Corrective Action Register</h3>
+<p>The corrective action register is a tracking document that lists all open corrective actions from all PIRs. Each entry contains:</p>
+<ul>
+<li>Action ID (sequential).</li>
+<li>Source incident ID.</li>
+<li>Description of the action.</li>
+<li>Deadline.</li>
+<li>Status: Open, In Progress, Completed, Verified, or Cancelled (with justification).</li>
+<li>Verification date and result (when completed).</li>
+</ul>
+<p>The register is reviewed during every quarterly operations cycle. Open actions past their deadline are escalated per D10-005.</p>
+
+<h3>4.5 Aggregate PIR Analysis</h3>
+<p>During the annual operations cycle, all PIRs from the past year are reviewed in aggregate:</p>
+<ul>
+<li>How many incidents occurred, by severity?</li>
+<li>What were the most common root causes?</li>
+<li>Which corrective actions were most effective?</li>
+<li>Which corrective actions failed to prevent recurrence?</li>
+<li>Are there systemic patterns that individual PIRs did not surface?</li>
+</ul>
+<p>The aggregate analysis feeds into the annual strategic planning and the D10-005 trend analysis.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D10P-01:</strong> Every incident, regardless of severity, receives a post-incident review per the timelines in Section 4.1. S4 incidents may be batched but must not be skipped.</li>
+<li><strong>R-D10P-02:</strong> Root cause analysis must reach a systemic cause, not a proximate cause. "The disk failed" is a proximate cause. "The disk failure was undetected because SMART monitoring was not configured for that device" is a systemic cause.</li>
+<li><strong>R-D10P-03:</strong> Corrective actions must be specific, achievable, scheduled, verifiable, and classified per Section 4.2 Step 4.</li>
+<li><strong>R-D10P-04:</strong> All corrective actions must be entered in the corrective action register and tracked to completion or cancellation.</li>
+<li><strong>R-D10P-05:</strong> The corrective action register must be reviewed during every quarterly operations cycle. Open actions past their deadline must be either completed, rescheduled with justification, or cancelled with justification.</li>
+<li><strong>R-D10P-06:</strong> The PIR process is blame-free. The review examines systems, procedures, and conditions. It does not evaluate the operator's character, judgment, or competence.</li>
+<li><strong>R-D10P-07:</strong> The annual aggregate PIR analysis is mandatory and feeds into strategic planning.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><p><strong>Perfunctory PIRs.</strong> The review is performed to satisfy the requirement but does not produce genuine insight. The root cause analysis stops at the first answer. Corrective actions are vague. Mitigation: R-D10P-02 requires systemic root causes. R-D10P-03 requires specific corrective actions. The quarterly review of the corrective action register reveals whether actions are genuinely improving the institution.</p></li>
+<li><p><strong>Action item abandonment.</strong> Corrective actions are generated, registered, and forgotten. The same incidents recur because the structural changes were never made. Mitigation: R-D10P-05 quarterly review. Actions past deadline are visible and must be addressed.</p></li>
+<li><p><strong>Self-blame disguised as analysis.</strong> The operator conducts the PIR as a self-criticism exercise rather than a systems analysis. "I should have noticed sooner" is blame. "The monitoring configuration did not alert for this condition" is analysis. Mitigation: R-D10P-06 establishes blame-free analysis as mandatory. Rephrase every finding that starts with "I should have" as a systems-level observation.</p></li>
+<li><p><strong>PIR overload.</strong> In a period of many incidents, the PIR backlog grows. The operator is spending more time reviewing past incidents than preventing future ones. Mitigation: S4 incidents are batched. S3 incidents have a 30-day window. If the PIR workload is unsustainable, it signals that the incident rate itself is the problem that needs structural attention.</p></li>
+<li><p><strong>Root cause tunnel vision.</strong> The five-whys analysis follows a single causal chain and misses contributing factors that are equally important. Mitigation: the contributing factor analysis in Step 2 explicitly examines monitoring, procedures, documentation, and environmental factors independent of the root cause chain.</p></li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><p><strong>If PIRs have been skipped:</strong> Conduct them now for all unreviewed incidents, in reverse chronological order (most recent first, as they are most relevant). If the backlog is large, focus on S1 and S2 incidents first. S3 and S4 incidents from more than 90 days ago may receive abbreviated reviews.</p></li>
+<li><p><strong>If the corrective action register has been neglected:</strong> Review it now. For each open action, determine whether it is still relevant. Complete, reschedule, or cancel each action with documentation. Re-establish the quarterly review cadence.</p></li>
+<li><p><strong>If PIRs are consistently perfunctory:</strong> For the next three PIRs, deliberately spend additional time on root cause analysis. Use the five-whys template rigidly, writing out each "why" and its answer. Force yourself past the first answer. The discipline of writing out the analysis often reveals depth that mental shortcuts miss.</p></li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><p><strong>Years 0-5:</strong> PIRs are building the institution's incident knowledge base from scratch. Every review reveals something new. Corrective actions are frequent and impactful. The corrective action register grows rapidly as systemic gaps are identified and addressed.</p></li>
+<li><p><strong>Years 5-15:</strong> The incident rate should be declining as corrective actions take effect. PIRs become less frequent but not less important. When incidents do occur, they are more likely to be novel, requiring deeper analysis. The aggregate annual review should show a clear trend of improving resilience.</p></li>
+<li><p><strong>Years 15-30:</strong> A decade or more of PIR history. The institution knows its failure modes intimately. New incidents are compared against the PIR archive: has this happened before? What did we learn? The PIR process is well-practiced and efficient. A successor can read the PIR archive and understand the institution's vulnerabilities.</p></li>
+<li><p><strong>Years 30-50+:</strong> The PIR archive is a longitudinal study of institutional resilience. Patterns visible only over decades emerge. The institution's design decisions can be evaluated against their actual long-term outcomes. This data is irreplaceable and constitutes one of the institution's most valuable intellectual assets.</p></li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I have conducted post-incident reviews in professional settings and I know two things about them. First, they are the most valuable process in any operational organization. Second, they are the first process to be abandoned when time is short. This tension is why I have given the PIR its own article rather than leaving it as a subsection of D10-003.</p>
+
+<p>The blame-free principle is easy to state and hard to practice when you are the only person involved. After an incident that I caused through carelessness, the natural response is self-recrimination. The PIR reframes this: the incident was not caused by carelessness. It was caused by a system that relied on my attention at a moment when my attention was elsewhere. The corrective action is not "be more careful" (which is not actionable and not sustainable) but "add a monitoring alert that catches this condition without requiring my attention" (which is specific, achievable, and permanent).</p>
+
+<p>The corrective action register is the teeth of the PIR process. Without it, reviews produce reports that sit in the log unactioned. With it, reviews produce changes that make the institution measurably more resilient. I have committed to reviewing the register quarterly and I encourage future operators to maintain this commitment.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D10-003 -- Incident Response Procedures (PIR introduction in Section 4.5, incident log format)</li>
+<li>D10-005 -- Incident Classification &amp; Response Framework (escalation from PIR findings, aggregate analysis)</li>
+<li>D10-006 -- Operational Logging Standards (PIR records as part of institutional memory)</li>
+<li>D10-010 -- Degraded Operations Doctrine (extended degradation triggers PIR)</li>
+<li>OPS-001 -- Operations Philosophy (quarterly and annual review cycles)</li>
+<li>GOV-001 -- Authority Model (governance tier for corrective actions, decision logging)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 6: Honest Accounting of Limitations)</li>
+</ul>
+
+</section>
+</article>
+</main>
+</body>
+</html>

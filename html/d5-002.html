@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D5-002 — Operating System Maintenance Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li class="active"><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d5-002">
+  <h1>D5-002 &mdash; Operating System Maintenance Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D5-002</dd>
+  <dt>Domain</dt>
+  <dd>5 -- Platform & Core Systems</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, P-001, P-002, P-003, P-012</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D5-003, D5-004, D5-005, D5-006, all Domain 12 (Disaster Recovery) articles involving system rebuilds.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the operating system is maintained on every machine within the institution. Maintenance means patching, updating, upgrading, and occasionally choosing not to do any of those things. In a conventional, internet-connected environment, operating system maintenance is largely automated: package managers pull updates from remote repositories, security patches arrive through automatic update services, and the operator's primary decision is whether to reboot now or later. None of that applies here.</p>
+<p>This institution is air-gapped. There are no remote repositories. There are no automatic updates. There is no mechanism by which a security advisory will appear on your screen unbidden. Every update that enters this institution does so because a human being physically transported it across the air gap, verified its integrity, tested it in isolation, and deliberately applied it. This article defines the procedures that make that process reliable, repeatable, and safe.</p>
+<p>The purpose is not merely technical. Operating system maintenance in an air-gapped environment is a governance act. Every patch applied is a decision to trust external code. Every patch withheld is a decision to accept a known vulnerability. Both decisions carry risk. Both decisions must be documented. This article provides the framework for making those decisions well.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The process for identifying which OS updates are available and relevant.</li>
+<li>The process for acquiring updates across the air gap.</li>
+<li>The process for testing updates before production deployment.</li>
+<li>The process for applying updates to production systems.</li>
+<li>Rollback procedures when updates cause problems.</li>
+<li>Kernel management: when to update the kernel, when to hold.</li>
+<li>The decision framework for major version upgrades versus staying on a current release.</li>
+<li>Security patch triage for offline systems.</li>
+</ul>
+<p>This article does NOT cover:</p>
+<ul>
+<li>The initial operating system installation (see P-003).</li>
+<li>Application-level software updates (see D5-006 for configuration management, P-002 for software acquisition).</li>
+<li>Hardware-level firmware updates (see Domain 4 articles).</li>
+<li>The quarantine process for incoming media (see Domain 18). This article assumes media has already cleared quarantine.</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<p>Operating system maintenance is the single most routine and most consequential platform task. It is routine because it happens regularly -- monthly at minimum, often more frequently. It is consequential because a failed update can render a system unbootable, and a missed security patch can leave a known vulnerability open indefinitely.</p>
+<p>In internet-connected environments, the community handles much of this burden. Security advisories propagate automatically. Package managers resolve dependencies. Rollback mechanisms are built into update tools. In an air-gapped environment, the operator assumes every one of these responsibilities personally. You are the distribution mirror. You are the advisory aggregation service. You are the dependency resolver. This is the cost of sovereignty, and it must be paid consistently.</p>
+<p>The historical record of institutions that deferred maintenance -- whether physical or digital -- is uniformly grim. Deferred maintenance compounds. A missed patch becomes two missed patches becomes a system so far behind that updating it requires a full reinstallation. This article exists to prevent that cascade.</p>
+<h3>3.1 The Air-Gap Maintenance Paradox</h3>
+<p>There is a fundamental tension in maintaining an air-gapped system. The air gap exists to protect the institution from external threats. But operating system updates come from the outside world. Every update is, by definition, a controlled breach of the air gap. The institution must manage this tension explicitly: allowing necessary updates through while maintaining the integrity that the air gap provides.</p>
+<p>The resolution is procedural, not technical. The air gap is not breached by the update itself but would be breached by an uncontrolled update process. A controlled, documented, verified update process preserves the spirit of the air gap even as it necessarily crosses the physical boundary.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Update Pipeline</h3>
+<p>Operating system updates flow through a five-stage pipeline. No stage may be skipped.</p>
+<p><strong>Stage 1: Intelligence Gathering.</strong>
+The operator monitors external sources for information about available updates. This happens outside the air gap, on a separate, non-institutional device. Sources include: the distribution's security advisory mailing list, the distribution's release notes, and relevant security databases (CVE databases, distribution-specific trackers). The operator records which updates are available and which are security-relevant.</p>
+<p><strong>Stage 2: Triage and Selection.</strong>
+Not every available update needs to be applied. The operator evaluates each update against three criteria: Does it fix a security vulnerability that is relevant to our deployment? Does it fix a bug we have encountered or are likely to encounter? Does it provide functionality we need? Updates that meet none of these criteria are deferred. Updates that meet at least one are candidates for the next stages.</p>
+<p><strong>Stage 3: Acquisition and Verification.</strong>
+Selected updates are downloaded on the external device. Their cryptographic signatures are verified against known-good keys. The packages are transferred to physical media -- USB drives or optical media -- following the quarantine procedures defined in Domain 18. Once quarantined media is cleared, the packages are available for testing.</p>
+<p><strong>Stage 4: Testing.</strong>
+Updates are applied to a non-production test system first. This test system must mirror the production configuration as closely as feasible. After applying updates, the operator runs the test suite defined in Section 4.4 of this article. The test system remains in the updated state for a minimum observation period of 48 hours before production deployment is authorized.</p>
+<p><strong>Stage 5: Production Deployment.</strong>
+Updates are applied to production systems one at a time, starting with the least critical system. After each system is updated, the operator runs the production verification checklist defined in Section 4.5. If any verification step fails, the operator halts deployment and initiates rollback procedures.</p>
+<h3>4.2 The Security Patch Triage Matrix</h3>
+<p>Security patches receive special handling. They are classified by two dimensions: severity and relevance.</p>
+<p><strong>Severity</strong> follows the standard CVSS framework, simplified for institutional use:
+- <strong>Critical:</strong> Remote code execution, privilege escalation, or data exposure without authentication.
+- <strong>High:</strong> Vulnerabilities that require some precondition (authenticated access, specific configuration) but have severe impact.
+- <strong>Medium:</strong> Vulnerabilities with limited impact or that require unlikely preconditions.
+- <strong>Low:</strong> Theoretical vulnerabilities, information disclosure of non-sensitive data, or denial-of-service against non-critical services.</p>
+<p><strong>Relevance</strong> is assessed against the institution's actual deployment:
+- <strong>Direct:</strong> The vulnerable component is installed and actively used.
+- <strong>Indirect:</strong> The vulnerable component is installed but not actively used, or is a dependency of an active component.
+- <strong>None:</strong> The vulnerable component is not installed.</p>
+<p>The triage matrix:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Critical</th>
+<th>High</th>
+<th>Medium</th>
+<th>Low</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Direct</strong></td>
+<td>Apply within 7 days</td>
+<td>Apply within 14 days</td>
+<td>Apply at next maintenance cycle</td>
+<td>Apply at convenience</td>
+</tr>
+<tr>
+<td><strong>Indirect</strong></td>
+<td>Apply within 14 days</td>
+<td>Apply at next maintenance cycle</td>
+<td>Apply at convenience</td>
+<td>Defer</td>
+</tr>
+<tr>
+<td><strong>None</strong></td>
+<td>No action</td>
+<td>No action</td>
+<td>No action</td>
+<td>No action</td>
+</tr>
+</tbody>
+</table>
+<p>These timelines are targets, not absolutes. The air-gap acquisition process adds latency that internet-connected systems do not face. The timelines begin when the operator becomes aware of the vulnerability, not when the patch is released.</p>
+<h3>4.3 Kernel Management</h3>
+<p>The kernel is the most sensitive component of the operating system. A failed kernel update can render a system unbootable. Kernel updates therefore receive additional scrutiny.</p>
+<p><strong>Rules for kernel updates:</strong>
+- Always keep at least two known-good kernels installed and available at boot time.
+- Before updating the kernel, verify that the bootloader is configured to fall back to the previous kernel if the new one fails to boot.
+- Kernel updates are never applied to production systems on the same day they are tested. A minimum 72-hour observation period on the test system is required for kernel updates, compared to 48 hours for other updates.
+- Kernel major version changes (e.g., 5.x to 6.x) are treated as Tier 2 architectural decisions per GOV-001. They require a written proposal, a 30-day waiting period, and a documented rollback plan.
+- Kernel configuration changes (recompilation, module changes) follow the same testing pipeline as kernel version updates.</p>
+<h3>4.4 The Test Suite</h3>
+<p>After applying updates to the test system, the following checks must pass:</p>
+<ol>
+<li>The system boots successfully to the expected runlevel or target.</li>
+<li>All expected filesystems mount correctly.</li>
+<li>All expected network interfaces come up with correct configuration.</li>
+<li>All core services start and pass their health checks (see D5-005).</li>
+<li>Disk I/O performance is within 10% of baseline measurements.</li>
+<li>Memory utilization at idle is within 15% of baseline.</li>
+<li>All scheduled cron jobs or systemd timers are intact and correctly configured.</li>
+<li>The system log shows no errors or unexpected warnings during boot and initial operation.</li>
+<li>A test backup completes successfully and can be restored.</li>
+<li>Authentication works correctly for all configured accounts.</li>
+</ol>
+<p>If any check fails, the update is not cleared for production deployment. The failure is documented, and the operator investigates before proceeding.</p>
+<h3>4.5 Production Verification Checklist</h3>
+<p>After applying updates to each production system:</p>
+<ol>
+<li>All items from the test suite (Section 4.4) are verified.</li>
+<li>All production workloads resume correctly.</li>
+<li>All inter-system connections are functional (see D5-004 for network verification).</li>
+<li>Monitoring dashboards show normal values (see D5-005).</li>
+<li>A snapshot or backup of the updated system state is created before proceeding to the next system.</li>
+</ol>
+<h3>4.6 The Upgrade Decision Framework</h3>
+<p>Periodically, the institution must decide whether to upgrade to a new major OS release or remain on the current one. This decision is governed by the following framework:</p>
+<p><strong>Stay on the current release when:</strong>
+- The current release is still receiving security patches.
+- No hardware support gap has emerged (new hardware requires a newer kernel or driver).
+- No critical software dependency requires the newer release.
+- The effort of upgrading exceeds the benefit.</p>
+<p><strong>Upgrade to the new release when:</strong>
+- The current release is approaching end of security support.
+- Hardware support requires it.
+- Critical software functionality requires it.
+- The new release has been available for at least six months and the institution has observed its stability in community reports.</p>
+<p>Major OS upgrades are Tier 2 architectural decisions per GOV-001. They require planning, documentation, and a full rollback strategy. The rollback strategy for a major upgrade must include the ability to restore from a pre-upgrade backup to a fully functional state.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D5-002-01:</strong> No operating system update shall be applied to a production system without first being tested on a non-production system.</li>
+<li><strong>R-D5-002-02:</strong> All updates must be cryptographically verified before application. Updates that fail signature verification are rejected and reported as a security incident.</li>
+<li><strong>R-D5-002-03:</strong> At least two bootable kernels must be available on every production system at all times.</li>
+<li><strong>R-D5-002-04:</strong> The operator must conduct intelligence gathering for available updates at least monthly. Security-critical sources must be checked at least bi-weekly.</li>
+<li><strong>R-D5-002-05:</strong> Every update applied to a production system must be recorded in the operational log with: date, system affected, packages updated, reason for update, test results, and post-deployment verification results.</li>
+<li><strong>R-D5-002-06:</strong> Major OS version upgrades require Tier 2 governance per GOV-001.</li>
+<li><strong>R-D5-002-07:</strong> No update shall be applied during a period when rollback capabilities are compromised (e.g., when backups are in progress, when the test system is unavailable, or when the operator will be unavailable for the observation period).</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Update neglect.</strong> The operator stops checking for updates. The system falls months or years behind. Eventually, updating requires a chain of intermediate updates or a full reinstallation. Mitigation: the monthly intelligence gathering requirement (R-D5-002-04) and the operational tempo in OPS-001.</li>
+<li><strong>Untested deployment.</strong> Under time pressure, the operator skips the test system and applies updates directly to production. The update breaks something. Rollback is required but may be incomplete. Mitigation: R-D5-002-01 is a hard constraint. No exceptions.</li>
+<li><strong>Failed rollback.</strong> An update causes problems, but the rollback mechanism fails -- the previous kernel was not preserved, the backup is corrupt, or the rollback procedure was never tested. Mitigation: R-D5-002-03 (multiple kernels) and the requirement to verify rollback capability before deploying.</li>
+<li><strong>Signature verification bypass.</strong> The operator cannot verify a package signature and applies it anyway because it seems urgent. A compromised package enters the institution. Mitigation: R-D5-002-02 is absolute. If a signature cannot be verified, the package is not applied. Period.</li>
+<li><strong>Test-production divergence.</strong> The test system drifts from production configuration. Updates pass testing but fail in production because the environments differ. Mitigation: quarterly configuration audits comparing test and production systems (see D5-006).</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>If an update has rendered a system unbootable:</strong>
+1. Boot from the previous kernel using the bootloader fallback mechanism.
+2. If the previous kernel boots successfully, remove the problematic update and document the failure.
+3. If no kernel boots, boot from the institution's emergency recovery media (a bootable USB or optical disk maintained per OPS-001, R-OPS-07).
+4. Mount the system's root filesystem from recovery media.
+5. Restore the system from the most recent known-good backup.
+6. Document the incident, including the specific update that caused the failure, the symptoms, and the recovery steps taken.</p>
+<p><strong>If an update has caused service failures without rendering the system unbootable:</strong>
+1. Identify the specific update that caused the failure using the operational log and package manager history.
+2. Roll back the specific package to its previous version.
+3. Verify that all services are restored.
+4. Document the incident.
+5. Investigate the root cause before re-attempting the update.</p>
+<p><strong>If the system has fallen significantly behind on updates:</strong>
+1. Do not attempt to apply all missed updates at once.
+2. Begin with security-critical patches, prioritized by the triage matrix.
+3. Apply updates in small batches, testing each batch before proceeding.
+4. If the system is more than one major release behind, evaluate whether a clean reinstallation from current media is more practical than incremental updating. This decision is a Tier 3 governance decision.
+5. Document the catch-up plan and its execution.</p>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> The update pipeline is being established. Expect to refine the test suite and verification checklists as you discover what matters and what does not. The intelligence gathering process will stabilize as you learn which sources are reliable.</li>
+<li><strong>Years 2-5:</strong> The pipeline should be routine. Focus on ensuring the test system stays synchronized with production. Begin accumulating historical data on which types of updates cause problems.</li>
+<li><strong>Years 5-15:</strong> You will face your first major OS upgrade decision. The framework in Section 4.6 will be tested. Document the experience thoroughly for future reference.</li>
+<li><strong>Years 15-30:</strong> Multiple hardware generations will have passed. The OS may have been replaced entirely. The principles in this article -- test before deploy, verify signatures, maintain rollback capability, document everything -- should survive even if every specific procedure changes.</li>
+<li><strong>Years 30-50+:</strong> A successor may be maintaining the system. The update pipeline must be documented well enough that they can follow it without oral instruction. The Commentary Section should contain decades of operational wisdom about what types of updates tend to cause problems and how to handle them.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The most dangerous moment in OS maintenance is not the update itself. It is the moment you convince yourself that "this one is safe" and skip the test system. Every failed production deployment in the history of system administration was preceded by that thought. The pipeline exists because human judgment about update safety is unreliable. Follow the pipeline.</p>
+<p>The timelines in the triage matrix will feel slow to anyone accustomed to internet-connected systems where patches are applied within hours of release. Remember that the air gap itself is a significant mitigation for many vulnerability classes. A remote code execution vulnerability is substantially less threatening to a system with no network-reachable attack surface. The timelines reflect this reality. Urgency should be proportional to actual risk, not to the severity score alone.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (air-gap mandate)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (supply chain threats, Category 3)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo, documentation-first principle)</li>
+<li>P-001 -- Platform Philosophy and Architectural Principles</li>
+<li>P-002 -- Software Acquisition and Verification</li>
+<li>P-003 -- Operating System Selection and Configuration</li>
+<li>P-012 -- Platform Evolution and Migration Planning</li>
+<li>Domain 18 -- Import &amp; Quarantine (quarantine procedures for incoming media)</li>
+<li>Domain 12 -- Disaster Recovery (system restore procedures)</li>
+</ul>
+
+</section>
+<section>
+<h2>---</h2>
+
+</section>
+</article>
+</main>
+</body>
+</html>

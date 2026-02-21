@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D14-004 — Knowledge Classification and Taxonomy - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li class="active"><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d14-004">
+  <h1>D14-004 &mdash; Knowledge Classification and Taxonomy</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D14-004</dd>
+  <dt>Domain</dt>
+  <dd>14 -- Research & Theory</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, OPS-001, D14-001, D14-002</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D14-005, D14-006. All Domain 14 articles that produce or consume classified knowledge. All domains that reference institutional knowledge with confidence levels.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution organizes what it knows. Knowledge without organization is a pile. Knowledge with organization is a library. The difference between the two is not the knowledge itself but the structures that make it findable, assessable, and usable. This article provides those structures.</p>
+<p>D14-001 introduced the knowledge lifecycle (observation, investigation, validation, classification, integration, archival) and established four confidence levels (verified, provisional, speculative, deprecated). This article expands those concepts into a complete taxonomy -- a system of categories, relationships, and confidence levels that allows the institution to answer three critical questions about any piece of knowledge: What kind of knowledge is this? How confident are we in it? How does it relate to other things we know?</p>
+<p>These questions matter because knowledge that cannot be found is knowledge that does not exist, operationally speaking. Knowledge whose confidence level is unknown is either trusted too much or too little. Knowledge whose relationships are untracked creates blind spots -- the institution changes one thing without realizing it depends on another. The taxonomy is the defense against all three failures.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong>
+- The knowledge taxonomy: categories, subcategories, and classification rules.
+- Confidence levels: definitions, assignment criteria, promotion and demotion procedures.
+- Relationship types: dependencies, derivations, contradictions, and supersessions.
+- The classification process: how new knowledge is classified upon creation.
+- The taxonomy review process: how the taxonomy itself evolves.
+- Cross-domain knowledge integration: how knowledge from one domain relates to knowledge in others.
+- The knowledge registry: the master index of all classified institutional knowledge.</p>
+<p><strong>Out of scope:</strong>
+- The philosophical justification for research and knowledge management (D14-001).
+- Experimental methodology for producing new knowledge (D14-002).
+- Technology evaluation specifically (D14-003).
+- Negative results documentation format (D14-005, though negative results are classified within this taxonomy).
+- Physical storage and preservation of knowledge artifacts (RES-013, archival procedures).</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Problem of Institutional Amnesia</h3>
+<p>Institutions forget. Not through dramatic data loss -- though that happens -- but through the slow accumulation of knowledge that is recorded but not organized, filed but not findable, known to one person but not externalized into the institutional record. When the person who knows something leaves, retires, or simply forgets, the knowledge vanishes. The institution then rediscovers it, repeating work that was already done, or worse, proceeds without it and makes decisions based on incomplete understanding.</p>
+<p>This institution is especially vulnerable to institutional amnesia because it is operated by one person. There is no colleague to remind you that "we tried that in 2029 and it did not work." There is no institutional folklore passed through conversation. If knowledge is not in the record, it is not in the institution.</p>
+<p>The taxonomy is the antidote. By requiring that all significant knowledge be classified, indexed, and related to other knowledge, it creates a structure that survives individual memory failure.</p>
+<h3>3.2 The Confidence Problem</h3>
+<p>Not all knowledge is equally reliable, and treating it as such is dangerous. A result that has been replicated through multiple methods over five years is not the same as a preliminary observation from a single experiment. A procedure that has been tested in disaster recovery drills is not the same as one that was written but never executed. Yet without a formal confidence system, both occupy the same status in the institutional record: they are written down, and they are assumed to be true.</p>
+<p>The confidence level system introduced in D14-001 and formalized here addresses this problem. Every piece of classified knowledge carries an explicit confidence level that tells the reader: this is how much you should trust this. The levels are not grades. "Speculative" is not a failing mark -- it is an honest assessment that the evidence is preliminary. "Verified" is not a gold star -- it is a statement that specific evidentiary criteria have been met. The system values honesty over prestige.</p>
+<h3>3.3 The Taxonomy as Living System</h3>
+<p>A taxonomy created at founding and never revised will become useless within a decade. The institution's knowledge will outgrow the categories. New domains of inquiry will emerge that do not fit the original structure. Relationships between knowledge items will become apparent that the original taxonomy did not anticipate.</p>
+<p>The taxonomy must therefore be a living system -- regularly reviewed, periodically revised, and designed from the start to accommodate growth. This article defines not just the taxonomy but the process for evolving it.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Knowledge Categories</h3>
+<p>The taxonomy organizes institutional knowledge into seven primary categories:</p>
+<p><strong>Category 1: Technical Knowledge.</strong> How things work. Hardware specifications, software behavior, system configurations, performance characteristics, failure modes, and troubleshooting procedures. This is the institution's understanding of its own infrastructure.</p>
+<p><strong>Category 2: Procedural Knowledge.</strong> How things are done. Step-by-step procedures, workflows, checklists, and protocols. This includes everything from daily maintenance routines to disaster recovery sequences. Procedural knowledge is distinct from technical knowledge: you can understand how a filesystem works (technical) without knowing the institution's specific procedure for checking filesystem integrity (procedural).</p>
+<p><strong>Category 3: Analytical Knowledge.</strong> What has been learned through investigation. Experimental results, comparative analyses, technology evaluations, performance studies, and failure analyses. This is the output of the research function defined in D14-001 and executed through D14-002.</p>
+<p><strong>Category 4: Contextual Knowledge.</strong> Why things are the way they are. Design decisions, architectural rationales, historical context, and the reasoning behind institutional choices. This is the knowledge that answers "why?" rather than "how?" -- and it is often the first knowledge lost in institutional transitions, because people document what they did but not why they did it.</p>
+<p><strong>Category 5: Environmental Knowledge.</strong> What exists outside the institution. Technology trends, community health assessments, supply chain information, regulatory changes, and external threat intelligence. This knowledge is gathered during air-gap crossings and from the institution's reference library. It is inherently less current than internal knowledge and must be dated and contextualized accordingly.</p>
+<p><strong>Category 6: Negative Knowledge.</strong> What does not work, what has been disproven, and what has been tried and abandoned. This category is the complement of the Negative Results Registry (D14-005). It is perhaps the most valuable category for preventing repeated failures, and it is the category most institutions neglect because recording failures feels unproductive.</p>
+<p><strong>Category 7: Meta-Knowledge.</strong> Knowledge about the institution's knowledge. The taxonomy itself, the classification procedures, the confidence level definitions, the research methodology, and the evolution processes. Meta-knowledge is what allows the institution to manage and improve its own knowledge infrastructure.</p>
+<h3>4.2 Confidence Levels</h3>
+<p>Each classified knowledge item carries one of four confidence levels, as introduced in D14-001:</p>
+<p><strong>Verified.</strong> The knowledge has been established through rigorous investigation (D14-002), has survived adversarial review (D14-001, Section 4.2), and has been replicated through at least one adapted replication method (temporal, methodological, environmental, or documentation-based). Verified knowledge may be used as a basis for operational decisions and cited as evidence in further research. Promotion to Verified requires: a completed experiment log with pre-registration, a documented adversarial review, and a documented replication.</p>
+<p><strong>Provisional.</strong> The knowledge is supported by a single investigation or a limited evidence base. It has not been replicated. It may be used cautiously in operational decisions with explicit acknowledgment of its provisional status. Most new experimental results enter the taxonomy at this level. Promotion to Provisional requires: a completed experiment log or a thorough analytical assessment with documented methodology and evidence.</p>
+<p><strong>Speculative.</strong> The knowledge is based on preliminary observation, theoretical reasoning, or incomplete evidence. It should not be used as a basis for significant operational decisions without further investigation. Speculative knowledge is valuable because it identifies areas for future research. Entry at Speculative requires: a documented observation or hypothesis with a clear statement of the evidence supporting it and the evidence lacking.</p>
+<p><strong>Deprecated.</strong> The knowledge was previously classified at a higher level but has been contradicted by subsequent evidence, superseded by better knowledge, or invalidated by changed conditions. Deprecated knowledge is not deleted from the registry. It is retained with its deprecation justification and a reference to the knowledge that supersedes it. Deprecated knowledge serves as a historical record and a warning against re-adoption.</p>
+<h3>4.3 Relationship Types</h3>
+<p>Knowledge items in the taxonomy are connected through four relationship types:</p>
+<p><strong>Depends-on.</strong> Knowledge item A depends on knowledge item B if A's validity requires B's validity. If B is deprecated, A must be reviewed and potentially deprecated or re-validated independently.</p>
+<p><strong>Derived-from.</strong> Knowledge item A is derived from knowledge item B if A was produced through investigation or analysis of B. The derivation chain is a provenance record that allows future operators to trace conclusions back to their evidence base.</p>
+<p><strong>Contradicts.</strong> Knowledge item A contradicts knowledge item B if they cannot both be true. Contradictions must be resolved through further investigation or by deprecating one item. Unresolved contradictions are flagged in the registry and prioritized for research.</p>
+<p><strong>Supersedes.</strong> Knowledge item A supersedes knowledge item B if A is a more recent, more complete, or more accurate treatment of the same subject. Supersession does not delete B -- it retains B as historical context and marks A as the current authoritative source.</p>
+<h3>4.4 The Knowledge Registry</h3>
+<p>The knowledge registry is the master index of all classified institutional knowledge. It is a structured document (or set of documents) in plain text format, compliant with the 50-year continuity rules, containing for each entry:</p>
+<ul>
+<li><strong>Knowledge ID:</strong> Format KR-YYYY-NNN (year and sequential number).</li>
+<li><strong>Title:</strong> A concise description of the knowledge item.</li>
+<li><strong>Category:</strong> One of the seven primary categories (Section 4.1).</li>
+<li><strong>Confidence level:</strong> Verified, Provisional, Speculative, or Deprecated.</li>
+<li><strong>Date classified:</strong> When the item was added to the registry.</li>
+<li><strong>Date last reviewed:</strong> When the item's classification was last confirmed or changed.</li>
+<li><strong>Source:</strong> Reference to the experiment log, analysis, observation, or external source.</li>
+<li><strong>Relationships:</strong> Depends-on, Derived-from, Contradicts, and Supersedes links.</li>
+<li><strong>Summary:</strong> A brief (one to three paragraph) statement of the knowledge.</li>
+<li><strong>Full reference:</strong> Pointer to the complete document, experiment log, or data source.</li>
+</ul>
+<h3>4.5 The Taxonomy Review Process</h3>
+<p>The taxonomy itself is reviewed on a defined cycle:</p>
+<p><strong>Annual classification audit.</strong> Once per year, a random sample of at least 10% of registry entries is reviewed for accuracy of classification. Are the confidence levels still appropriate? Are the relationships still current? Has any knowledge been superseded without the registry being updated? The audit results are documented and any corrections are applied immediately.</p>
+<p><strong>Triennial taxonomy review.</strong> Every three years, the category structure itself is reviewed. Are the seven categories still adequate? Do any categories need to be split, merged, or redefined? Are there significant bodies of knowledge that do not fit any existing category? The review may result in taxonomy modifications, which are documented as taxonomy evolution events in the registry.</p>
+<p><strong>Event-triggered review.</strong> Certain events trigger an immediate taxonomy review of affected entries: a major technology migration, a disaster recovery event, a succession event, or the deprecation of a significant body of knowledge. The triggered review covers all knowledge items related to the event and ensures the registry accurately reflects the institution's post-event knowledge state.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-KCT-01:</strong> Every significant knowledge item produced by the institution's research function must be classified and entered in the knowledge registry within 60 days of its production. "Significant" means any knowledge that may inform an operational decision or be referenced by a future investigation.</li>
+<li><strong>R-KCT-02:</strong> Confidence levels must be assigned based on the criteria defined in Section 4.2, not on the operator's intuitive sense of how reliable the knowledge is. The criteria are the standard, not the feeling.</li>
+<li><strong>R-KCT-03:</strong> Relationships between knowledge items must be documented at the time of classification. The classifier must actively check for dependencies, derivations, contradictions, and supersessions with existing registry entries.</li>
+<li><strong>R-KCT-04:</strong> Deprecated knowledge must never be deleted from the registry. Deprecation is a status change, not a deletion. The full history of a knowledge item -- including its original classification, any promotions or demotions, and its eventual deprecation -- must be preserved.</li>
+<li><strong>R-KCT-05:</strong> The annual classification audit (Section 4.5) is mandatory and must be completed within the first quarter of each calendar year. The results must be documented in the research archive.</li>
+<li><strong>R-KCT-06:</strong> Taxonomy modifications (changes to the category structure, confidence level definitions, or relationship types) are Tier 2 decisions under GOV-001 and require the 30-day waiting period. The taxonomy is institutional infrastructure and must not be changed casually.</li>
+<li><strong>R-KCT-07:</strong> All knowledge registry data must be stored in plain text formats compliant with the 50-year continuity rules. The registry must be readable without any specialized software.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Classification backlog.</strong> Knowledge is produced faster than it is classified. The registry falls behind, and an increasing body of institutional knowledge exists outside the taxonomy. Mitigation: R-KCT-01's 60-day deadline. If the backlog grows despite this, reduce the classification effort per item (a brief classification is better than no classification) or increase the time allocated to classification in the operational tempo.</li>
+<li><strong>Confidence inflation.</strong> Knowledge is routinely assigned higher confidence than the evidence supports, typically because the operator wants to feel certain rather than provisional. Mitigation: R-KCT-02 requires criteria-based assignment. The annual audit (R-KCT-05) provides a systematic check.</li>
+<li><strong>Relationship neglect.</strong> Knowledge items are classified individually but their relationships are not documented. The registry becomes a flat list rather than a connected graph. Mitigation: R-KCT-03 requires active relationship checking at classification time. The audit verifies relationship documentation.</li>
+<li><strong>Taxonomy ossification.</strong> The taxonomy is never revised, and knowledge items are forced into categories that no longer fit. Mitigation: the triennial taxonomy review (Section 4.5) is mandatory. The review explicitly asks whether the categories are still adequate.</li>
+<li><strong>Registry as bureaucracy.</strong> The classification process becomes so burdensome that the operator avoids producing new knowledge to avoid the classification work. Mitigation: the classification process should be lightweight -- a structured entry in a plain text file, not an elaborate production. If classification takes more than 30 minutes per item on average, the process should be simplified.</li>
+<li><strong>Deprecated knowledge zombies.</strong> Knowledge that has been deprecated is still being used as the basis for operational decisions because operators check the procedure but not the registry. Mitigation: procedures that reference knowledge items should include the knowledge ID. When a knowledge item is deprecated, a search of all documents referencing it should be conducted and references updated.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a classification backlog has accumulated:</strong> Conduct a classification sprint. Classify all backlogged items at the minimum viable level: category, confidence level, one-sentence summary, and source reference. Relationships can be documented in a second pass. The priority is getting everything into the registry, even if the entries are sparse.</p>
+</li>
+<li>
+<p><strong>If confidence levels have been inflated:</strong> Conduct a confidence audit. Review all "verified" items. For each, check: is there a documented replication? Is there a documented adversarial review? If not, downgrade to "provisional." Review all "provisional" items. For each, check: is there a completed experiment log? If not, downgrade to "speculative."</p>
+</li>
+<li>
+<p><strong>If relationships have been neglected:</strong> Conduct a relationship review. For each registry entry, check: does this item depend on other items? Does it derive from evidence? Does it contradict anything? Does it supersede an older entry? Document all identified relationships. This is labor-intensive but is a one-time recovery that, once completed, is maintained incrementally.</p>
+</li>
+<li>
+<p><strong>If the taxonomy has ossified:</strong> Conduct an emergency taxonomy review. Identify all knowledge items that do not fit their assigned categories. Look for patterns -- do the misfits suggest a new category is needed? Revise the taxonomy and reclassify affected items. File the revision as a Tier 2 decision per R-KCT-06.</p>
+</li>
+<li>
+<p><strong>If the registry has been abandoned entirely:</strong> Begin rebuilding from the research archive. Every experiment log, every TDR, every negative result entry is a knowledge item that should be in the registry. Classify them systematically, starting with the most recent and working backward. Accept that the early reconstruction will be incomplete and refine it over time.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The taxonomy is new and sparsely populated. The seven categories and four confidence levels should be sufficient for the institution's initial knowledge base. The operator is learning to classify consistently. Some miscategorization is inevitable and will be corrected in early audits.</li>
+<li><strong>Years 5-15:</strong> The registry grows to hundreds of entries. Relationships between knowledge items become increasingly important. The registry begins to function as a genuine knowledge graph -- a map of what the institution knows and how its knowledge connects. The triennial taxonomy review may reveal that one or two categories need subdivision.</li>
+<li><strong>Years 15-30:</strong> Succession is likely during this period. The taxonomy is one of the most valuable resources the successor inherits, because it provides an organized map of everything the institution has learned. The taxonomy review following succession is critically important -- the successor may organize knowledge differently than the founder, and the taxonomy should accommodate that.</li>
+<li><strong>Years 30-50+:</strong> The registry contains the institution's entire intellectual history. Deprecated items show what was once believed and later disproven. Relationship chains show how understanding evolved. The registry is not just an index -- it is a narrative of institutional learning.</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+I resist taxonomy. My natural instinct is to throw knowledge into a wiki and rely on search. But search finds what you are looking for. Taxonomy reveals what you did not know to look for. The relationship links, especially, are the value proposition: when I deprecate a piece of knowledge, I need to know what else depends on it. When I discover a contradiction, I need to know which items are affected. A flat file system cannot provide this. A taxonomy can. So I will build the taxonomy, I will maintain it, and I will resist the temptation to let it atrophy when it feels like overhead. It is not overhead. It is the institution's nervous system.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 6: Honest Accounting of Limitations)</li>
+<li>CON-001 -- The Founding Mandate (knowledge preservation, 50-year continuity)</li>
+<li>GOV-001 -- Authority Model (Tier 2 decisions for taxonomy changes)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first, operational tempo)</li>
+<li>D14-001 -- Research Philosophy (knowledge lifecycle, confidence levels, anti-echo-chamber structures)</li>
+<li>D14-002 -- Experimental Design (experiment log format, pre-registration)</li>
+<li>D14-005 -- Negative Results Registry (Category 6: Negative Knowledge)</li>
+<li>D14-006 -- Multi-Generational Research Continuity (taxonomy as succession resource)</li>
+<li>META-00-ART-001 -- Stage 1 Meta-Framework (50-year continuity rules, plain text requirements)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

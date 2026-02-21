@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D17-007 — Sync Package Specification - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li class="active"><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d17-007">
+  <h1>D17-007 &mdash; Sync Package Specification</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D17-007</dd>
+  <dt>Domain</dt>
+  <dd>17 -- Scaling & Federation</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D17-001, D17-003, D17-005, SEC-001, OPS-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D17-008 (governance sync uses sync packages), D18-003 (malware scanning applies to incoming sync packages), D18-005 (provenance tracking references sync package metadata). All federation operations that create or consume sync packages depend on this specification.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the complete technical specification of a sync package -- the unit of data exchange between federated nodes. D17-001 introduced the sync package as a concept. D17-003 defined the operational procedures for creating, transporting, and receiving sync packages. This article specifies the exact format: the byte-level structure, the fields, the cryptographic requirements, the manifest schema, and the validation rules that every sync package must satisfy.</p>
+<p>A sync package is a diplomatic pouch in digital form. It must be self-contained, self-verifying, and self-describing. The receiving node must be able to determine, from the package alone, who sent it, what it contains, whether it has been tampered with, and whether the sender had the authority to send it. No external lookup, no network call, no reference to any resource outside the package and the receiving node's own trust store may be required to validate a sync package.</p>
+<p>This specification exists because ambiguity in a data exchange format is a vulnerability. If two nodes disagree about what a field means, data will be misinterpreted. If the integrity verification procedure is imprecise, corrupted data will pass validation on one node and fail on another. If the encryption scheme is underspecified, a future implementation may choose a weak algorithm. Every field, every algorithm, and every validation rule is specified here so that two independent implementations, written decades apart, can produce and consume interoperable sync packages.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The sync package container format and its layered structure.</li>
+<li>The plaintext header specification: fields, encoding, and validation rules.</li>
+<li>The signed manifest specification: schema, content hash requirements, and signature format.</li>
+<li>The encrypted payload specification: encryption algorithm, key derivation, and payload structure.</li>
+<li>The integrity seal specification: hash algorithm, signature format, and verification procedure.</li>
+<li>Version negotiation between nodes running different software versions.</li>
+<li>The sync package lifecycle: creation, validation, application, and archival.</li>
+<li>Extensibility: how the format evolves without breaking backward compatibility.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The operational procedures for sync (see D17-003).</li>
+<li>The physical transport of sync media (see D17-003, Section 4.3).</li>
+<li>The trust establishment that produces encryption keys (see D17-005).</li>
+<li>The conflict resolution that occurs after a sync package is applied (see D17-004).</li>
+<li>Content-level validation of items within the payload (see Domain 18 for imported content validation).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why a Formal Specification Matters</h3>
+<p>D17-003 describes the sync package at a structural level: header, manifest, payload, integrity seal. That description is sufficient for understanding the sync protocol. It is not sufficient for implementing it. Implementation requires precision that operational documentation does not provide. What character encoding does the header use? What hash algorithm produces the content hashes in the manifest? What happens when the manifest references a file whose path contains characters that are invalid on the receiving node's filesystem? These questions cannot be answered by philosophy or procedure. They require a specification.</p>
+<p>The specification also serves as a contract between implementations. If two nodes are running different versions of the institutional software -- or, in the distant future, entirely different software that implements the same specification -- the sync package format is their shared language. The specification defines that language with enough precision that a conforming implementation can be written from this document alone.</p>
+<h3>3.2 Design Principles for the Format</h3>
+<p>The sync package format is governed by four design principles, each derived from the institution's philosophical foundations:</p>
+<p><strong>Self-containment.</strong> A sync package includes everything needed to validate and process it. This derives from R-D17-02 (Partition Is Normal) and R-D17-05 (Sync Packages Are Self-Contained). The receiving node may have been disconnected from all other nodes for years. It cannot consult any external resource. The package must be complete.</p>
+<p><strong>Transparency.</strong> The package format is fully documented. There are no proprietary components, no patent-encumbered algorithms, no fields whose meaning is known only to the software authors. This derives from ETH-001, Principle 3 (Transparency of Operation). A future operator must be able to read a sync package with nothing more than a hex editor and this specification.</p>
+<p><strong>Integrity.</strong> Every byte of the package is covered by the integrity seal. Every item in the payload is individually hashed in the manifest. Corruption at any level is detectable. This derives from SEC-001's integrity requirements.</p>
+<p><strong>Longevity.</strong> The format uses stable, well-understood algorithms and encodings. No algorithm is chosen for novelty. Every algorithm is chosen because it has a long track record of security analysis and because open-source implementations exist in multiple languages. This derives from ETH-001, Principle 4 (Longevity Over Novelty).</p>
+<h3>3.3 Relationship to Existing Descriptions</h3>
+<p>D17-003, Section 4.1 describes the sync package as consisting of four components: Header, Manifest, Payload, and Integrity Seal. This specification retains that four-component structure and elaborates each component to implementation-ready detail. Nothing in this specification contradicts D17-003. Everything in this specification extends it.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Package Container Format</h3>
+<p>A sync package is a single file with the extension <code>.syncpkg</code>. The file is a concatenation of four sections in fixed order, each preceded by a section delimiter that identifies the section type and its length. The overall structure is:</p>
+<p><code>[Package Preamble]
+[Section 1: Header]
+[Section 2: Manifest]
+[Section 3: Payload]
+[Section 4: Integrity Seal]</code></p>
+<p><strong>Package Preamble.</strong> The first 64 bytes of the file. Contains:</p>
+<ul>
+<li>Bytes 0-7: Magic number <code>SYNCPKG\0</code> (ASCII, null-terminated). Identifies the file as a sync package.</li>
+<li>Bytes 8-11: Format version (uint32, big-endian). Current version: <code>0x00000001</code> (version 1).</li>
+<li>Bytes 12-15: Header section offset (uint32, big-endian). Byte offset from the start of the file to the beginning of the header section.</li>
+<li>Bytes 16-19: Header section length (uint32, big-endian).</li>
+<li>Bytes 20-23: Manifest section offset (uint32, big-endian).</li>
+<li>Bytes 24-27: Manifest section length (uint32, big-endian).</li>
+<li>Bytes 28-31: Payload section offset (uint32, big-endian).</li>
+<li>Bytes 32-35: Payload section length (uint32, big-endian).</li>
+<li>Bytes 36-39: Seal section offset (uint32, big-endian).</li>
+<li>Bytes 40-43: Seal section length (uint32, big-endian).</li>
+<li>Bytes 44-63: Reserved (zero-filled). Reserved for future format versions.</li>
+</ul>
+<p>The preamble is always plaintext and unencrypted. It allows the receiving node to locate each section without parsing the entire file.</p>
+<h3>4.2 Header Specification</h3>
+<p>The header is a UTF-8 encoded, newline-delimited set of key-value pairs. Each line consists of a key, a colon, a space, and a value. Keys are ASCII alphanumeric with hyphens. Values are UTF-8 strings. The header is not encrypted, allowing the receiving node to identify the package before any cryptographic operations.</p>
+<p>Required header fields:</p>
+<ul>
+<li><code>Package-ID</code>: A unique identifier for this package. Format: <code>&lt;sender-node-id&gt;-&lt;timestamp&gt;-&lt;sequence&gt;</code>, where timestamp is ISO 8601 UTC and sequence is a zero-padded four-digit integer to handle multiple packages created in the same second.</li>
+<li><code>Format-Version</code>: The sync package format version. Must match the version in the preamble.</li>
+<li><code>Sender-Node-ID</code>: The unique identifier of the sending node (the SHA-256 hash of the sender's public key, hex-encoded, first 32 characters).</li>
+<li><code>Recipient-Node-ID</code>: The unique identifier of the intended recipient node (same format as Sender-Node-ID).</li>
+<li><code>Created-Timestamp</code>: The creation time of the package, ISO 8601 UTC format.</li>
+<li><code>Software-Version</code>: The version of the institutional software that created the package, in semantic versioning format (MAJOR.MINOR.PATCH).</li>
+<li><code>Standards-Version</code>: The version of the institutional standards this package conforms to.</li>
+<li><code>Sync-Type</code>: One of <code>FULL</code>, <code>INCREMENTAL</code>, or <code>GOVERNANCE</code>. FULL contains all shared data. INCREMENTAL contains only changes since the last sync with this recipient. GOVERNANCE contains only governance-related content (used by D17-008).</li>
+<li><code>Description</code>: A human-readable description of the package contents. Maximum 500 characters.</li>
+<li><code>Previous-Sync-ID</code>: The Package-ID of the most recent sync package successfully exchanged with this recipient, or <code>NONE</code> if this is the first sync. This field enables the receiving node to detect gaps in the sync sequence.</li>
+<li><code>Item-Count</code>: The number of items in the payload (uint32, decimal string).</li>
+<li><code>Payload-Compression</code>: The compression algorithm applied to the payload before encryption. One of <code>NONE</code>, <code>ZSTD</code>, or <code>GZIP</code>. Zstandard is preferred for its balance of compression ratio and speed.</li>
+<li><code>Encryption-Algorithm</code>: The algorithm used to encrypt the payload. Currently: <code>AES-256-GCM</code>. This field enables future algorithm migration.</li>
+<li><code>Hash-Algorithm</code>: The hash algorithm used for content hashes in the manifest and for the integrity seal. Currently: <code>SHA-256</code>. This field enables future algorithm migration.</li>
+</ul>
+<p>Optional header fields:</p>
+<ul>
+<li><code>Urgency</code>: One of <code>ROUTINE</code>, <code>PRIORITY</code>, <code>CRITICAL</code>. Defaults to <code>ROUTINE</code>. CRITICAL indicates the package contains urgent content such as trust revocation notices.</li>
+<li><code>Expiry-Date</code>: ISO 8601 UTC date after which the package should be considered stale and not applied. Used for time-sensitive governance actions.</li>
+<li><code>Human-Note</code>: An additional free-text note from the sender to the recipient. Maximum 2000 characters.</li>
+</ul>
+<h3>4.3 Manifest Specification</h3>
+<p>The manifest is a structured document listing every item in the payload. It is encoded as UTF-8 text in a defined schema and is cryptographically signed by the sender.</p>
+<p>The manifest consists of a manifest header and a list of item entries.</p>
+<p><strong>Manifest header fields:</strong></p>
+<ul>
+<li><code>Manifest-Version</code>: Currently <code>1</code>.</li>
+<li><code>Total-Items</code>: The count of item entries.</li>
+<li><code>Total-Size</code>: The total uncompressed size of all payload items in bytes.</li>
+<li><code>Manifest-Created</code>: ISO 8601 UTC timestamp.</li>
+<li><code>Sender-Fingerprint</code>: The full SHA-256 fingerprint of the sender's public key (64 hex characters).</li>
+</ul>
+<p><strong>Item entry fields (one set per item):</strong></p>
+<ul>
+<li><code>Item-Path</code>: The logical path of the item within the institutional content structure. Uses forward-slash separators regardless of the sender's operating system. Maximum 1024 characters. Characters restricted to: UTF-8 alphanumeric, hyphen, underscore, period, forward-slash, and space.</li>
+<li><code>Item-Type</code>: One of <code>DOCUMENT</code>, <code>METADATA</code>, <code>GOVERNANCE</code>, <code>MEMORY</code>, <code>BINARY</code>, <code>SYSTEM</code>.</li>
+<li><code>Item-Hash</code>: The SHA-256 hash of the item's content (64 hex characters).</li>
+<li><code>Item-Size</code>: The uncompressed size of the item in bytes.</li>
+<li><code>Item-Modified</code>: The last modification timestamp of the item, ISO 8601 UTC.</li>
+<li><code>Item-Action</code>: One of <code>CREATE</code>, <code>UPDATE</code>, <code>DELETE</code>. CREATE indicates a new item. UPDATE indicates a modification to an existing item. DELETE indicates the item should be removed on the receiving node (the payload contains the deletion record, not the deleted content).</li>
+<li><code>Item-Previous-Hash</code>: For UPDATE actions, the SHA-256 hash of the version this update is based on. This enables the receiving node to detect conflicts (if the local version's hash does not match Item-Previous-Hash, the item has been modified locally since the last sync). For CREATE and DELETE actions, this field is <code>NONE</code>.</li>
+</ul>
+<p>The manifest is signed using the sender's private key with the Ed25519 signature algorithm. The signature covers the entire manifest text (from the first byte of the manifest header through the last byte of the last item entry). The signature is appended to the manifest as a final field:</p>
+<ul>
+<li><code>Manifest-Signature</code>: The Ed25519 signature, base64-encoded.</li>
+<li><code>Signing-Key-Fingerprint</code>: The SHA-256 fingerprint of the public key corresponding to the signing private key.</li>
+</ul>
+<h3>4.4 Payload Specification</h3>
+<p>The payload contains the actual data items listed in the manifest. The payload is first assembled as an uncompressed archive, then compressed (if Payload-Compression is not NONE), then encrypted.</p>
+<p><strong>Payload archive format.</strong> The payload is a TAR archive (POSIX.1-2001 / pax format) containing one file per manifest item entry. Each file in the archive is named with the Item-Path from the manifest. The archive contains no directories as separate entries -- directories are implied by the file paths. The archive contains no symlinks, no hard links, no device nodes, and no special files. Only regular files are permitted.</p>
+<p>For DELETE actions, the archive contains a deletion record file at the Item-Path with the extension <code>.deleted</code> appended. The deletion record is a UTF-8 text file containing: the original Item-Hash (the hash of the content being deleted), the deletion timestamp, and the reason for deletion.</p>
+<p><strong>Compression.</strong> If Payload-Compression specifies an algorithm, the TAR archive is compressed as a single unit before encryption. The compressed data is what gets encrypted.</p>
+<p><strong>Encryption.</strong> The compressed (or uncompressed) archive is encrypted using AES-256-GCM. The encryption key is derived from the bilateral trust relationship between the sender and recipient, using HKDF-SHA256 with the following inputs:</p>
+<ul>
+<li>Input key material: The shared secret established during the key exchange ceremony (D17-005).</li>
+<li>Salt: The Package-ID, UTF-8 encoded.</li>
+<li>Info: The string <code>syncpkg-payload-encryption</code>, UTF-8 encoded.</li>
+</ul>
+<p>The AES-256-GCM nonce (96 bits) is randomly generated and prepended to the ciphertext. The GCM authentication tag (128 bits) is appended to the ciphertext.</p>
+<p>The encrypted payload section therefore contains: <code>[nonce (12 bytes)][ciphertext][auth-tag (16 bytes)]</code>.</p>
+<h3>4.5 Integrity Seal Specification</h3>
+<p>The integrity seal covers the entire package: header, manifest, and encrypted payload. It provides tamper detection for the package as a whole, complementing the manifest's per-item hashes and the payload's GCM authentication.</p>
+<p>The integrity seal is computed as follows:</p>
+<ol>
+<li>Concatenate the raw bytes of the header section, manifest section, and payload section (including encryption overhead).</li>
+<li>Compute the SHA-256 hash of the concatenation.</li>
+<li>Sign the hash using the sender's Ed25519 private key.</li>
+</ol>
+<p>The seal section contains:</p>
+<ul>
+<li><code>Seal-Hash</code>: The SHA-256 hash (64 hex characters).</li>
+<li><code>Seal-Signature</code>: The Ed25519 signature of the hash, base64-encoded.</li>
+<li><code>Seal-Key-Fingerprint</code>: The SHA-256 fingerprint of the signing key.</li>
+<li><code>Seal-Timestamp</code>: The time the seal was created, ISO 8601 UTC. This should be within seconds of Created-Timestamp in the header. A significant discrepancy indicates the package was modified after initial creation.</li>
+</ul>
+<h3>4.6 Version Negotiation</h3>
+<p>When two nodes run different software versions, the sync package format version determines compatibility. The negotiation rules are:</p>
+<p><strong>Backward compatibility.</strong> A node running software version N must be able to read sync packages created by software version N or any earlier version. This means every format change must be backward-compatible: new fields may be added to the header and manifest, but existing fields may not be removed or have their semantics changed.</p>
+<p><strong>Forward tolerance.</strong> A node receiving a sync package with a format version higher than its own should attempt to process it. Unknown header fields are ignored. Unknown manifest item types are logged and the items are placed in a quarantine directory for manual review. If the format version is two or more major versions ahead, the node should reject the package and log a warning that a software upgrade is needed.</p>
+<p><strong>Version advertisement.</strong> Each sync package's header includes both the format version and the software version. A node that consistently receives packages with a higher software version knows that it should consider upgrading. This information is logged but does not trigger any automatic action.</p>
+<p><strong>Migration packages.</strong> When a format version change occurs that requires data migration, the upgrading node may include a <code>Format-Migration-Guide</code> item in the payload (Item-Type: SYSTEM). This is a human-readable document explaining the changes and any actions the recipient should take.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li>
+<p><strong>R-D17-007-01: Strict Format Compliance.</strong> Every sync package must comply with this specification in its entirety. A package that omits a required field, uses an unsupported encoding, or violates any structural requirement defined in Section 4 is non-conforming and must be rejected by the receiving node. Partial compliance is not acceptable.</p>
+</li>
+<li>
+<p><strong>R-D17-007-02: Cryptographic Algorithm Constraints.</strong> The encryption algorithm (AES-256-GCM), hash algorithm (SHA-256), signature algorithm (Ed25519), and key derivation function (HKDF-SHA256) are the mandatory algorithms for format version 1. Alternative algorithms may be introduced in future format versions but must not replace these algorithms in version 1 packages. Algorithm agility is achieved through format versioning, not through runtime negotiation.</p>
+</li>
+<li>
+<p><strong>R-D17-007-03: No Executable Content in Payload.</strong> The payload must not contain executable files (binaries, scripts, bytecode) unless the Item-Type is explicitly SYSTEM and the item is a format migration guide or a similar institutional tool. Executable content in sync packages is a supply chain attack vector and is forbidden for all other item types.</p>
+</li>
+<li>
+<p><strong>R-D17-007-04: Path Normalization.</strong> All Item-Path values must be normalized: no <code>.</code> or <code>..</code> components, no double slashes, no trailing slashes, no absolute paths (all paths are relative to the institutional content root). A manifest containing non-normalized paths is non-conforming.</p>
+</li>
+<li>
+<p><strong>R-D17-007-05: Maximum Package Size.</strong> A single sync package must not exceed 128 GB (after compression, before encryption). This limit exists to ensure that packages can be transported on commonly available removable media and can be processed within reasonable time and memory constraints. If the sync scope exceeds this limit, it must be split into multiple sequential packages, linked by a <code>Continuation-Of</code> header field.</p>
+</li>
+<li>
+<p><strong>R-D17-007-06: Hash Verification Is Mandatory Before Application.</strong> After decryption and decompression, every item in the payload must be hash-verified against its manifest entry before any item is applied to the production system. If any single item fails hash verification, the entire package is rejected. This is the atomic integrity rule: the package succeeds as a whole or fails as a whole.</p>
+</li>
+<li>
+<p><strong>R-D17-007-07: Manifest Must Be Verified Before Decryption.</strong> The manifest signature must be verified before the payload is decrypted. If the manifest signature is invalid, the payload is never decrypted. This prevents the processing of payloads whose contents cannot be trusted, even if the outer seal verifies.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Format version mismatch beyond tolerance.</strong> The receiving node encounters a package with a format version it cannot process. The package is unreadable. Mitigation: the version negotiation rules in Section 4.6 define the tolerance range. When a package is rejected due to version mismatch, the rejection is logged with the specific version numbers, providing the operator with clear information about what upgrade is needed. The sending node should include a Format-Migration-Guide when creating packages in a new format version.</p>
+</li>
+<li>
+<p><strong>Algorithm deprecation.</strong> A cryptographic algorithm used in the format is found to be insecure. All existing packages signed or encrypted with that algorithm are potentially compromised. Mitigation: algorithm changes require a new format version. The old format version remains supported for reading (backward compatibility) but is no longer used for creating new packages. A migration period allows nodes to upgrade. The Commentary Section of this article should record any algorithm deprecation decisions.</p>
+</li>
+<li>
+<p><strong>Path encoding conflicts.</strong> The sender's institutional content structure uses characters in Item-Path that the receiver's filesystem cannot represent. Mitigation: the restricted character set in Section 4.3 is deliberately conservative. If a path contains characters outside this set, the manifest is non-conforming and the package is rejected. The sender must rename the item before including it in a sync package.</p>
+</li>
+<li>
+<p><strong>Nonce reuse in encryption.</strong> The same AES-256-GCM nonce is used for two different packages encrypted with the same key. This catastrophically compromises the encryption of both packages. Mitigation: the nonce is randomly generated (96 bits, providing a collision probability of approximately 2^-48 per pair of packages). Additionally, the key derivation uses the Package-ID as salt, meaning that even if the same nonce were generated twice, the derived keys would differ because the Package-IDs differ. This provides defense in depth against nonce reuse.</p>
+</li>
+<li>
+<p><strong>Manifest-payload inconsistency.</strong> The manifest lists items that are not in the payload, or the payload contains items not listed in the manifest. Mitigation: the hash verification procedure (R-D17-007-06) catches missing or corrupted items. An item in the payload but not in the manifest is detected during extraction (unknown files in the archive are flagged and quarantined). Both conditions result in package rejection.</p>
+</li>
+<li>
+<p><strong>Package truncation.</strong> The package file is incomplete -- truncated during write to media or during read from media. Mitigation: the preamble contains section offsets and lengths. If the file is shorter than the offset plus length of any section, the truncation is detected immediately. The integrity seal also fails on a truncated package.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If a sync package fails format validation:</strong> Log the specific validation failure (which field, what value, what was expected). Do not attempt to repair the package. Notify the sender with the specific failure details. The sender should investigate whether the failure is a software bug (the package was created incorrectly), a transport corruption (the package was damaged in transit), or a tampering attempt (the package was deliberately modified). The sender creates and transmits a replacement package.</p>
+</li>
+<li>
+<p><strong>If the receiving node cannot process the package's format version:</strong> Log the version mismatch. Check whether a software upgrade is available on local media. If an upgrade is available and has been validated per Domain 18 procedures, consider upgrading before reprocessing the package. If no upgrade is available, notify the sender that a lower format version is needed. The sender should create a new package using a format version within the receiver's tolerance range.</p>
+</li>
+<li>
+<p><strong>If cryptographic algorithm deprecation is announced:</strong> Do not immediately stop processing existing packages using the deprecated algorithm. Establish a migration timeline. During the migration period, accept packages using either the old or new algorithm. After the migration deadline, reject packages using the deprecated algorithm. Document the migration in the governance log and in this article's Commentary Section.</p>
+</li>
+<li>
+<p><strong>If nonce reuse is detected or suspected:</strong> Identify all packages that may be affected. If the affected packages used the same derived key (same sender-recipient pair), consider the encrypted payloads of those packages as potentially compromised. Re-request the data via new sync packages. Rotate the bilateral encryption keys by performing a new key exchange. Document the incident.</p>
+</li>
+<li>
+<p><strong>If a package exceeds the maximum size limit:</strong> The sender must split the sync scope into multiple packages. Each subsequent package references the previous one via the <code>Continuation-Of</code> header field. The receiving node processes the packages in order, treating them as a single logical sync. If any package in the continuation chain fails validation, the entire chain is rejected.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Format version 1 is established and tested. Expect to discover edge cases not covered by this specification -- unusual characters in paths, unexpected file sizes, compression ratios that challenge memory constraints. Document these discoveries in the Commentary Section. Resist the urge to increment the format version for minor issues; instead, clarify the specification through addenda.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The first format version increment may be needed. New item types, new metadata fields, or new compression algorithms may justify a version 2. The version 2 specification must be written as a companion to this document, not a replacement. Version 1 packages must remain readable indefinitely.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Cryptographic algorithm review becomes critical. SHA-256 and AES-256 are considered strong as of 2026, but cryptographic landscapes change. The institution should monitor (through imported security literature) whether these algorithms remain appropriate. If migration is needed, it should be planned over a multi-year timeline, not rushed.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The sync package format may have gone through multiple version increments. The preamble structure, with its magic number and version field, should remain stable across all versions. A node running in 2076 should be able to read the first eight bytes of any sync package ever created and determine whether it can process it. That is the fifty-year promise of this specification.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The choice of TAR as the payload archive format deserves explanation. TAR is old, simple, well-understood, and implemented in every operating system. It has no compression built in (compression is handled separately), no encryption built in (encryption is handled separately), and no complex metadata that could introduce compatibility issues. It is, in the best sense, boring. Boring is what we want in a format that must be readable in fifty years. ZIP was considered and rejected because its integrated compression and its handling of character encodings have caused decades of interoperability problems. TAR with external compression and external encryption gives us full control over each layer.</p>
+<p>The choice of Ed25519 for signatures and AES-256-GCM for encryption reflects a preference for algorithms that are fast, well-analyzed, and implemented in every major cryptographic library. Ed25519 in particular was chosen because it produces short signatures, has no known weaknesses as of 2026, and is deterministic (the same message and key always produce the same signature, eliminating a class of implementation bugs).</p>
+<p>The 128 GB package size limit is generous by current standards but may seem small in the future. It can be raised in a future format version. The continuation mechanism ensures that even version 1 can handle arbitrarily large syncs through multiple packages.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>D17-001 -- Federation Philosophy (sync package concept; R-D17-05 self-containment requirement)</li>
+<li>D17-003 -- Air-Gapped Synchronization Procedures (sync protocol; package creation and reception steps)</li>
+<li>D17-005 -- Trust Establishment and Verification (key exchange; shared secrets for encryption)</li>
+<li>D17-004 -- Conflict Resolution Between Nodes (Item-Previous-Hash enables conflict detection)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (cryptographic requirements; integrity model)</li>
+<li>ETH-001 -- Ethical Foundations (Principle 3: Transparency; Principle 4: Longevity Over Novelty)</li>
+<li>OPS-001 -- Operations Philosophy (complexity budget; operational sustainability)</li>
+<li>Domain 18 -- Import &amp; Quarantine (content validation after payload extraction)</li>
+<li>Domain 20 -- Institutional Memory (sync event logging)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

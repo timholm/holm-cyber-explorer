@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D8-005 — Emergency Override and Kill Switch Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li class="active"><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d8-005">
+  <h1>D8-005 &mdash; Emergency Override and Kill Switch Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D8-005</dd>
+  <dt>Domain</dt>
+  <dd>8 -- Automation & Agents</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, GOV-001, SEC-001, OPS-001, D8-001, D8-002, D8-003</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D8-004, D8-006, D10-002, D10-003. All articles involving emergency response to automation failures.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines the procedures for immediately halting any or all automation in the institution. It specifies the physical and software kill switches, the emergency shutdown sequence, the post-stop checks, and the restart procedures.</p>
+<p>D8-001 establishes the servant principle: the operator must always be able to stop any automation at any time, immediately, without consequences that cannot be remedied. This article makes that principle operational. When a runaway automation is filling a disk, or a cascading failure is propagating through multiple agents faster than the operator can diagnose, this article tells them exactly what to do.</p>
+<p>Emergency overrides are the last line of defense. The procedures are designed for speed and certainty, sacrificing diagnostic thoroughness for immediacy. Understand what went wrong after the automation is stopped, not while it is still running.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Physical kill switches: hardware-level mechanisms to halt automation.</li>
+<li>Software kill switches: command-level mechanisms for specific or total automation halt.</li>
+<li>The emergency shutdown sequence.</li>
+<li>Post-stop checks and damage assessment.</li>
+<li>Restart procedures.</li>
+<li>Kill switch testing requirements.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>Routine intervention (see D8-003).</li>
+<li>Planned decommissioning (see D8-004).</li>
+<li>General system emergency procedures (see D10-003).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Kill Switches Must Be Pre-Planned</h3>
+<p>In an emergency, the operator does not have time to read documentation or reason about dependencies. They need a procedure they can execute from memory or from a laminated card on the wall. These procedures are designed in advance, tested regularly, and maintained as the automation estate changes.</p>
+<h3>3.2 Physical Versus Software Kill Switches</h3>
+<p>Software kill switches are precise, auditable, and can target specific automations. But they can fail: the process may not respond to signals, the command may hang, the system may be overloaded. Physical kill switches -- disconnecting power, unplugging storage -- are crude but reliable. Both levels must be documented, maintained, and tested.</p>
+<h3>3.3 The Cascading Failure Scenario</h3>
+<p>The most dangerous automation emergency is cascading failure: one automation's failure triggers another's error handler, which makes incorrect decisions, triggering a third, and so on. The speed exceeds human comprehension. The correct response is not diagnosis -- it is immediate total shutdown, followed by diagnosis at leisure.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Kill Switch Architecture</h3>
+<p>Three levels, each more aggressive:</p>
+<p><strong>Level 1: Individual Agent Kill.</strong> Halts a single automation.
+1. Identify the agent ID.
+2. Execute the kill command from ASD Section E (typically <code>systemctl stop [service-name]</code>, <code>kill $(cat [pidfile])</code>, or cron removal).
+3. Verify: check process list, check log for shutdown entry, confirm PID file removal.
+4. Record in operational log.</p>
+<p><strong>Level 2: Category Kill.</strong> Halts all automation in a functional category (e.g., all backup agents).
+1. Execute <code>/institution/automation/kill-category.sh [category]</code> -- reads the inventory, executes individual kills in sequence.
+2. If the script fails, fall back to individual Level 1 kills for each agent in the category.
+3. Verify all agents stopped. Record in operational log.</p>
+<p><strong>Level 3: Total Kill.</strong> Halts all automation.</p>
+<p><em>Software Total Kill:</em>
+1. Execute <code>/institution/automation/kill-all.sh</code> -- disables all cron jobs and systemd timers, sends SIGTERM to all automation processes (identified by service accounts per SEC-002), waits 10 seconds, sends SIGKILL to remainders, logs every action.
+2. If the script fails, execute manually:
+   - Disable cron: <code>for user in $(cat /institution/automation/service-accounts.list); do crontab -r -u $user; done</code>
+   - Disable systemd: <code>systemctl stop institution-automation.target</code>
+   - Kill processes: <code>for user in $(cat /institution/automation/service-accounts.list); do pkill -u $user; done</code>
+3. Verify: <code>ps -u [each service account]</code> returns no processes.</p>
+<p><em>Physical Total Kill (last resort):</em>
+If software methods fail or the system is unresponsive:
+1. Disconnect power to the automation server (or primary server if shared). This is a hard shutdown affecting all services.
+2. If UPS is present, press the UPS power button or disconnect the machine from UPS.
+3. Physical kills risk data corruption and filesystem damage. Use only when software methods have failed and automation is causing active, ongoing harm exceeding the harm of a hard shutdown.</p>
+<h3>4.2 The Emergency Shutdown Sequence</h3>
+<p>Step 1: <strong>Stop the harm.</strong> If you know which automation is causing the problem, Level 1 kill immediately.</p>
+<p>Step 2: <strong>Assess scope.</strong> Confined to one agent, or spreading? If unsure or spreading, proceed to Level 3 total kill immediately. Err on the side of stopping too much.</p>
+<p>Step 3: <strong>Execute the kill.</strong> Level 1, 2, or 3 matching your uncertainty. When in doubt, Level 3.</p>
+<p>Step 4: <strong>Verify.</strong> Confirm targeted automation has halted. Check process lists, logs, and that harmful behavior has stopped.</p>
+<p>Step 5: <strong>Secure.</strong> Do not restart anything. Disable scheduled triggers to prevent automatic restart. Record the time and reason.</p>
+<p>Step 6: <strong>Proceed to post-stop checks.</strong></p>
+<h3>4.3 Post-Stop Checks</h3>
+<p><strong>Data Integrity.</strong> Examine data stores the automation had write access to. Compare against last known-good state (recent backup or integrity verification per D6-007). Do not attempt repair until the cause is understood.</p>
+<p><strong>System State.</strong> Other services functioning? Disk space adequate? Filesystems healthy? If physical kill was used, run filesystem checks after restoration.</p>
+<p><strong>Log Analysis.</strong> Read logs from the last known-good run forward. Identify what changed and what actions the automation took during the failure.</p>
+<p><strong>Scope of Damage.</strong> What damage occurred? Confined to documented scope or wider? Reversible? Any ongoing risk?</p>
+<p><strong>Root Cause.</strong> Identify why the failure occurred before restarting. Common causes: resource exhaustion, dependency failure, unexpected input, software bug, environmental change. If root cause is unknown, the automation must not restart until identified or a Tier 2 risk-acceptance decision is made per GOV-001.</p>
+<h3>4.4 Restart Procedures</h3>
+<p><strong>Single-Agent Restart:</strong> Verify root cause addressed. Review ASD. If automation was modified, run relevant D8-002 checklist items. Restart and actively monitor the first run (watch logs in real time). Verify success before returning to normal monitoring. If first run fails, halt and investigate further.</p>
+<p><strong>Category Restart:</strong> Restart one agent at a time in criticality order. Verify each before starting the next. Monitor for inter-agent interaction issues.</p>
+<p><strong>Total Restart:</strong> Restart in priority order, one group at a time:
+- Priority 1: Data protection (backup, integrity verification).
+- Priority 2: System monitoring (disk space, hardware health).
+- Priority 3: Operational (log rotation, cleanup, reporting).
+- Priority 4: All others.</p>
+<p>Within each group, restart one agent at a time per the single-agent procedure. Total restart may take hours or days. During the restart period, perform all automated tasks manually using ASD fallback procedures. Simultaneous restart of all automation is prohibited.</p>
+<h3>4.5 Kill Switch Testing</h3>
+<p><strong>Individual Kill Test:</strong> Annually during D8-004 audit, and during D8-002 code review for new automation.</p>
+<p><strong>Category Kill Test:</strong> Semi-annually. Verify correct agent identification and successful stop.</p>
+<p><strong>Total Kill Test:</strong> Annually during a scheduled maintenance window. Execute total kill, perform post-stop checks, restart all automation using the total restart procedure. This also exercises restart procedures and manual fallback.</p>
+<p><strong>Physical Kill Test:</strong> Annual review of physical access to power controls. Actual disconnection test only when data loss risk is acceptable (e.g., after verified backup).</p>
+<p><strong>Laminated Quick-Reference Card:</strong> A summary of the emergency shutdown sequence posted in Zone 1 per SEC-002. Contains essential commands and physical kill procedure, written for execution under stress. Updated whenever procedures change. Verified during annual test.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D8-05-01:</strong> Every automation must have a documented kill procedure in ASD Section E.</li>
+<li><strong>R-D8-05-02:</strong> Kill scripts (<code>kill-all.sh</code>, <code>kill-category.sh</code>) must be updated whenever the automation inventory changes.</li>
+<li><strong>R-D8-05-03:</strong> In a suspected cascading failure, execute Level 3 total kill immediately. Diagnosis follows the stop.</li>
+<li><strong>R-D8-05-04:</strong> No restart after emergency kill until post-stop checks are complete and root cause is understood or risk-acceptance is documented.</li>
+<li><strong>R-D8-05-05:</strong> Kill switch tests must follow the schedules in Section 4.5. A failed test means the automation is paused until the kill switch is repaired.</li>
+<li><strong>R-D8-05-06:</strong> Physical kill must be executable without software interaction. Power connections must be accessible without moving equipment or unlocking additional enclosures.</li>
+<li><strong>R-D8-05-07:</strong> The laminated quick-reference card must be posted in Zone 1 and updated whenever procedures change.</li>
+<li><strong>R-D8-05-08:</strong> After total kill, restart one agent at a time in priority order. Simultaneous restart is prohibited.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Kill switch rot.</strong> Scripts reference agents that no longer exist or miss newly added agents. Mitigation: R-D8-05-02 ties updates to inventory changes. Annual total kill test catches drift.</p>
+</li>
+<li>
+<p><strong>Untested kill procedures.</strong> ASD kill commands have never been tested during execution. Mitigation: D8-002 code review includes kill test; annual testing per Section 4.5.</p>
+</li>
+<li>
+<p><strong>Panic-driven diagnosis.</strong> The operator tries to understand the problem while automation is still running. Mitigation: R-D8-05-03 and the shutdown sequence are explicit: stop first, diagnose second.</p>
+</li>
+<li>
+<p><strong>Premature restart.</strong> Operator restarts without completing post-stop checks. Root cause persists. Problem recurs. Mitigation: R-D8-05-04 prohibits restart without checks.</p>
+</li>
+<li>
+<p><strong>Physical access obstruction.</strong> Power cable is inaccessible. Mitigation: R-D8-05-06 requires unobstructed access, verified annually.</p>
+</li>
+<li>
+<p><strong>Card staleness.</strong> Laminated card references outdated commands. Mitigation: tied to kill script updates; verified during annual test.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If the total kill script fails during an emergency:</strong> Fall back to manual software kill immediately. If that also fails, use the physical kill. Debug the script afterward, not during the emergency.</p>
+</li>
+<li>
+<p><strong>If physical kill caused data corruption:</strong> Boot from recovery media. Run filesystem checks before mounting read-write. Compare against verified backup. Restore from backup per D6-006 if corruption is confirmed.</p>
+</li>
+<li>
+<p><strong>If root cause cannot be identified:</strong> Document everything known. Make a documented Tier 2 decision per GOV-001 about whether to restart with enhanced monitoring (reduce to Level 2 requiring human approval) or leave disabled until more information is available.</p>
+</li>
+<li>
+<p><strong>If restart reveals multiple agents affected by the same root cause:</strong> Stop the restart. The common cause may be environmental. Address it before restarting any agent.</p>
+</li>
+<li>
+<p><strong>If the laminated card is missing during an emergency:</strong> Consult this document. Replace the card immediately afterward. Consider a second card at a different location.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> Practice the shutdown sequence even when nothing is wrong. Build muscle memory. The total kill test is a brief exercise with a small inventory.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Larger inventory makes kill scripts more complex. Category kills become important. Annual total kill test may take several hours for the full restart.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> Hardware changes require updates to physical kill procedures. New operators must practice until the response is reflexive.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The kill switch architecture must remain simple even as the automation estate evolves. The kill switch is the one system that must work when everything else is broken.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the software total kill takes more than 5 minutes or the physical kill more than 30 seconds, the procedures or infrastructure need simplification.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The laminated card may be the most important artifact in this article. Everything else is documentation I will consult at leisure. The card is what I will read at 2 AM when something is on fire and my hands are shaking. It needs to be right, and it needs to be where I can see it.</p>
+<p>I have made the total kill procedure aggressive. When in doubt, stop everything. The cost of stopping everything is manual labor during restart. The cost of not stopping everything is potential data loss and cascading damage. Manual labor is always cheaper.</p>
+<p>The restart procedure is deliberately slow -- one agent at a time, verified before the next. This feels agonizing when ten agents are down. But the restart is the moment of greatest risk: if the root cause was not fully addressed, the first restart triggers the problem again. Slow restart limits the blast radius of an incomplete fix.</p>
+<p>Physical kill switches feel anachronistic. They are not. Pulling a power cord always works. Everything else is a best effort.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 1: Sovereignty; Principle 2: Integrity Over Convenience)</li>
+<li>CON-001 -- The Founding Mandate (human authority over all institutional systems)</li>
+<li>GOV-001 -- Authority Model (Tier 2 decisions for restart with unknown root cause)</li>
+<li>SEC-001 -- Threat Model (Pillar 1: Assume Breach, Prevent Breach)</li>
+<li>SEC-002 -- Access Control Procedures (Zone 1, service accounts)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle)</li>
+<li>D6-001 -- Data Philosophy (data tier system, integrity requirements)</li>
+<li>D6-006 -- Backup Doctrine (restoration after corruption)</li>
+<li>D6-007 -- Data Integrity &amp; Verification (post-stop integrity checks)</li>
+<li>D8-001 -- Automation Philosophy: The Restraint Doctrine (servant principle, kill switch mandate)</li>
+<li>D8-002 -- Agent Design Principles (ASD Section E, code review kill test)</li>
+<li>D8-003 -- Human-in-the-Loop Procedures (escalation matrix, Severity 4)</li>
+<li>D8-004 -- Automation Audit (annual kill switch testing)</li>
+<li>D10-002 -- Daily Operations Doctrine (manual fallback during restart)</li>
+<li>D10-003 -- Incident Response Procedures (broader incident response)</li>
+<li>Stage 1 Documentation Framework, Domain 8: Automation &amp; Agents</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEC-014 — Security Documentation and Classification - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li class="active"><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="sec-014">
+  <h1>SEC-014 &mdash; Security Documentation and Classification</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>SEC-014</dd>
+  <dt>Domain</dt>
+  <dd>3 -- Security &amp; Integrity</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>SEC-002 (Access Control), SEC-008 (Security Audit Framework)</dd>
+  <dt>Depended Upon By</dt>
+  <dd>None (internal process document)</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution handles security-sensitive information within its own documentation. Not all information in the institution is equally sensitive. The philosophical principles in Domain 1 are public by design -- their strength comes from transparency, not secrecy. But cryptographic key identifiers, specific hardware configurations, backup locations, and vulnerability assessments are sensitive and must be handled with appropriate care.</p>
+
+<p>The challenge in a single-operator institution is that the operator has access to everything. Classification does not restrict access in the traditional sense. Instead, it serves three purposes. First, it informs the operator about which information requires special handling -- what should not be written on paper left in public, what should not be discussed casually, what should not be included in documents that might leave the institutional perimeter. Second, it informs a future successor about which information carries elevated sensitivity, since the successor may not have the founding operator's intuitive understanding of what matters. Third, it determines how information is stored, backed up, and protected within the institution's zone architecture.</p>
+
+<p>This article establishes the classification system, defines the handling requirements for each classification level, and describes how classification decisions are made and reviewed.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The classification levels used within the institution.</li>
+<li>The criteria for assigning each classification level.</li>
+<li>Handling requirements for each level: storage, access, backup, and disposal.</li>
+<li>The process for classifying and reclassifying information.</li>
+<li>The relationship between classification and the zone architecture (SEC-009).</li>
+<li>Classification of the security documentation itself (a meta-question this article must address).</li>
+</ul>
+
+<p>This article does not cover access control mechanisms (SEC-002), cryptographic protection of classified data (SEC-010), or the physical security of storage locations (SEC-006). Those articles provide the tools; this article defines the policy that determines when and how those tools are applied.</p>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Paradox of Security Documentation</h3>
+<p>Security documentation exists in tension with itself. The documentation must be detailed enough to be useful -- a successor must be able to understand and maintain the institution's security systems using only the documentation. But the documentation must also be careful about what it reveals -- specific key identifiers, vulnerability assessments, and implementation details could be exploited if they fell into the wrong hands.</p>
+
+<p>The institution resolves this tension through the Kerckhoffs principle (SEC-010): the security of the institution must not depend on the secrecy of its documentation. The algorithms are public. The procedures are public. The architecture is public. Only the keys are secret. This principle means that most security documentation can be classified at the lowest sensitivity level, because reading it does not compromise the institution. The small number of documents that contain actual secret material -- key inventories, specific vulnerability assessments, succession credentials -- require elevated classification.</p>
+
+<h3>3.2 Classification in a Single-Operator Context</h3>
+<p>In a conventional organization, information classification controls who can access what. In this institution, where a single operator has access to everything, classification serves a different function. It serves as a labeling system that tells the operator (and future successors) how to handle information appropriately. A document classified as "restricted" does not become inaccessible to the operator. It becomes a document that the operator knows must be stored in Zone A, must not be copied to Zone B without encryption, must not be included in any material that crosses the institutional perimeter, and must be destroyed securely when it is no longer needed.</p>
+
+<p>Classification is therefore a set of handling instructions encoded as a label. The label triggers a set of behaviors. The behaviors protect the information. This indirect mechanism -- label triggers behavior, behavior provides protection -- works only if the operator has internalized the handling requirements for each label. This article defines those requirements.</p>
+
+<h3>3.3 Over-Classification as a Failure Mode</h3>
+<p>The temptation is to classify everything as highly sensitive. This is a common failure in classification systems, and it is counterproductive for two reasons. First, if everything is classified as sensitive, nothing is distinguishable from anything else, and the operator cannot prioritize protection efforts. The key inventory and the style guide receive the same handling, which means either the style guide is over-protected (wasteful) or the key inventory is under-protected (dangerous). Second, over-classification creates operational friction that leads to classification fatigue, where the operator begins to ignore classification labels because they are perceived as meaningless.</p>
+
+<p>The classification system defined here is deliberately simple and deliberately conservative in what it elevates to higher sensitivity levels. Most institutional documentation is unclassified. A small number of documents contain sensitive operational details. An even smaller number contain secret material. This pyramid shape is intentional.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Classification Levels</h3>
+<p>The institution uses three classification levels:</p>
+
+<p><strong>Level 1: Open.</strong> Information that can be known by anyone without compromising the institution's security. This includes: all constitutional and philosophical documents (Domain 1), all governance procedures (Domain 2), all security framework documents (Domain 3, except as noted), all operational procedures that do not reveal specific implementation vulnerabilities, and all educational and training materials (Domain 9). The Kerckhoffs principle means that the vast majority of institutional documentation is Open. The institution's security does not depend on the secrecy of its architecture, algorithms, or procedures.</p>
+
+<p><strong>Level 2: Restricted.</strong> Information that would provide a meaningful advantage to an adversary or whose exposure would create operational risk. This includes: specific hardware configurations and their security properties (e.g., which USB ports are disabled and how), specific software versions and their known limitations, vulnerability assessments and penetration testing results, physical security details (specific lock types, sensor placements, alarm configurations), incident response logs that reveal specific weaknesses, and self-audit records that document procedural deviations. Restricted information must be stored in Zone A or Zone B (never Zone C), must be encrypted at rest, and must not cross the institutional perimeter.</p>
+
+<p><strong>Level 3: Secret.</strong> Information whose exposure would directly compromise institutional security. This includes: cryptographic key material and key identifiers, passphrases and authentication credentials, succession credentials and emergency access procedures, the specific locations of geographically distributed backups, and any information that would allow unauthorized access to institutional systems. Secret information must be stored only in Zone A, must be encrypted with the strongest available algorithms, must be backed up only to locations with equivalent physical security, and must be destroyed using secure deletion procedures when no longer needed.</p>
+
+<h3>4.2 Classification Criteria</h3>
+<p>The classification of a piece of information is determined by answering one question: what is the worst thing that could happen if this information were known by an adversary?</p>
+
+<p>If the answer is "nothing significant" -- the adversary gains no actionable advantage -- the information is Open.</p>
+
+<p>If the answer is "the adversary gains knowledge that would make attacking the institution easier, but does not directly enable an attack" -- the adversary learns where to look, but not how to get in -- the information is Restricted.</p>
+
+<p>If the answer is "the adversary could directly compromise the institution's security" -- the adversary gains credentials, key material, or access paths that would permit unauthorized access -- the information is Secret.</p>
+
+<p>When in doubt, classify at the higher level and reclassify downward after review. The cost of brief over-classification is minor inconvenience. The cost of under-classification is potential exposure.</p>
+
+<h3>4.3 Handling Requirements by Level</h3>
+
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Open</th>
+<th>Restricted</th>
+<th>Secret</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Storage zones</td>
+<td>Any zone</td>
+<td>Zone A or B only</td>
+<td>Zone A only</td>
+</tr>
+<tr>
+<td>Encryption at rest</td>
+<td>Per zone policy</td>
+<td>Required</td>
+<td>Required (strongest available)</td>
+</tr>
+<tr>
+<td>May cross perimeter</td>
+<td>Yes (per procedures)</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Backup locations</td>
+<td>Standard backup policy</td>
+<td>Encrypted backups only</td>
+<td>Equivalent-security locations only</td>
+</tr>
+<tr>
+<td>Disposal method</td>
+<td>Standard deletion</td>
+<td>Secure deletion</td>
+<td>Secure deletion with verification</td>
+</tr>
+<tr>
+<td>Access logging</td>
+<td>Standard</td>
+<td>Enhanced</td>
+<td>Full audit trail</td>
+</tr>
+<tr>
+<td>Review frequency</td>
+<td>Standard review cycle</td>
+<td>Annual classification review</td>
+<td>Semi-annual classification review</td>
+</tr>
+</tbody>
+</table>
+
+<h3>4.4 Classification of Security Documentation</h3>
+<p>This section addresses the meta-question: what is the classification of the Domain 3 security documents themselves?</p>
+
+<p>Per the Kerckhoffs principle, the security framework documents -- including this one -- are classified as Open. They describe the institution's security architecture, threat model, and procedures. They do not contain key material, credentials, or specific vulnerability details. An adversary who reads these documents learns how the institution thinks about security, but gains no direct avenue of attack.</p>
+
+<p>Specific annexes or companion documents that contain implementation details (hardware configurations, vulnerability scan results, key inventories) are classified at Level 2 or Level 3 as appropriate. These annexes are referenced from the framework documents but stored and handled according to their own classification.</p>
+
+<p>The classification of each document is stated in its metadata header. If no classification is stated, the document is assumed to be Open. This default-open stance is deliberate: it reflects the Kerckhoffs principle and prevents the over-classification failure mode described in Section 3.3.</p>
+
+<h3>4.5 Reclassification</h3>
+<p>Information may be reclassified in either direction. Downward reclassification (from Secret to Restricted, or from Restricted to Open) occurs when the reason for the original classification no longer applies -- for example, when a cryptographic key has been rotated and the old key identifier is no longer sensitive. Upward reclassification occurs when new information reveals that a previously Open document contains details that are more sensitive than initially assessed.</p>
+
+<p>Reclassification decisions are documented in the provenance record of the affected document. The reclassification record includes: the previous classification, the new classification, the date of reclassification, and the reasoning. This record ensures that the classification history of every document is traceable.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-SC-01:</strong> Every document in the institution must have an explicit classification. If no classification is assigned, the document defaults to Open. This default is by design, not by oversight.</li>
+<li><strong>R-SC-02:</strong> Classification decisions must be based on the worst-case adversary impact test described in Section 4.2. Classification must not be based on the document's perceived importance, prestige, or the effort invested in creating it. Importance and sensitivity are different properties.</li>
+<li><strong>R-SC-03:</strong> Secret information must never exist in Zone B or Zone C, even temporarily. If Secret material must be accessed during operations in Zone B, it must be accessed by reference (consulting Zone A) rather than by copy (moving data to Zone B).</li>
+<li><strong>R-SC-04:</strong> When a document contains information at multiple classification levels, the document as a whole must be classified at the highest level of any information it contains. Alternatively, the sensitive portions may be extracted into a separate, higher-classified annex, and the main document may remain at its lower classification with a reference to the annex.</li>
+<li><strong>R-SC-05:</strong> Classification reviews must be conducted annually for Restricted documents and semi-annually for Secret documents. The review must assess whether the classification remains appropriate or whether reclassification (in either direction) is warranted.</li>
+<li><strong>R-SC-06:</strong> Secure deletion of Restricted and Secret material must follow documented procedures that ensure the data is not recoverable. For magnetic media, this means overwriting. For solid-state media, this means using the media's secure erase command followed by physical destruction if the media is being decommissioned. Standard file deletion (which merely removes the directory entry) is insufficient for Restricted and Secret material.</li>
+<li><strong>R-SC-07:</strong> The classification system must be simple enough that the operator can apply it consistently without constant reference to this document. Three levels are sufficient. Adding additional levels requires a formal amendment to this article with justification that the existing three levels are insufficient.</li>
+<li><strong>R-SC-08:</strong> Classification does not restrict the operator's access. The operator has access to all classification levels. Classification determines handling requirements, not access permissions. This distinction is critical in a single-operator institution and must be understood by any successor.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Over-classification.</strong> Too many documents are classified at Restricted or Secret, diluting the signal value of higher classifications and creating operational burden. Mitigation: the default-Open stance, the adversary impact test, and R-SC-07's simplicity requirement all push against over-classification. The annual classification review provides opportunities to downgrade documents that were initially over-classified.</li>
+<li><strong>Under-classification.</strong> Genuinely sensitive information is classified as Open and handled without appropriate safeguards. Mitigation: the adversary impact test is designed to catch this. When in doubt, classify higher. The semi-annual review of Secret documents and annual review of Restricted documents provide checkpoints.</li>
+<li><strong>Classification drift.</strong> Over time, the operator stops assigning classifications to new documents, and the system degrades. Mitigation: the default-Open rule means that unclassified documents are treated as Open, which is safe for the majority of documents. The audit framework (SEC-008) includes classification compliance as a checkpoint.</li>
+<li><strong>Handling non-compliance.</strong> Documents are correctly classified but handled incorrectly -- Secret material is copied to Zone B for convenience, Restricted documents are not securely deleted. Mitigation: the self-audit (SEC-013) includes handling compliance. The zone separation architecture (SEC-009) provides structural barriers against casual handling errors.</li>
+<li><strong>Succession confusion.</strong> A successor does not understand the classification system or its handling requirements, and mishandles sensitive material. Mitigation: this document must be among the first that a successor reads during the onboarding process defined in GOV-001. The classification labels on documents serve as persistent reminders of handling requirements.</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If Secret material is found in an inappropriate zone:</strong> Immediately delete the copy from the inappropriate zone using secure deletion. Verify that no further copies exist outside Zone A. Assess whether the material was exposed to any context where it could have been compromised (e.g., if Zone C hardware had access to the material, treat it as a potential exposure). Document the incident. Review the circumstances that led to the misplacement and update procedures to prevent recurrence.</li>
+<li><strong>If a document is discovered to be under-classified:</strong> Immediately reclassify it at the appropriate level. Apply the handling requirements for the new classification retroactively: move the document to the appropriate zone, ensure encryption, verify that no copies exist in unauthorized locations. If the document was handled as Open when it should have been Restricted or Secret, assess the exposure risk and treat as an incident if the exposure could have been harmful.</li>
+<li><strong>If the classification system has fallen into disuse:</strong> Conduct a comprehensive classification review of all institutional documents. This is a labor-intensive process, but it is necessary to restore the system's integrity. Prioritize the review by starting with documents most likely to contain sensitive material (key management records, audit logs, incident reports) and working outward. Re-establish the classification discipline going forward.</li>
+<li><strong>If secure deletion was not performed for decommissioned material:</strong> If the material is still physically accessible, perform secure deletion retroactively. If the material has left the operator's physical control (e.g., a decommissioned drive was discarded without secure deletion), assess the worst-case exposure. If Secret material may have been on the media, treat it as a potential key compromise and consider key rotation.</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-2:</strong> Establish the classification system and classify all existing documents. The initial classification pass will be the most labor-intensive. Most documents will be Open. A small set will be Restricted. A very small set will be Secret. Get the initial classification right; it is much harder to reclassify hundreds of documents later than to classify them correctly now.</li>
+<li><strong>Years 2-5:</strong> The classification system should be routine. New documents are classified as they are created. Classification reviews happen on schedule. The three-level system should prove adequate for the institution's needs. If it does not, assess why before adding complexity.</li>
+<li><strong>Years 5-15:</strong> As the institution's document corpus grows, the classification review may require more time. Consider developing a prioritized review schedule that focuses on documents most likely to need reclassification (e.g., documents referencing specific technology that has changed, incident reports whose findings are no longer sensitive).</li>
+<li><strong>Years 15-30:</strong> Much of the early Secret material (initial key identifiers, original hardware configurations) may have been reclassified downward as keys were rotated and hardware was replaced. The classification system's value lies increasingly in managing currently sensitive material rather than protecting historical secrets.</li>
+<li><strong>Years 30-50+:</strong> The classification system should be one of the most stable components of the institution's security architecture. Three levels. Clear criteria. Documented handling requirements. The system's simplicity is its strength: it is easy to teach to successors, easy to maintain, and resistant to the complexity creep that undermines more elaborate classification schemes.</li>
+</ul>
+
+</section>
+<section>
+<h2>Founder Commentary</h2>
+
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I debated whether this article was necessary for a single-operator institution. If I have access to everything, what does classification accomplish? The answer came when I thought about succession. Someday, someone will inherit this institution and will need to know, immediately and unambiguously, which documents contain material that must be protected with extra care. They will not have time to read every document and assess its sensitivity from scratch. They need labels. They need a system. They need this article.</p>
+
+<p>I also realized that classification serves me now, not just my successor later. When I am handling a document classified as Secret, the label reminds me to be careful. Not to leave it displayed on screen when I step away. Not to include its contents in notes that might leave the institutional perimeter. Not to let it exist in a zone where it does not belong. The label is a trigger for discipline, and discipline is a perishable commodity that needs regular reinforcement.</p>
+
+<p>Three levels. No more. The moment you have more than three levels, you spend more time arguing about classification than protecting information. Open, Restricted, Secret. If you cannot decide between them, use the adversary impact test. If you still cannot decide, classify higher and move on. The system works by being simple enough to use every time, not by being sophisticated enough to handle every edge case.</p>
+
+</section>
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>SEC-001 -- Threat Model and Security Philosophy (the threat model that classification protects against)</li>
+<li>SEC-002 -- Access Control Procedures (access mechanisms referenced by handling requirements)</li>
+<li>SEC-008 -- Security Audit Framework (classification compliance as an audit checkpoint)</li>
+<li>SEC-009 -- Trust Boundary Definitions (zone architecture that underpins storage requirements)</li>
+<li>SEC-010 -- Cryptographic Principles and Standards (Kerckhoffs principle; encryption standards for classified material)</li>
+<li>SEC-013 -- Insider Threat Considerations (self-audit includes classification compliance)</li>
+<li>GOV-001 -- Authority Model (succession onboarding must include classification training)</li>
+<li>Domain 6 -- Data &amp; Archives (archival storage of classified material)</li>
+</ul>
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

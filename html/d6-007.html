@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D6-007 — Metadata Standards and Procedures - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li class="active"><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d6-007">
+  <h1>D6-007 &mdash; Metadata Standards and Procedures</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D6-007</dd>
+  <dt>Domain</dt>
+  <dd>6 -- Data & Archives</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D6-001, D6-002, D6-003, D6-004</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D6-005, D6-006, D6-008, D6-009, D6-011, D6-014. All articles involving data cataloguing, search, or retrieval.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how metadata is created, maintained, and used within the holm.chat Documentation Institution. Metadata is data about data -- the descriptive, structural, and administrative information that makes institutional data findable, understandable, and manageable over time. Without metadata, a file is an opaque blob of bytes. Its name hints at its contents. Its timestamp suggests when it was created. But its purpose, its relationships, its classification, its provenance, and its retention requirements are unknown. Metadata is what transforms a file from an artifact into a record.</p>
+<p>In an air-gapped institution designed to persist for fifty years, metadata is not a convenience. It is infrastructure. The metadata is what will allow a future operator who has never seen a particular file to understand what it is, where it came from, why it was kept, and how it relates to everything else in the archive. Without metadata, institutional data degrades from knowledge to noise over a single generation.</p>
+<p>D6-001 establishes the principle that data without context is noise. This article provides the procedures that create and maintain that context. It defines the required metadata fields for every data type, the quality checks that ensure metadata remains accurate, the search and discovery mechanisms that use metadata to make the archive useful, and the metadata audit that verifies compliance.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>The institutional metadata schema: what fields are required, recommended, and optional for each data type.</li>
+<li>Metadata creation procedures: how and when metadata is generated.</li>
+<li>Metadata maintenance: how metadata is updated as data moves through its lifecycle.</li>
+<li>Metadata quality checks: how to verify that metadata is complete, accurate, and consistent.</li>
+<li>Search and discovery: how metadata enables finding data in the archive.</li>
+<li>The metadata catalogue: the central index of all institutional metadata.</li>
+<li>The metadata audit: scheduled verification of metadata health.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The canonical data model (see D6-002).</li>
+<li>Archive directory structure and naming (see D6-004, though metadata and naming are related).</li>
+<li>File format specifications (see D6-003).</li>
+<li>Retention decisions informed by metadata (see D6-011).</li>
+<li>The data ingest process that triggers initial metadata creation (see D6-014).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Metadata Crisis</h3>
+<p>The metadata crisis is not that metadata is missing. It is that metadata is absent precisely when it is needed most -- years after the data was created, when the original context has evaporated. The person who created the file knew what it was. They did not need metadata to understand it. But the person who discovers the file ten years later, or the successor operator who inherits the archive, has none of that implicit knowledge. They need metadata, and if the metadata was never created, the data is effectively orphaned.</p>
+<p>This crisis is universal in digital systems. Email archives with millions of messages and no tagging. Photo libraries with thousands of images and no descriptions. Document collections where the folder name "Projects" contains three hundred undifferentiated files. The institutional answer is not to hope that future operators will intuit the meaning of old data. It is to capture the meaning now, while the context exists, in a structured and durable form.</p>
+<h3>3.2 Metadata in an Air-Gapped Environment</h3>
+<p>In a connected environment, metadata can be enriched automatically -- machine learning classifies images, natural language processing extracts keywords, linking to external databases provides context. In an air-gapped institution, all metadata creation is manual or generated by local tools. There is no external enrichment. The operator creates the metadata, and the quality of the metadata depends entirely on the operator's diligence.</p>
+<p>This constraint makes metadata procedures more important, not less. The effort of creating good metadata at the time of data creation is small. The effort of retroactively adding metadata to years of untagged data is enormous and often impossible because the context has been lost.</p>
+<h3>3.3 Metadata Is a Promise to the Future</h3>
+<p>Every metadata record is a message from the present to the future. It says: "This is what this data is. This is where it came from. This is why it matters. This is how it relates to everything else." The integrity of that message depends on the metadata being created honestly, maintained faithfully, and preserved alongside the data it describes. Metadata that is fabricated, neglected, or allowed to drift from reality is worse than no metadata, because it creates false confidence.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Metadata Schema</h3>
+<p>Every piece of data in the institution carries metadata organized in three layers:</p>
+<p><strong>Layer 1: Core Metadata (Required for all data, no exceptions).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>Unique identifier. Format: <code>[domain]-[YYYYMMDD]-[sequence]</code></td>
+<td><code>D6-20260215-0042</code></td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>Human-readable title of the data item</td>
+<td><code>Quarterly Archive Audit Report Q1 2026</code></td>
+</tr>
+<tr>
+<td><code>created</code></td>
+<td>Creation date in ISO 8601 format</td>
+<td><code>2026-02-15</code></td>
+</tr>
+<tr>
+<td><code>creator</code></td>
+<td>Who or what created the data</td>
+<td><code>operator</code> or <code>syslog-daemon</code></td>
+</tr>
+<tr>
+<td><code>tier</code></td>
+<td>Data tier per D6-001 (1, 2, 3, or 4)</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>format</code></td>
+<td>File format and version</td>
+<td><code>text/markdown; charset=utf-8</code></td>
+</tr>
+<tr>
+<td><code>checksum</code></td>
+<td>SHA-256 hash of the content</td>
+<td><code>a1b2c3d4...</code></td>
+</tr>
+<tr>
+<td><code>archived</code></td>
+<td>Date the item entered the archive</td>
+<td><code>2026-03-01</code></td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>One-paragraph summary of the content</td>
+<td>Free text, 50-300 words</td>
+</tr>
+<tr>
+<td><code>retention</code></td>
+<td>Retention class per D6-011</td>
+<td><code>permanent</code> or <code>5-year</code> or <code>transient</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Layer 2: Contextual Metadata (Required for Tier 1 and Tier 2; recommended for Tier 3).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>domain</code></td>
+<td>The institutional domain this data belongs to</td>
+<td><code>6</code></td>
+</tr>
+<tr>
+<td><code>project</code></td>
+<td>Associated project, if any</td>
+<td><code>archive-system-v2</code></td>
+</tr>
+<tr>
+<td><code>related</code></td>
+<td>IDs of related data items</td>
+<td><code>[D6-20260210-0038, D6-20260212-0040]</code></td>
+</tr>
+<tr>
+<td><code>supersedes</code></td>
+<td>ID of item this data replaces, if any</td>
+<td><code>D6-20260101-0015</code></td>
+</tr>
+<tr>
+<td><code>provenance</code></td>
+<td>Origin chain: how this data came to exist</td>
+<td><code>Created during Q1 audit per D6-004</code></td>
+</tr>
+<tr>
+<td><code>classification</code></td>
+<td>Security classification per SEC-001</td>
+<td><code>institutional</code> or <code>restricted</code></td>
+</tr>
+<tr>
+<td><code>keywords</code></td>
+<td>Controlled vocabulary terms for search</td>
+<td><code>[archive, audit, integrity, tier-1]</code></td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>Version number of the content</td>
+<td><code>1.0.0</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Layer 3: Technical Metadata (Automatically generated where possible; required for Tier 1).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>size</code></td>
+<td>File size in bytes</td>
+<td><code>245760</code></td>
+</tr>
+<tr>
+<td><code>encoding</code></td>
+<td>Character encoding</td>
+<td><code>UTF-8</code></td>
+</tr>
+<tr>
+<td><code>permissions</code></td>
+<td>File permissions at archival</td>
+<td><code>640</code></td>
+</tr>
+<tr>
+<td><code>original-filename</code></td>
+<td>Filename before any renaming</td>
+<td><code>audit-report-final.md</code></td>
+</tr>
+<tr>
+<td><code>migration-history</code></td>
+<td>List of format migrations this item has undergone</td>
+<td><code>[]</code> or <code>[{from: "docx", to: "odt", date: "2028-06-15"}]</code></td>
+</tr>
+<tr>
+<td><code>backup-locations</code></td>
+<td>Where backup copies of this item exist</td>
+<td><code>[local-backup-drive-1, offsite-vault]</code></td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 Metadata File Format</h3>
+<p>Metadata is stored in a companion file alongside the data it describes. The companion file uses the same base name as the data file with a <code>.meta.yaml</code> extension:</p>
+<p><code>2026-02-15_op_quarterly-archive-audit-report_v1.md
+2026-02-15_op_quarterly-archive-audit-report_v1.meta.yaml</code></p>
+<p>The YAML format is chosen for human readability and editability. YAML is a plain-text format that can be read and written with any text editor, requires no specialized tools, and is widely supported across programming languages. It is an approved archival format per D6-003.</p>
+<p>Example metadata file:</p>
+<p><code>yaml
+id: D6-20260215-0042
+title: Quarterly Archive Audit Report Q1 2026
+created: 2026-02-15
+creator: operator
+tier: 1
+format: text/markdown; charset=utf-8
+checksum: sha256:a1b2c3d4e5f6...
+archived: 2026-03-01
+description: &gt;
+  Comprehensive audit of the Tier 1 and Tier 2 archives for Q1 2026.
+  Includes integrity verification results, naming convention compliance,
+  storage consumption analysis, and corrective actions taken.
+retention: permanent
+domain: 6
+project: null
+related:
+  - D6-20251215-0038
+  - D6-20260101-0039
+supersedes: null
+provenance: Created during quarterly comprehensive audit per D6-004 Section 4.6
+classification: institutional
+keywords:
+  - archive
+  - audit
+  - integrity
+  - quarterly
+version: 1.0.0
+size: 245760
+encoding: UTF-8
+permissions: "640"
+original-filename: audit-report-q1-2026.md
+migration-history: []
+backup-locations:
+  - local-backup-drive-1
+  - offsite-vault-a</code></p>
+<h3>4.3 Metadata Creation Procedures</h3>
+<p>Metadata is created at three points in the data lifecycle:</p>
+<p><strong>At creation:</strong> When the operator creates a new document, record, or artifact, they create the companion metadata file simultaneously. The core metadata fields are populated immediately. Contextual metadata fields are populated to the extent known. Technical metadata fields are generated automatically where tools exist or populated manually.</p>
+<p><strong>At ingest:</strong> When data enters the institution from external sources per D6-014, the ingest process requires metadata creation as a mandatory step. The operator classifies the data, assigns a tier, writes a description, and populates all core fields. Contextual fields are populated based on the ingest assessment.</p>
+<p><strong>At archival transition:</strong> When data moves from active storage to the archive per D6-004, the metadata is reviewed and completed. Any fields that were marked as unknown at creation must be resolved or explicitly documented as unresolvable. The <code>archived</code> date field is set.</p>
+<h3>4.4 Metadata Maintenance</h3>
+<p>Metadata is not static. It must be updated when:</p>
+<ul>
+<li>The data item is modified (new version): update <code>version</code>, <code>checksum</code>, <code>size</code>, and add a <code>related</code> reference to the previous version.</li>
+<li>The data item undergoes format migration per D6-005: update <code>format</code>, <code>checksum</code>, <code>size</code>, and add an entry to <code>migration-history</code>.</li>
+<li>The data item's tier classification changes: update <code>tier</code> and <code>retention</code>.</li>
+<li>Related items are created or discovered: update <code>related</code>.</li>
+<li>The data item is backed up to a new location: update <code>backup-locations</code>.</li>
+<li>An error in the metadata is discovered: correct the error and note the correction in the metadata audit log.</li>
+</ul>
+<p>Every metadata modification must be reflected in the metadata catalogue (Section 4.6).</p>
+<h3>4.5 The Controlled Vocabulary</h3>
+<p>The <code>keywords</code> field uses a controlled vocabulary -- a defined set of terms that standardize how data is described. The controlled vocabulary prevents the problem of synonymous but different tags: one item tagged <code>backup</code> and another tagged <code>backups</code> and another tagged <code>data-backup</code>, all meaning the same thing but invisible to each other's searches.</p>
+<p>The controlled vocabulary is maintained as a Tier 1 document in the archive. It is organized by domain and may be extended through the GOV-001 Tier 4 decision process (operational decisions). New terms are added when existing terms are insufficient. Existing terms are not renamed or removed; they are marked as deprecated and mapped to their replacement term.</p>
+<p>The initial controlled vocabulary is seeded from the domain names, the data tier names, the operational process names, and the common institutional concepts. It will grow over time as the institution's data diversifies.</p>
+<h3>4.6 The Metadata Catalogue</h3>
+<p>The metadata catalogue is the central searchable index of all institutional metadata. It aggregates the individual <code>.meta.yaml</code> files into a single queryable repository. The catalogue is implemented as a flat-file database (a consolidated YAML or CSV file) that can be searched with standard text tools (grep, awk) or a simple script.</p>
+<p>The catalogue is rebuilt from the individual metadata files during each quarterly metadata audit. Between audits, it is updated incrementally as new items are archived or existing metadata is modified.</p>
+<p>The catalogue is stored as Tier 1 data and backed up per D6-006. However, per D6-004 Section 7.3, the catalogue is a derived index. If it is lost, it can be rebuilt from the individual metadata files. The individual files are the source of truth; the catalogue is a convenience for search and discovery.</p>
+<h3>4.7 Search and Discovery</h3>
+<p>Metadata enables finding data in the archive through several search methods:</p>
+<p><strong>By field value.</strong> Search for all items with a specific tier, domain, creator, date range, or retention class. Example: "Find all Tier 1 items in Domain 6 created in 2026." This is a structured query against the catalogue.</p>
+<p><strong>By keyword.</strong> Search the <code>keywords</code> field using the controlled vocabulary. Example: "Find all items tagged with <code>archive</code> and <code>audit</code>." The controlled vocabulary ensures consistent terminology.</p>
+<p><strong>By relationship.</strong> Follow the <code>related</code> and <code>supersedes</code> links to navigate from one item to its related items. This enables tracing the history and context of a specific piece of data.</p>
+<p><strong>By full text.</strong> Search the <code>description</code> and <code>title</code> fields for free-text terms. This is a fallback for when structured fields and keywords do not capture the needed concept.</p>
+<p><strong>By provenance.</strong> Search the <code>provenance</code> field to find all data items that originated from a specific process, event, or source. Example: "Find all items created during the 2027 annual audit."</p>
+<h3>4.8 The Metadata Audit</h3>
+<p>The metadata audit verifies that metadata is complete, accurate, and consistent. It occurs at two frequencies:</p>
+<p><strong>Quarterly Metadata Audit (1-2 hours):</strong>
+- Select 50 items from the archive at random (stratified by tier: 20 Tier 1, 20 Tier 2, 10 Tier 3).
+- For each item, verify that the companion <code>.meta.yaml</code> file exists and is well-formed.
+- Verify that all core metadata fields are populated and non-empty.
+- Verify that the <code>checksum</code> field matches the actual checksum of the data file.
+- Verify that the <code>tier</code> and <code>retention</code> fields are consistent with each other per D6-011.
+- Verify that <code>keywords</code> use only terms from the controlled vocabulary.
+- Rebuild the metadata catalogue from individual files. Compare against the existing catalogue. Resolve discrepancies.
+- Document audit results in the operational log.</p>
+<p><strong>Annual Metadata Audit (4-8 hours):</strong>
+- Perform the quarterly audit at full scope: verify all Tier 1 metadata files, 50% of Tier 2, and 20% of Tier 3.
+- Verify that every item in the archive has a companion metadata file. Items without metadata are flagged for remediation.
+- Verify that the controlled vocabulary is current and that no items use deprecated terms without the mapping.
+- Assess metadata quality: are descriptions informative or perfunctory? Are provenance chains complete? Are relationship links accurate?
+- Identify metadata patterns that suggest systemic problems: many items with identical descriptions (copy-paste metadata), missing contextual fields on Tier 1 items, stale <code>backup-locations</code> fields.
+- Produce an annual metadata health report. Archive it as Tier 1 data.</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D6-007-01:</strong> Every data item in the archive must have a companion <code>.meta.yaml</code> file containing all core metadata fields populated. Items without metadata are non-compliant and must be remediated.</li>
+<li><strong>R-D6-007-02:</strong> Metadata is created at the time of data creation or ingest. Retroactive metadata creation is a remediation activity, not a normal workflow. The goal is to never need it.</li>
+<li><strong>R-D6-007-03:</strong> The <code>description</code> field must contain a substantive summary of the data item's content and purpose. Descriptions shorter than 50 words for Tier 1 items or 25 words for other tiers are flagged for review during the metadata audit.</li>
+<li><strong>R-D6-007-04:</strong> The <code>keywords</code> field must use only terms from the controlled vocabulary. New terms are added to the vocabulary before being used in metadata.</li>
+<li><strong>R-D6-007-05:</strong> The <code>checksum</code> field must be verified during every metadata audit. A checksum mismatch indicates either data corruption or metadata staleness. Both require investigation.</li>
+<li><strong>R-D6-007-06:</strong> The metadata catalogue must be rebuilt from source files at least quarterly. The catalogue is never the sole record of any metadata.</li>
+<li><strong>R-D6-007-07:</strong> Metadata modifications must be reflected in both the companion file and the catalogue. Inconsistencies between the two are detected during the quarterly audit.</li>
+<li><strong>R-D6-007-08:</strong> The controlled vocabulary must be reviewed and updated at least annually. Deprecated terms must be mapped to replacement terms, not simply deleted.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Metadata neglect.</strong> The operator stops creating metadata because it feels like overhead. Files accumulate without companion metadata. Over years, large portions of the archive become undescribed and unfindable. Mitigation: R-D6-007-01 and R-D6-007-02 establish metadata creation as a mandatory, immediate activity. The quarterly audit detects gaps.</p>
+</li>
+<li>
+<p><strong>Perfunctory metadata.</strong> Metadata is created but without care. Descriptions read "data file" or "see filename." Keywords are generic or absent. The metadata exists but provides no value. Mitigation: R-D6-007-03 establishes minimum quality standards. The annual audit assesses metadata quality, not just presence.</p>
+</li>
+<li>
+<p><strong>Vocabulary drift.</strong> The controlled vocabulary is not maintained. Different operators use different terms for the same concept. Search returns inconsistent results. Mitigation: R-D6-007-04 requires vocabulary compliance. R-D6-007-08 requires annual vocabulary review.</p>
+</li>
+<li>
+<p><strong>Checksum staleness.</strong> The data file is modified (perhaps during a format migration) but the checksum in the metadata is not updated. The metadata claims a checksum that does not match the file. This could mask real corruption because the checksum cannot be trusted. Mitigation: R-D6-007-05 requires checksum verification during every audit. D6-005 migration procedures require metadata updates.</p>
+</li>
+<li>
+<p><strong>Catalogue-source divergence.</strong> The metadata catalogue drifts from the individual <code>.meta.yaml</code> files. Search against the catalogue returns stale or incorrect results. Mitigation: R-D6-007-06 requires quarterly catalogue rebuilds. R-D6-007-07 requires synchronized updates.</p>
+</li>
+<li>
+<p><strong>Over-engineering.</strong> The metadata schema becomes so complex that creating metadata for a single file takes longer than creating the file itself. The operator rebels and stops creating metadata altogether. Mitigation: the three-layer schema is designed to be progressive. Only Layer 1 is mandatory for all items. Layer 2 is mandatory only for Tier 1 and Tier 2. Layer 3 is largely automatable. If the schema needs simplification in practice, revise it -- but do not abandon it.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<p><strong>7.1 If a large body of data is discovered without metadata:</strong>
+1. Declare a metadata remediation sprint. Prioritize by tier: Tier 1 items first, then Tier 2.
+2. For each item without metadata, attempt to reconstruct the core fields from available evidence: filesystem timestamps (for <code>created</code>), file content (for <code>title</code>, <code>description</code>), directory location (for <code>tier</code>, <code>domain</code>), file format (for <code>format</code>).
+3. For fields that cannot be reconstructed, use explicit unknowns: <code>description: "Content unknown; metadata created during remediation sprint [date]."</code> Honest ignorance is better than fabricated metadata.
+4. Mark all remediated metadata files with a provenance note: <code>provenance: "Metadata created retroactively during remediation on [date]. Original context unavailable."</code>
+5. Document the remediation effort: how many items were affected, how much metadata could be reconstructed, and what remains unknown.
+6. Investigate why the metadata gap occurred and correct the process that allowed it.</p>
+<p><strong>7.2 If the controlled vocabulary becomes inconsistent:</strong>
+1. Export all unique <code>keywords</code> values from all metadata files.
+2. Compare against the current controlled vocabulary. Identify unauthorized terms.
+3. For each unauthorized term, determine whether it should be added to the vocabulary or mapped to an existing term.
+4. Update all metadata files that use unauthorized terms to use the correct vocabulary terms.
+5. Rebuild the controlled vocabulary document and the metadata catalogue.</p>
+<p><strong>7.3 If the metadata catalogue is lost or corrupted:</strong>
+1. The individual <code>.meta.yaml</code> files are the source of truth. The catalogue is derived.
+2. Walk the archive directory structure. Collect all <code>.meta.yaml</code> files.
+3. Parse each file and rebuild the catalogue.
+4. Verify the rebuilt catalogue against a sample of individual files.
+5. Investigate the cause of the loss. Ensure the catalogue is backed up per D6-006.</p>
+<p><strong>7.4 If metadata quality has degraded systemically:</strong>
+1. This is a discipline problem, not a data problem. The metadata exists but is inadequate.
+2. Conduct the annual metadata audit with enhanced scrutiny.
+3. Identify the pattern: are descriptions inadequate? Keywords missing? Relationships not tracked?
+4. Address the root cause: if the operator has insufficient time for metadata, evaluate whether the schema can be simplified. If the operator has insufficient motivation, revisit D6-001 Section 4.2 on why metadata matters.
+5. Remediate the worst examples first: Tier 1 items with inadequate metadata are the highest priority.</p>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The metadata schema is new. The controlled vocabulary is growing rapidly as new types of data are catalogued. Expect frequent additions to the vocabulary. Expect the operator to develop shortcuts and templates for common metadata patterns. Document these templates -- they are operational knowledge.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> The metadata corpus becomes a valuable asset in its own right. The ability to search and navigate the archive through metadata transforms how the institution accesses its own knowledge. The controlled vocabulary should stabilize. The metadata audit should be routine.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The metadata created in the early years proves its value as the original context fades from memory. Items that seemed self-explanatory when they were created now depend entirely on their metadata for comprehensibility. This is when the quality of early metadata decisions becomes apparent.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> The metadata may need its own migration as the YAML format ages. The principles of metadata -- structured description, controlled vocabulary, companion files, audit -- are format-independent. If YAML is superseded, migrate the metadata using the same procedures in D6-005 that govern any format migration.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the metadata schema consistently fails to capture important distinctions, if the controlled vocabulary is growing unmanageably, or if the audit burden is disproportionate to the value provided, this article should be revised through the GOV-001 Tier 3 decision process.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+Metadata is the part of data management that nobody wants to do. It is the digital equivalent of filing -- necessary, unglamorous, and immediately punished when neglected. I write this article knowing that the biggest threat to metadata quality is my own laziness.</p>
+<p>The three-layer schema is a compromise between thoroughness and practicality. I considered a simpler schema (just title, date, tier, and description) and rejected it because it does not support search or relationship tracking. I considered a more elaborate schema (Dublin Core, METS, or PREMIS-style) and rejected it because the overhead would guarantee non-compliance. Three layers, with only the first universally mandatory, is the balance I can realistically maintain.</p>
+<p>The companion file approach (<code>.meta.yaml</code> next to every data file) is chosen over a centralized database for one critical reason: survivability. If the catalogue is lost, the metadata survives because it is distributed alongside the data. If a directory is copied or moved, its metadata travels with it. If the institution's tools change, the YAML files are readable with any text editor. Centralized metadata databases are more searchable but are single points of failure. In a fifty-year institution, distributed resilience wins over centralized elegance.</p>
+<p>The description field is the most important field in the schema. It is the field that a future operator will read when they do not understand what a file is. It is the field that transforms an opaque artifact into a comprehensible record. Every time I am tempted to write "see filename" in the description field, I will remember that I am writing for someone who has not seen the filename's context. The description must stand alone.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations of the Institution (Principle 2: Integrity Over Convenience; Principle 4: Longevity Over Novelty)</li>
+<li>CON-001 -- The Founding Mandate (documentation completeness, institutional continuity)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (data classification)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle, operational tempo)</li>
+<li>D6-001 -- Data Philosophy (data tiers, data lifecycle, "data without context is noise")</li>
+<li>D6-002 -- The Canonical Data Model (entity types that metadata describes)</li>
+<li>D6-003 -- Format Longevity Doctrine (YAML as approved format; format metadata)</li>
+<li>D6-004 -- Archive Management Procedures (directory structure, naming conventions, manifests)</li>
+<li>D6-005 -- Format Migration Procedures (metadata updates during migration)</li>
+<li>D6-006 -- Backup Verification and Test Restoration (metadata verification during restoration)</li>
+<li>D6-008 -- Storage Lifecycle Management (backup-locations metadata field)</li>
+<li>D6-011 -- Retention Schedules &amp; Disposal Policy (retention field in metadata)</li>
+<li>D6-014 -- Data Ingest Procedures (metadata creation at ingest)</li>
+<li>GOV-001 -- Authority Model (decision tiers for vocabulary and schema changes)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

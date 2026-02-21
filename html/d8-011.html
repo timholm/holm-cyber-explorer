@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D8-011 — Automation Observability Standards - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li class="active"><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d8-011">
+  <h1>D8-011 &mdash; Automation Observability Standards</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D8-011</dd>
+  <dt>Domain</dt>
+  <dd>8 -- Automation & Agents</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-16</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>ETH-001, CON-001, SEC-001, OPS-001, D8-001, D8-002, D8-003, D8-007, D8-008, D8-009, D8-010, D6-001, D6-008</dd>
+  <dt>Depended Upon By</dt>
+  <dd>All articles in Domain 8 that reference logging, metrics, or status reporting. D10-009. All operational articles that consume automation state information.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines what every automation in the institution must expose about its internal state. Observability is the quality of a system that allows an external observer to understand what the system is doing, what it has done, and whether it is functioning correctly -- without modifying the system or accessing its internal code. It is D8-001 Criterion 4 (Observability) made concrete: specific standards for logging, metrics, status reporting, and self-description that every automation must implement.</p>
+<p>Observability is not monitoring. Monitoring (D8-008) is what the institution does to watch automation from the outside. Observability is what the automation provides to make monitoring possible. A well-monitored but poorly observable automation is a black box with sensors taped to its exterior -- the sensors can tell you that something went wrong but not what or why. A well-observable automation is a glass box: its internal state is visible, its decisions are traceable, and its failures are diagnosable.</p>
+<p>This article establishes the standards that make every automation in the institution a glass box. The standards are deliberately opinionated: they specify formats, required fields, naming conventions, and retention requirements. This rigidity serves comprehensibility. When every automation logs in the same format with the same fields, an operator reading logs from any automation in the institution encounters a familiar structure. When every automation exposes the same health metrics, the monitoring system (D8-008) can aggregate and compare them uniformly. Standardization is the foundation of institutional observability.</p>
+
+</section>
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Logging standards: what must be logged, in what format, with what fields.</li>
+<li>Metrics requirements: what quantitative data every automation must expose.</li>
+<li>Status reporting: how every automation communicates its current state.</li>
+<li>The observability audit checklist: how to verify that an automation meets observability standards.</li>
+<li>How to build observability into automation from the start, rather than retrofitting it.</li>
+<li>Log retention, rotation, and archival requirements.</li>
+</ul>
+<p>This article does not cover:</p>
+<ul>
+<li>The monitoring architecture that consumes observability data (see D8-008).</li>
+<li>The specification template that documents observability requirements (see D8-007, Section 10).</li>
+<li>Testing of observability (see D8-010, which includes observability verification in its test procedures).</li>
+<li>General system logging unrelated to automation (see D5-005).</li>
+<li>Data retention policies beyond automation-specific requirements (see D6-001, D6-011).</li>
+</ul>
+
+</section>
+<section>
+<h2>Background</h2>
+
+<h3>3.1 The Black Box Problem</h3>
+<p>D8-001 identifies the black box problem as existential for a multi-generational institution: automation that cannot be understood by its current maintainer is worse than automation that does not exist, because it creates dependency without comprehension. Observability is the primary defense against the black box problem. An automation that logs every decision, reports every outcome, and exposes every metric may still be difficult to understand -- but it is not opaque. The operator has evidence to reason from, even if they do not fully understand the mechanism that produced the evidence.</p>
+<h3>3.2 Why Standards, Not Guidelines</h3>
+<p>Guidelines are optional by nature. Standards are mandatory. The distinction matters because observability is most needed precisely when the operator is least inclined to invest in it: during rapid development, during emergency fixes, during "temporary" automations that become permanent. If observability is a guideline, it will be the first thing sacrificed to urgency. If it is a standard -- verifiable, auditable, enforced -- it will be present when it is needed.</p>
+<h3>3.3 The Log as Historical Record</h3>
+<p>In a fifty-year institution, automation logs are not just diagnostic tools. They are historical records of what the institution's automated systems did, when, and with what results. They enable future operators to understand not just the current state but the history of automation behavior. Per D6-001, automation logs are classified as Tier 2 data (Operational Data) with a defined retention period. Logs are not ephemeral. They are institutional memory.</p>
+
+</section>
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 The Logging Standard</h3>
+<p>Every automation must produce structured logs conforming to the following standard:</p>
+<p><strong>Log format:</strong> Each log entry is a single line of text (no multi-line entries except for stack traces or error details, which are indented under their parent entry). Each line contains the following fields, separated by a consistent delimiter (pipe character "|" is the institutional standard):</p>
+<p><code>TIMESTAMP | AUTOMATION-ID | EXECUTION-ID | LEVEL | COMPONENT | MESSAGE</code></p>
+<p><strong>Field definitions:</strong></p>
+<ul>
+<li>
+<p><strong>TIMESTAMP:</strong> ISO 8601 format with timezone, to second precision minimum. Example: 2026-02-16T03:15:42+00:00. Consistent timestamps enable chronological interleaving of logs from different automations.</p>
+</li>
+<li>
+<p><strong>AUTOMATION-ID:</strong> The SPEC-ID from the automation's specification (per D8-007). Enables filtering logs by automation.</p>
+</li>
+<li>
+<p><strong>EXECUTION-ID:</strong> A unique identifier for this execution run. Format: YYYYMMDD-HHMMSS-[SHORT-RANDOM]. Enables grouping all log entries from a single execution.</p>
+</li>
+<li>
+<p><strong>LEVEL:</strong> One of: TRACE (detailed internal state, may be disabled in production), DEBUG (useful for diagnosis, not needed normally), INFO (normal operational events), WARN (unexpected but recovered), ERROR (something went wrong, operator should investigate), FATAL (cannot continue, terminating, immediate attention required).</p>
+</li>
+<li>
+<p><strong>COMPONENT:</strong> The logical component within the automation that produced the entry. For simple automations, this is the automation name. For complex automations, this identifies the stage (e.g., "input-validation", "processing", "output-write").</p>
+</li>
+<li>
+<p><strong>MESSAGE:</strong> Human-readable description of what happened. Messages must be self-contained -- understandable without referring to source code. Bad: "Condition met, proceeding." Good: "Backup file /data/backups/2026-02-16.tar.gz verified, size 4.2GB matches expected range 3.5-5.0GB."</p>
+</li>
+</ul>
+<h3>4.2 Required Log Events</h3>
+<p>Every automation must log, at minimum, the following events at the specified levels:</p>
+<p><strong>At execution start (INFO):</strong> Timestamp, automation ID and version, execution ID, input summary (sufficient to reproduce the execution), and environment summary (disk space, dependency availability).</p>
+<p><strong>At each significant processing milestone (INFO):</strong> Phase or step completed, intermediate results or metrics.</p>
+<p><strong>At execution completion (INFO):</strong> Success or failure status, output summary (what was produced, where), execution duration, resource consumption summary.</p>
+<p><strong>At any error or unexpected condition (WARN or ERROR):</strong>
+- Description of the condition and what the automation was doing when it occurred.
+- Impact on the automation's output or continuation.
+- Action taken (retried, skipped, failed, continued with degraded output).</p>
+<p><strong>At termination due to unrecoverable error (FATAL):</strong>
+- Description of the fatal condition and state at time of failure.
+- What outputs may be in an inconsistent state.
+- Recommended recovery action for the operator.</p>
+<h3>4.3 Metrics Requirements</h3>
+<p>Every automation must expose the following metrics, updated at each execution:</p>
+<p><strong>Execution metrics:</strong> Last execution start time, end time, duration (seconds), and status (success/failure/partial). Cumulative execution count, success count, failure count, and success rate (as percentage).</p>
+<p><strong>Resource metrics (per execution):</strong> Peak memory usage, CPU time consumed, disk I/O (bytes read and written), and execution duration compared to historical average (percentage deviation).</p>
+<p><strong>Output metrics (per execution):</strong> Output size or count, output location, and output validation result (pass/fail, if applicable).</p>
+<p>Metrics are written to a standardized metrics file alongside the automation's logs. The metrics file is a simple key-value text file, overwritten at each execution with the most recent values and appended to a historical metrics log:</p>
+<p>```</p>
+<h1>Metrics for AUTO-D6-003 (Backup Rotation)</h1>
+<h1>Generated: 2026-02-16T03:20:15+00:00</h1>
+<p>last_start=2026-02-16T03:15:42+00:00
+last_end=2026-02-16T03:20:14+00:00
+last_duration_seconds=272
+last_status=success
+total_executions=847
+total_successes=845
+total_failures=2
+success_rate=99.76
+peak_memory_mb=128
+cpu_seconds=45.3
+bytes_read=4521789440
+bytes_written=4521789440
+output_size_bytes=4521789440
+output_path=/data/backups/2026-02-16.tar.gz
+output_valid=true
+```</p>
+<h3>4.4 Status Reporting</h3>
+<p>Every automation must provide a mechanism for the operator to query its current status at any time. The status report answers the question: "Is this automation healthy right now?"</p>
+<p>The status mechanism is a status file written by the automation and readable by the operator and by the monitoring system (D8-008). The status file contains:</p>
+<p>```</p>
+<h1>Status for AUTO-D6-003 (Backup Rotation)</h1>
+<h1>Updated: 2026-02-16T03:20:15+00:00</h1>
+<p>automation_id=AUTO-D6-003
+automation_name=Backup Rotation
+status=healthy
+last_execution=2026-02-16T03:20:14+00:00
+last_result=success
+next_scheduled=2026-02-17T03:15:00+00:00
+active_alerts=none
+dependencies_status=all_available
+notes=
+```</p>
+<p>Status values are: <strong>healthy</strong> (last execution succeeded, no active alerts), <strong>degraded</strong> (last execution succeeded with warnings, or a non-critical dependency is unavailable), <strong>failed</strong> (last execution failed), <strong>unknown</strong> (no execution has occurred since deployment or since a status reset).</p>
+<p>The status file is updated at the conclusion of each execution and whenever the automation detects a change in its dependencies. The monitoring system (D8-008) consumes status files as part of its health assessment.</p>
+<h3>4.5 Building Observability In</h3>
+<p>Observability cannot be retrofitted effectively. It must be designed into automation from the start.</p>
+<p><strong>Before writing any automation logic, write the logging framework first.</strong> The first lines of any automation establish the log file path, format, execution ID, and start entry. The last lines write the completion entry, metrics file, and status file. Logic goes between these bookends. This forces the developer to think in terms of observable events before implementation.</p>
+<p><strong>The observability template:</strong> The institution maintains a shell function library (or equivalent) that provides:
+- <code>obs_init</code> -- initializes logging, sets execution ID, writes start entry.
+- <code>obs_log</code> -- writes a log entry at a specified level.
+- <code>obs_metric</code> -- records a metric value.
+- <code>obs_complete</code> -- writes completion entry, metrics file, status file, heartbeat.
+- <code>obs_fail</code> -- writes failure entry, updates status to failed, writes heartbeat with failure flag.</p>
+<p>Every automation uses this library. The library is maintained as institutional infrastructure per D5-006.</p>
+<h3>4.6 The Observability Audit Checklist</h3>
+<p>The following checklist is used during the quarterly automation audit (D8-009, Section 4.4) and the annual automation review (D8-001, R-D8-07) to verify that each automation meets observability standards:</p>
+<p>```
+OBSERVABILITY AUDIT CHECKLIST
+Automation: [SPEC-ID]  Auditor: [Name]  Date: [Date]</p>
+<p>LOGGING:
+[ ] Log file exists at documented location
+[ ] Entries conform to standard format (Section 4.1)
+[ ] All required log events present (Section 4.2)
+[ ] Messages are human-readable and self-contained
+[ ] Log rotation configured and functioning
+[ ] Retention meets D6-001 requirements</p>
+<p>METRICS:
+[ ] Metrics file exists at documented location
+[ ] All required metrics present (Section 4.3)
+[ ] Values plausible and consistent with log entries
+[ ] Historical metrics log maintained</p>
+<p>STATUS:
+[ ] Status file exists, is current, and accurately reflects actual state</p>
+<p>MONITORING INTEGRATION:
+[ ] Heartbeat written per D8-008; independent monitor checking it
+[ ] Alert thresholds configured</p>
+<p>INFRASTRUCTURE:
+[ ] Uses standard observability library, or non-standard implementation
+    is documented and justified</p>
+<p>NOTES: [Free-form observations on observability quality]
+```</p>
+
+</section>
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D8-11-01:</strong> Every automation must produce structured logs conforming to the format defined in Section 4.1. Non-conforming log formats are a compliance failure.</li>
+<li><strong>R-D8-11-02:</strong> Every automation must log all required events defined in Section 4.2. Missing required log events are a compliance failure.</li>
+<li><strong>R-D8-11-03:</strong> Every automation must expose all required metrics defined in Section 4.3.</li>
+<li><strong>R-D8-11-04:</strong> Every automation must maintain a status file conforming to Section 4.4, updated at the conclusion of each execution.</li>
+<li><strong>R-D8-11-05:</strong> Log entries must be human-readable without reference to source code. Codes, abbreviations, and internal identifiers must be accompanied by human-readable explanations.</li>
+<li><strong>R-D8-11-06:</strong> Automation logs are classified as Tier 2 data per D6-001. They must be retained for a minimum of one year. Historical metrics logs must be retained for the lifetime of the automation.</li>
+<li><strong>R-D8-11-07:</strong> Log rotation must be configured for every automation. No log file may grow without bound. The rotation policy must be documented in the automation's specification (D8-007, Section 10).</li>
+<li><strong>R-D8-11-08:</strong> New automation must use the standard observability library (Section 4.5). Exceptions require documented justification and must implement equivalent functionality.</li>
+<li><strong>R-D8-11-09:</strong> The observability audit checklist (Section 4.6) must be completed for every automation during the quarterly audit. Automations that fail the audit must be remediated within 14 days.</li>
+<li><strong>R-D8-11-10:</strong> Log messages must never contain sensitive data (passwords, cryptographic keys, personal information beyond what is necessary for operational diagnosis). This constraint is absolute and overrides completeness.</li>
+</ul>
+
+</section>
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li>
+<p><strong>Log format divergence.</strong> Different automations use different log formats. Aggregating or comparing logs across automations becomes impossible. The operator must learn each automation's idiosyncratic format. Mitigation: R-D8-11-01 mandates the standard format. The quarterly audit verifies compliance.</p>
+</li>
+<li>
+<p><strong>Log verbosity extremes.</strong> Either too verbose (generating gigabytes of unreadable logs) or too terse (logging only errors, making pre-error context invisible). Mitigation: the required log events (Section 4.2) define the minimum. TRACE and DEBUG may be disabled in production, but INFO, WARN, ERROR, and FATAL must always be active.</p>
+</li>
+<li>
+<p><strong>Metrics staleness.</strong> The metrics file is not updated because the automation failed before reaching the metrics-writing step. The monitoring system reads stale metrics and reports health when the automation is actually broken. Mitigation: the monitoring system (D8-008) checks metrics timestamps, not just values. A stale metrics file triggers a warning.</p>
+</li>
+<li>
+<p><strong>Status file corruption.</strong> The status file is partially written (due to a crash during write). The monitoring system reads garbled data. Mitigation: status files should be written atomically (write to a temporary file, then rename). The monitoring system validates status file format before consuming it.</p>
+</li>
+<li>
+<p><strong>Observability as afterthought.</strong> Observability is added as a compliance task after development. Logs are generic, metrics superficial, status reporting perfunctory. Mitigation: Section 4.5 mandates building observability first. The AATP (D8-010) includes observability verification.</p>
+</li>
+<li>
+<p><strong>Sensitive data in logs.</strong> A log message inadvertently includes passwords, keys, or personal information. Mitigation: R-D8-11-10 prohibits sensitive data. Developers must sanitize variable content before logging.</p>
+</li>
+<li>
+<p><strong>Log storage exhaustion.</strong> Log rotation fails. Logs fill the filesystem. Other automations fail. Mitigation: R-D8-11-07 mandates rotation. The independent monitor (D8-008) tracks disk space. The audit verifies rotation.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li>
+<p><strong>If log format non-compliance is discovered:</strong> Identify all non-compliant automations. Prioritize by criticality. Modify each to use the standard format. Verify through the audit checklist. For historical non-standard logs, document the format and maintain a conversion guide.</p>
+</li>
+<li>
+<p><strong>If logs are missing for a period:</strong> Determine cause. Fix the logging mechanism. Reconstruct the gap period from other evidence (system logs, outputs, monitoring records). Document the gap.</p>
+</li>
+<li>
+<p><strong>If sensitive data is found in logs:</strong> Redact from all copies. Rotate any exposed credentials. Fix the automation. Review all automations for similar vulnerabilities. Document per SEC-001.</p>
+</li>
+<li>
+<p><strong>If log storage is exhausted:</strong> Rotate or compress logs immediately. Verify all automations have functioning rotation. Review retention policies. Expand storage capacity if retention requirements demand it.</p>
+</li>
+<li>
+<p><strong>If the observability library is inadequate:</strong> Document the inadequacy. Extend through the standard development process (D8-010). Update all consuming automations. If log format changes, update monitoring system parsing and document the version change.</p>
+</li>
+</ol>
+
+</section>
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li>
+<p><strong>Years 0-5:</strong> The observability standards are new. The observability library will be built and tested. Expect to iterate on log format and metrics definitions as you learn what is genuinely useful for diagnosis versus merely comprehensive.</p>
+</li>
+<li>
+<p><strong>Years 5-15:</strong> Standards should be stable, the library mature. The primary challenge is maintaining consistency as automations evolve. Historical metrics logs become valuable for trend analysis.</p>
+</li>
+<li>
+<p><strong>Years 15-30:</strong> The log corpus spans a decade or more. The log format should remain stable to enable historical analysis. If the format must change, maintain a format version field and a conversion tool.</p>
+</li>
+<li>
+<p><strong>Years 30-50+:</strong> A successor inherits logs, metrics, and status reports spanning decades. Because every automation used the same format, the successor can read any log from any era. The observability standards are the successor's window into automated history.</p>
+</li>
+<li>
+<p><strong>Signpost for revision:</strong> If the log format consistently lacks diagnostic information, extend it. If metrics include values never consulted, simplify. But resist removing fields merely because they seem unused -- their value may appear only during rare failure investigations.</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-16 -- Founding Entry:</strong>
+The most contentious standard in this article will be the requirement for human-readable log messages (R-D8-11-05). It is faster to write <code>log("ERR:BKP:CHK:FAIL:3")</code> than <code>log("ERROR: Backup checksum verification failed for /data/backups/2026-02-16.tar.gz -- computed SHA-256 does not match stored value. This is attempt 3 of 3. Backup file may be corrupt.")</code>. The first takes less disk space, less development time, and less thought. The second can be understood by someone who has never seen the source code, twenty years from now, in a crisis, at 3 AM.</p>
+<p>Write the second kind. Always.</p>
+<p>I also want to note that the pipe-delimited format was chosen over JSON deliberately. JSON is more structured and more easily parsed by machines. But it is less readable by humans when viewed in a terminal with <code>cat</code> or <code>less</code>. This institution prioritizes human readability over machine parseability. If a future operator needs machine parsing, a pipe-delimited format is trivially convertible to JSON, CSV, or any other structured format. The reverse is not true -- JSON logs are cumbersome to read raw.</p>
+<p>One final observation: the requirement to write the observability framework before the automation logic (Section 4.5) will feel backward to experienced developers. It is not. It is the automation equivalent of test-driven development: define how you will observe the system before you build the system. What you choose to observe shapes how you think about what the system does. Build the glass box first, then put the mechanism inside it.</p>
+
+</section>
+<section>
+<h2>References</h2>
+
+<ul>
+<li>ETH-001 -- Ethical Foundations (Principle 3: Transparency of Operation)</li>
+<li>CON-001 -- The Founding Mandate (comprehensibility, longevity)</li>
+<li>SEC-001 -- Threat Model and Security Philosophy (sensitive data handling, incident reporting)</li>
+<li>OPS-001 -- Operations Philosophy (documentation-first principle, operational tempo)</li>
+<li>GOV-001 -- Authority Model (governance for standards changes)</li>
+<li>D6-001 -- Data Philosophy (data tier classification for logs; Tier 2: Operational Data)</li>
+<li>D6-003 -- Format Longevity Doctrine (plain text format for logs and metrics)</li>
+<li>D6-008 -- Metadata Standards (metadata requirements for log files)</li>
+<li>D6-011 -- Data Retention Schedules (retention requirements for automation logs)</li>
+<li>D8-001 -- Automation Restraint Doctrine (Criterion 4: Observability; R-D8-04: all automation must be observable)</li>
+<li>D8-002 -- Agent Design Principles (observability as a design principle)</li>
+<li>D8-007 -- Automation Specification Language (specification Section 10: logging and observability)</li>
+<li>D8-008 -- Monitoring Automation (consumes observability data; heartbeat, dashboard, alert integration)</li>
+<li>D8-009 -- Scheduled Task Architecture (logging requirements for scheduled tasks)</li>
+<li>D8-010 -- Automation Testing and Validation (observability verification during testing)</li>
+<li>D5-005 -- Service Health and System Monitoring (general system logging context)</li>
+<li>D10-009 -- Operational Monitoring Procedures (operational consumption of observability data)</li>
+</ul>
+<hr />
+<p><em>End of Stage 4: Specialized Systems -- Automation Advanced Reference</em></p>
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOV-013 — Meeting and Deliberation Protocols - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li class="active"><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="gov-013">
+  <h1>GOV-013 &mdash; Meeting and Deliberation Protocols</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>GOV-013</dd>
+  <dt>Domain</dt>
+  <dd>2 -- Governance & Authority</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>GOV-001, GOV-002, GOV-008</dd>
+  <dt>Depended Upon By</dt>
+  <dd>None. Referenced by governance articles that involve formal deliberation or review.</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how formal deliberations are conducted, recorded, and archived within the holm.chat Documentation Institution. In a multi-member institution, formal deliberation means meetings: scheduled gatherings where members discuss decisions, review institutional health, and coordinate activity. In a single-operator institution, formal deliberation means structured self-review: scheduled sessions where the operator engages deliberately with institutional governance rather than making decisions ad hoc.</p>
+<p>The distinction between a decision made during a formal deliberation and a decision made informally is not about the quality of the decision. It is about the quality of the process that surrounds it. Formal deliberation imposes structure: an agenda, a time limit, a documentation requirement. This structure forces the decision-maker to prepare, to focus, and to record. Informal decisions lack this structure and are therefore more susceptible to carelessness, omission, and forgetting.</p>
+<p>This article does not require that all decisions be made formally. Routine decisions (GOV-008, Category 1) do not require formal deliberation. But Significant, Critical, and Existential decisions benefit enormously from a structured deliberation process, even when the "deliberation" is a single person sitting at a desk with a written agenda and a timer. The purpose of this article is to define that structure and to make it sustainable, so that it is followed consistently rather than abandoned after the first few weeks of enthusiasm.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p>This article covers:</p>
+<ul>
+<li>Types of formal deliberation sessions: scheduled governance reviews, decision-specific deliberation sessions, and emergency deliberation sessions.</li>
+<li>Agenda requirements and preparation standards for each type of session.</li>
+<li>Documentation standards for deliberation records (minutes, decisions, action items).</li>
+<li>Quorum requirements for multi-member institutions.</li>
+<li>The structured self-review process for single-operator institutions.</li>
+<li>Archival requirements for deliberation records.</li>
+<li>The relationship between deliberation records and the decision log (GOV-002).</li>
+</ul>
+<p>This article does not cover the substance of what is deliberated (that is covered by the relevant governance articles) or the dispute resolution process when deliberation reveals disagreement (GOV-003). It covers the procedural container within which deliberation occurs.</p>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<p>Most personal projects have no concept of formal deliberation. The operator thinks about things in the shower, makes a decision while eating lunch, and implements it that afternoon. This spontaneous approach has the advantage of speed and the disadvantage of everything else. There is no record of the reasoning. There is no structured consideration of alternatives. There is no distinction between "I decided this" and "I drifted into this."</p>
+<p>Formal deliberation is the antidote to drift. When you sit down with an agenda, a timer, and a commitment to write down what you decide and why, you are forced to be intentional. You cannot drift into a decision during formal deliberation; you must actively choose it. This difference is subtle but compounding: over years, an institution where decisions are formally deliberated will have a coherent, traceable decision history. An institution where decisions are made informally will have a collection of outcomes with no connective tissue.</p>
+<p>The protocols in this article are designed for sustainability, not ceremony. A governance review session should take 60 to 90 minutes, not an entire day. A decision-specific deliberation session should take 30 to 60 minutes, not a week. The goal is regular, focused engagement with governance, not an exhausting bureaucratic exercise. If the deliberation protocols feel burdensome, they should be reviewed and simplified through the amendment process in GOV-012, not abandoned.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Types of Deliberation Sessions</h3>
+
+<p><strong>Scheduled Governance Review (SGR).</strong> A periodic session dedicated to reviewing the overall state of institutional governance. Frequency: quarterly during the first five years, then semi-annually. Duration: 60 to 90 minutes. Purpose: assess governance health (per GOV-007), review the decision log for the period, identify pending decisions that need attention, and review the status of any ongoing amendment processes.</p>
+<p>In a single-operator institution, the SGR is a structured self-review session. The operator sits down with the governance health assessment checklist (GOV-007), the decision log, and a written agenda. They work through the checklist, note any concerns, and record the session's findings.</p>
+
+<p><strong>Decision-Specific Deliberation (DSD).</strong> A session dedicated to a specific non-routine decision. Required for all Critical and Existential decisions (GOV-008, Categories 3 and 4). Recommended for Significant decisions when the operator feels uncertain. Duration: 30 to 60 minutes. Purpose: focused analysis of a single decision using the appropriate decision template.</p>
+<p>In a single-operator institution, the DSD is a focused work session. The operator commits a specific block of time to the decision, prepares by reading the relevant templates and any applicable precedents from the decision log, and works through the template fields systematically. The session ends with either a decision, a list of open questions that need resolution, or a deferral with documented reasons.</p>
+
+<p><strong>Emergency Deliberation Session (EDS).</strong> An unscheduled session convened in response to an emergency declaration (GOV-005). Duration: as long as necessary, but the initial response phase should be concentrated and time-bounded. Purpose: assess the emergency, formulate a response plan, and initiate the emergency governance protocols.</p>
+<p>In a single-operator institution, the EDS is the moment when the operator shifts from reactive mode to structured response. Even in an emergency, taking ten minutes to write down the situation, classify the severity, and outline a response plan (per GOV-005, Section 4.2) constitutes an emergency deliberation session.</p>
+
+<h3>4.2 Agenda Requirements</h3>
+<p>Every deliberation session has a written agenda prepared before the session begins. The agenda format varies by session type:</p>
+
+<p><strong>SGR Agenda:</strong></p>
+<ol>
+<li>Review of previous SGR's action items (completion status, deferred items).</li>
+<li>Decision log review for the period (summary of decisions made, any patterns or concerns).</li>
+<li>Governance health assessment (GOV-007 checklist).</li>
+<li>Pending decisions requiring attention.</li>
+<li>Pending amendment proposals.</li>
+<li>Continuity archive status (GOV-009).</li>
+<li>External relations review (GOV-011).</li>
+<li>New action items.</li>
+</ol>
+
+<p><strong>DSD Agenda:</strong></p>
+<ol>
+<li>Decision identification (what is being decided).</li>
+<li>Decision category and authority tier confirmation.</li>
+<li>Template review (are all required fields prepared?).</li>
+<li>Deliberation (work through the template).</li>
+<li>Outcome (decision, deferral, or escalation).</li>
+<li>Documentation (record the session's work).</li>
+</ol>
+
+<p><strong>EDS Agenda:</strong></p>
+<ol>
+<li>Situation assessment (what is happening).</li>
+<li>Severity classification (per GOV-005).</li>
+<li>Response plan formulation.</li>
+<li>Execution authorization.</li>
+<li>Communication plan (per GOV-005, Section 4.4).</li>
+</ol>
+
+<h3>4.3 Documentation Standards</h3>
+<p>Every deliberation session produces a written record. The record format varies by session type but always includes:</p>
+<ul>
+<li><strong>Date and time</strong> of the session.</li>
+<li><strong>Session type</strong> (SGR, DSD, or EDS).</li>
+<li><strong>Participants</strong> (in a single-operator institution: the operator's name).</li>
+<li><strong>Agenda</strong> (as prepared, with notes on any deviations).</li>
+<li><strong>Deliberation summary</strong> (key points discussed, arguments considered, concerns raised).</li>
+<li><strong>Decisions made</strong> (if any, with references to decision log entries).</li>
+<li><strong>Action items</strong> (tasks arising from the session, with owners and deadlines).</li>
+<li><strong>Duration</strong> (actual time spent).</li>
+</ul>
+<p>Deliberation records are stored in the institutional archive alongside the decision log. They are not part of the decision log itself (which records decisions), but they are cross-referenced with decision log entries. A decision log entry may note: "Deliberated during DSD-2026-03-15; see deliberation record for full discussion."</p>
+
+<h3>4.4 Quorum for Multi-Member Institutions</h3>
+<p>When the institution has more than one member, the following quorum rules apply:</p>
+<ul>
+<li><strong>SGR:</strong> All members must participate. If a member cannot attend, the SGR is rescheduled within 14 days. Governance reviews require full participation because they assess the institution as a whole.</li>
+<li><strong>DSD for Significant decisions:</strong> The proposing member plus at least one other member. If the institution has only two members, both must participate.</li>
+<li><strong>DSD for Critical decisions:</strong> A majority of members must participate.</li>
+<li><strong>DSD for Existential decisions:</strong> All members must participate.</li>
+<li><strong>EDS:</strong> Any available member may convene an EDS. Quorum is not required for emergency response, but all available members should participate. Members who were unavailable must be briefed within 24 hours.</li>
+</ul>
+
+<h3>4.5 The Structured Self-Review</h3>
+<p>In a single-operator institution, the concept of a "meeting" requires adaptation. The operator cannot deliberate with themselves in the way that a group can. But they can impose structure on their thinking, and that structure serves the same purpose as a meeting: it creates a bounded, focused, documented period of governance engagement.</p>
+<p>The structured self-review follows these principles:</p>
+<ul>
+<li><strong>Set a specific time.</strong> Do not review governance "when you get around to it." Schedule it. Put it on a calendar. Treat it as an appointment you cannot cancel.</li>
+<li><strong>Prepare the agenda in advance.</strong> Do not sit down and improvise. The agenda templates in Section 4.2 exist for this reason. Fill in the specifics before the session begins.</li>
+<li><strong>Set a timer.</strong> Structured self-review should last 60 to 90 minutes for an SGR and 30 to 60 minutes for a DSD. If you are done early, review the session notes. If you are not done when the timer rings, either extend by 15-minute increments (with a hard stop at 120 minutes) or defer remaining items to a follow-up session within 7 days.</li>
+<li><strong>Write everything down.</strong> The act of writing forces clarity. If you cannot write down your reasoning, you have not finished reasoning.</li>
+<li><strong>Review your notes before closing.</strong> Read what you wrote. Does it make sense? Would it make sense to someone else? Would it make sense to you in six months?</li>
+</ul>
+
+<h3>4.6 Archival Requirements</h3>
+<p>All deliberation records are archived permanently. They are part of the institution's governance history. The archival process follows the same principles as the decision log (GOV-002): append-only, with no records modified or deleted after the session is closed.</p>
+<p>Deliberation records should be organized chronologically and cross-indexed with the decision log. A future operator reviewing a decision should be able to trace it from the decision log entry to the deliberation record that produced it, and from the deliberation record to the agenda and preparation materials that informed it.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-GOV-13-01:</strong> Scheduled Governance Reviews must be conducted quarterly during the first five years and semi-annually thereafter. Failure to conduct an SGR within 30 days of its scheduled date is a governance violation that must be documented and addressed at the next SGR.</li>
+<li><strong>R-GOV-13-02:</strong> Decision-Specific Deliberation sessions are mandatory for all Critical and Existential decisions. A Critical or Existential decision made without a DSD is procedurally deficient and subject to the procedural veto provisions in GOV-010.</li>
+<li><strong>R-GOV-13-03:</strong> Every deliberation session must produce a written record containing at minimum the elements listed in Section 4.3. Sessions without written records did not happen for governance purposes.</li>
+<li><strong>R-GOV-13-04:</strong> Agendas must be prepared before sessions begin, not created during the session. The preparation requirement exists to ensure that deliberation is focused and productive rather than meandering.</li>
+<li><strong>R-GOV-13-05:</strong> Deliberation records are append-only and permanent. They may not be modified after the session is closed. Corrections are recorded as addenda, not edits.</li>
+<li><strong>R-GOV-13-06:</strong> In a multi-member institution, quorum requirements are mandatory. Decisions made at sessions without quorum are provisional and must be ratified at a subsequent session with proper quorum.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Session skipping.</strong> The operator schedules governance reviews but consistently reschedules or cancels them. The quarterly cadence degrades into semi-annual, then annual, then never. Mitigation: R-GOV-13-01 defines the schedule and the consequences of missing it. The governance health check (GOV-007) flags missed sessions. The key practical mitigation is to keep sessions short and focused so they do not feel burdensome enough to skip.</li>
+<li><strong>Agenda-less deliberation.</strong> The operator sits down for a governance review without an agenda and spends the time browsing the decision log aimlessly. The session produces no useful output. Mitigation: R-GOV-13-04 requires advance agenda preparation. The agenda templates in Section 4.2 provide a starting point. If preparing the agenda feels like too much effort, the agenda itself should be simplified, not abandoned.</li>
+<li><strong>Pro-forma documentation.</strong> The operator produces session records that technically meet the format requirements but contain no substantive content. "Reviewed decision log. No concerns." is technically a deliberation summary but practically useless. Mitigation: the periodic review of session records during the governance health check. If session records are consistently thin, the health check should flag this as a concern.</li>
+<li><strong>Meeting inflation (multi-member).</strong> When the institution has multiple members, the temptation to add meetings for every minor issue can consume more time than it saves. Members spend more time in deliberation than in operation. Mitigation: the deliberation type system limits mandatory sessions to SGRs and DSDs for non-routine decisions. Routine decisions do not require deliberation sessions.</li>
+<li><strong>Self-review dishonesty.</strong> In a single-operator institution, the operator goes through the motions of structured self-review but does not genuinely engage. They write what they think the record should say rather than what they actually think. Mitigation: this is the hardest failure mode to mitigate because it depends entirely on the operator's intellectual honesty. The Commentary Section is the best tool here: honest reflections from the founder create a culture of honesty that future operators may absorb. The founder's example matters more than any rule.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If Scheduled Governance Reviews have been missed:</strong> Conduct a catch-up SGR as soon as possible. The catch-up SGR should cover the entire period since the last actual SGR, with particular attention to whether any decisions were made during the gap that should have been deliberated. Document the gap and its causes. Establish a concrete plan to prevent recurrence (specific calendar entries, reminders, accountability mechanisms).</li>
+<li><strong>If deliberation records are missing:</strong> Reconstruct what can be reconstructed from the decision log and from memory. Mark reconstructed records as "RECONSTRUCTED" and note the date of reconstruction. The reconstruction will be less detailed than a contemporaneous record, but it is better than an undocumented gap. Going forward, integrate the documentation habit into the session itself rather than treating it as a separate post-session task.</li>
+<li><strong>If sessions have become pro forma:</strong> At the next SGR, acknowledge the problem explicitly. Review the last three session records and assess their quality. Identify what would make the sessions genuinely useful rather than performative. Common remedies include: reducing the frequency but increasing the depth, changing the time of day to when the operator is more alert, or restructuring the agenda to focus on the items that matter most.</li>
+<li><strong>If quorum has been violated (multi-member):</strong> Review all decisions made at sessions without proper quorum. Each such decision must be ratified at a session with proper quorum within 30 days. If a decision cannot be ratified, it must be reconsidered through the proper process.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The deliberation protocols are being established as habits. The founder should expect the first few sessions to feel awkward and overly formal. Persist. The habit is what matters, not the comfort. After a year of quarterly SGRs, the process should feel natural. The session records from this period will be the foundation for future governance continuity.</li>
+<li><strong>Years 5-15:</strong> The protocols should be well-established. The session records form a secondary governance record alongside the decision log: where the decision log records what was decided, the deliberation records capture how and why. The frequency and format should be reviewed and adjusted as needed through the amendment process (GOV-012).</li>
+<li><strong>Years 15-30:</strong> If the institution transitions to multiple members, the deliberation protocols transition from structured self-review to actual meetings. The agenda templates and documentation standards are designed to scale. The quorum requirements in Section 4.4 activate. The session records become a shared governance artifact rather than a personal one.</li>
+<li><strong>Years 30-50+:</strong> The deliberation archive contains decades of governance sessions. It is an invaluable resource for understanding how the institution evolved, what was debated, and why decisions were made. New operators should read selected session records from each decade during their onboarding to understand the institution's governance culture, not just its governance rules.</li>
+</ul>
+</section>
+
+<section>
+<h2>Commentary Section</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators. Each entry should include the date, the author's identifier, and the context for the commentary.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+I have scheduled my first Scheduled Governance Review for the end of March. It will be the first formal deliberation session in the institution's history, and it will consist of one person sitting at a desk with a checklist. This sounds absurd. It is not.</p>
+<p>The reason it is not absurd is that I have tried the alternative. I have run personal projects without structure, making decisions when they occurred to me, recording nothing, reviewing nothing. Every one of those projects eventually reached a point where I could not remember what I had decided or why. Every one of those projects eventually drifted from its original purpose because there was no mechanism for noticing the drift.</p>
+<p>The structured self-review is not a meeting. It is a discipline. It is the discipline of sitting with your own governance documentation and honestly asking: is this working? Am I following the rules I set for myself? If not, why not? Those questions are uncomfortable, and uncomfortable questions are the ones most worth asking regularly.</p>
+</section>
+
+<section>
+<h2>References</h2>
+
+<ul>
+<li>GOV-001 -- Authority Model (authority framework within which deliberation occurs)</li>
+<li>GOV-002 -- Decision Record Keeping (the decision log that deliberation records cross-reference)</li>
+<li>GOV-003 -- Dispute Resolution Procedures (activated when deliberation reveals disagreement)</li>
+<li>GOV-005 -- Emergency Governance Protocols (emergency deliberation sessions)</li>
+<li>GOV-007 -- Institutional Health Assessment (the governance health checklist used during SGRs)</li>
+<li>GOV-008 -- Decision-Making Frameworks (decision categories that determine deliberation requirements)</li>
+<li>GOV-009 -- The Continuity Protocol (SGR includes review of continuity archive status)</li>
+<li>GOV-011 -- External Relations Policy (SGR includes external relations review)</li>
+<li>GOV-012 -- Governance Amendment Process (amendments may arise from deliberation sessions)</li>
+<li>OPS-001 -- Operations Philosophy (operational tempo that includes time for deliberation)</li>
+</ul>
+<hr />
+<hr />
+</section>
+</article>
+</main>
+</body>
+</html>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D12-011 — Continuity of Operations in Degraded Mode - holm.chat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; line-height: 1.6; color: #222; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; min-width: 260px; background: #1a1a2e; color: #ccc; height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100; transition: transform 0.2s; }
+    .sidebar-header { padding: 1em; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .home-link { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .sidebar-toggle { background: none; border: none; color: #888; font-size: 1.4em; cursor: pointer; display: none; }
+    .sidebar-content { padding: 0.5em 0; }
+    .sidebar details { border-bottom: 1px solid #2a2a4a; }
+    .sidebar summary { padding: 0.6em 1em; cursor: pointer; font-size: 0.85em; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sidebar summary:hover { color: #fff; background: #2a2a4a; }
+    .sidebar ul { list-style: none; padding: 0 0 0.4em 0; }
+    .sidebar li { font-size: 0.82em; }
+    .sidebar li a { display: block; padding: 0.3em 1em 0.3em 1.8em; color: #bbb; text-decoration: none; }
+    .sidebar li a:hover { color: #fff; background: #2a2a4a; }
+    .sidebar li.active a { color: #fff; background: #16213e; border-left: 3px solid #4a90d9; padding-left: calc(1.8em - 3px); }
+
+    /* Main content */
+    main { margin-left: 260px; flex: 1; max-width: 52em; padding: 2em 2em 4em 2em; }
+    .mobile-menu-btn { display: none; position: fixed; top: 0.6em; left: 0.6em; z-index: 200; background: #1a1a2e; color: #fff; border: none; padding: 0.4em 0.7em; font-size: 1.2em; cursor: pointer; border-radius: 4px; }
+
+    /* Typography */
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; margin-bottom: 0.8em; font-size: 1.6em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.2em; margin-top: 2em; margin-bottom: 0.6em; font-size: 1.25em; }
+    h3 { margin-top: 1.5em; margin-bottom: 0.4em; }
+    p { margin-bottom: 0.8em; }
+    section { margin-bottom: 2em; }
+    ul, ol { margin: 0.5em 0 0.8em 1.5em; }
+    li { margin-bottom: 0.3em; }
+    aside.metadata { background: #f8f8f8; border-left: 3px solid #666; padding: 0.8em 1.2em; margin: 1em 0; font-size: 0.9em; }
+    aside.metadata dl { margin: 0; }
+    aside.metadata dt { font-weight: bold; display: inline; }
+    aside.metadata dt::after { content: ": "; }
+    aside.metadata dd { display: inline; margin: 0; }
+    aside.metadata dd::after { content: "\A"; white-space: pre; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #f0f0f0; }
+    pre { background: #f5f5f5; padding: 1em; overflow-x: auto; border: 1px solid #ddd; margin: 0.8em 0; }
+    code { font-family: "Courier New", monospace; font-size: 0.9em; }
+    blockquote { border-left: 3px solid #999; margin: 0.8em 0; padding-left: 1em; color: #555; }
+
+    /* Mobile */
+    @media (max-width: 800px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar-toggle { display: block; }
+        body:not(.sidebar-closed) .sidebar { transform: translateX(-100%); }
+        body.sidebar-open .sidebar { transform: translateX(0); }
+        main { margin-left: 0; padding: 3em 1em 2em 1em; }
+        .mobile-menu-btn { display: block; }
+    }
+
+  </style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="document.body.classList.toggle('sidebar-open')">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="home-link">holm.chat</a>
+    <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-closed')" aria-label="Toggle menu">&times;</button>
+  </div>
+  <div class="sidebar-content">
+  <details>
+    <summary>Constitution & Philosophy</summary>
+    <ul>
+      <li><a href="con-001.html">CON-001</a></li>
+      <li><a href="con-002.html">CON-002</a></li>
+      <li><a href="con-003.html">CON-003</a></li>
+      <li><a href="con-004.html">CON-004</a></li>
+      <li><a href="con-005.html">CON-005</a></li>
+      <li><a href="con-006.html">CON-006</a></li>
+      <li><a href="con-007.html">CON-007</a></li>
+      <li><a href="con-008.html">CON-008</a></li>
+      <li><a href="con-009.html">CON-009</a></li>
+      <li><a href="con-010.html">CON-010</a></li>
+      <li><a href="con-011.html">CON-011</a></li>
+      <li><a href="con-012.html">CON-012</a></li>
+      <li><a href="con-013.html">CON-013</a></li>
+      <li><a href="domain-1.html">DOMAIN-1</a></li>
+      <li><a href="eth-001.html">ETH-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Governance & Authority</summary>
+    <ul>
+      <li><a href="domain-2.html">DOMAIN-2</a></li>
+      <li><a href="gov-001.html">GOV-001</a></li>
+      <li><a href="gov-002.html">GOV-002</a></li>
+      <li><a href="gov-003.html">GOV-003</a></li>
+      <li><a href="gov-004.html">GOV-004</a></li>
+      <li><a href="gov-005.html">GOV-005</a></li>
+      <li><a href="gov-006.html">GOV-006</a></li>
+      <li><a href="gov-007.html">GOV-007</a></li>
+      <li><a href="gov-008.html">GOV-008</a></li>
+      <li><a href="gov-009.html">GOV-009</a></li>
+      <li><a href="gov-010.html">GOV-010</a></li>
+      <li><a href="gov-011.html">GOV-011</a></li>
+      <li><a href="gov-012.html">GOV-012</a></li>
+      <li><a href="gov-013.html">GOV-013</a></li>
+      <li><a href="gov-014.html">GOV-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Security & Integrity</summary>
+    <ul>
+      <li><a href="domain-3.html">DOMAIN-3</a></li>
+      <li><a href="sec-001.html">SEC-001</a></li>
+      <li><a href="sec-002.html">SEC-002</a></li>
+      <li><a href="sec-003.html">SEC-003</a></li>
+      <li><a href="sec-004.html">SEC-004</a></li>
+      <li><a href="sec-005.html">SEC-005</a></li>
+      <li><a href="sec-006.html">SEC-006</a></li>
+      <li><a href="sec-007.html">SEC-007</a></li>
+      <li><a href="sec-008.html">SEC-008</a></li>
+      <li><a href="sec-009.html">SEC-009</a></li>
+      <li><a href="sec-010.html">SEC-010</a></li>
+      <li><a href="sec-011.html">SEC-011</a></li>
+      <li><a href="sec-012.html">SEC-012</a></li>
+      <li><a href="sec-013.html">SEC-013</a></li>
+      <li><a href="sec-014.html">SEC-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Infrastructure & Power</summary>
+    <ul>
+      <li><a href="d4-001.html">D4-001</a></li>
+      <li><a href="d4-002.html">D4-002</a></li>
+      <li><a href="d4-003.html">D4-003</a></li>
+      <li><a href="d4-004.html">D4-004</a></li>
+      <li><a href="d4-005.html">D4-005</a></li>
+      <li><a href="d4-006.html">D4-006</a></li>
+      <li><a href="d4-007.html">D4-007</a></li>
+      <li><a href="d4-008.html">D4-008</a></li>
+      <li><a href="d4-009.html">D4-009</a></li>
+      <li><a href="d4-010.html">D4-010</a></li>
+      <li><a href="d4-011.html">D4-011</a></li>
+      <li><a href="d4-012.html">D4-012</a></li>
+      <li><a href="d4-013.html">D4-013</a></li>
+      <li><a href="d4-014.html">D4-014</a></li>
+      <li><a href="domain-4.html">DOMAIN-4</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Platform & Core Systems</summary>
+    <ul>
+      <li><a href="d5-001.html">D5-001</a></li>
+      <li><a href="d5-002.html">D5-002</a></li>
+      <li><a href="d5-003.html">D5-003</a></li>
+      <li><a href="d5-004.html">D5-004</a></li>
+      <li><a href="d5-005.html">D5-005</a></li>
+      <li><a href="d5-006.html">D5-006</a></li>
+      <li><a href="domain-5.html">DOMAIN-5</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Data & Archives</summary>
+    <ul>
+      <li><a href="d6-001.html">D6-001</a></li>
+      <li><a href="d6-002.html">D6-002</a></li>
+      <li><a href="d6-003.html">D6-003</a></li>
+      <li><a href="d6-004.html">D6-004</a></li>
+      <li><a href="d6-005.html">D6-005</a></li>
+      <li><a href="d6-006.html">D6-006</a></li>
+      <li><a href="d6-007.html">D6-007</a></li>
+      <li><a href="d6-008.html">D6-008</a></li>
+      <li><a href="d6-009.html">D6-009</a></li>
+      <li><a href="d6-010.html">D6-010</a></li>
+      <li><a href="d6-011.html">D6-011</a></li>
+      <li><a href="d6-012.html">D6-012</a></li>
+      <li><a href="d6-013.html">D6-013</a></li>
+      <li><a href="d6-014.html">D6-014</a></li>
+      <li><a href="d6-015.html">D6-015</a></li>
+      <li><a href="domain-6.html">DOMAIN-6</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Intelligence & Analysis</summary>
+    <ul>
+      <li><a href="d7-001.html">D7-001</a></li>
+      <li><a href="d7-002.html">D7-002</a></li>
+      <li><a href="d7-003.html">D7-003</a></li>
+      <li><a href="d7-004.html">D7-004</a></li>
+      <li><a href="d7-005.html">D7-005</a></li>
+      <li><a href="d7-006.html">D7-006</a></li>
+      <li><a href="d7-007.html">D7-007</a></li>
+      <li><a href="d7-008.html">D7-008</a></li>
+      <li><a href="d7-009.html">D7-009</a></li>
+      <li><a href="d7-010.html">D7-010</a></li>
+      <li><a href="d7-011.html">D7-011</a></li>
+      <li><a href="d7-012.html">D7-012</a></li>
+      <li><a href="d7-013.html">D7-013</a></li>
+      <li><a href="domain-7.html">DOMAIN-7</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Automation & Agents</summary>
+    <ul>
+      <li><a href="d8-001.html">D8-001</a></li>
+      <li><a href="d8-002.html">D8-002</a></li>
+      <li><a href="d8-003.html">D8-003</a></li>
+      <li><a href="d8-004.html">D8-004</a></li>
+      <li><a href="d8-005.html">D8-005</a></li>
+      <li><a href="d8-006.html">D8-006</a></li>
+      <li><a href="d8-007.html">D8-007</a></li>
+      <li><a href="d8-008.html">D8-008</a></li>
+      <li><a href="d8-009.html">D8-009</a></li>
+      <li><a href="d8-010.html">D8-010</a></li>
+      <li><a href="d8-011.html">D8-011</a></li>
+      <li><a href="d8-012.html">D8-012</a></li>
+      <li><a href="d8-013.html">D8-013</a></li>
+      <li><a href="domain-8.html">DOMAIN-8</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Education & Training</summary>
+    <ul>
+      <li><a href="d9-001.html">D9-001</a></li>
+      <li><a href="d9-002.html">D9-002</a></li>
+      <li><a href="d9-003.html">D9-003</a></li>
+      <li><a href="d9-004.html">D9-004</a></li>
+      <li><a href="d9-005.html">D9-005</a></li>
+      <li><a href="d9-006.html">D9-006</a></li>
+      <li><a href="d9-007.html">D9-007</a></li>
+      <li><a href="d9-008.html">D9-008</a></li>
+      <li><a href="d9-009.html">D9-009</a></li>
+      <li><a href="d9-010.html">D9-010</a></li>
+      <li><a href="d9-011.html">D9-011</a></li>
+      <li><a href="d9-012.html">D9-012</a></li>
+      <li><a href="d9-013.html">D9-013</a></li>
+      <li><a href="domain-9.html">DOMAIN-9</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>User Operations</summary>
+    <ul>
+      <li><a href="d10-002.html">D10-002</a></li>
+      <li><a href="d10-003.html">D10-003</a></li>
+      <li><a href="d10-004.html">D10-004</a></li>
+      <li><a href="d10-005.html">D10-005</a></li>
+      <li><a href="d10-006.html">D10-006</a></li>
+      <li><a href="d10-007.html">D10-007</a></li>
+      <li><a href="d10-008.html">D10-008</a></li>
+      <li><a href="d10-009.html">D10-009</a></li>
+      <li><a href="d10-010.html">D10-010</a></li>
+      <li><a href="d10-011.html">D10-011</a></li>
+      <li><a href="d10-012.html">D10-012</a></li>
+      <li><a href="d10-013.html">D10-013</a></li>
+      <li><a href="d10-014.html">D10-014</a></li>
+      <li><a href="domain-10.html">DOMAIN-10</a></li>
+      <li><a href="ops-001.html">OPS-001</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Administration</summary>
+    <ul>
+      <li><a href="d11-001.html">D11-001</a></li>
+      <li><a href="d11-002.html">D11-002</a></li>
+      <li><a href="d11-003.html">D11-003</a></li>
+      <li><a href="d11-004.html">D11-004</a></li>
+      <li><a href="d11-005.html">D11-005</a></li>
+      <li><a href="d11-006.html">D11-006</a></li>
+      <li><a href="d11-007.html">D11-007</a></li>
+      <li><a href="d11-008.html">D11-008</a></li>
+      <li><a href="d11-009.html">D11-009</a></li>
+      <li><a href="d11-010.html">D11-010</a></li>
+      <li><a href="d11-011.html">D11-011</a></li>
+      <li><a href="d11-012.html">D11-012</a></li>
+      <li><a href="d11-013.html">D11-013</a></li>
+      <li><a href="domain-11.html">DOMAIN-11</a></li>
+    </ul>
+  </details>
+  <details open>
+    <summary>Disaster Recovery</summary>
+    <ul>
+      <li><a href="d12-001.html">D12-001</a></li>
+      <li><a href="d12-002.html">D12-002</a></li>
+      <li><a href="d12-003.html">D12-003</a></li>
+      <li><a href="d12-004.html">D12-004</a></li>
+      <li><a href="d12-005.html">D12-005</a></li>
+      <li><a href="d12-006.html">D12-006</a></li>
+      <li><a href="d12-007.html">D12-007</a></li>
+      <li><a href="d12-008.html">D12-008</a></li>
+      <li><a href="d12-009.html">D12-009</a></li>
+      <li><a href="d12-010.html">D12-010</a></li>
+      <li class="active"><a href="d12-011.html">D12-011</a></li>
+      <li><a href="d12-012.html">D12-012</a></li>
+      <li><a href="d12-013.html">D12-013</a></li>
+      <li><a href="d12-014.html">D12-014</a></li>
+      <li><a href="domain-12.html">DOMAIN-12</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Evolution & Adaptation</summary>
+    <ul>
+      <li><a href="d13-001.html">D13-001</a></li>
+      <li><a href="d13-002.html">D13-002</a></li>
+      <li><a href="d13-003.html">D13-003</a></li>
+      <li><a href="d13-004.html">D13-004</a></li>
+      <li><a href="d13-005.html">D13-005</a></li>
+      <li><a href="d13-006.html">D13-006</a></li>
+      <li><a href="d13-007.html">D13-007</a></li>
+      <li><a href="d13-008.html">D13-008</a></li>
+      <li><a href="d13-009.html">D13-009</a></li>
+      <li><a href="d13-010.html">D13-010</a></li>
+      <li><a href="d13-011.html">D13-011</a></li>
+      <li><a href="d13-012.html">D13-012</a></li>
+      <li><a href="d13-013.html">D13-013</a></li>
+      <li><a href="domain-13.html">DOMAIN-13</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Research & Theory</summary>
+    <ul>
+      <li><a href="d14-001.html">D14-001</a></li>
+      <li><a href="d14-002.html">D14-002</a></li>
+      <li><a href="d14-003.html">D14-003</a></li>
+      <li><a href="d14-004.html">D14-004</a></li>
+      <li><a href="d14-005.html">D14-005</a></li>
+      <li><a href="d14-006.html">D14-006</a></li>
+      <li><a href="d14-007.html">D14-007</a></li>
+      <li><a href="d14-008.html">D14-008</a></li>
+      <li><a href="d14-009.html">D14-009</a></li>
+      <li><a href="d14-010.html">D14-010</a></li>
+      <li><a href="d14-011.html">D14-011</a></li>
+      <li><a href="d14-012.html">D14-012</a></li>
+      <li><a href="d14-013.html">D14-013</a></li>
+      <li><a href="domain-14.html">DOMAIN-14</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Ethics & Safeguards</summary>
+    <ul>
+      <li><a href="d15-001.html">D15-001</a></li>
+      <li><a href="d15-002.html">D15-002</a></li>
+      <li><a href="d15-003.html">D15-003</a></li>
+      <li><a href="d15-004.html">D15-004</a></li>
+      <li><a href="d15-005.html">D15-005</a></li>
+      <li><a href="domain-15.html">DOMAIN-15</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Interface & Navigation</summary>
+    <ul>
+      <li><a href="d16-001.html">D16-001</a></li>
+      <li><a href="d16-002.html">D16-002</a></li>
+      <li><a href="d16-003.html">D16-003</a></li>
+      <li><a href="d16-004.html">D16-004</a></li>
+      <li><a href="d16-005.html">D16-005</a></li>
+      <li><a href="d16-006.html">D16-006</a></li>
+      <li><a href="d16-007.html">D16-007</a></li>
+      <li><a href="d16-008.html">D16-008</a></li>
+      <li><a href="d16-009.html">D16-009</a></li>
+      <li><a href="d16-010.html">D16-010</a></li>
+      <li><a href="d16-011.html">D16-011</a></li>
+      <li><a href="d16-012.html">D16-012</a></li>
+      <li><a href="d16-013.html">D16-013</a></li>
+      <li><a href="d16-014.html">D16-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Scaling & Federation</summary>
+    <ul>
+      <li><a href="d17-001.html">D17-001</a></li>
+      <li><a href="d17-002.html">D17-002</a></li>
+      <li><a href="d17-003.html">D17-003</a></li>
+      <li><a href="d17-004.html">D17-004</a></li>
+      <li><a href="d17-005.html">D17-005</a></li>
+      <li><a href="d17-006.html">D17-006</a></li>
+      <li><a href="d17-007.html">D17-007</a></li>
+      <li><a href="d17-008.html">D17-008</a></li>
+      <li><a href="d17-009.html">D17-009</a></li>
+      <li><a href="d17-010.html">D17-010</a></li>
+      <li><a href="d17-011.html">D17-011</a></li>
+      <li><a href="d17-012.html">D17-012</a></li>
+      <li><a href="d17-013.html">D17-013</a></li>
+      <li><a href="d17-014.html">D17-014</a></li>
+      <li><a href="d17-015.html">D17-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Import & Quarantine</summary>
+    <ul>
+      <li><a href="d18-001.html">D18-001</a></li>
+      <li><a href="d18-002.html">D18-002</a></li>
+      <li><a href="d18-003.html">D18-003</a></li>
+      <li><a href="d18-004.html">D18-004</a></li>
+      <li><a href="d18-005.html">D18-005</a></li>
+      <li><a href="d18-006.html">D18-006</a></li>
+      <li><a href="d18-007.html">D18-007</a></li>
+      <li><a href="d18-008.html">D18-008</a></li>
+      <li><a href="d18-009.html">D18-009</a></li>
+      <li><a href="d18-010.html">D18-010</a></li>
+      <li><a href="d18-011.html">D18-011</a></li>
+      <li><a href="d18-012.html">D18-012</a></li>
+      <li><a href="d18-013.html">D18-013</a></li>
+      <li><a href="d18-014.html">D18-014</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Quality Assurance</summary>
+    <ul>
+      <li><a href="d19-001.html">D19-001</a></li>
+      <li><a href="d19-002.html">D19-002</a></li>
+      <li><a href="d19-003.html">D19-003</a></li>
+      <li><a href="d19-004.html">D19-004</a></li>
+      <li><a href="d19-005.html">D19-005</a></li>
+      <li><a href="d19-006.html">D19-006</a></li>
+      <li><a href="d19-007.html">D19-007</a></li>
+      <li><a href="d19-008.html">D19-008</a></li>
+      <li><a href="d19-009.html">D19-009</a></li>
+      <li><a href="d19-010.html">D19-010</a></li>
+      <li><a href="d19-011.html">D19-011</a></li>
+      <li><a href="d19-012.html">D19-012</a></li>
+      <li><a href="d19-013.html">D19-013</a></li>
+      <li><a href="d19-014.html">D19-014</a></li>
+      <li><a href="d19-015.html">D19-015</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Institutional Memory</summary>
+    <ul>
+      <li><a href="d20-001.html">D20-001</a></li>
+      <li><a href="d20-002.html">D20-002</a></li>
+      <li><a href="d20-003.html">D20-003</a></li>
+      <li><a href="d20-004.html">D20-004</a></li>
+      <li><a href="d20-005.html">D20-005</a></li>
+      <li><a href="d20-006.html">D20-006</a></li>
+      <li><a href="d20-007.html">D20-007</a></li>
+      <li><a href="d20-008.html">D20-008</a></li>
+      <li><a href="d20-009.html">D20-009</a></li>
+      <li><a href="d20-010.html">D20-010</a></li>
+      <li><a href="d20-011.html">D20-011</a></li>
+      <li><a href="d20-012.html">D20-012</a></li>
+      <li><a href="d20-013.html">D20-013</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Meta-Documentation</summary>
+    <ul>
+      <li><a href="meta-001.html">META-001</a></li>
+      <li><a href="meta-002.html">META-002</a></li>
+      <li><a href="meta-003.html">META-003</a></li>
+      <li><a href="meta-004.html">META-004</a></li>
+      <li><a href="meta-005.html">META-005</a></li>
+      <li><a href="meta-006.html">META-006</a></li>
+      <li><a href="meta-007.html">META-007</a></li>
+      <li><a href="meta-008.html">META-008</a></li>
+      <li><a href="meta-009.html">META-009</a></li>
+      <li><a href="meta-010.html">META-010</a></li>
+      <li><a href="meta-011.html">META-011</a></li>
+      <li><a href="meta-012.html">META-012</a></li>
+      <li><a href="meta-013.html">META-013</a></li>
+      <li><a href="meta-014.html">META-014</a></li>
+      <li><a href="meta-015.html">META-015</a></li>
+      <li><a href="meta-framework.html">Unifying Standards for the Hol</a></li>
+    </ul>
+  </details>
+  <details>
+    <summary>Framework</summary>
+    <ul>
+      <li><a href="appendix-a.html">ARTICLE INDEX (ALL DOMAINS)</a></li>
+      <li><a href="appendix-a-2.html">ARTICLE TEMPLATE (FULL)</a></li>
+      <li><a href="appendix-b.html">DOCUMENT VERSIONING SCHEME</a></li>
+      <li><a href="appendix-b-2.html">META-RULES FOR ALL DOCUMENTATI</a></li>
+      <li><a href="appendix-c.html">HOW TO USE THIS FRAMEWORK</a></li>
+      <li><a href="consolidated-writing-schedule.html">Consolidated Writing Schedule</a></li>
+      <li><a href="cross-domain-integration.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-integration-2.html">CROSS-DOMAIN INTEGRATION</a></li>
+      <li><a href="cross-domain-dependency-matrix.html">Cross-Domain Dependency Matrix</a></li>
+      <li><a href="cross-domain-synthesis-domains-6-10.html">CROSS-DOMAIN SYNTHESIS: DOMAIN</a></li>
+      <li><a href="universal-review-process.html">UNIVERSAL REVIEW PROCESS</a></li>
+      <li><a href="universal-maintenance-plan.html">UNIVERSAL MAINTENANCE PLAN</a></li>
+    </ul>
+  </details>
+  </div>
+</nav>
+
+<main>
+<article id="d12-011">
+  <h1>D12-011 &mdash; Continuity of Operations in Degraded Mode</h1>
+<aside class="metadata">
+<dl>
+  <dt>Document ID</dt>
+  <dd>D12-011</dd>
+  <dt>Domain</dt>
+  <dd>12 -- Disaster Recovery</dd>
+  <dt>Version</dt>
+  <dd>1.0.0</dd>
+  <dt>Date</dt>
+  <dd>2026-02-17</dd>
+  <dt>Status</dt>
+  <dd>Ratified</dd>
+  <dt>Depends On</dt>
+  <dd>D12-001, D12-004, D12-007, OPS-001, ETH-001, CON-001</dd>
+  <dt>Depended Upon By</dt>
+  <dd>D12-002 (all drill scenarios involve degraded mode assessment), D12-012 (cascade analysis references degraded mode tiers), D12-014 (communication during degraded operations).</dd>
+</dl>
+</aside>
+
+<section>
+<h2>Purpose</h2>
+
+<p>This article defines how the institution continues to function when it cannot function fully. Most failures are partial, not total. A storage drive fails but the OS drive survives. The power grid drops but the UPS provides hours of battery. A backup location becomes inaccessible but the other two remain. These partial failures put the institution into a degraded state: still operational but with reduced capability, reduced redundancy, or reduced margin for additional failures.</p>
+<p>D12-001 Section 4.2 introduced the graceful degradation model with five levels from full capability to catastrophic loss. This article operationalizes that model. For each degradation level, it defines: the entry criteria (what triggers entry into this level), the operational constraints (what the institution can and cannot do at this level), the priorities (what activities take precedence), the exit criteria (what must happen to return to a higher capability level), and the time limits (how long the institution can safely remain at this level before the degraded state itself becomes a threat).</p>
+<p>The key insight is that degraded operations require different behavior than normal operations. In normal operations, the operator follows the full operational tempo, conducts all scheduled activities, and pursues the institution's complete mission. In degraded operations, the operator narrows focus to preserving the institution's core assets -- data, documentation, and the ability to recover -- while deferring everything else until capability is restored.</p>
+</section>
+
+<section>
+<h2>Scope</h2>
+
+<p><strong>In scope:</strong></p>
+<ul>
+<li>Definition of five degradation tiers with entry criteria, operational constraints, priorities, exit criteria, and time limits.</li>
+<li>Decision framework for determining the current degradation tier.</li>
+<li>Operational checklists for each tier.</li>
+<li>Escalation and de-escalation procedures between tiers.</li>
+<li>Integration with other recovery procedures.</li>
+</ul>
+<p><strong>Out of scope:</strong></p>
+<ul>
+<li>Specific component recovery procedures (D12-007, D12-008, D12-009).</li>
+<li>Full rebuild procedures (D12-003).</li>
+<li>Ethical triage decisions during degraded operations (Domain 15, cross-referenced).</li>
+</ul>
+</section>
+
+<section>
+<h2>Background</h2>
+
+<h3>3.1 Why Degraded Mode Needs Its Own Article</h3>
+<p>Most disaster recovery documentation focuses on two states: normal and crisis. The implicit assumption is that a crisis triggers a recovery procedure, the procedure restores normal operations, and everything returns to the way it was. This assumption ignores the most common reality: the period between a failure and full recovery, which can last hours, days, or weeks.</p>
+<p>During this period, the institution is neither normal nor in active crisis. It is in between: functional but fragile. And this in-between state is where mistakes are most likely. The operator, relieved that the initial crisis is past but aware that the system is still impaired, may take risks they would not normally take, defer safety activities because "we're already in a bad state," or fail to recognize that the degraded state has created new vulnerabilities.</p>
+
+<h3>3.2 The Compounding Risk of Degraded Operations</h3>
+<p>Every degradation level reduces the institution's ability to withstand additional failures. At full capability, a single drive failure is a routine recovery event. At reduced capability (with one drive already failed and operating from backup), a second drive failure becomes a crisis. The longer the institution operates in a degraded state, the greater the risk that an additional failure will cascade into a more severe tier. Time limits for each tier reflect this compounding risk.</p>
+</section>
+
+<section>
+<h2>System Model</h2>
+
+<h3>4.1 Tier 0: Full Capability</h3>
+<p><strong>Entry criteria:</strong> All systems operational. All backup locations current. All scheduled maintenance up to date. Spare parts inventory complete.</p>
+<p><strong>Operations:</strong> Normal operational tempo per OPS-001. Full mission activities.</p>
+<p><strong>This is not a degraded tier.</strong> It is the baseline against which degradation is measured.</p>
+
+<h3>4.2 Tier 1: Reduced Capability</h3>
+<p><strong>Entry criteria:</strong> One non-critical system or component is offline or impaired. All critical data remains accessible. All backup locations remain functional. Examples: a peripheral fails, a non-essential service is down, a Tier 3 data set is temporarily inaccessible.</p>
+<p><strong>Operational constraints:</strong></p>
+<ul>
+<li>Continue normal operations for all unaffected systems.</li>
+<li>Defer non-essential activities to focus on restoration of the impaired component.</li>
+<li>Increase monitoring frequency for the impaired area.</li>
+</ul>
+<p><strong>Priorities:</strong> 1) Diagnose and repair the impaired component. 2) Verify that the impairment has not affected other systems. 3) Resume normal operations.</p>
+<p><strong>Exit criteria:</strong> Impaired component restored and verified. Normal operations resumed.</p>
+<p><strong>Time limit:</strong> 30 days. If the impairment cannot be resolved within 30 days, escalate to Tier 2 assessment (the extended impairment itself becomes a vulnerability).</p>
+
+<h3>4.3 Tier 2: Significant Degradation</h3>
+<p><strong>Entry criteria:</strong> One critical system or component is offline or impaired, OR one backup location is unavailable, OR spare parts inventory is depleted for a critical component class. Examples: primary storage drive failed (operating from backup), Location A backup unavailable, power supply failed and no spare available.</p>
+<p><strong>Operational constraints:</strong></p>
+<ul>
+<li>Suspend all non-essential activities.</li>
+<li>Increase backup frequency for remaining functional systems (if a backup location is lost, the remaining locations must compensate).</li>
+<li>Do not perform any operations that risk additional data or system loss.</li>
+<li>Document the degraded state in the operational log, including the date of entry and the planned recovery path.</li>
+</ul>
+<p><strong>Priorities:</strong> 1) Restore the critical component or backup location. 2) Verify the integrity of all remaining systems. 3) Replenish depleted spares. 4) Resume normal operations only after all Tier 0 criteria are met.</p>
+<p><strong>Exit criteria:</strong> Critical component restored, backup location re-established, or equivalent capability provided through alternative means. Return to Tier 0 or Tier 1 confirmed.</p>
+<p><strong>Time limit:</strong> 14 days. Extended operation at Tier 2 means the institution has reduced redundancy and is one additional failure away from Tier 3 or worse.</p>
+
+<h3>4.4 Tier 3: Minimal Capability</h3>
+<p><strong>Entry criteria:</strong> Multiple critical systems or components are offline, OR two or more backup locations are unavailable, OR the institution is operating on emergency power with limited runtime. Examples: hardware failure during an ongoing backup recovery, primary and secondary backup locations both compromised, UPS on battery with no mains power available.</p>
+<p><strong>Operational constraints:</strong></p>
+<ul>
+<li>The institution's only function is to preserve data and maintain the ability to recover.</li>
+<li>Cease all activities except: data preservation, backup integrity maintenance, and active recovery work.</li>
+<li>If on emergency power, prepare for orderly shutdown: verify latest backup, ensure all critical writes are committed, document the current state for recovery reference.</li>
+</ul>
+<p><strong>Priorities:</strong> 1) Preserve data integrity. 2) Restore at least one backup location to functional status. 3) Address the failures that caused entry into Tier 3. 4) Escalate to D12-003 (full rebuild) if component-level recovery is not feasible.</p>
+<p><strong>Exit criteria:</strong> At least one critical system and one backup location restored. Confirmed ability to return to Tier 2 or better.</p>
+<p><strong>Time limit:</strong> 7 days. At Tier 3, the institution is operating without adequate safety margin. Every day increases the probability of total loss.</p>
+
+<h3>4.5 Tier 4: Preservation Mode</h3>
+<p><strong>Entry criteria:</strong> The institution cannot actively operate. All compute systems are offline. The institution's data exists only on backup media. Examples: all on-site hardware destroyed (facility loss per D12-009), extended power loss with UPS depleted, all drives failed simultaneously.</p>
+<p><strong>Operational constraints:</strong></p>
+<ul>
+<li>No active services. No active operations.</li>
+<li>The institution's existence is maintained through its backup media and documentation.</li>
+<li>The operator's role is to preserve the backup media (keep it physically secure, prevent environmental damage) and plan the recovery.</li>
+</ul>
+<p><strong>Priorities:</strong> 1) Secure all surviving backup media. 2) Plan the recovery (procure hardware, identify rebuild site). 3) Execute D12-003 (System Rebuild).</p>
+<p><strong>Exit criteria:</strong> A functional system has been rebuilt and verified per D12-003. Data has been restored from backup. At least one backup location is operational.</p>
+<p><strong>Time limit:</strong> No strict time limit (the institution is safe in backup form), but active recovery should begin as soon as resources permit. Extended periods in Tier 4 increase the risk of backup media degradation.</p>
+</section>
+
+<section>
+<h2>Rules &amp; Constraints</h2>
+
+<ul>
+<li><strong>R-D12-11-01:</strong> Entry into any degraded tier (Tier 1 through Tier 4) must be documented in the operational log with: the date of entry, the cause, the current tier, and the planned recovery path.</li>
+<li><strong>R-D12-11-02:</strong> Time limits for each tier must be respected. If the time limit is exceeded, the situation must be escalated: either to the next higher tier's procedures or to a Tier 3 governance decision.</li>
+<li><strong>R-D12-11-03:</strong> At Tier 2 or higher, no non-essential operations may be performed. The operator must focus entirely on recovery.</li>
+<li><strong>R-D12-11-04:</strong> Exit from a degraded tier requires verification that the exit criteria are met, not merely the operator's assessment that things "seem fine." The verification checklist for the relevant recovery procedure (D12-007, D12-008, D12-003) must be completed.</li>
+<li><strong>R-D12-11-05:</strong> Each degradation tier must be practiced at least once per year through the DR drill cycle (D12-002). The operator must experience operating at Tier 2 and Tier 3 under drill conditions per D12-001 R-DR-08.</li>
+</ul>
+</section>
+
+<section>
+<h2>Failure Modes</h2>
+
+<ul>
+<li><strong>Tier underestimation.</strong> The operator assesses a Tier 2 situation as Tier 1, failing to take adequate precautions and deferring recovery. A second failure escalates to Tier 3 or worse. Mitigation: the entry criteria for each tier are defined explicitly. When in doubt, assume the higher tier.</li>
+<li><strong>Recovery procrastination.</strong> The institution is functional (barely) at a degraded tier, and the operator defers recovery because "it's still working." Time limits are exceeded. Mitigation: R-D12-11-02 enforces time limits. The operational log entry (R-D12-11-01) creates accountability.</li>
+<li><strong>Panic escalation.</strong> The operator, stressed by a partial failure, over-reacts and treats a Tier 1 situation as Tier 3, shutting down systems unnecessarily and creating disruption that worsens the situation. Mitigation: the structured tier model provides a rational framework. Follow the entry criteria. Match the response to the actual tier.</li>
+<li><strong>Unrecognized degradation.</strong> The institution has silently entered a degraded state (e.g., a backup location has failed without notification, spare parts have been depleted without tracking). The operator believes they are at Tier 0 when they are actually at Tier 2. Mitigation: the quarterly health check (GOV-007) verifies all Tier 0 criteria.</li>
+</ul>
+</section>
+
+<section>
+<h2>Recovery Procedures</h2>
+
+<ol>
+<li><strong>If the current degradation tier is uncertain:</strong> Evaluate against the entry criteria for each tier, starting from Tier 4 and working down. The institution is at the highest tier whose entry criteria are met. When uncertain between two tiers, assume the more severe one.</li>
+<li><strong>If time limits have been exceeded:</strong> Immediately assess whether the situation has worsened. If additional failures have occurred, escalate the tier. If no additional failures have occurred, intensify recovery efforts and document the overrun. Set a new deadline of half the original time limit.</li>
+<li><strong>If the institution reaches Tier 4:</strong> This is a survival scenario. Follow D12-003 for rebuild, D12-009 for facility loss if applicable. The operational focus narrows to a single goal: restore one functional system with verified data from backup.</li>
+</ol>
+</section>
+
+<section>
+<h2>Evolution Path</h2>
+
+<ul>
+<li><strong>Years 0-5:</strong> The degradation tier model is theoretical until the first real degraded event occurs. Drill at least Tier 2 scenarios annually. The first real Tier 1 or Tier 2 event will test whether the tier definitions are practical.</li>
+<li><strong>Years 5-15:</strong> Real degraded operations events (drive failures, power issues) provide data to refine the tier definitions and time limits. Adjust based on actual recovery times observed.</li>
+<li><strong>Years 15-30:</strong> The tier model may need expansion or adjustment as the institution's complexity changes. New systems may create new degradation pathways not covered by the original model.</li>
+<li><strong>Years 30-50+:</strong> The accumulated history of degraded-mode events informs a refined model. The tiers remain useful as a thinking framework even as the specific criteria evolve.</li>
+</ul>
+</section>
+
+<section>
+<h2>Founder Commentary</h2>
+
+<p><em>This section is reserved for dated entries by current and future operators.</em></p>
+<p><strong>2026-02-17 -- Founding Entry:</strong>
+The degraded-mode model addresses a problem I have seen in every disaster recovery plan I have read: they tell you what to do when things break, but not how to live with partial breakage while you fix it. The gap between "crisis detected" and "crisis resolved" can be days or weeks, and during that time you still need to operate -- just differently.</p>
+<p>The time limits are the most important feature of this article. Without them, it is too easy to normalize degradation. "We've been running with one backup location for six months and nothing bad has happened" -- until it does, and then the missing backup location is the difference between recovery and catastrophe. The time limits force action. They say: this state is temporary. Resolve it or escalate it. Do not accept it as the new normal.</p>
+</section>
+
+<section>
+<h2>Internal References</h2>
+
+<ul>
+<li>D12-001 -- Disaster Recovery Philosophy (graceful degradation model, Section 4.2)</li>
+<li>D12-004 -- Failure Taxonomy (failure classes that trigger degradation)</li>
+<li>D12-007 -- Hardware Failure Recovery (component-level recovery during degraded operations)</li>
+<li>D12-008 -- Data Corruption Recovery (data recovery during degraded operations)</li>
+<li>D12-009 -- Facility Loss and Relocation (Tier 4 facility loss scenario)</li>
+<li>D12-003 -- System Rebuild Procedures (Tier 4 rebuild scenario)</li>
+<li>D12-002 -- Disaster Recovery Drill Framework (degraded-mode drills)</li>
+<li>D12-012 -- Cascade Failure Analysis (degraded states creating cascade risk)</li>
+<li>D12-014 -- Communication During Disasters (coordination during degraded operations)</li>
+<li>OPS-001 -- Operations Philosophy (normal operational tempo baseline)</li>
+<li>GOV-007 -- Institutional Health Assessment (quarterly Tier 0 verification)</li>
+<li>ETH-001 -- Ethical Foundations (triage priorities during degraded operations)</li>
+</ul>
+<hr>
+<hr>
+</section>
+</article>
+</main>
+</body>
+</html>
