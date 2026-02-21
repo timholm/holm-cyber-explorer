@@ -699,6 +699,19 @@ input, textarea { font-family: var(--font); }
 }
 body.offline #offline-banner { display: block; }
 
+
+/* Pull to refresh */
+.ptr-indicator {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  padding: 0.5rem 1rem; font-size: 0.7rem;
+  color: var(--neon-cyan); background: var(--bg-surface);
+  border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  opacity: 0; transition: opacity 0.2s;
+  z-index: 150; pointer-events: none;
+}
+.ptr-indicator.visible { opacity: 1; }
+
 /* ═══════════════════════════════════════════════════════════════
    Desktop Media Queries
    ═══════════════════════════════════════════════════════════════ */
@@ -735,6 +748,7 @@ body.offline #offline-banner { display: block; }
 
 <!-- Offline Banner -->
 <div id="offline-banner">You are offline — showing cached data</div>
+<div class="ptr-indicator" id="ptr-indicator">Release to refresh</div>
 
 <!-- Loading Screen -->
 <div id="loading-screen">
@@ -1695,7 +1709,6 @@ function setupGraphInteractions(canvas, ctx) {
     isDragging = false; dragNode = null; lastPos = null; lastTouchDist = 0;
     touchStartTime = 0; touchStartPos = null;
   });
-  });
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1819,6 +1832,48 @@ function restoreScrollPos(docId) {
 }
 
 });
+
+/* Pull to Refresh */
+(function() {
+  let startY = 0;
+  let pulling = false;
+  const threshold = 80;
+  const indicator = document.getElementById('ptr-indicator');
+  
+  document.addEventListener('touchstart', e => {
+    if (window.scrollY === 0 && currentView === 'hub') {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+  
+  document.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 30) {
+      indicator.classList.add('visible');
+      indicator.textContent = dy > threshold ? 'Release to refresh' : 'Pull to refresh';
+    }
+  }, { passive: true });
+  
+  document.addEventListener('touchend', e => {
+    if (!pulling) return;
+    const dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : 0) - startY;
+    pulling = false;
+    indicator.classList.remove('visible');
+    if (dy > threshold && currentView === 'hub') {
+      showToast('Refreshing...');
+      fetch('/api/docs').then(r => r.json()).then(docs => {
+        allDocs = docs;
+        docsById = {};
+        allDocs.forEach(d => { docsById[d.docId] = d; });
+        computeDomainHealth();
+        renderHub();
+        showToast('Refreshed');
+      }).catch(() => showToast('Refresh failed', 'error'));
+    }
+  }, { passive: true });
+})();
 
 init();
 </script>
