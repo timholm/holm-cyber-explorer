@@ -23,12 +23,32 @@ spec:
       # CoreDNS resolves *.holm.chat via coredns-custom ConfigMap
       # For air-gapped operation, remove all external nameservers
       initContainers:
-        - name: git-clone
+        - name: git-sync
           image: alpine/git:latest
           command:
             - sh
             - -c
             - |
+              # ── Offline-aware init: use cached content if network unavailable ──
+              # If /data/server.js exists from a previous run, skip cloning.
+              # This lets the pod start without internet access.
+              if [ -f /data/server.js ] && [ -f /data/manifest.json ]; then
+                echo "[init] Persistent content found — attempting git pull (non-fatal)..."
+                cd /data
+                git pull --depth 1 origin main 2>/dev/null || echo "[init] Pull failed (offline?) — using cached content"
+                # Try updating docs too
+                if [ -d /tmp/docs-cache/.git ]; then
+                  cd /tmp/docs-cache
+                  git pull --depth 1 origin main 2>/dev/null && {
+                    cp html/manifest.json /data/manifest.json
+                    cp -r html /data/html
+                  } || echo "[init] Docs pull failed — using cached docs"
+                fi
+                echo "[init] Ready (offline-capable)."
+                exit 0
+              fi
+
+              echo "[init] No cached content — fresh clone required..."
               for i in 1 2 3 4 5; do
                 echo "Attempt $i: cloning repos..."
                 git clone --depth 1 https://github.com/timholm/holm-cyber-explorer.git /tmp/repo && break
@@ -36,15 +56,24 @@ spec:
                 sleep ${i}0
                 rm -rf /tmp/repo
               done
+              if [ ! -d /tmp/repo ]; then
+                echo "[init] FATAL: Cannot clone and no cached content. Exiting."
+                exit 1
+              fi
               cp -r /tmp/repo/* /data/
+              # Preserve .git for future pulls
+              cp -r /tmp/repo/.git /data/.git 2>/dev/null || true
               for i in 1 2 3 4 5; do
                 git clone --depth 1 https://github.com/timholm/docs-framework.git /tmp/docs && break
                 echo "Docs clone failed, retrying in ${i}0s..."
                 sleep ${i}0
                 rm -rf /tmp/docs
               done
-              cp /tmp/docs/html/manifest.json /data/manifest.json
-              cp -r /tmp/docs/html /data/html
+              if [ -d /tmp/docs ]; then
+                cp /tmp/docs/html/manifest.json /data/manifest.json
+                cp -r /tmp/docs/html /data/html
+              fi
+              echo "[init] Fresh clone complete."
           volumeMounts:
             - name: app-content
               mountPath: /data
@@ -81,6 +110,8 @@ spec:
                   name: holm-cyber-secrets
                   key: webhook-secret
                   optional: true
+            - name: DATA_CACHE_DIR
+              value: "/cache"
           livenessProbe:
             httpGet:
               path: /healthz
@@ -108,6 +139,8 @@ spec:
             - name: app-content
               mountPath: /app
               readOnly: false
+            - name: local-cache
+              mountPath: /cache
           resources:
             requests:
               memory: "256Mi"
@@ -117,7 +150,11 @@ spec:
               cpu: "500m"
       volumes:
         - name: app-content
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: app-content
+        - name: local-cache
+          persistentVolumeClaim:
+            claimName: local-cache
 ---
 apiVersion: v1
 kind: Service

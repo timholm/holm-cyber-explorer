@@ -10,8 +10,67 @@ app.set('etag', 'strong');
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/holmvault';
 const BASE_URL = process.env.BASE_URL || 'http://holm.local';
+const DATA_CACHE_DIR = process.env.DATA_CACHE_DIR || path.join(__dirname, '.cache');
 
 let db;
+let mongoConnected = false;
+
+// ══════════════════════════════════════════════════════════════
+// LOCAL FILE CACHE — offline fallback for reads when MongoDB is down
+// ══════════════════════════════════════════════════════════════
+const localCache = {
+  _ensureDir(subdir) {
+    const dir = path.join(DATA_CACHE_DIR, subdir);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    return dir;
+  },
+
+  /** Write a document or collection snapshot to disk */
+  set(collection, key, data) {
+    try {
+      const dir = this._ensureDir(collection);
+      const filePath = path.join(dir, `${encodeURIComponent(key)}.json`);
+      fs.writeFileSync(filePath, JSON.stringify(data), 'utf8');
+    } catch (err) {
+      console.warn('[cache] Write failed:', err.message);
+    }
+  },
+
+  /** Read a cached document from disk */
+  get(collection, key) {
+    try {
+      const filePath = path.join(DATA_CACHE_DIR, collection, `${encodeURIComponent(key)}.json`);
+      if (!fs.existsSync(filePath)) return null;
+      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (err) {
+      console.warn('[cache] Read failed:', err.message);
+      return null;
+    }
+  },
+
+  /** Check if cache directory exists and has data */
+  stats() {
+    try {
+      if (!fs.existsSync(DATA_CACHE_DIR)) return { exists: false, collections: 0, totalFiles: 0, sizeBytes: 0 };
+      const collections = fs.readdirSync(DATA_CACHE_DIR).filter(f =>
+        fs.statSync(path.join(DATA_CACHE_DIR, f)).isDirectory()
+      );
+      let totalFiles = 0;
+      let sizeBytes = 0;
+      for (const col of collections) {
+        const colPath = path.join(DATA_CACHE_DIR, col);
+        const files = fs.readdirSync(colPath);
+        totalFiles += files.length;
+        for (const f of files) {
+          sizeBytes += fs.statSync(path.join(colPath, f)).size;
+        }
+      }
+      return { exists: true, collections: collections.length, totalFiles, sizeBytes };
+    } catch {
+      return { exists: false, collections: 0, totalFiles: 0, sizeBytes: 0 };
+    }
+  }
+};
 
 function validateGithubSignature(payload, signature, secret) {
   const hmac = crypto.createHmac('sha256', secret);
@@ -32,10 +91,14 @@ async function connectDB() {
   });
 
   client.on('connectionPoolCreated', () => console.log('[mongo] Connection pool created'));
-  client.on('connectionPoolClosed', () => console.log('[mongo] Connection pool closed'));
+  client.on('connectionPoolClosed', () => {
+    console.log('[mongo] Connection pool closed');
+    mongoConnected = false;
+  });
   client.on('connectionCheckOutFailed', (e) => console.warn('[mongo] Connection checkout failed:', e.reason));
   await client.connect();
   db = client.db();
+  mongoConnected = true;
   console.log('Connected to MongoDB');
 
   // Create indexes (skip unique if duplicates exist from import)
@@ -121,11 +184,16 @@ async function connectWithRetry() {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       await connectDB();
+      console.log('[mongo] Populating local cache from MongoDB...');
+      await populateCache();
       return;
     } catch (err) {
       if (attempt === MAX_ATTEMPTS) {
-        console.error(`MongoDB connection failed after ${MAX_ATTEMPTS} attempts:`, err.message);
-        process.exit(1);
+        console.error(`MongoDB connection failed after ${MAX_ATTEMPTS} attempts — running in OFFLINE mode`);
+        console.warn('[offline] API reads will serve from local file cache if available');
+        // Don't exit — keep running with cache fallback and retry in background
+        scheduleReconnect();
+        return;
       }
       const delaySec = delays[attempt - 1] / 1000;
       console.warn(
@@ -134,6 +202,68 @@ async function connectWithRetry() {
       await new Promise(resolve => setTimeout(resolve, delays[attempt - 1]));
     }
   }
+}
+
+/** Populate the local file cache with current MongoDB data */
+async function populateCache() {
+  if (!db) return;
+  try {
+    // Cache all documents (without content for the list, with content individually)
+    const docs = await db.collection('documents')
+      .find({}, { projection: { content: 0 } })
+      .sort({ domain: 1, docId: 1 })
+      .toArray();
+    localCache.set('documents', '_index', docs);
+
+    // Cache individual documents with content
+    const fullDocs = await db.collection('documents').find({}).toArray();
+    for (const doc of fullDocs) {
+      localCache.set('documents', doc.docId, doc);
+    }
+
+    // Cache tasks
+    const tasks = await db.collection('tasks').find({}).sort({ status: 1, priority: 1 }).toArray();
+    localCache.set('tasks', '_index', tasks);
+
+    // Cache graph data
+    const graphDocs = await db.collection('documents')
+      .find({}, { projection: { docId: 1, title: 1, domain: 1, domainName: 1, dependsOn: 1, dependedBy: 1 } })
+      .toArray();
+    localCache.set('graph', '_data', graphDocs);
+
+    // Cache tags
+    const tags = await db.collection('documents').aggregate([
+      { $unwind: '$tags' },
+      { $group: { _id: '$tags', count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]).toArray();
+    localCache.set('tags', '_index', tags.map(t => ({ tag: t._id, count: t.count })));
+
+    const stats = localCache.stats();
+    console.log(`[cache] Populated: ${stats.totalFiles} files, ${(stats.sizeBytes / 1024).toFixed(1)}KB`);
+  } catch (err) {
+    console.warn('[cache] Population failed:', err.message);
+  }
+}
+
+/** Background reconnection — tries every 60s when MongoDB is down */
+function scheduleReconnect() {
+  const RETRY_INTERVAL = 60000;
+  const timer = setInterval(async () => {
+    if (mongoConnected) {
+      clearInterval(timer);
+      return;
+    }
+    console.log('[reconnect] Attempting MongoDB reconnection...');
+    try {
+      await connectDB();
+      console.log('[reconnect] MongoDB reconnected — repopulating cache...');
+      await populateCache();
+      clearInterval(timer);
+    } catch (err) {
+      console.warn(`[reconnect] Still offline: ${err.message}`);
+    }
+  }, RETRY_INTERVAL);
 }
 
 // Security headers
@@ -174,9 +304,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Return 503 for /api routes while MongoDB is still connecting
+// For /api routes: if MongoDB is down, allow GET routes to try cache fallback
 app.use('/api', (req, res, next) => {
-  if (!db) return res.status(503).json({ error: 'Database connecting...' });
+  if (!db) {
+    // Write operations require MongoDB — no cache fallback
+    if (req.method !== 'GET') {
+      return res.status(503).json({ error: 'Database unavailable — write operations disabled in offline mode' });
+    }
+    // Mark request as offline so route handlers can try cache
+    req.offlineMode = true;
+  }
   next();
 });
 
@@ -205,6 +342,18 @@ function authMiddleware(req, res, next) {
 // List all docs (lightweight — no content field)
 app.get('/api/docs', async (req, res) => {
   try {
+    if (req.offlineMode) {
+      const cached = localCache.get('documents', '_index');
+      if (cached) {
+        res.setHeader('X-Served-From', 'cache');
+        const { domain, tag } = req.query;
+        let filtered = cached;
+        if (domain) filtered = filtered.filter(d => d.domain === domain);
+        if (tag) filtered = filtered.filter(d => (d.tags || []).includes(tag));
+        return res.json(filtered);
+      }
+      return res.status(503).json({ error: 'Database offline and no cache available' });
+    }
     const { domain, tag } = req.query;
     const filter = {};
     if (domain) filter.domain = domain;
@@ -213,21 +362,44 @@ app.get('/api/docs', async (req, res) => {
       .find(filter, { projection: { content: 0 } })
       .sort({ domain: 1, docId: 1 })
       .toArray();
-    // Set ETag-friendly cache headers
+    // Populate cache on successful read (unfiltered)
+    if (!domain && !tag) localCache.set('documents', '_index', docs);
     res.setHeader('Cache-Control', 'no-cache');
     res.json(docs);
   } catch (err) {
+    // Try cache fallback on MongoDB error
+    const cached = localCache.get('documents', '_index');
+    if (cached) {
+      res.setHeader('X-Served-From', 'cache');
+      return res.json(cached);
+    }
     res.status(500).json({ error: err.message });
   }
 });
 
 // Get single doc by docId
 app.get('/api/docs/:id', async (req, res) => {
+  const docId = req.params.id.toUpperCase();
   try {
-    const doc = await db.collection('documents').findOne({ docId: req.params.id.toUpperCase() });
+    if (req.offlineMode) {
+      const cached = localCache.get('documents', docId);
+      if (cached) {
+        res.setHeader('X-Served-From', 'cache');
+        return res.json(cached);
+      }
+      return res.status(503).json({ error: 'Database offline and document not cached' });
+    }
+    const doc = await db.collection('documents').findOne({ docId });
     if (!doc) return res.status(404).json({ error: 'Document not found' });
+    // Cache individual document
+    localCache.set('documents', docId, doc);
     res.json(doc);
   } catch (err) {
+    const cached = localCache.get('documents', docId);
+    if (cached) {
+      res.setHeader('X-Served-From', 'cache');
+      return res.json(cached);
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -330,18 +502,13 @@ app.get('/api/search', async (req, res) => {
 
 // Graph data — all nodes and edges
 app.get('/api/graph', async (req, res) => {
-  try {
-    const docs = await db.collection('documents')
-      .find({}, { projection: { docId: 1, title: 1, domain: 1, domainName: 1, dependsOn: 1, dependedBy: 1 } })
-      .toArray();
-
+  function buildGraph(docs) {
     const nodes = docs.map(d => ({
       id: d.docId,
       title: d.title,
       domain: d.domain,
       domainName: d.domainName
     }));
-
     const edges = [];
     const edgeSet = new Set();
     for (const d of docs) {
@@ -353,8 +520,29 @@ app.get('/api/graph', async (req, res) => {
         }
       }
     }
-    res.json({ nodes, edges });
+    return { nodes, edges };
+  }
+
+  try {
+    if (req.offlineMode) {
+      const cached = localCache.get('graph', '_data');
+      if (cached) {
+        res.setHeader('X-Served-From', 'cache');
+        return res.json(buildGraph(cached));
+      }
+      return res.status(503).json({ error: 'Database offline and graph not cached' });
+    }
+    const docs = await db.collection('documents')
+      .find({}, { projection: { docId: 1, title: 1, domain: 1, domainName: 1, dependsOn: 1, dependedBy: 1 } })
+      .toArray();
+    localCache.set('graph', '_data', docs);
+    res.json(buildGraph(docs));
   } catch (err) {
+    const cached = localCache.get('graph', '_data');
+    if (cached) {
+      res.setHeader('X-Served-From', 'cache');
+      return res.json(buildGraph(cached));
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -362,13 +550,22 @@ app.get('/api/graph', async (req, res) => {
 // All tags with counts
 app.get('/api/tags', async (req, res) => {
   try {
+    if (req.offlineMode) {
+      const cached = localCache.get('tags', '_index');
+      if (cached) { res.setHeader('X-Served-From', 'cache'); return res.json(cached); }
+      return res.status(503).json({ error: 'Database offline and tags not cached' });
+    }
     const tags = await db.collection('documents').aggregate([
       { $unwind: '$tags' },
       { $group: { _id: '$tags', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]).toArray();
-    res.json(tags.map(t => ({ tag: t._id, count: t.count })));
+    const result = tags.map(t => ({ tag: t._id, count: t.count }));
+    localCache.set('tags', '_index', result);
+    res.json(result);
   } catch (err) {
+    const cached = localCache.get('tags', '_index');
+    if (cached) { res.setHeader('X-Served-From', 'cache'); return res.json(cached); }
     res.status(500).json({ error: err.message });
   }
 });
@@ -704,13 +901,54 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 });
 
 // Health check — used by Kubernetes liveness/readiness probes
+// Returns 200 even in offline mode (app is alive, just degraded)
 app.get('/healthz', async (req, res) => {
-  try {
-    await db.admin().ping();
-    res.status(200).json({ status: 'ok', mongo: 'connected' });
-  } catch (err) {
-    res.status(503).json({ status: 'error', mongo: 'disconnected', error: err.message });
+  const cache = localCache.stats();
+  if (db && mongoConnected) {
+    try {
+      await db.admin().ping();
+      return res.status(200).json({ status: 'ok', mongo: 'connected', cache, mode: 'online' });
+    } catch (err) {
+      mongoConnected = false;
+      return res.status(200).json({ status: 'degraded', mongo: 'disconnected', cache, mode: 'offline', error: err.message });
+    }
   }
+  // Offline but alive — respond 200 so k8s doesn't kill the pod
+  res.status(200).json({ status: 'degraded', mongo: 'disconnected', cache, mode: 'offline' });
+});
+
+// Storage status — detailed view of persistent storage and cache health
+app.get('/api/storage/status', async (req, res) => {
+  const cache = localCache.stats();
+  let mongo = { connected: false, dbName: null, collections: [] };
+  if (db && mongoConnected) {
+    try {
+      await db.admin().ping();
+      const collections = await db.listCollections().toArray();
+      const collStats = [];
+      for (const col of collections) {
+        const count = await db.collection(col.name).estimatedDocumentCount();
+        collStats.push({ name: col.name, documents: count });
+      }
+      mongo = { connected: true, dbName: db.databaseName, collections: collStats };
+    } catch (err) {
+      mongo.error = err.message;
+    }
+  }
+  res.json({
+    mode: mongoConnected ? 'online' : 'offline',
+    mongodb: mongo,
+    localCache: {
+      directory: DATA_CACHE_DIR,
+      ...cache
+    },
+    persistentVolumes: {
+      appContent: { mountPath: '/app', description: 'Cached app code — survives pod restarts without GitHub' },
+      localCache: { mountPath: DATA_CACHE_DIR, description: 'Document read cache — offline fallback' },
+      mongodbData: { mountPath: '/data/db', description: 'MongoDB data directory (Longhorn PVC)' },
+      mongodbBackup: { description: 'Nightly mongodump archives (CronJob)' }
+    }
+  });
 });
 
 // Document permalink with Open Graph tags for link previews
@@ -860,6 +1098,11 @@ app.put('/api/agent-state', authMiddleware, async (req, res) => {
 // List tasks (roadmap) — supports orchestrator query filters
 app.get('/api/tasks', async (req, res) => {
   try {
+    if (req.offlineMode) {
+      const cached = localCache.get('tasks', '_index');
+      if (cached) { res.setHeader('X-Served-From', 'cache'); return res.json(cached); }
+      return res.status(503).json({ error: 'Database offline and tasks not cached' });
+    }
     const filter = {};
     if (req.query.status) filter.status = req.query.status;
     if (req.query.directiveId) filter.directiveId = req.query.directiveId;
@@ -870,8 +1113,14 @@ app.get('/api/tasks', async (req, res) => {
       .find(filter)
       .sort({ status: 1, priority: 1, createdAt: -1 })
       .toArray();
+    // Cache unfiltered task list
+    if (!req.query.status && !req.query.directiveId && !req.query.unassigned) {
+      localCache.set('tasks', '_index', tasks);
+    }
     res.json(tasks);
   } catch (err) {
+    const cached = localCache.get('tasks', '_index');
+    if (cached) { res.setHeader('X-Served-From', 'cache'); return res.json(cached); }
     res.status(500).json({ error: err.message });
   }
 });
