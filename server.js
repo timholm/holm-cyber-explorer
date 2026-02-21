@@ -945,8 +945,8 @@ app.get('/api/directives', async (req, res) => {
   }
 });
 
-// Create directive
-app.post('/api/directives', authMiddleware, async (req, res) => {
+// Create directive (no auth — single-operator personal system)
+app.post('/api/directives', async (req, res) => {
   try {
     const { intent, priority, source, context, maxWorkers } = req.body;
     if (!intent) return res.status(400).json({ error: 'intent required' });

@@ -1209,19 +1209,11 @@ function submitDirective() {
   var prioEl = document.getElementById('directive-priority');
   if (!textEl || !textEl.value.trim()) { toast('Enter a directive', 'error'); return; }
 
-  var apiKey = localStorage.getItem('holm-api-key') || '';
-  if (!apiKey) {
-    apiKey = prompt('Enter holm.chat API key:');
-    if (apiKey) localStorage.setItem('holm-api-key', apiKey);
-    else return;
-  }
-
   fetch('/api/directives', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Api-Key': apiKey },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intent: textEl.value.trim(), priority: parseInt(prioEl.value) || 3 })
   }).then(function(r) {
-    if (r.status === 401) { localStorage.removeItem('holm-api-key'); toast('Invalid API key', 'error'); return; }
     if (!r.ok) throw new Error('Failed');
     textEl.value = '';
     toast('Directive issued');
