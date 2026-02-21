@@ -473,8 +473,16 @@ app.get('/healthz', async (req, res) => {
   }
 });
 
-// SPA fallback — serve index.html for non-API, non-file routes
+// SPA fallback — serve index.html for navigation, 404 for everything else
 app.get('*', (req, res) => {
+  // Don't serve index.html for API routes that weren't matched
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  // Don't serve index.html for direct file requests that don't exist
+  if (req.path.match(/\.\w{2,4}$/) && !req.path.endsWith('.html')) {
+    return res.status(404).send('Not found');
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
