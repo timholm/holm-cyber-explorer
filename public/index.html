@@ -199,6 +199,13 @@ main { max-width: var(--max-w); margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 .sr-snippet mark { background: rgba(0,240,255,0.15); color: var(--cyan); padding: 0 0.1rem; border-radius: 2px; }
 .search-empty { text-align: center; padding: 3rem; color: var(--dim); font-size: 0.8rem; }
 
+/* ── Collapsible domain sections ── */
+.domain-heading { cursor: pointer; user-select: none; }
+.domain-heading::before { content: '▾'; margin-right: 0.5rem; color: var(--dim); transition: transform 0.15s; display: inline-block; }
+.domain-section.collapsed .domain-heading::before { transform: rotate(-90deg); }
+.domain-section.collapsed .doc-link { display: none; }
+
+
 /* ── Toast ── */
 .toast-container { position: fixed; bottom: calc(1rem + var(--safe-b)); left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 0.4rem; pointer-events: none; }
 .toast { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 0.9rem; font-size: 0.7rem; pointer-events: auto; animation: fade-in 0.2s ease; white-space: nowrap; }
@@ -214,6 +221,26 @@ main { max-width: var(--max-w); margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 .offline-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 400; background: rgba(255,0,170,0.1); border-bottom: 1px solid var(--magenta); text-align: center; padding: 0.3rem; font-size: 0.65rem; color: var(--magenta); }
 body.offline .offline-bar { display: block; }
 
+/* ── Table of Contents ── */
+.toc { margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; }
+.progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--cyan); z-index: 200; width: 0%; transition: width 0.1s; pointer-events: none; opacity: 0; }
+.progress-bar.visible { opacity: 1; }
+
+.toc-title { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.toc a { display: block; font-size: 0.75rem; color: var(--muted); padding: 0.15rem 0; transition: color 0.1s; }
+.toc a:hover { color: var(--cyan); text-decoration: none; }
+.toc a.toc-h2 { padding-left: 0.8rem; }
+.toc a.toc-h3 { padding-left: 1.6rem; font-size: 0.7rem; }
+
+/* ── Document Nav ── */
+.doc-nav-footer { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.doc-nav-link { font-size: 0.75rem; color: var(--muted); cursor: pointer; transition: color 0.15s; max-width: 45%; }
+.doc-nav-link:hover { color: var(--cyan); }
+.doc-nav-link .nav-label { font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.15rem; }
+.doc-nav-link .nav-title { color: var(--text); font-size: 0.8rem; }
+.doc-nav-link:hover .nav-title { color: var(--cyan); }
+.doc-nav-link.next { text-align: right; margin-left: auto; }
+
 /* ── Print ── */
 @media print {
   header, .search-overlay, .toast-container, .comments, .offline-bar { display: none !important; }
@@ -228,6 +255,14 @@ body.offline .offline-bar { display: block; }
 </style>
 </head>
 <body>
+
+
+/* ── Back to Top ── */
+.back-top { position: fixed; bottom: calc(1.5rem + var(--safe-b)); right: 1rem; width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, color 0.15s; z-index: 50; }
+.back-top.show { opacity: 1; pointer-events: auto; }
+.back-top:hover { color: var(--cyan); border-color: var(--cyan); }
+
+<div class="progress-bar" id="progress-bar"></div>
 
 <div class="offline-bar">Offline — showing cached data</div>
 
@@ -251,6 +286,8 @@ body.offline .offline-bar { display: block; }
     <div class="search-empty">Type to search across all documents</div>
   </div>
 </div>
+
+<button class="back-top" id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&uarr;</button>
 
 <div class="toast-container" id="toasts"></div>
 
@@ -297,6 +334,7 @@ function goHome() {
   currentDocId = null;
   renderHome();
   history.replaceState(null, '', '/');
+  progressBar.classList.remove('visible'); progressBar.style.width = '0%';
 }
 
 function openDoc(id) {
@@ -353,7 +391,7 @@ function renderHome() {
     var docs = domains[k].sort(function(a, b) { return a.docId.localeCompare(b.docId); });
     var name = DOMAIN_NAMES[k] || (docs[0] && docs[0].domainName) || k;
     html += '<div class="domain-section">';
-    html += '<div class="domain-heading">' + esc(name) + ' <span>' + docs.length + '</span></div>';
+    html += '<div class="domain-heading" onclick="this.parentElement.classList.toggle(\'collapsed\')">' + esc(name) + ' <span>' + docs.length + '</span></div>';
     for (var j = 0; j < docs.length; j++) {
       var d = docs[j];
       html += '<div class="doc-link" onclick="openDoc(\'' + esc(d.docId) + '\')">';
@@ -369,6 +407,23 @@ function renderHome() {
 }
 
 /* ── Document Page ── */
+function buildTOC(content) {
+  var div = document.createElement('div');
+  div.innerHTML = content || '';
+  var headings = div.querySelectorAll('h1, h2, h3');
+  if (headings.length < 3) return { toc: '', content: content };
+  var tocHtml = '<div class="toc"><div class="toc-title">Contents</div>';
+  for (var i = 0; i < headings.length; i++) {
+    var h = headings[i];
+    var id = 'h-' + h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+    h.id = id;
+    var level = h.tagName.toLowerCase();
+    tocHtml += '<a href="#' + id + '" class="toc-' + level + '">' + h.textContent.trim() + '</a>';
+  }
+  tocHtml += '</div>';
+  return { toc: tocHtml, content: div.innerHTML };
+}
+
 async function renderDoc(id) {
   var el = document.getElementById('main');
   var doc = docsById[id];
@@ -432,7 +487,11 @@ async function renderDoc(id) {
     html += '</div></div>';
   }
 
-  html += '<div class="doc-content">' + (doc.content || '<p style="color:var(--dim)">No content</p>') + '</div>';
+  var tocResult = buildTOC(doc.content);
+  html += tocResult.toc;
+  html += '<div class="doc-content">' + (tocResult.content || '<p style="color:var(--dim)">No content</p>') + '</div>';
+
+  html += buildDocNav(doc);
 
   html += '<div class="comments">';
   html += '<div class="comments-title">Comments <span id="cc"></span></div>';
@@ -452,6 +511,32 @@ async function renderDoc(id) {
   if (saved) document.getElementById('c-author').value = saved;
 
   loadComments(id);
+}
+
+/* ── Document Navigation ── */
+function buildDocNav(doc) {
+  var domainDocs = allDocs.filter(function(d) { return d.domain === doc.domain; })
+    .sort(function(a, b) { return a.docId.localeCompare(b.docId); });
+  var idx = domainDocs.findIndex(function(d) { return d.docId === doc.docId; });
+  if (idx === -1) return '';
+  var prev = idx > 0 ? domainDocs[idx - 1] : null;
+  var next = idx < domainDocs.length - 1 ? domainDocs[idx + 1] : null;
+  if (!prev && !next) return '';
+  var html = '<div class="doc-nav-footer">';
+  if (prev) {
+    html += '<div class="doc-nav-link" onclick="openDoc(\'' + esc(prev.docId) + '\')">';
+    html += '<div class="nav-label">&larr; Previous</div>';
+    html += '<div class="nav-title">' + esc(prev.title) + '</div></div>';
+  } else {
+    html += '<div></div>';
+  }
+  if (next) {
+    html += '<div class="doc-nav-link next" onclick="openDoc(\'' + esc(next.docId) + '\')">';
+    html += '<div class="nav-label">Next &rarr;</div>';
+    html += '<div class="nav-title">' + esc(next.title) + '</div></div>';
+  }
+  html += '</div>';
+  return html;
 }
 
 /* ── Comments ── */
