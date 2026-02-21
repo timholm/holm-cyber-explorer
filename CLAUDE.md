@@ -12,10 +12,7 @@ Hardware:
   - All behind Cloudflare tunnels for current internet access
 
 Kubernetes workloads (namespace: holm-cyber, cloudflare, monitoring, etc.):
-  - prototype.holm.chat — cyberpunk documentation nexus (Express.js +
-    MongoDB, 299 documents across 20 domains, force-directed graph,
-    comments system, domain health scoring, mobile-first SPA)
-  - holm.chat — social media platform (Next.js + Prisma, hosted on Gitea)
+  - holm.chat — cyberpunk documentation nexus (Express.js + MongoDB, the primary project in this repo)
   - grafana.holm.chat — monitoring dashboards
   - uptime.holm.chat — Uptime Kuma
   - cmd.holm.chat, dev.holm.chat, mind.holm.chat, claude-action.holm.chat
@@ -53,7 +50,7 @@ Document Framework (299 docs imported from timholm/docs-framework):
   graph. Many have broken dependencies or are orphaned.
 
 GitHub repos:
-  - timholm/holm-cyber-explorer (prototype.holm.chat source)
+  - timholm/holm-cyber-explorer (holm.chat source)
   - timholm/docs-framework (HTML documents + manifest)
 
 Deployment pattern:

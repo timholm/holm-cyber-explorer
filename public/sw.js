@@ -1,7 +1,7 @@
 // HOLM Vault — Service Worker
 // Cache-first for static assets, network-first for API calls
 
-var CACHE_VERSION = 'holm-chat-v2';
+var CACHE_VERSION = 'holm-chat-v3';
 
 var PRECACHE_URLS = [
   '/',
