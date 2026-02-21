@@ -223,9 +223,6 @@ body.offline .offline-bar { display: block; }
 
 /* ── Table of Contents ── */
 .toc { margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; }
-.progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--cyan); z-index: 200; width: 0%; transition: width 0.1s; pointer-events: none; opacity: 0; }
-.progress-bar.visible { opacity: 1; }
-
 .toc-title { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
 .toc a { display: block; font-size: 0.75rem; color: var(--muted); padding: 0.15rem 0; transition: color 0.1s; }
 .toc a:hover { color: var(--cyan); text-decoration: none; }
@@ -240,6 +237,11 @@ body.offline .offline-bar { display: block; }
 .doc-nav-link .nav-title { color: var(--text); font-size: 0.8rem; }
 .doc-nav-link:hover .nav-title { color: var(--cyan); }
 .doc-nav-link.next { text-align: right; margin-left: auto; }
+
+
+/* ── Progress Bar ── */
+.progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--cyan); z-index: 200; width: 0%; transition: width 0.1s; pointer-events: none; opacity: 0; }
+.progress-bar.visible { opacity: 1; }
 
 /* ── Print ── */
 @media print {
@@ -326,6 +328,28 @@ function timeAgo(d) {
   if (s < 3600) return Math.floor(s/60) + 'm ago';
   if (s < 86400) return Math.floor(s/3600) + 'h ago';
   return Math.floor(s/86400) + 'd ago';
+}
+
+function linkifyDocIds(html) {
+  if (!html) return html;
+  // Match doc ID patterns not already inside HTML tags or existing links
+  var idPattern = /\b([A-Z]{1,10}-\d{1,4}|D\d{1,2}-\d{1,4})\b/g;
+  // Simple approach: split on HTML tags, process text nodes only
+  var parts = html.split(/(<[^>]*>)/);
+  var inLink = false;
+  for (var i = 0; i < parts.length; i++) {
+    if (parts[i].match(/^<a[\s>]/i)) inLink = true;
+    if (parts[i].match(/^<\/a>/i)) inLink = false;
+    if (parts[i].charAt(0) !== '<' && !inLink) {
+      parts[i] = parts[i].replace(idPattern, function(match) {
+        if (docsById[match]) {
+          return '<a href="#' + match + '" onclick="event.preventDefault();openDoc(\'' + match + '\')" style="color:var(--cyan);cursor:pointer">' + match + '</a>';
+        }
+        return match;
+      });
+    }
+  }
+  return parts.join('');
 }
 
 /* ── Routing ── */
@@ -489,7 +513,7 @@ async function renderDoc(id) {
 
   var tocResult = buildTOC(doc.content);
   html += tocResult.toc;
-  html += '<div class="doc-content">' + (tocResult.content || '<p style="color:var(--dim)">No content</p>') + '</div>';
+  html += '<div class="doc-content">' + (linkifyDocIds(tocResult.content) || '<p style="color:var(--dim)">No content</p>') + '</div>';
 
   html += buildDocNav(doc);
 
