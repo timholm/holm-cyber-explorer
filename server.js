@@ -5,6 +5,7 @@ const compression = require('compression');
 const crypto = require('crypto');
 
 const app = express();
+app.set('etag', 'strong');
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/holmvault';
 
@@ -136,6 +137,8 @@ app.get('/api/docs', async (req, res) => {
       .find(filter, { projection: { content: 0 } })
       .sort({ domain: 1, docId: 1 })
       .toArray();
+    // Set ETag-friendly cache headers
+    res.setHeader('Cache-Control', 'no-cache');
     res.json(docs);
   } catch (err) {
     res.status(500).json({ error: err.message });
