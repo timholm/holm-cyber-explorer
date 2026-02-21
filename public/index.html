@@ -720,7 +720,7 @@ body.offline #offline-banner { display: block; }
   #top-nav { display: flex; }
   #bottom-nav { display: none; }
   #app { padding-top: var(--nav-height); padding-bottom: 1rem; }
-  #hub-view, #domain-view, #doc-view { max-width: 960px; margin: 0 auto; }
+  #hub-view, #domain-view, #doc-view, #stats-view { max-width: 960px; margin: 0 auto; }
   .domain-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
   .doc-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
   .doc-body { font-size: 0.9rem; }
@@ -766,6 +766,7 @@ body.offline #offline-banner { display: block; }
     <button onclick="showHub()" data-nav="hub">Nexus</button>
     <button onclick="openSearch()" data-nav="search">Search</button>
     <button onclick="showGraph()" data-nav="graph">Map</button>
+    <button onclick="showStats()" data-nav="stats">Stats</button>
   </div>
 </nav>
 
@@ -818,6 +819,14 @@ body.offline #offline-banner { display: block; }
       <div id="comments-list"></div>
     </div>
   </div>
+
+  <!-- Stats View -->
+  <div id="stats-view" class="view">
+    <div style="padding:1rem;max-width:720px;margin:0 auto">
+      <h2 style="font-size:1.2rem;font-weight:500;margin-bottom:1.5rem;color:var(--neon-cyan)">System Statistics</h2>
+      <div id="stats-content"></div>
+    </div>
+  </div>
 </main>
 
 <!-- Graph View -->
@@ -866,6 +875,10 @@ body.offline #offline-banner { display: block; }
   <button class="bottom-nav-btn" onclick="showGraph()" data-nav="graph">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><path d="M12 8v4M7.5 17.2L10 13M16.5 17.2L14 13" stroke-linecap="round"/></svg>
     <span>Map</span>
+  </button>
+  <button class="bottom-nav-btn" onclick="showStats()" data-nav="stats">
+    <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Stats</span>
   </button>
 </nav>
 
@@ -987,6 +1000,7 @@ function updateHash() {
   else if (currentView === 'doc' && currentDoc) hash = '#doc/' + currentDoc.docId;
   else if (currentView === 'graph') hash = '#graph';
   else if (currentView === 'search') hash = '#search';
+  else if (currentView === 'stats') hash = '#stats';
   if (location.hash !== hash && hash !== '') {
     history.replaceState(null, '', hash);
   } else if (hash === '' && location.hash !== '') {
@@ -1214,10 +1228,12 @@ async function openDoc(id, pushHistory) {
   switchView('doc', pushHistory);
   renderDocView(doc);
   loadComments(doc.docId);
+  renderRelatedDocs(doc);
   restoreScrollPos(doc.docId);
 }
 
 function renderDocView(doc) {
+  const oldRelated = document.getElementById('related-docs'); if (oldRelated) oldRelated.remove();
   // Breadcrumb
   const domainName = doc.domainName || DOMAIN_NAMES[doc.domain] || doc.domain;
   document.getElementById('doc-breadcrumb').innerHTML =
@@ -1771,6 +1787,99 @@ async function performSearch(q) {
   }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   Stats View
+   ═══════════════════════════════════════════════════════════════ */
+function showStats(pushHistory) {
+  switchView('stats', pushHistory);
+  renderStats();
+}
+
+function renderStats() {
+  const docIdSet = new Set(allDocs.map(d => d.docId));
+  const totalDocs = allDocs.length;
+  const totalDomains = Object.keys(domainHealth).length;
+
+  let brokenCount = 0;
+  let orphanCount = 0;
+  let totalDeps = 0;
+  const tagCounts = {};
+  const statusCounts = {};
+
+  for (const doc of allDocs) {
+    const deps = doc.dependsOn || [];
+    const refs = doc.dependedBy || [];
+    totalDeps += deps.length;
+    deps.forEach(d => { if (!docIdSet.has(d)) brokenCount++; });
+    if (deps.length === 0 && refs.length === 0) orphanCount++;
+    (doc.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+    const st = doc.status || 'unknown';
+    statusCounts[st] = (statusCounts[st] || 0) + 1;
+  }
+
+  const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
+
+  const domainKeys = Object.keys(domainHealth).sort((a, b) => {
+    const na = parseInt(a), nb = parseInt(b);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return a.localeCompare(b);
+  });
+
+  const el = document.getElementById('stats-content');
+  el.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;margin-bottom:2rem">' +
+      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
+        '<div style="font-size:1.8rem;font-weight:600;color:var(--neon-cyan)">' + totalDocs + '</div>' +
+        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Documents</div>' +
+      '</div>' +
+      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
+        '<div style="font-size:1.8rem;font-weight:600;color:var(--neon-cyan)">' + totalDomains + '</div>' +
+        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Domains</div>' +
+      '</div>' +
+      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
+        '<div style="font-size:1.8rem;font-weight:600;color:var(--neon-cyan)">' + totalDeps + '</div>' +
+        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Dependencies</div>' +
+      '</div>' +
+      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
+        '<div style="font-size:1.8rem;font-weight:600;color:#ff4444">' + brokenCount + '</div>' +
+        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Broken Deps</div>' +
+      '</div>' +
+      '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center">' +
+        '<div style="font-size:1.8rem;font-weight:600;color:#ffaa00">' + orphanCount + '</div>' +
+        '<div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase">Orphaned</div>' +
+      '</div>' +
+    '</div>' +
+    '<h3 style="font-size:0.8rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Domain Health</h3>' +
+    '<div style="margin-bottom:2rem">' +
+    domainKeys.map(function(k) {
+      var dh = domainHealth[k];
+      var color = healthColor(dh.score);
+      return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.4rem 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openDomainView(\'' + k + '\')">' +
+        '<span style="font-size:0.7rem;color:var(--text-muted);min-width:30px">D' + escHtml(k) + '</span>' +
+        '<span style="font-size:0.8rem;flex:1">' + escHtml(dh.name) + '</span>' +
+        '<span style="font-size:0.7rem;color:var(--text-muted)">' + dh.total + ' docs</span>' +
+        '<div style="width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:' + dh.score + '%;background:' + color + ';border-radius:2px"></div></div>' +
+        '<span style="font-size:0.7rem;color:' + color + ';min-width:30px;text-align:right">' + dh.score + '%</span>' +
+      '</div>';
+    }).join('') +
+    '</div>' +
+    '<h3 style="font-size:0.8rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Top Tags</h3>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:2rem">' +
+    topTags.map(function(pair) {
+      return '<span style="display:inline-flex;align-items:center;padding:0.2rem 0.5rem;font-size:0.7rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;color:var(--text-muted)">' +
+        escHtml(pair[0]) + ' <span style="margin-left:0.3rem;color:var(--neon-cyan)">' + pair[1] + '</span></span>';
+    }).join('') +
+    '</div>' +
+    '<h3 style="font-size:0.8rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Document Status</h3>' +
+    '<div style="margin-bottom:2rem">' +
+    Object.entries(statusCounts).sort(function(a, b) { return b[1] - a[1]; }).map(function(pair) {
+      return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.3rem 0"><span style="font-size:0.8rem;flex:1">' +
+        escHtml(pair[0]) + '</span><span style="font-size:0.8rem;color:var(--neon-cyan)">' + pair[1] + '</span></div>';
+    }).join('') +
+    '</div>';
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Hash Routing
    ═══════════════════════════════════════════════════════════════ */
@@ -1786,6 +1895,8 @@ function handleHash() {
     showGraph(false);
   } else if (hash === '#search') {
     openSearch(false);
+  } else if (hash === '#stats') {
+    showStats(false);
   } else {
     showHub(false);
   }
