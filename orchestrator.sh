@@ -16,7 +16,7 @@ unset CLAUDECODE 2>/dev/null || true
 PROJECT_DIR="/Users/tim/holm-cyber-explorer"
 LOG_DIR="$PROJECT_DIR/.orchestrator"
 STOP_FILE="/tmp/orchestrator-stop"
-MAX_WORKERS="${1:-5}"
+MAX_WORKERS="${1:-8}"
 MAX_BUDGET_PER_TASK="5.00"
 HEARTBEAT_TIMEOUT=120
 COORDINATOR_INTERVAL=10
@@ -265,24 +265,24 @@ else:
 }
 
 # ─── Worker Stream Parser ───
-# Reads NDJSON from Claude's stdout and updates the dashboard
+# Reads NDJSON from Claude's stdout, classifies each event, and streams
+# to the ops center via POST /api/workers/:id/log (batched, no throttle).
+# Also updates currentOutput every 2s for backward compat with home view.
 parse_worker_stream() {
   local worker_id="$1"
   local task_id="$2"
   local last_update=0
   local line_count=0
+  local log_batch=""
+  local batch_count=0
 
   while IFS= read -r line; do
     line_count=$((line_count + 1))
-
-    # Throttle dashboard updates to 1/sec
     local now=$(date +%s)
-    if [ $((now - last_update)) -ge 1 ]; then
-      last_update=$now
 
-      # Extract text from the JSON line
-      local text
-      text=$(echo "$line" | python3 -c "
+    # Parse every line into a log entry via Python
+    local parsed
+    parsed=$(echo "$line" | python3 -c "
 import json, sys
 try:
     d = json.load(sys.stdin)
@@ -291,39 +291,101 @@ try:
         content = d.get('message', {}).get('content', [])
         for c in content:
             if c.get('type') == 'text':
-                text = c.get('text', '')[-200:]
-                print(text)
+                text = c.get('text', '')[-500:]
+                if text.strip():
+                    print('text|' + text.replace('\n', ' '))
+                break
+            elif c.get('type') == 'tool_use':
+                name = c.get('name', '?')
+                inp = c.get('input', {})
+                summary = ''
+                if name == 'Bash':
+                    summary = inp.get('command', '')[:200]
+                elif name in ('Edit', 'Write', 'Read'):
+                    summary = inp.get('file_path', '')
+                elif name == 'Grep':
+                    summary = inp.get('pattern', '')[:100]
+                elif name == 'Glob':
+                    summary = inp.get('pattern', '')[:100]
+                else:
+                    summary = json.dumps(inp)[:150]
+                print('tool|[' + name + '] ' + summary)
                 break
     elif t == 'tool_use':
-        print('[tool] ' + d.get('name', '?'))
+        print('tool|[' + d.get('name', '?') + ']')
     elif t == 'result':
         cost = d.get('cost_usd', 0)
-        if cost: print(f'COST:{cost}')
+        if cost: print('cost|COST:' + str(cost))
+        else: print('result|done')
 except: pass
 " 2>/dev/null)
 
-      if [ -n "$text" ]; then
-        # Check for cost info
-        if echo "$text" | grep -q "^COST:"; then
-          local cost_val
-          cost_val=$(echo "$text" | sed 's/COST://')
-          # Update total cost (approximate)
-          TOTAL_COST=$(python3 -c "print(round($TOTAL_COST + ${cost_val:-0}, 2))")
+    if [ -n "$parsed" ]; then
+      local entry_type="${parsed%%|*}"
+      local entry_text="${parsed#*|}"
+
+      # Handle cost accumulation
+      if echo "$entry_text" | grep -q "^COST:"; then
+        local cost_val=$(echo "$entry_text" | sed 's/COST://')
+        TOTAL_COST=$(python3 -c "print(round($TOTAL_COST + ${cost_val:-0}, 2))")
+      fi
+
+      # Build JSON batch entry using Python for safe escaping
+      local ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+      local json_entry
+      json_entry=$(python3 -c "
+import json, sys
+text = sys.argv[1][:500]
+etype = sys.argv[2]
+ts = sys.argv[3]
+print(json.dumps({'text': text, 'type': etype, 'ts': ts}))
+" "$entry_text" "$entry_type" "$ts" 2>/dev/null)
+
+      if [ -n "$json_entry" ]; then
+        if [ $batch_count -eq 0 ]; then
+          log_batch="[$json_entry"
+        else
+          log_batch="$log_batch,$json_entry"
         fi
+        batch_count=$((batch_count + 1))
+      fi
 
-        # Update worker output
-        api_put "/api/workers/$worker_id" "{\"currentOutput\": $(python3 -c "import json; print(json.dumps('$text'[:200])")}" >/dev/null 2>&1 &
+      # Flush batch every 5 lines or every 2 seconds
+      if [ $batch_count -ge 5 ] || [ $((now - last_update)) -ge 2 ]; then
+        if [ $batch_count -gt 0 ]; then
+          log_batch="$log_batch]"
+          curl -s -X POST "$HOLM_API_URL/api/workers/$worker_id/log" \
+            -H "Content-Type: application/json" -H "X-Api-Key: $HOLM_API_KEY" \
+            -d "{\"lines\":$log_batch}" >/dev/null 2>&1 &
+          log_batch=""
+          batch_count=0
+        fi
+      fi
 
-        # Broadcast stream event for live output
-        # (SSE broadcast happens server-side via worker update)
+      # Update currentOutput every 2 seconds (backward compat for home view)
+      if [ $((now - last_update)) -ge 2 ]; then
+        last_update=$now
+        local escaped_output
+        escaped_output=$(python3 -c "import json,sys; print(json.dumps(sys.argv[1][:200]))" "$entry_text" 2>/dev/null)
+        if [ -n "$escaped_output" ]; then
+          api_put "/api/workers/$worker_id" "{\"currentOutput\": $escaped_output}" >/dev/null 2>&1 &
+        fi
       fi
     fi
 
-    # Heartbeat — update worker
+    # Heartbeat every 10 lines
     if [ $((line_count % 10)) -eq 0 ]; then
       api_put "/api/workers/$worker_id" "{\"status\": \"working\", \"lastHeartbeat\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" >/dev/null 2>&1 &
     fi
   done
+
+  # Flush remaining batch
+  if [ $batch_count -gt 0 ]; then
+    log_batch="$log_batch]"
+    curl -s -X POST "$HOLM_API_URL/api/workers/$worker_id/log" \
+      -H "Content-Type: application/json" -H "X-Api-Key: $HOLM_API_KEY" \
+      -d "{\"lines\":$log_batch}" >/dev/null 2>&1 &
+  fi
 }
 
 # ─── Spawn Worker ───

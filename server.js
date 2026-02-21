@@ -743,6 +743,10 @@ app.get('/doc/:id', async (req, res) => {
   }
 });
 
+// ── Worker Log Buffers (in-memory, ephemeral) ──
+const workerLogs = new Map();
+const WORKER_LOG_MAX = 500;
+
 // ── SSE Infrastructure ──
 const sseClients = [];
 
@@ -1120,10 +1124,35 @@ app.delete('/api/workers/:id', authMiddleware, async (req, res) => {
     const result = await db.collection('workers').deleteOne({ _id: req.params.id });
     if (result.deletedCount === 0) return res.status(404).json({ error: 'Worker not found' });
     broadcastSSE('worker', { _id: req.params.id, status: 'removed' });
+    workerLogs.delete(req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// Append log lines to worker buffer and broadcast via SSE
+app.post('/api/workers/:id/log', authMiddleware, (req, res) => {
+  const wid = req.params.id;
+  const { lines } = req.body;
+  if (!lines || !Array.isArray(lines)) return res.status(400).json({ error: 'lines array required' });
+
+  if (!workerLogs.has(wid)) workerLogs.set(wid, []);
+  const buf = workerLogs.get(wid);
+
+  for (const line of lines) {
+    const entry = { text: (line.text || '').slice(0, 500), type: line.type || 'text', tool: line.tool || null, ts: line.ts || new Date().toISOString() };
+    buf.push(entry);
+    broadcastSSE('worker_log', { workerId: wid, ...entry });
+  }
+
+  while (buf.length > WORKER_LOG_MAX) buf.shift();
+  res.json({ buffered: buf.length });
+});
+
+// Get full log buffer for a worker (initial load)
+app.get('/api/workers/:id/logs', (req, res) => {
+  res.json(workerLogs.get(req.params.id) || []);
 });
 
 // ── Orchestrator Routes ──

@@ -648,6 +648,99 @@ body.offline main { padding-top: 2.5rem; }
 .graph-tooltip .tt-title { color: var(--text); font-size: 0.65rem; margin-top: 0.15rem; }
 .graph-tooltip .tt-domain { color: var(--muted); font-size: 0.55rem; margin-top: 0.2rem; }
 .graph-tooltip .tt-deps { color: var(--dim); font-size: 0.55rem; margin-top: 0.15rem; }
+
+/* ── Ops Center ── */
+.ops-view {
+  position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
+  display: grid; grid-template-columns: 1fr 260px;
+  grid-template-rows: auto 1fr;
+  background: var(--bg); overflow: hidden;
+}
+.ops-status-bar {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  font-size: 0.65rem;
+}
+.ops-stat { display: flex; align-items: center; gap: 0.3rem; }
+.ops-stat-label { color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.55rem; }
+.ops-stat-value { color: var(--cyan); font-weight: 700; font-size: 0.8rem; }
+.ops-stat-value.warn { color: #ffcc00; }
+.ops-stat-value.danger { color: #ff4444; }
+.ops-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 3px; padding: 3px;
+  overflow: hidden;
+}
+.ops-panel {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+  display: flex; flex-direction: column; overflow: hidden; min-height: 0;
+}
+.ops-panel.working { border-color: var(--cyan); }
+.ops-panel.idle { border-color: #333; opacity: 0.6; }
+.ops-panel-header {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ops-panel-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.ops-panel-dot.working { animation: pulse-dot 1.5s ease-in-out infinite; }
+.ops-panel-id { font-size: 0.7rem; font-weight: 700; }
+.ops-panel-task { font-size: 0.55rem; color: var(--muted); margin-left: auto; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ops-panel-cost { font-size: 0.5rem; color: var(--cyan); margin-left: 0.3rem; }
+.ops-terminal {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0.3rem 0.4rem;
+  background: #08080d;
+  font-size: 0.6rem; line-height: 1.35;
+  font-family: var(--font); min-height: 0;
+}
+.ops-line { white-space: pre-wrap; word-break: break-all; padding: 0.05rem 0; }
+.ops-line-ts { color: var(--dim); font-size: 0.5rem; margin-right: 0.3rem; }
+.ops-line.text { color: var(--text); }
+.ops-line.tool { color: #ffcc00; border-left: 2px solid var(--magenta); padding-left: 0.3rem; }
+.ops-line.cost { color: var(--cyan); font-weight: 700; }
+.ops-line.result { color: #00e676; }
+.ops-file-link { color: var(--cyan); cursor: pointer; text-decoration: underline; }
+.ops-file-link:hover { color: #fff; }
+.ops-sidebar {
+  background: var(--bg2); border-left: 1px solid var(--border);
+  overflow-y: auto; padding: 0.5rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.ops-sidebar-title {
+  font-size: 0.6rem; color: var(--muted); letter-spacing: 0.08em;
+  text-transform: uppercase; padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+.ops-task-item {
+  padding: 0.3rem 0.4rem; border-radius: 4px;
+  border-left: 3px solid var(--dim); font-size: 0.6rem;
+  background: var(--bg); margin-bottom: 0.25rem;
+}
+.ops-task-item.in_progress { border-left-color: var(--cyan); }
+.ops-task-item.queued { border-left-color: #ffcc00; }
+.ops-task-item.completed { border-left-color: #00e676; opacity: 0.5; }
+.ops-task-item.failed { border-left-color: #ff4444; }
+.ops-task-title { font-weight: 500; color: var(--text); }
+.ops-task-meta { font-size: 0.5rem; color: var(--dim); margin-top: 0.1rem; }
+.ops-doc-change {
+  font-size: 0.55rem; padding: 0.2rem 0.3rem;
+  border-left: 2px solid var(--magenta); margin-bottom: 0.15rem;
+}
+.ops-doc-change a { color: var(--cyan); cursor: pointer; }
+@media (max-width: 1200px) {
+  .ops-view { grid-template-columns: 1fr; }
+  .ops-sidebar { display: none; }
+  .ops-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
+}
+@media (max-width: 600px) {
+  .ops-grid { grid-template-columns: 1fr; grid-template-rows: repeat(8, minmax(120px, 1fr)); }
+}
 </style>
 </head>
 <body>
@@ -660,6 +753,7 @@ body.offline main { padding-top: 2.5rem; }
   <span class="logo" onclick="goHome()">holm.chat</span>
   <span id="doc-count" style="font-size:0.6rem;color:var(--dim);margin-left:-0.5rem"></span>
   <nav>
+    <button onclick="openOps()" style="font-size:0.75rem;color:var(--muted);padding:0.3rem 0;transition:color 0.15s;letter-spacing:0.06em" onmouseover="this.style.color='var(--magenta)'" onmouseout="this.style.color='var(--muted)'">ops</button>
     <button onclick="openGraph()" style="font-size:0.75rem;color:var(--muted);padding:0.3rem 0;transition:color 0.15s" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--muted)'">graph</button>
     <button onclick="openRandom()" style="font-size:0.75rem;color:var(--muted);padding:0.3rem 0;transition:color 0.15s" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--muted)'">random</button>
     <button class="search-trigger" onclick="openSearch()">search <kbd>/</kbd></button>
@@ -815,6 +909,8 @@ function goHome() {
   histStack = [];
   currentDocId = null;
   currentDomain = null;
+  var mainEl = document.getElementById('main');
+  mainEl.style.maxWidth = ''; mainEl.style.padding = '';
   renderHome();
   history.replaceState(null, '', '/');
   progressBar.classList.remove('visible'); progressBar.style.width = '0%';
@@ -880,6 +976,7 @@ function goBack() {
 
 window.addEventListener('popstate', function() {
   var h = location.hash.slice(1);
+  if (h === 'ops') { renderOpsCenter(); return; }
   if (h === 'graph') { renderGraph(); return; }
   if (h.startsWith('d/')) { openDomain(h.slice(2)); return; }
   if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
@@ -1613,12 +1710,320 @@ function renderMiniGraph(doc) {
   container.querySelector('.mini-graph-svg').innerHTML = svg;
 }
 
+/* ── Ops Center (Mission Control) ── */
+var opsAutoScroll = {};
+var opsDocChanges = [];
+var opsSseListenerAdded = false;
+
+function openOps() {
+  if (graphAnim) { cancelAnimationFrame(graphAnim); graphAnim = null; }
+  histStack = [];
+  currentDocId = null;
+  currentDomain = null;
+  renderOpsCenter();
+  history.pushState({ ops: true }, '', '#ops');
+}
+
+function renderOpsCenter() {
+  var el = document.getElementById('main');
+  el.style.maxWidth = 'none';
+  el.style.padding = '0';
+
+  var html = '<div class="ops-view">';
+
+  // Status bar
+  html += '<div class="ops-status-bar" id="ops-status-bar">';
+  html += '<div class="ops-stat"><span class="orch-dot" id="ops-orch-dot"></span><span class="ops-stat-label">Orchestrator</span></div>';
+  html += '<div class="ops-stat"><span class="ops-stat-label">Workers</span><span class="ops-stat-value" id="ops-workers">0/8</span></div>';
+  html += '<div class="ops-stat"><span class="ops-stat-label">Tasks</span><span class="ops-stat-value" id="ops-tasks-done">0</span></div>';
+  html += '<div class="ops-stat"><span class="ops-stat-label">Cost</span><span class="ops-stat-value" id="ops-cost">$0.00</span></div>';
+  html += '<div class="ops-stat"><span class="ops-stat-label">Rate</span><span class="ops-stat-value" id="ops-rate">0/900</span></div>';
+  html += '<div class="ops-stat"><span class="ops-stat-label">Uptime</span><span class="ops-stat-value" id="ops-uptime">--</span></div>';
+  html += '</div>';
+
+  // Grid of 8 terminal panels
+  html += '<div class="ops-grid" id="ops-grid">';
+  for (var i = 1; i <= 8; i++) {
+    var wid = 'worker-' + String(i).padStart(2, '0');
+    var color = WORKER_COLORS[i - 1];
+    html += '<div class="ops-panel idle" id="ops-panel-' + wid + '">';
+    html += '<div class="ops-panel-header">';
+    html += '<div class="ops-panel-dot" id="ops-dot-' + wid + '" style="background:' + color + '"></div>';
+    html += '<span class="ops-panel-id" style="color:' + color + '">' + wid + '</span>';
+    html += '<span class="ops-panel-task" id="ops-task-' + wid + '">idle</span>';
+    html += '<span class="ops-panel-cost" id="ops-cost-' + wid + '"></span>';
+    html += '</div>';
+    html += '<div class="ops-terminal" id="ops-term-' + wid + '"></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Sidebar: task pipeline + doc changes
+  html += '<div class="ops-sidebar" id="ops-sidebar">';
+  html += '<div class="ops-sidebar-title">Task Pipeline</div>';
+  html += '<div id="ops-task-list" style="flex:1;overflow-y:auto">Loading...</div>';
+  html += '<div class="ops-sidebar-title" style="margin-top:0.5rem">Recent File Changes</div>';
+  html += '<div id="ops-doc-changes" style="max-height:150px;overflow-y:auto"><div style="font-size:0.55rem;color:var(--dim)">No changes yet</div></div>';
+  html += '</div>';
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Init auto-scroll and attach scroll listeners
+  for (var i = 1; i <= 8; i++) {
+    var wid = 'worker-' + String(i).padStart(2, '0');
+    opsAutoScroll[wid] = true;
+    (function(id) {
+      var term = document.getElementById('ops-term-' + id);
+      if (term) term.addEventListener('scroll', function() {
+        var atBottom = (this.scrollHeight - this.scrollTop - this.clientHeight) < 30;
+        opsAutoScroll[id] = atBottom;
+      });
+    })(wid);
+  }
+
+  // Load initial data
+  opsLoadInitialData();
+
+  // Ensure SSE is connected and add ops listeners
+  if (!sseSource) connectSSE();
+  opsAttachSSEListeners();
+}
+
+async function opsLoadInitialData() {
+  // Fetch orchestrator state, workers, tasks in parallel
+  try {
+    var results = await Promise.all([
+      fetch('/api/orchestrator').then(function(r) { return r.json(); }).catch(function() { return {}; }),
+      fetch('/api/workers').then(function(r) { return r.json(); }).catch(function() { return []; }),
+      fetch('/api/tasks').then(function(r) { return r.json(); }).catch(function() { return []; })
+    ]);
+
+    orchState = results[0];
+    opsRenderStatusBar();
+
+    // Update panel headers from worker data + load their log buffers
+    var workers = results[1];
+    for (var i = 0; i < workers.length; i++) {
+      opsUpdatePanelHeader(workers[i]);
+      opsLoadWorkerLogs(workers[i]._id);
+    }
+
+    opsRenderTaskList(results[2]);
+  } catch(e) {}
+}
+
+function opsLoadWorkerLogs(wid) {
+  fetch('/api/workers/' + wid + '/logs')
+    .then(function(r) { return r.json(); })
+    .then(function(logs) {
+      var term = document.getElementById('ops-term-' + wid);
+      if (!term) return;
+      term.innerHTML = '';
+      for (var i = 0; i < logs.length; i++) {
+        opsAppendLine(wid, logs[i]);
+      }
+    })
+    .catch(function() {});
+}
+
+function opsAttachSSEListeners() {
+  if (opsSseListenerAdded || !sseSource) return;
+  opsSseListenerAdded = true;
+
+  sseSource.addEventListener('worker_log', function(e) {
+    try {
+      var data = JSON.parse(e.data);
+      if (document.getElementById('ops-grid')) {
+        opsAppendLine(data.workerId, data);
+      }
+    } catch(err) {}
+  });
+
+  sseSource.addEventListener('worker', function(e) {
+    try {
+      var w = JSON.parse(e.data);
+      if (document.getElementById('ops-grid')) {
+        opsUpdatePanelHeader(w);
+      }
+    } catch(err) {}
+  });
+
+  sseSource.addEventListener('orchestrator', function(e) {
+    try {
+      orchState = JSON.parse(e.data);
+      if (document.getElementById('ops-grid')) opsRenderStatusBar();
+    } catch(err) {}
+  });
+
+  sseSource.addEventListener('task', function(e) {
+    if (document.getElementById('ops-grid')) {
+      fetch('/api/tasks').then(function(r) { return r.json(); }).then(opsRenderTaskList).catch(function() {});
+    }
+  });
+
+  sseSource.addEventListener('doc_created', function(e) {
+    if (document.getElementById('ops-grid')) {
+      try {
+        var data = JSON.parse(e.data);
+        opsAddDocChange(data.docId || data._id || '?', data.title || '');
+      } catch(err) {}
+    }
+  });
+}
+
+function opsAppendLine(workerId, entry) {
+  var term = document.getElementById('ops-term-' + workerId);
+  if (!term) return;
+
+  var div = document.createElement('div');
+  div.className = 'ops-line ' + (entry.type || 'text');
+
+  var text = entry.text || '';
+
+  // Timestamp prefix
+  var tsStr = '';
+  if (entry.ts) {
+    var d = new Date(entry.ts);
+    tsStr = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0');
+  }
+
+  // Linkify docIds (DOC-XXX-NNN patterns)
+  var linkedText = esc(text).replace(/((?:DOC|META|FW|HIC|PROJ|LOG)-[\w]+-\d{3})/g, function(match) {
+    return '<a class="ops-file-link" onclick="openDoc(\'' + match + '\')">' + match + '</a>';
+  });
+
+  div.innerHTML = '<span class="ops-line-ts">' + tsStr + '</span>' + linkedText;
+
+  // Track file changes from tool lines
+  if (entry.type === 'tool' && text.indexOf('[Edit]') !== -1) {
+    var fmatch = text.match(/\/([\w/.+-]+)/);
+    if (fmatch) opsAddDocChange(fmatch[0], workerId);
+  }
+
+  term.appendChild(div);
+
+  // Auto-scroll
+  if (opsAutoScroll[workerId]) {
+    term.scrollTop = term.scrollHeight;
+  }
+
+  // Cap DOM nodes at 500
+  while (term.children.length > 500) {
+    term.removeChild(term.firstChild);
+  }
+}
+
+function opsUpdatePanelHeader(worker) {
+  if (!worker || !worker._id) return;
+  var wid = worker._id;
+  var panel = document.getElementById('ops-panel-' + wid);
+  var dot = document.getElementById('ops-dot-' + wid);
+  var taskEl = document.getElementById('ops-task-' + wid);
+  var costEl = document.getElementById('ops-cost-' + wid);
+
+  if (panel) {
+    panel.className = 'ops-panel ' + (worker.status || 'idle');
+  }
+  if (dot) {
+    var color = workerColor(wid);
+    if (worker.status === 'working') {
+      dot.style.background = color;
+      dot.className = 'ops-panel-dot working';
+    } else {
+      dot.style.background = 'var(--dim)';
+      dot.className = 'ops-panel-dot';
+    }
+  }
+  if (taskEl) {
+    taskEl.textContent = worker.currentTaskTitle || worker.currentTaskId || (worker.status === 'removed' ? 'removed' : 'idle');
+  }
+  if (costEl && worker.sessionCost) {
+    costEl.textContent = '$' + worker.sessionCost.toFixed(2);
+  }
+
+  // If worker was removed, clear terminal
+  if (worker.status === 'removed') {
+    var term = document.getElementById('ops-term-' + wid);
+    if (term) term.innerHTML = '';
+  }
+}
+
+function opsRenderStatusBar() {
+  if (!orchState) return;
+  var dot = document.getElementById('ops-orch-dot');
+  if (dot) dot.className = 'orch-dot ' + (orchState.running ? 'running' : 'stopped');
+  var w = document.getElementById('ops-workers');
+  if (w) w.textContent = (orchState.activeWorkers || 0) + '/' + (orchState.maxWorkers || 8);
+  var td = document.getElementById('ops-tasks-done');
+  if (td) td.textContent = orchState.totalIterations || 0;
+  var c = document.getElementById('ops-cost');
+  if (c) c.textContent = '$' + (orchState.totalCost || 0).toFixed(2);
+  var rl = orchState.rateLimitBudget || {};
+  var used = rl.promptsUsed || 0;
+  var limit = rl.promptsLimit || 900;
+  var rate = document.getElementById('ops-rate');
+  if (rate) {
+    rate.textContent = used + '/' + limit;
+    var pct = limit > 0 ? used / limit : 0;
+    rate.className = 'ops-stat-value' + (pct > 0.8 ? ' danger' : pct > 0.5 ? ' warn' : '');
+  }
+  var uptime = document.getElementById('ops-uptime');
+  if (uptime && orchState.startedAt) {
+    var elapsed = Math.floor((Date.now() - new Date(orchState.startedAt).getTime()) / 1000);
+    if (elapsed < 60) uptime.textContent = elapsed + 's';
+    else if (elapsed < 3600) uptime.textContent = Math.floor(elapsed / 60) + 'm';
+    else uptime.textContent = Math.floor(elapsed / 3600) + 'h ' + Math.floor((elapsed % 3600) / 60) + 'm';
+  }
+}
+
+function opsRenderTaskList(tasks) {
+  var el = document.getElementById('ops-task-list');
+  if (!el) return;
+  if (!tasks || tasks.length === 0) {
+    el.innerHTML = '<div style="font-size:0.6rem;color:var(--dim);text-align:center;padding:0.5rem">No tasks</div>';
+    return;
+  }
+  var order = { in_progress: 0, queued: 1, planned: 2, completed: 3, failed: 4, skipped: 5 };
+  tasks.sort(function(a, b) { return (order[a.status] || 9) - (order[b.status] || 9); });
+  el.innerHTML = tasks.slice(0, 30).map(function(t) {
+    var wb = '';
+    if (t.assignedWorker) {
+      var wc = workerColor(t.assignedWorker);
+      wb = ' <span style="color:' + wc + '">' + t.assignedWorker.replace('worker-', 'W') + '</span>';
+    }
+    return '<div class="ops-task-item ' + (t.status || 'planned') + '">' +
+      '<div class="ops-task-title">' + esc((t.title || '').slice(0, 60)) + '</div>' +
+      '<div class="ops-task-meta">' + esc(t.taskId || '') + wb + '</div></div>';
+  }).join('');
+}
+
+function opsAddDocChange(path, source) {
+  opsDocChanges.unshift({ path: path, source: source, ts: new Date() });
+  if (opsDocChanges.length > 20) opsDocChanges.length = 20;
+  var el = document.getElementById('ops-doc-changes');
+  if (!el) return;
+  el.innerHTML = opsDocChanges.map(function(c) {
+    var ts = String(c.ts.getHours()).padStart(2, '0') + ':' + String(c.ts.getMinutes()).padStart(2, '0');
+    var link = c.path;
+    // Make docIds clickable
+    if (docsById[c.path]) {
+      link = '<a class="ops-file-link" onclick="openDoc(\'' + esc(c.path) + '\')">' + esc(c.path) + '</a>';
+    } else {
+      link = esc(c.path);
+    }
+    return '<div class="ops-doc-change"><span class="ops-line-ts">' + ts + '</span> ' + link + ' <span style="color:var(--dim)">' + esc(String(c.source)) + '</span></div>';
+  }).join('');
+}
+
 /* ── Full Graph Visualization ── */
 var graphAnim = null;
 function openGraph() {
   histStack = [];
   currentDocId = null;
   currentDomain = null;
+  var mainEl = document.getElementById('main');
+  mainEl.style.maxWidth = ''; mainEl.style.padding = '';
   renderGraph();
   history.pushState({ graph: true }, '', '#graph');
 }
@@ -2498,7 +2903,8 @@ async function init() {
     try { sessionStorage.setItem('holm-doc-index', JSON.stringify(allDocs)); } catch(e) {}
 
     var h = location.hash.slice(1);
-    if (h === 'graph') { renderGraph(); }
+    if (h === 'ops') { renderOpsCenter(); }
+    else if (h === 'graph') { renderGraph(); }
     else if (h.startsWith('d/')) { openDomain(h.slice(2)); }
     else if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
     else renderHome();
@@ -2513,7 +2919,8 @@ async function init() {
         document.getElementById('doc-count').textContent = allDocs.length + ' docs (cached)';
         toast('Loaded cached index');
         var h = location.hash.slice(1);
-        if (h === 'graph') { renderGraph(); }
+        if (h === 'ops') { renderOpsCenter(); }
+        else if (h === 'graph') { renderGraph(); }
         else if (h.startsWith('d/')) { openDomain(h.slice(2)); }
         else if (h && docsById[h]) { currentDocId = h; renderDoc(h); }
         else renderHome();
